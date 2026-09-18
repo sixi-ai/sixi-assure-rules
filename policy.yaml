@@ -1,0 +1,8 @@
+# Policy values consumed by CEL helper required("<key>") — tenant may raise, never lower below regime minimum
+retention_days:
+  default: 365
+  FINMA: 3650        # CH Code of Obligations Art. 958f
+  CH-CO: 3650        # CH Code of Obligations Art. 958f (log pack regime CH-CO)
+  AIACT_deployer: 180 # AI Act Art. 26(6)
+regions:
+  allowed_default: [switzerlandnorth, switzerlandwest]

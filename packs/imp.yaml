@@ -1,0 +1,18 @@
+# IMP — import quality (docs/13, ADR-011). Deterministic CEL; the LLM never creates findings.
+# Imported cells whose draw.io shape could not be mapped to a type (docs/02 §2) become `app`
+# nodes flagged `x_unmapped_style`. Rules only assess typed components, so the user must finish
+# the typing before the assessment of an imported map can be trusted.
+pack: imp
+version: 0.1.0
+regimes: [FINMA, CH-CO, FADP, CH-ISG, DORA, AIACT, CRA, NIS2, ISO, MCSB, NIST, IEC, OWASP, MAESTRO, MSFT]
+rules:
+  - id: IMP-001
+    title: Untyped component from import
+    scope: node
+    severity: low
+    condition: 'attr(n, "x_unmapped_style", "") != ""'
+    message: "{{n.name}} was imported without a recognised type; complete its type before trusting the assessment."
+    clauses: [MCSB:v1:IM-1]
+    remediation: "Open the node and set its type (and the attributes the type requires): the draw.io shape was not recognised, so no rule assesses this component yet."
+    fixtures: { positive: fixtures/IMP-001.pos.json, negative: fixtures/IMP-001.neg.json }
+    tags: [import]

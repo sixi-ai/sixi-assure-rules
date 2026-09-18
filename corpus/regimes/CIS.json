@@ -1,0 +1,27 @@
+[
+  {
+    "id": "CIS:Azure:1.x",
+    "regime": "CIS",
+    "doc": "CIS Microsoft Azure Foundations Benchmark",
+    "ref": "Section 1 (Identity and Access Management)",
+    "title": "Identity and access management recommendations",
+    "summary": "Section-level reference to the identity and access management recommendations of the CIS Microsoft Azure Foundations Benchmark, which cover administrative accounts, multi-factor authentication, guest access and related tenant configuration.",
+    "excerpt": "",
+    "version": "2026-09-10",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.cisecurity.org/benchmark/azure",
+    "tags": [
+      "identity",
+      "access-control",
+      "benchmark",
+      "azure"
+    ],
+    "licence": "cis-benchmark",
+    "verified": false,
+    "note": "The benchmark name and the current version (Microsoft Azure Foundations 6.0.0) were verified via cisecurity.org on 2026-09-10, but the benchmark PDF requires registration and the section numbering used by the rule pack (1.x) could not be confirmed for that version; recommendation text is not reproduced because CIS Benchmarks are licensed under CC BY-NC-SA.",
+    "redacted": "licence"
+  }
+]

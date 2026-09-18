@@ -1,0 +1,446 @@
+[
+  {
+    "id": "EU-GMP:Annex11:Principle",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Principle",
+    "title": "Principle",
+    "summary": "The annex covers every computerised system used in GMP-regulated activities: applications are validated, IT infrastructure is qualified, and automating a manual operation must not lower quality or raise process risk.",
+    "excerpt": "This annex applies to all forms of computerised systems used as part of a GMP regulated activities. A computerised system is a set of software and hardware components which together fulfill certain functionalities. The application should be validated; IT infrastructure should be qualified. Where a computerised system replaces a manual operation, there should be no resultant decrease in product …",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "scope",
+      "validation",
+      "qualification",
+      "gxp"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:1",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 1",
+    "title": "Risk Management",
+    "summary": "Risk management applies across the system lifecycle, weighing patient safety, data integrity and product quality; the extent of validation and data-integrity controls rests on a documented risk assessment.",
+    "excerpt": "Risk management should be applied throughout the lifecycle of the computerised system taking into account patient safety, data integrity and product quality. As part of a risk management system, decisions on the extent of validation and data integrity controls should be based on a justified and documented risk assessment of the computerised system.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "risk",
+      "lifecycle",
+      "data-integrity"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:2",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 2",
+    "title": "Personnel",
+    "summary": "Process owner, system owner, qualified persons and IT cooperate; everyone has suitable qualifications, access levels and defined responsibilities.",
+    "excerpt": "There should be close cooperation between all relevant personnel such as Process Owner, System Owner, Qualified Persons and IT. All personnel should have appropriate qualifications, level of access and defined responsibilities to carry out their assigned duties.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "roles",
+      "responsibilities",
+      "access"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:3",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 3",
+    "title": "Suppliers and Service Providers",
+    "summary": "Third parties that provide, operate, maintain or host a computerised system or process data need formal agreements stating their responsibilities; supplier selection and audits are risk-based, and supplier quality information is available to inspectors.",
+    "excerpt": "3.1 When third parties (e.g. suppliers, service providers) are used e.g. to provide, install, configure, integrate, validate, maintain (e.g. via remote access), modify or retain a computerised system or related service or for data processing, formal agreements must exist between the manufacturer and any third parties, and these agreements should include clear statements of the responsibilities …",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "third-party",
+      "suppliers",
+      "cloud",
+      "agreements"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:4",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 4",
+    "title": "Validation",
+    "summary": "Validation documentation covers the lifecycle and is justified by risk assessment, including change control and deviations; user requirements are traceable, test scenarios cover limits and error handling, and data migrations are checked for unchanged values and meaning.",
+    "excerpt": "4.1 The validation documentation and reports should cover the relevant steps of the life cycle. Manufacturers should be able to justify their standards, protocols, acceptance criteria, procedures and records based on their risk assessment. 4.2 Validation documentation should include change control records (if applicable) and reports on any deviations observed during the validation process.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "validation",
+      "testing",
+      "requirements",
+      "lifecycle"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:4.3",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 4.3",
+    "title": "System inventory and description",
+    "summary": "An up-to-date inventory of systems and their GMP functionality is kept; critical systems also have a current description of physical and logical arrangement, data flows, interfaces, prerequisites and security measures.",
+    "excerpt": "4.3 An up to date listing of all relevant systems and their GMP functionality (inventory) should be available. For critical systems an up to date system description detailing the physical and logical arrangements, data flows and interfaces with other systems or processes, any hardware and software pre-requisites, and security measures should be available.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "inventory",
+      "architecture",
+      "data-flows",
+      "documentation"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:5",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 5",
+    "title": "Data",
+    "summary": "Systems that exchange data electronically include built-in checks for correct and secure entry and processing of that data.",
+    "excerpt": "Computerised systems exchanging data electronically with other systems should include appropriate built-in checks for the correct and secure entry and processing of data, in order to minimize the risks.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "interfaces",
+      "input-validation",
+      "data-integrity"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:6",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 6",
+    "title": "Accuracy Checks",
+    "summary": "Critical data entered manually gets an additional accuracy check by a second operator or validated electronic means, scaled by the consequences of erroneous entry.",
+    "excerpt": "For critical data entered manually, there should be an additional check on the accuracy of the data. This check may be done by a second operator or by validated electronic means. The criticality and the potential consequences of erroneous or incorrectly entered data to a system should be covered by risk management.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "data-entry",
+      "four-eyes",
+      "data-integrity"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:7",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 7",
+    "title": "Data Storage",
+    "summary": "Data is protected physically and electronically, checked for accessibility, readability and accuracy, and accessible throughout the retention period; regular backups are made and restoration is verified during validation and periodically.",
+    "excerpt": "7.1 Data should be secured by both physical and electronic means against damage. Stored data should be checked for accessibility, readability and accuracy. Access to data should be ensured throughout the retention period. 7.2 Regular back-ups of all relevant data should be done. Integrity and accuracy of back- up data and the ability to restore the data should be checked during validation and …",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "storage",
+      "backup",
+      "retention",
+      "restore"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:8",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 8",
+    "title": "Printouts",
+    "summary": "Clear printed copies of electronic data can be obtained; for batch-release records, printouts show whether data changed after the original entry.",
+    "excerpt": "8.1 It should be possible to obtain clear printed copies of electronically stored data. 8.2 For records supporting batch release it should be possible to generate printouts indicating if any of the data has been changed since the original entry.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "records",
+      "printouts",
+      "batch-release"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:9",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 9",
+    "title": "Audit Trails",
+    "summary": "Based on risk, the system records all GMP-relevant changes and deletions in a system-generated audit trail with the reason for each; audit trails are available in intelligible form and regularly reviewed.",
+    "excerpt": "Consideration should be given, based on a risk assessment, to building into the system the creation of a record of all GMP-relevant changes and deletions (a system generated \"audit trail\"). For change or deletion of GMP-relevant data the reason should be documented. Audit trails need to be available and convertible to a generally intelligible form and regularly reviewed.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "audit-trail",
+      "logging",
+      "review",
+      "data-integrity"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:10",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 10",
+    "title": "Change and Configuration Management",
+    "summary": "Changes to a computerised system, including its configuration, are made only in a controlled way under a defined procedure.",
+    "excerpt": "Any changes to a computerised system including system configurations should only be made in a controlled manner in accordance with a defined procedure.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "change-control",
+      "configuration",
+      "lifecycle"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:11",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 11",
+    "title": "Periodic evaluation",
+    "summary": "Systems are evaluated periodically to show they remain in a validated state and meet GMP, looking at functionality, deviations, incidents, upgrades, performance, reliability, security and validation status.",
+    "excerpt": "Computerised systems should be periodically evaluated to confirm that they remain in a valid state and are compliant with GMP. Such evaluations should include, where appropriate, the current range of functionality, deviation records, incidents, problems, upgrade history, performance, reliability, security and validation status reports.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "periodic-review",
+      "validation",
+      "monitoring"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:12",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 12",
+    "title": "Security",
+    "summary": "Physical and logical controls restrict access to authorised persons, scaled to criticality; granting and revoking access is recorded, and data systems record who entered, changed, approved or deleted data and when.",
+    "excerpt": "12.1 Physical and/or logical controls should be in place to restrict access to computerised system to authorised persons. Suitable methods of preventing unauthorised entry to the system may include the use of keys, pass cards, personal codes with passwords, biometrics, restricted access to computer equipment and data storage areas. 12.2 The extent of security controls depends on the criticality …",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "access-control",
+      "identity",
+      "audit-trail",
+      "security"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:13",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 13",
+    "title": "Incident Management",
+    "summary": "All incidents, not only failures and data errors, are reported and assessed; the root cause of a critical incident drives corrective and preventive action.",
+    "excerpt": "All incidents, not only system failures and data errors, should be reported and assessed. The root cause of a critical incident should be identified and should form the basis of corrective and preventive actions.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "incidents",
+      "capa",
+      "root-cause"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:14",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 14",
+    "title": "Electronic Signature",
+    "summary": "Electronic signatures have the same effect as handwritten ones within the company, are permanently linked to their record and carry the date and time they were applied.",
+    "excerpt": "Electronic records may be signed electronically. Electronic signatures are expected to: a. have the same impact as hand-written signatures within the boundaries of the company, b. be permanently linked to their respective record, c. include the time and date that they were applied.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "electronic-signatures",
+      "approval",
+      "integrity"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:15",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 15",
+    "title": "Batch release",
+    "summary": "Where a computerised system records batch release, only qualified persons may release batches, the system identifies and records the person who did, and the release is signed electronically.",
+    "excerpt": "When a computerised system is used for recording certification and batch release, the system should allow only Qualified Persons to certify the release of the batches and it should clearly identify and record the person releasing or certifying the batches. This should be performed using an electronic signature.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "batch-release",
+      "qualified-person",
+      "electronic-signatures"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:16",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 16",
+    "title": "Business Continuity",
+    "summary": "Systems supporting critical processes have documented and tested continuity arrangements (e.g. a manual or alternative system) with a risk-based time to bring them into use.",
+    "excerpt": "For the availability of computerised systems supporting critical processes, provisions should be made to ensure continuity of support for those processes in the event of a system breakdown (e.g. a manual or alternative system). The time required to bring the alternative arrangements into use should be based on risk and appropriate for a particular system and the business process it supports. …",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "continuity",
+      "resilience",
+      "fallback"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  },
+  {
+    "id": "EU-GMP:Annex11:17",
+    "regime": "EU-GMP",
+    "doc": "EudraLex Volume 4 (GMP) — Annex 11: Computerised Systems, revision 1",
+    "ref": "Section 17",
+    "title": "Archiving",
+    "summary": "Archived data is checked for accessibility, readability and integrity, and retrievability is ensured and tested before relevant system changes.",
+    "excerpt": "Data may be archived. This data should be checked for accessibility, readability and integrity. If relevant changes are to be made to the system (e.g. computer equipment or programs), then the ability to retrieve the data should be ensured and tested.",
+    "version": "2010-12-20",
+    "effective": "2011-06-30",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+    "tags": [
+      "archiving",
+      "retention",
+      "retrieval"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the Commission PDF (SANCO/C8/AM/sl/ares(2010)1064599, in operation from 30 June 2011), the version listed as current on the EudraLex Volume 4 page on that date. A revision was consulted from 7 July to 7 October 2025; it is not loaded until the Commission adopts it."
+  }
+]

@@ -1,0 +1,59 @@
+{
+  "id": "arch_fx_imp_001_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture IMP-001 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth"
+    ],
+    "x_import_source": "drawio"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_web",
+      "type": "app",
+      "name": "Chat web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Core banking database",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "cid",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_web",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

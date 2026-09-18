@@ -1,0 +1,90 @@
+{
+  "id": "arch_fx_ai_011_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture AI-011 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_a",
+      "type": "agent",
+      "name": "Orchestrator",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_b",
+      "type": "agent",
+      "name": "Worker",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "autonomous",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Log Analytics",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_a",
+      "to": "n_b",
+      "kind": "delegates",
+      "auth": "obo",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_a",
+      "to": "n_logs",
+      "kind": "writes",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

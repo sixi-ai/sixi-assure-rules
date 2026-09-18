@@ -1,0 +1,2 @@
+Nightly export URL handed to the partner:
+https://examplestore.blob.core.windows.net/exports/report.csv?sv=2022-11-02&ss=b&srt=sco&sp=rl&se=2030-01-01T00%3A00%3A00Z&spr=https&sig=EXAMPLEnotarealsignature0123456789abcdefgh%3D

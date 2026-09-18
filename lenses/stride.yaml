@@ -1,0 +1,123 @@
+# STRIDE lens — every rule in packs/ classified by the threat category its finding belongs to.
+# Data only: no loader reads this file in slice 1 (see lenses/README.md). A lens NEVER produces
+# a finding (CLAUDE.md §1.2); it re-labels a finding a deterministic rule already made, so a security
+# reviewer can read the assessment in the vocabulary of their own threat model.
+lens: stride
+version: 2026-09-16
+source: https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats
+licence: none (our own classification; STRIDE itself is a taxonomy, not a licensed artefact)
+accessed: 2026-09-16
+notes: |
+  Covers all 85 rules in packs/*.yaml as of 2026-09-16. The classification is ours: it says which
+  property of the system the drawn weakness puts at risk, not which attack will happen. Several rules
+  carry more than one letter; the order follows the acronym. Repudiation (R) is used for the evidence
+  and accountability gaps — missing logs, missing owner, missing inventory entry — because that is the
+  property a design-time assessment can actually evidence.
+categories:
+  S: Spoofing — an identity can be assumed or is not distinct
+  T: Tampering — data, code, configuration or model behaviour can be altered
+  R: Repudiation — the action leaves no evidence, or no one is accountable for it
+  I: Information disclosure — data reaches somewhere it should not
+  D: Denial of service — the function cannot be delivered or recovered
+  E: Elevation of privilege — a component acts with more authority than its task needs
+map:
+  # ---- agt
+  AGT-001:  [S, T]         # Third-party tool shadows the name of another tool
+  AGT-002:  [T, E]         # Declared behaviour hides a secondary action
+  AGT-003:  [T, I, E]      # Agent ingests third-party content without content safety
+  AGT-004:  [T]            # Third-party tool or MCP server not pinned against later change
+  AGT-005:  [T, E]         # Agent holds an unvetted third-party tool and a write capability
+  AGT-006:  [T, E]         # Autonomous agent reaches a code-executing tool with no approval step
+  AGT-007:  [T]            # Third-party component declares no capabilities and cannot be assessed
+  # ---- ai
+  AI-001:   [I, D]         # LLM called without an AI gateway
+  AI-002:   [T, I]         # User-facing agent without content safety
+  AI-003:   [E]            # Consequential agent action without human approval
+  AI-004:   [T]            # Agents without an evaluation / drift-monitoring node
+  AI-005:   [R]            # Incomplete AI inventory fields
+  AI-006:   [R]            # AI Act risk tier not declared
+  AI-007:   [S]            # User-facing agent without AI disclosure
+  AI-008:   [I, E]         # Tool or MCP server with unrestricted scopes
+  AI-009:   [T]            # Third-party tool or MCP server not vetted
+  AI-010:   [D]            # Autonomous agent without kill switch and rate limit
+  AI-011:   [R]            # Hop to an autonomous agent not logged
+  AI-012:   [S]            # User-facing agent output not marked as AI-generated
+  AI-013:   [R]            # LLM endpoint without model documentation
+  AI-014:   [R]            # Evaluation declares no scope
+  AI-015:   [T]            # High-risk system evaluated without robustness and bias coverage
+  # ---- c4
+  STR-001:  [R]            # Component declared without a containing element
+  STR-002:  [S, E]         # Relationship crosses a boundary without authentication
+  STR-003:  [R]            # Accepted decision without a citation
+  STR-004:  [S, E]         # Container calls other components without a workload identity
+  STR-005:  [I, E]         # Agent reaches an MCP server with no gateway on the path
+  STR-006:  [S, E]         # Service-to-service relationship authenticated with a shared secret
+  STR-007:  [R]            # Context-level element without any relationship
+  STR-008:  [R]            # C4 parent is missing or not above the element
+  # ---- data
+  DATA-001: [I]            # Sensitive data embedded without classification or redaction
+  DATA-002: [I, E]         # Retrieval over a sensitive index without ACL trimming
+  DATA-003: [I]            # Sensitive data outside allowed regions
+  DATA-004: [I]            # Sensitive datastore without customer-managed keys
+  DATA-005: [D]            # Critical datastore without backups
+  DATA-006: [I]            # PII or secrets sent to an LLM endpoint
+  # ---- drift
+  DRF-001:  [T, D]         # Element uses a service or feature the knowledge base records as deprecated
+  DRF-002:  [R]            # Accepted decision rests on a document that has moved on
+  DRF-003:  [R]            # Element documentation link is stale, superseded or unreachable
+  DRF-004:  [T, D]         # Relationship names a deprecated feature or protocol
+  # ---- gov
+  GOV-001:  [R]            # Architecture without an owner
+  GOV-002:  [R]            # Incident reporting path not defined (ISG / DORA / NIS2 / CRA)
+  CRA-001:  [T, R]         # CRA product without SBOM
+  CRA-002:  [T, E]         # CRA product without secure boot or signed updates
+  # ---- gxp
+  GXP-001:  [T, R]         # No immutable audit trail for GxP records
+  GXP-002:  [S, R]         # Electronic approval not bound to the signer's own identity
+  GXP-003:  [D]            # GxP data store without backups
+  GXP-004:  [T]            # Configured or custom GxP software without a supplier assessment
+  # ---- imp
+  IMP-001:  [R]            # Untyped component from import
+  # ---- log
+  LOG-001:  [R]            # AI components without a log sink
+  LOG-002:  [R]            # Log retention below the regime minimum
+  LOG-003:  [T, R]         # Log sink not immutable (FINMA)
+  LOG-004:  [R]            # LLM traffic not logged through a gateway
+  LOG-005:  [R]            # Agent tool calls not logged
+  # ---- mr
+  MR-001:   [R]            # Self-evolving ML safety function without third-party conformity assessment
+  MR-002:   [R]            # Machine write leaves no tracing log of the intervention
+  MR-003:   [R]            # Self-evolving safety system does not record its safety decisions
+  MR-004:   [T, R]         # AI command path on machinery without a substantial-modification assessment
+  # ---- net
+  NET-001:  [I, E]         # Datastore exposed to the public network
+  NET-002:  [I, D]         # LLM endpoint not on a private network
+  NET-003:  [T, D]         # Public app or API without a gateway/WAF in front
+  NET-004:  [I]            # Edge egress without an egress policy
+  NET-005:  [I, E]         # Edge traffic reaches a datastore without a broker/DMZ conduit
+  NET-006:  [T, I]         # Unencrypted or unknown transport encryption
+  # ---- ot
+  OT-001:   [T, E]         # AI component can reach a machine write without human approval
+  OT-002:   [T]            # Machine write not validated on the device
+  OT-003:   [S, E]         # AI component can reach the command-signing key
+  OT-004:   [T, E]         # Write crosses OT zones without a conduit
+  OT-005:   [T]            # OT data reaches an agent without content safety
+  OT-006:   [S, E]         # Command approval not bound to a separate human identity
+  OT-007:   [I]            # Data from several OT zones read by AI without row-level security
+  # ---- res
+  RES-001:  [D]            # Critical component without geo-redundancy
+  RES-002:  [D]            # Critical component without RTO/RPO
+  RES-003:  [D]            # Disaster recovery not tested (DORA)
+  # ---- tpr
+  TPR-001:  [R]            # External service not in the outsourcing register
+  TPR-002:  [D]            # Critical external service without exit strategy
+  # ---- zt
+  ZT-001:   [S, E]         # Shared secret on service-to-data edge
+  ZT-002:   [S, R]         # Agent without dedicated identity
+  ZT-003:   [S, E]         # Agent-to-agent delegation without OBO
+  ZT-004:   [E]            # Standing broad RBAC scope
+  ZT-005:   [E]            # Admin access without PIM/JIT
+  ZT-006:   [S, E]         # Public app or API accessed with an API key
+  ZT-007:   [I, E]         # Secrets kept outside a secret store
+  ZT-008:   [S, E]         # Agent calls tool/MCP server without authentication
+  ZT-009:   [S, E]         # Public app reached by a user without MFA

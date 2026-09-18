@@ -1,0 +1,7 @@
+{
+  "deprecated": {},
+  "freshness": {
+    "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/use-your-data": "superseded",
+    "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview": "fresh"
+  }
+}

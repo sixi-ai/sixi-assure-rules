@@ -1,0 +1,67 @@
+{
+  "id": "arch_fx_cra_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CRA-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FINMA",
+      "DORA",
+      "CH-ISG",
+      "CRA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "CISO on-call within 1 h; NCSC within 24 h (ISG); DORA Art. 19.",
+    "dr_tested_at": "2026-06-30"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_prod",
+      "type": "product",
+      "name": "GlassBox Edge appliance",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "cra_scope": true,
+        "sbom": true,
+        "secure_boot": true,
+        "ota_signed": true,
+        "version": "2.3.0"
+      }
+    },
+    {
+      "id": "n_dev",
+      "type": "edge_device",
+      "name": "Edge device",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": true,
+        "sbom": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_dev",
+      "to": "n_prod",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

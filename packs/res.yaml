@@ -1,0 +1,37 @@
+# RES — resilience (docs/03 §RES). Deterministic CEL; the LLM never creates findings.
+pack: res
+version: 0.1.0
+regimes: [DORA, FINMA]
+rules:
+  - id: RES-001
+    title: Critical component without geo-redundancy
+    scope: node
+    severity: high
+    condition: 'attr(n, "criticality", "") == "critical" && !attr(n, "geo_redundant", false)'
+    message: "Critical component {{n.name}} is not geo-redundant."
+    clauses: [DORA:2022/2554:Art11-12, FINMA:2023/1:Rz-BCM]
+    remediation: "Deploy across paired regions / availability zones with failover (geo_redundant=true)."
+    fixtures: { positive: fixtures/RES-001.pos.json, negative: fixtures/RES-001.neg.json }
+    tags: [resilience]
+
+  - id: RES-002
+    title: Critical component without RTO/RPO
+    scope: node
+    severity: medium
+    condition: 'attr(n, "criticality", "") == "critical" && (attr(n, "rto_min", 0) == 0 || attr(n, "rpo_min", 0) == 0)'
+    message: "Critical component {{n.name}} has no RTO/RPO defined."
+    clauses: [DORA:2022/2554:Art11]
+    remediation: "Define recovery time and recovery point objectives (rto_min, rpo_min) and test them."
+    fixtures: { positive: fixtures/RES-002.pos.json, negative: fixtures/RES-002.neg.json }
+    tags: [resilience, bcm]
+
+  - id: RES-003
+    title: Disaster recovery not tested (DORA)
+    scope: graph
+    severity: low
+    condition: 'regime("DORA") && attr(g, "dr_tested_at", "") == ""'
+    message: "No disaster-recovery test is recorded for this architecture."
+    clauses: [DORA:2022/2554:Art24-26]
+    remediation: "Run and record a DR test (dr_tested_at) at least yearly."
+    fixtures: { positive: fixtures/RES-003.pos.json, negative: fixtures/RES-003.neg.json }
+    tags: [resilience, dora, testing]

@@ -1,0 +1,84 @@
+[
+  {
+    "rule_id": "CRA-001",
+    "ids": [
+      "n_cam2",
+      "n_product"
+    ]
+  },
+  {
+    "rule_id": "CRA-002",
+    "ids": [
+      "n_plc1",
+      "n_vib3"
+    ]
+  },
+  {
+    "rule_id": "DATA-003",
+    "ids": [
+      "n_blob"
+    ]
+  },
+  {
+    "rule_id": "DATA-004",
+    "ids": [
+      "n_blob"
+    ]
+  },
+  {
+    "rule_id": "DATA-005",
+    "ids": [
+      "n_blob"
+    ]
+  },
+  {
+    "rule_id": "GOV-002",
+    "ids": [
+      "arch_demo_edge_iot_bad"
+    ]
+  },
+  {
+    "rule_id": "LOG-002",
+    "ids": [
+      "n_logs"
+    ]
+  },
+  {
+    "rule_id": "NET-004",
+    "ids": [
+      "e_egw_dmz",
+      "e_vib3_blob"
+    ]
+  },
+  {
+    "rule_id": "NET-005",
+    "ids": [
+      "e_vib3_blob"
+    ]
+  },
+  {
+    "rule_id": "NET-006",
+    "ids": [
+      "e_plc1_egw",
+      "e_vib3_blob"
+    ]
+  },
+  {
+    "rule_id": "RES-001",
+    "ids": [
+      "n_blob"
+    ]
+  },
+  {
+    "rule_id": "RES-002",
+    "ids": [
+      "n_blob"
+    ]
+  },
+  {
+    "rule_id": "RES-003",
+    "ids": [
+      "arch_demo_edge_iot_bad"
+    ]
+  }
+]

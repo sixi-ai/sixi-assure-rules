@@ -1,0 +1,35 @@
+{
+  "id": "arch_fx_drf_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DRF-003 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true
+      },
+      "external_ref": "https://learn.microsoft.com/en-us/azure/api-management/genai-gateway-capabilities"
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,106 @@
+# OT — AI in operational technology: the command path and zone isolation (docs/03 §OT). Deterministic CEL over the
+# model; the LLM never creates findings. The pack evidences the invariants of an AI assistant that reads a plant and
+# may propose machine commands: nothing an AI component does reaches a machine without a human approval under the
+# approver's own identity and a validation on the device; OT text is untrusted input; zones stay separate in the
+# data layer. "Machine write" = an edge of kind writes/executes into an edge_device.
+pack: ot
+version: 0.3.0
+regimes: [IEC, CRA, NIS2, AIACT, ISO, OWASP, MAESTRO, FDA, EU-GMP, MR]
+rules:
+  - id: OT-001
+    title: AI component can reach a machine write without human approval
+    scope: node
+    severity: critical
+    condition: |
+      n.type in ["agent","mcp_server","llm_endpoint","tool"] &&
+      g.writersInto("edge_device").exists(w, g.pathAvoiding(n.id, w, "human_step"))
+    message: "{{n.name}} can reach a write to an OT device without a human approval step on the path."
+    clauses: [AIACT:2024/1689:Art14, OWASP:LLMTop10:LLM06, OWASP:AgenticTop10:ASI02, IEC:62443-3-3:Standard, MR:2023/1230:AnnexIII-1.2.1]
+    remediation: "Let AI components only propose commands: route every command through a human approval step and a command broker the AI cannot call, and validate it on the device before it acts."
+    fixtures: { positive: fixtures/OT-001.pos.json, negative: fixtures/OT-001.neg.json }
+    tags: [ot, command-path, human-oversight]
+
+  - id: OT-002
+    title: Machine write not validated on the device
+    scope: edge
+    severity: high
+    condition: |
+      e.kind in ["writes","executes"] && e.to.type == "edge_device" && !attr(e.from, "command_validation", false) &&
+      g.upstreamAvoidingAttr(e.from.id, "command_validation").exists(c, !(c.layer in ["edge","human"]))
+    message: "{{e.from.name}} writes {{e.to.name}} on commands that reach it from outside the site, and nothing on that path validates them on the device."
+    clauses: [IEC:62443-4-2:CR3.x, IEC:62443-3-3:Standard, CRA:2024/2847:AnnexI, FDA:21CFR11:11.10(h), MR:2023/1230:AnnexIII-1.1.9]
+    remediation: "Validate every command on the device before it acts: signature, freshness, unused nonce, allow-list, value range and machine state (command_validation=true on the node that writes)."
+    patch_template:
+      - { op: add, path: "/nodes/{{e.from.id}}/attrs/command_validation", value: true }
+    fixtures: { positive: fixtures/OT-002.pos.json, negative: fixtures/OT-002.neg.json }
+    tags: [ot, command-path, device]
+
+  - id: OT-003
+    title: AI component can reach the command-signing key
+    scope: node
+    severity: critical
+    condition: |
+      n.type == "secret_store" && attr(n, "key_use", "") == "command_signing" &&
+      (g.nodes("agent") + g.nodes("mcp_server") + g.nodes("llm_endpoint") + g.nodes("tool")).exists(x,
+        g.pathAvoiding(x.id, n.id, "human_step"))
+    message: "An AI component can reach {{n.name}}, which holds the command-signing key: whatever can sign can forge an approved command."
+    clauses: [ISO:27001:A.8.24, OWASP:AgenticTop10:ASI03, NIST:800-207:S2.1]
+    remediation: "Grant the signing key to the command broker's identity alone, behind the human approval; keep AI components and their tools off every path to the key store."
+    fixtures: { positive: fixtures/OT-003.pos.json, negative: fixtures/OT-003.neg.json }
+    tags: [ot, command-path, keys]
+
+  - id: OT-004
+    title: Write crosses OT zones without a conduit
+    scope: edge
+    severity: high
+    condition: |
+      e.kind in ["writes","executes"] && e.from.layer == "edge" && e.to.layer == "edge" &&
+      e.from.zone != "" && e.to.zone != "" && e.from.zone != e.to.zone
+    message: "{{e.from.name}} writes {{e.to.name}} in another zone ({{e.from.zone}} → {{e.to.zone}}) directly, not through a conduit."
+    clauses: [IEC:62443-3-2:Zones, IEC:62443-3-3:SR5.1, NIS2:2022/2555:Art21]
+    remediation: "Keep machine writes inside their zone; traffic between zones goes through a conduit with its own controls."
+    fixtures: { positive: fixtures/OT-004.pos.json, negative: fixtures/OT-004.neg.json }
+    tags: [ot, zones, segmentation]
+
+  - id: OT-005
+    title: OT data reaches an agent without content safety
+    scope: node
+    severity: high
+    condition: 'n.type == "agent" && !attr(n, "content_safety", false) && size(g.dataSources(n.id, "edge")) > 0'
+    message: "Data from OT devices (alarm text, operator comments, tags) reaches {{n.name}} without content safety screening: a device that can write text can instruct the model."
+    clauses: [OWASP:LLMTop10:LLM01, OWASP:AgenticTop10:ASI06, MAESTRO:L2, AIACT:2024/1689:Art15(5)]
+    remediation: "Screen device-originated text as untrusted documents before the model sees it (e.g. Prompt Shields), and flag redacted fields in the trail (content_safety=true)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/content_safety", value: true }
+    fixtures: { positive: fixtures/OT-005.pos.json, negative: fixtures/OT-005.neg.json }
+    tags: [ot, prompt-injection, untrusted-input]
+
+  - id: OT-006
+    title: Command approval not bound to a separate human identity
+    scope: node
+    severity: high
+    condition: |
+      n.type == "human_step" && attr(n, "approval_identity", "") != "separate" &&
+      g.writersInto("edge_device").exists(w, g.reachable(n.id, w))
+    message: "{{n.name}} approves commands that reach an OT device, but the approval is not declared as signed under the approver's own identity (approval_identity={{attr(n, 'approval_identity', 'not declared')}})."
+    clauses: [ISO:27001:A.5.15, NIST:800-207:S2.1, AIACT:2024/1689:Art14]
+    remediation: "Sign each approval under the approver's own identity, distinct from the agent's and from the broker that executes it (approval_identity=separate)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/approval_identity", value: separate }
+    fixtures: { positive: fixtures/OT-006.pos.json, negative: fixtures/OT-006.neg.json }
+    tags: [ot, command-path, e-signature]
+
+  - id: OT-007
+    title: Data from several OT zones read by AI without row-level security
+    scope: node
+    severity: high
+    condition: |
+      n.type == "datastore" && !attr(n, "row_level_security", false) && size(g.dataZones(n.id, "edge")) >= 2 &&
+      (g.nodes("agent") + g.nodes("mcp_server") + g.nodes("tool")).exists(x, g.dataFlows(n.id, x.id))
+    message: "{{n.name}} holds data from {{size(g.dataZones(n.id, 'edge'))}} OT zones and AI components read it, but it enforces no row-level security: an agent working for one zone can read another's."
+    clauses: [IEC:62443-3-2:Zones, ISO:27001:A.5.15, OWASP:AgenticTop10:ASI03, NIS2:2022/2555:Art21]
+    remediation: "Enforce the zone in the data layer: row-level security keyed on the caller's zone or line, set from the token for every request (row_level_security=true)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/row_level_security", value: true }
+    fixtures: { positive: fixtures/OT-007.pos.json, negative: fixtures/OT-007.neg.json }
+    tags: [ot, zones, data-layer]

@@ -1,0 +1,179 @@
+[
+  {
+    "id": "GDPR:Art25",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 25",
+    "title": "Data protection by design and by default",
+    "summary": "Controllers must implement appropriate technical and organisational measures, such as pseudonymisation and data minimisation, both when determining the means of processing and during processing, and must ensure by default that only personal data necessary for each purpose are processed.",
+    "excerpt": "The controller shall implement appropriate technical and organisational measures for ensuring that, by default, only personal data which are necessary for each specific purpose of the processing are processed.",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all",
+      "deployer",
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "privacy",
+      "minimisation",
+      "pseudonymisation",
+      "by-design"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ text (CELEX 32016R0679). Standing note 2026-09-16: the Digital Omnibus on data, COM(2025) 837 (procedure 2025/0360(COD)), is still in ITRE/LIBE committee — its proposed changes to Art. 4(1), Art. 9(2)(k), Art. 33 (96 h via the NIS2 single entry point), Art. 35 (EU-wide DPIA template) and new Arts. 88a/88b are not law and are not recorded here; Arts. 25, 30, 32 and 44-49 are untouched by that proposal."
+  },
+  {
+    "id": "GDPR:Art32",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 32",
+    "title": "Security of processing",
+    "summary": "Controllers and processors must implement appropriate technical and organisational security measures for the risk, including where appropriate pseudonymisation and encryption, resilience of systems, restoration of availability and regular testing of effectiveness.",
+    "excerpt": "Taking into account the state of the art, the costs of implementation and the nature, scope, context and purposes of processing as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons, the controller and the processor shall implement appropriate technical and organisational measures …",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "security",
+      "encryption",
+      "resilience",
+      "testing"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ text (CELEX 32016R0679). Standing note 2026-09-16: the Digital Omnibus on data, COM(2025) 837 (procedure 2025/0360(COD)), is still in ITRE/LIBE committee — its proposed changes to Art. 4(1), Art. 9(2)(k), Art. 33 (96 h via the NIS2 single entry point), Art. 35 (EU-wide DPIA template) and new Arts. 88a/88b are not law and are not recorded here; Arts. 25, 30, 32 and 44-49 are untouched by that proposal."
+  },
+  {
+    "id": "GDPR:Art44",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 44",
+    "title": "General principle for transfers",
+    "summary": "Personal data may be transferred to a third country or international organisation only if the conditions in Chapter V are met, so that the level of protection guaranteed by the Regulation is not undermined.",
+    "excerpt": "Any transfer of personal data which are undergoing processing or are intended for processing after transfer to a third country or to an international organisation shall take place only if, subject to the other provisions of this Regulation, the conditions laid down in this Chapter are complied with by the controller and processor …",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "transfer",
+      "residency",
+      "third-country",
+      "privacy"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ text (CELEX 32016R0679). Standing note 2026-09-16: the Digital Omnibus on data, COM(2025) 837 (procedure 2025/0360(COD)), is still in ITRE/LIBE committee — its proposed changes to Art. 4(1), Art. 9(2)(k), Art. 33 (96 h via the NIS2 single entry point), Art. 35 (EU-wide DPIA template) and new Arts. 88a/88b are not law and are not recorded here; Arts. 25, 30, 32 and 44-49 are untouched by that proposal."
+  },
+  {
+    "id": "GDPR:Art30",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 30",
+    "title": "Records of processing activities",
+    "summary": "Each controller and processor keeps a record of the processing activities under its responsibility, including the purposes, the categories of data subjects, personal data and recipients, transfers to third countries, erasure time limits and a general description of the technical and organisational security measures.",
+    "excerpt": "Each controller and, where applicable, the controller's representative, shall maintain a record of processing activities under its responsibility.",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all",
+      "deployer",
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "inventory",
+      "records",
+      "privacy",
+      "documentation"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32016R0679). Standing note 2026-09-16: the Digital Omnibus on data, COM(2025) 837 (procedure 2025/0360(COD)), is still in ITRE/LIBE committee — its proposed changes to Art. 4(1), Art. 9(2)(k), Art. 33 (96 h via the NIS2 single entry point), Art. 35 (EU-wide DPIA template) and new Arts. 88a/88b are not law and are not recorded here; Arts. 25, 30, 32 and 44-49 are untouched by that proposal."
+  },
+  {
+    "id": "GDPR:Art32(1)(a)",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 32(1)(a)",
+    "title": "Security of processing — pseudonymisation and encryption",
+    "summary": "The first limb of the appropriate security measures names pseudonymisation and encryption of personal data; on a drawing this is the declared encryption of a flow or store and the presence of a masking or pseudonymisation component on the path.",
+    "excerpt": "the pseudonymisation and encryption of personal data",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all",
+      "deployer",
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "encryption",
+      "pseudonymisation",
+      "privacy",
+      "security"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32016R0679). Paragraph-level record split out of GDPR:Art32 because (a) and (c) are architectural while (b) and (d) are partly or wholly process. Standing note 2026-09-16: the Digital Omnibus on data, COM(2025) 837 (procedure 2025/0360(COD)), is still in ITRE/LIBE committee — its proposed changes to Art. 4(1), Art. 9(2)(k), Art. 33 (96 h via the NIS2 single entry point), Art. 35 (EU-wide DPIA template) and new Arts. 88a/88b are not law and are not recorded here; Arts. 25, 30, 32 and 44-49 are untouched by that proposal."
+  },
+  {
+    "id": "GDPR:Art35",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 35",
+    "title": "Data protection impact assessment",
+    "summary": "Where a type of processing, in particular using new technologies, is likely to result in a high risk to the rights and freedoms of natural persons, the controller carries out an impact assessment before the processing; a systematic and extensive automated evaluation producing legal or similarly significant effects is one of the listed triggers.",
+    "excerpt": "Where a type of processing in particular using new technologies, and taking into account the nature, scope, context and purposes of the processing, is likely to result in a high risk to the rights and freedoms of natural persons, the controller shall, prior to the processing, carry out an assessment of the impact of the envisaged processing operations on the protection of personal data.",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all",
+      "deployer"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "dpia",
+      "risk",
+      "privacy",
+      "assessment"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32016R0679). The architecture supplies the scaffolding of the assessment (processing operations, data flows, recipients, oversight steps); the assessment's conclusion is never a tool output. Standing note 2026-09-16: the Digital Omnibus on data, COM(2025) 837 (procedure 2025/0360(COD)), is still in ITRE/LIBE committee — its proposed changes to Art. 4(1), Art. 9(2)(k), Art. 33 (96 h via the NIS2 single entry point), Art. 35 (EU-wide DPIA template) and new Arts. 88a/88b are not law and are not recorded here; Arts. 25, 30, 32 and 44-49 are untouched by that proposal."
+  },
+  {
+    "id": "GDPR:Art46",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 46",
+    "title": "Transfers subject to appropriate safeguards",
+    "summary": "Absent an adequacy decision, a transfer to a third country needs appropriate safeguards — the instruments listed in Art. 46(2), such as standard data protection clauses or binding corporate rules — together with enforceable data subject rights and effective legal remedies.",
+    "excerpt": "In the absence of a decision pursuant to Article 45(3), a controller or processor may transfer personal data to a third country or an international organisation only if the controller or processor has provided appropriate safeguards, and on condition that enforceable data subject rights and effective legal remedies for data subjects are available.",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all",
+      "deployer",
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "transfers",
+      "third-country",
+      "privacy",
+      "safeguards"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32016R0679). The drawing evidences the transfer itself (region of each node, the flow that crosses it); the safeguard instrument is a contractual fact recorded beside it. Standing note 2026-09-16: the Digital Omnibus on data, COM(2025) 837 (procedure 2025/0360(COD)), is still in ITRE/LIBE committee — its proposed changes to Art. 4(1), Art. 9(2)(k), Art. 33 (96 h via the NIS2 single entry point), Art. 35 (EU-wide DPIA template) and new Arts. 88a/88b are not law and are not recorded here; Arts. 25, 30, 32 and 44-49 are untouched by that proposal."
+  }
+]

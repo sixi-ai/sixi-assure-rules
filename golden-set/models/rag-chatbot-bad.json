@@ -1,0 +1,41 @@
+{
+  "id": "arch_demo_rag_bad",
+  "tenant_id": "tenant_demo",
+  "name": "Azure RAG chatbot – retail banking (bad twin)",
+  "version": 1,
+  "attrs": { "owner": "", "criticality": "high", "ai_act_tier": "", "materiality": "high",
+             "allowed_regions": ["switzerlandnorth", "switzerlandwest"], "regimes": ["FINMA", "AIACT", "FADP", "MCSB"] },
+  "groups": [
+    { "id": "g_users", "kind": "zone", "name": "Users", "node_ids": ["n_user"] },
+    { "id": "g_cloud", "kind": "zone", "name": "Azure – Switzerland North", "node_ids": ["n_web", "n_agent", "n_llm", "n_search", "n_sql", "n_crm", "n_kv"] },
+    { "id": "g_agent_tb", "kind": "trust_boundary", "name": "Agent runtime", "node_ids": ["n_agent"] }
+  ],
+  "nodes": [
+    { "id": "n_user",   "type": "user", "name": "Retail customer", "layer": "human", "zone": "g_users", "position": {"x": 40, "y": 200}, "source": "design",
+      "attrs": { "population": "customer", "mfa": true } },
+    { "id": "n_web",    "type": "app", "name": "Chat web app", "layer": "app", "zone": "g_cloud", "position": {"x": 260, "y": 200}, "source": "design",
+      "attrs": { "exposure": "public", "waf": false, "authn": "oidc", "secrets_in": "secret_store" } },
+    { "id": "n_agent",  "type": "agent", "name": "Advisor agent", "layer": "ai", "zone": "g_cloud", "position": {"x": 480, "y": 200}, "source": "design",
+      "attrs": { "identity": "shared", "autonomy": "assisted", "purpose": "", "owner": "", "materiality": "", "content_safety": false, "ai_disclosure": false } },
+    { "id": "n_llm",    "type": "llm_endpoint", "name": "Azure OpenAI (Foundry)", "layer": "ai", "zone": "g_cloud", "position": {"x": 720, "y": 80}, "source": "design",
+      "attrs": { "provider": "azure", "region": "switzerlandnorth", "network": "public", "outsourcing_registered": false } },
+    { "id": "n_search", "type": "vector_index", "name": "AI Search index", "layer": "data", "zone": "g_cloud", "position": {"x": 720, "y": 200}, "source": "design",
+      "attrs": { "data_class": "cid", "acl_trimming": false, "redaction": false, "region": "switzerlandnorth" } },
+    { "id": "n_sql",    "type": "datastore", "name": "Customer SQL DB", "layer": "data", "zone": "g_cloud", "position": {"x": 720, "y": 320}, "source": "design",
+      "attrs": { "engine": "azure_sql", "data_class": "cid", "region": "switzerlandnorth", "network_exposure": "public", "encryption_key": "pmk", "backup": false, "criticality": "critical", "geo_redundant": false } },
+    { "id": "n_crm",    "type": "datastore", "name": "CRM export (blob)", "layer": "data", "zone": "g_cloud", "position": {"x": 960, "y": 200}, "source": "design",
+      "attrs": { "engine": "blob", "data_class": "pii", "region": "westeurope", "network_exposure": "private", "encryption_key": "pmk", "backup": true } },
+    { "id": "n_kv",     "type": "secret_store", "name": "Key Vault", "layer": "identity", "zone": "g_cloud", "position": {"x": 480, "y": 360}, "source": "design",
+      "attrs": {} }
+  ],
+  "edges": [
+    { "id": "e_user_web",    "from": "n_user",   "to": "n_web",    "kind": "calls",  "protocol": "https", "auth": "oauth_client",      "encryption": "tls",     "data_class": "cid",  "attrs": {} },
+    { "id": "e_web_agent",   "from": "n_web",    "to": "n_agent",  "kind": "calls",  "protocol": "https", "auth": "managed_identity",  "encryption": "tls",     "data_class": "cid",  "attrs": {} },
+    { "id": "e_agent_llm",   "from": "n_agent",  "to": "n_llm",    "kind": "calls",  "protocol": "https", "auth": "api_key",           "encryption": "tls",     "data_class": "cid",  "attrs": { "prompt_contains": "pii" } },
+    { "id": "e_agent_search","from": "n_agent",  "to": "n_search", "kind": "reads",  "protocol": "https", "auth": "api_key",           "encryption": "tls",     "data_class": "cid",  "attrs": {} },
+    { "id": "e_agent_sql",   "from": "n_agent",  "to": "n_sql",    "kind": "reads",  "protocol": "tds",   "auth": "connection_string", "encryption": "unknown", "data_class": "cid",  "attrs": {} },
+    { "id": "e_crm_search",  "from": "n_crm",    "to": "n_search", "kind": "flows",  "protocol": "https", "auth": "managed_identity",  "encryption": "tls",     "data_class": "pii",  "attrs": {} }
+  ],
+  "findings": [],
+  "evidence": []
+}

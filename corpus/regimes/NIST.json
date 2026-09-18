@@ -1,0 +1,242 @@
+[
+  {
+    "id": "NIST:800-207:S2",
+    "regime": "NIST",
+    "doc": "NIST Special Publication 800-207, Zero Trust Architecture",
+    "ref": "Section 2",
+    "title": "Zero Trust Basics",
+    "summary": "Introduces zero trust as a set of principles for resource protection where trust is never granted implicitly, and sets out the tenets of zero trust and a zero trust view of a network.",
+    "excerpt": "",
+    "version": "2020-08-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://csrc.nist.gov/pubs/sp/800/207/final",
+    "tags": [
+      "zero-trust",
+      "principles",
+      "identity",
+      "network"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Section title verified 2026-09-10 against the official NIST PDF (NIST.SP.800-207, August 2020). Subsections: 2.1 Tenets of Zero Trust, 2.2 A Zero Trust View of a Network."
+  },
+  {
+    "id": "NIST:800-207:S2.1",
+    "regime": "NIST",
+    "doc": "NIST Special Publication 800-207, Zero Trust Architecture",
+    "ref": "Section 2.1",
+    "title": "Tenets of Zero Trust",
+    "summary": "Lists the tenets of zero trust, including treating all data sources and computing services as resources, securing all communication regardless of network location, granting access per session, and determining access by dynamic policy.",
+    "excerpt": "",
+    "version": "2020-08-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://csrc.nist.gov/pubs/sp/800/207/final",
+    "tags": [
+      "zero-trust",
+      "tenets",
+      "policy",
+      "session"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Section title verified 2026-09-10 against the official NIST PDF; the tenets themselves are paraphrased."
+  },
+  {
+    "id": "NIST:800-207:S3",
+    "regime": "NIST",
+    "doc": "NIST Special Publication 800-207, Zero Trust Architecture",
+    "ref": "Section 3",
+    "title": "Logical Components of Zero Trust Architecture",
+    "summary": "Describes the logical components of a zero trust architecture, including the policy engine, policy administrator and policy enforcement point, together with deployment variations and the trust algorithm.",
+    "excerpt": "",
+    "version": "2020-08-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://csrc.nist.gov/pubs/sp/800/207/final",
+    "tags": [
+      "zero-trust",
+      "policy-enforcement",
+      "architecture",
+      "components"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Section title verified 2026-09-10 against the official NIST PDF; subsections include 3.1 Variations of Zero Trust Architecture Approaches, 3.3 Trust Algorithm and 3.4 Network/Environment Components."
+  },
+  {
+    "id": "NIST:AIRMF:GOVERN",
+    "regime": "NIST",
+    "doc": "NIST AI 100-1, Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+    "ref": "Core function GOVERN",
+    "title": "GOVERN",
+    "summary": "The cross-cutting function of the AI RMF Core: cultivating a culture of risk management, with policies, processes, accountability structures and workforce arrangements for AI risk, applied across all stages of the AI lifecycle.",
+    "excerpt": "",
+    "version": "2023-01-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://doi.org/10.6028/NIST.AI.100-1",
+    "tags": [
+      "ai-risk",
+      "governance",
+      "accountability",
+      "policy"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Function name verified 2026-09-10 against the official NIST AI 100-1 PDF (January 2023)."
+  },
+  {
+    "id": "NIST:AIRMF:MAP",
+    "regime": "NIST",
+    "doc": "NIST AI 100-1, Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+    "ref": "Core function MAP",
+    "title": "MAP",
+    "summary": "The function that establishes context and frames risks: understanding the intended purpose, setting, actors and impacts of an AI system so that risks can be identified.",
+    "excerpt": "",
+    "version": "2023-01-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://doi.org/10.6028/NIST.AI.100-1",
+    "tags": [
+      "ai-risk",
+      "context",
+      "impact",
+      "identification"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Function name verified 2026-09-10 against the official NIST AI 100-1 PDF (January 2023)."
+  },
+  {
+    "id": "NIST:AIRMF:MEASURE",
+    "regime": "NIST",
+    "doc": "NIST AI 100-1, Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+    "ref": "Core function MEASURE",
+    "title": "MEASURE",
+    "summary": "The function that analyses, assesses, benchmarks and monitors AI risk and related impacts using quantitative, qualitative or mixed methods and tools.",
+    "excerpt": "",
+    "version": "2023-01-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://doi.org/10.6028/NIST.AI.100-1",
+    "tags": [
+      "ai-risk",
+      "evaluation",
+      "metrics",
+      "monitoring"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Function name verified 2026-09-10 against the official NIST AI 100-1 PDF (January 2023)."
+  },
+  {
+    "id": "NIST:AIRMF:MANAGE",
+    "regime": "NIST",
+    "doc": "NIST AI 100-1, Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+    "ref": "Core function MANAGE",
+    "title": "MANAGE",
+    "summary": "The function that allocates resources to treat mapped and measured risks, including risk response, recovery, communication and management of third-party AI risks.",
+    "excerpt": "",
+    "version": "2023-01-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://doi.org/10.6028/NIST.AI.100-1",
+    "tags": [
+      "ai-risk",
+      "treatment",
+      "response",
+      "third-party"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Function name verified 2026-09-10 against the official NIST AI 100-1 PDF (January 2023)."
+  },
+  {
+    "id": "NIST:CSWP29:CSF2.0",
+    "regime": "NIST",
+    "doc": "NIST CSWP 29, The NIST Cybersecurity Framework (CSF) 2.0",
+    "ref": "CSWP 29",
+    "title": "The NIST Cybersecurity Framework (CSF) 2.0",
+    "summary": "A taxonomy of high-level cybersecurity outcomes organised as Functions, Categories and Subcategories that an organisation of any size or sector can use to understand, assess, prioritise and communicate its cybersecurity work. The Framework states outcomes and does not prescribe how they are achieved.",
+    "excerpt": "",
+    "version": "2024-02-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://csrc.nist.gov/pubs/cswp/29/the-nist-cybersecurity-framework-csf-20/final",
+    "tags": [
+      "csf",
+      "framework",
+      "outcomes",
+      "governance"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the NIST CSRC publication page (date published 26 February 2024). Cited beside a finding to make it legible to a buyer running a CSF programme; the asset, identity, data and infrastructure-resilience categories are the design-time-relevant ones. Excerpt not stored: the corpus validator treats the NIST licence as paraphrase-only, so the summary carries our wording."
+  },
+  {
+    "id": "NIST:800-207A:Model",
+    "regime": "NIST",
+    "doc": "NIST Special Publication 800-207A, A Zero Trust Architecture Model for Access Control in Cloud-Native Applications in Multi-Cloud Environments",
+    "ref": "SP 800-207A",
+    "title": "A zero trust architecture model for cloud-native applications in multi-cloud environments",
+    "summary": "Moves zero trust access control from network parameters to identities, requiring authentication and authorisation policies based on application and service identities and a platform of API gateways, sidecar proxies and identity providers to enforce them.",
+    "excerpt": "",
+    "version": "2023-09-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://csrc.nist.gov/pubs/sp/800/207/a/final",
+    "tags": [
+      "zero-trust",
+      "identity",
+      "gateway",
+      "multi-cloud"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the NIST CSRC publication page (date published September 2023). Names gateways, sidecars and service identity explicitly, which is what makes it usable beside boundary and workload-identity findings. Excerpt not stored: the corpus validator treats the NIST licence as paraphrase-only, so the summary carries our wording."
+  },
+  {
+    "id": "NIST:1800-35:Practice",
+    "regime": "NIST",
+    "doc": "NIST Special Publication 1800-35, Implementing a Zero Trust Architecture",
+    "ref": "SP 1800-35",
+    "title": "Implementing a Zero Trust Architecture (NCCoE practice guide)",
+    "summary": "A practice guide showing how organisations can implement a zero trust architecture consistent with SP 800-207, built from nineteen example implementations with commercially available technology.",
+    "excerpt": "",
+    "version": "2025-06-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://csrc.nist.gov/pubs/sp/1800/35/final",
+    "tags": [
+      "zero-trust",
+      "practice-guide",
+      "reference",
+      "architecture"
+    ],
+    "licence": "nist-public",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the NIST CSRC publication page (final, June 2025). A reference for remediation text, never the source of a finding. Excerpt not stored: the corpus validator treats the NIST licence as paraphrase-only, so the summary carries our wording."
+  }
+]

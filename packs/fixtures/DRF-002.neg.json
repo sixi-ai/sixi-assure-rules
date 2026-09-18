@@ -1,0 +1,50 @@
+{
+  "id": "arch_fx_drf_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DRF-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "decisions": [
+      {
+        "id": "dec_1",
+        "title": "Ground the assistant on enterprise data",
+        "status": "accepted",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "MCSB:v1:IM-1"
+          },
+          {
+            "kind": "document",
+            "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview",
+            "title": "Provider documentation",
+            "fetched_at": "2026-06-01T00:00:00Z"
+          }
+        ]
+      }
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {}
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

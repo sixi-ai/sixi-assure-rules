@@ -1,0 +1,85 @@
+{
+  "id": "arch_fx_zt_006_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ZT-006 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_user",
+      "type": "user",
+      "name": "User",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "population": "employee",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "Gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "waf",
+        "logging": true
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Public API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "public",
+        "authn": "oauth",
+        "secrets_in": "secret_store"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_user",
+      "to": "n_gw",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_gw",
+      "to": "n_api",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_user",
+      "to": "n_api",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

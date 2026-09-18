@@ -1,0 +1,71 @@
+{
+  "id": "arch_fx_zt_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ZT-003 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_a",
+      "type": "agent",
+      "name": "Agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_b",
+      "type": "agent",
+      "name": "Agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_a",
+      "to": "n_b",
+      "kind": "delegates",
+      "auth": "obo",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,155 @@
+[
+  {
+    "rule_id": "AI-001",
+    "ids": [
+      "e_agent_llm"
+    ]
+  },
+  {
+    "rule_id": "AI-004",
+    "ids": [
+      "arch_demo_rag_bad"
+    ]
+  },
+  {
+    "rule_id": "AI-005",
+    "ids": [
+      "n_agent",
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "AI-006",
+    "ids": [
+      "arch_demo_rag_bad"
+    ]
+  },
+  {
+    "rule_id": "AI-012",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "AI-013",
+    "ids": [
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "DATA-001",
+    "ids": [
+      "e_crm_search"
+    ]
+  },
+  {
+    "rule_id": "DATA-002",
+    "ids": [
+      "e_agent_search"
+    ]
+  },
+  {
+    "rule_id": "DATA-003",
+    "ids": [
+      "n_crm"
+    ]
+  },
+  {
+    "rule_id": "DATA-004",
+    "ids": [
+      "n_crm",
+      "n_sql"
+    ]
+  },
+  {
+    "rule_id": "DATA-005",
+    "ids": [
+      "n_sql"
+    ]
+  },
+  {
+    "rule_id": "DATA-006",
+    "ids": [
+      "e_agent_llm"
+    ]
+  },
+  {
+    "rule_id": "GOV-001",
+    "ids": [
+      "arch_demo_rag_bad"
+    ]
+  },
+  {
+    "rule_id": "LOG-001",
+    "ids": [
+      "arch_demo_rag_bad"
+    ]
+  },
+  {
+    "rule_id": "LOG-004",
+    "ids": [
+      "e_agent_llm"
+    ]
+  },
+  {
+    "rule_id": "NET-001",
+    "ids": [
+      "n_sql"
+    ]
+  },
+  {
+    "rule_id": "NET-002",
+    "ids": [
+      "e_agent_llm"
+    ]
+  },
+  {
+    "rule_id": "NET-003",
+    "ids": [
+      "e_user_web"
+    ]
+  },
+  {
+    "rule_id": "NET-006",
+    "ids": [
+      "e_agent_sql"
+    ]
+  },
+  {
+    "rule_id": "RES-001",
+    "ids": [
+      "n_sql"
+    ]
+  },
+  {
+    "rule_id": "RES-002",
+    "ids": [
+      "n_sql"
+    ]
+  },
+  {
+    "rule_id": "STR-006",
+    "ids": [
+      "e_agent_llm",
+      "e_agent_search"
+    ]
+  },
+  {
+    "rule_id": "TPR-001",
+    "ids": [
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "ZT-001",
+    "ids": [
+      "e_agent_sql"
+    ]
+  },
+  {
+    "rule_id": "ZT-002",
+    "ids": [
+      "n_agent"
+    ]
+  }
+]

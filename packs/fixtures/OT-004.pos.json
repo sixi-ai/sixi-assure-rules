@@ -1,0 +1,92 @@
+{
+  "id": "arch_fx_ot_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "CRA",
+      "NIS2",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited",
+    "incident_reporting": "Plant CSIRT within 24 h (NIS2 Art. 23); CRA Art. 14 via the PSIRT."
+  },
+  "groups": [
+    {
+      "id": "z_a",
+      "kind": "zone",
+      "name": "Zone – line A",
+      "node_ids": [
+        "n_node_a",
+        "n_plc_a"
+      ]
+    },
+    {
+      "id": "z_b",
+      "kind": "zone",
+      "name": "Zone – line B",
+      "node_ids": [
+        "n_plc_b"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_node_a",
+      "type": "edge_gateway",
+      "name": "Edge node – line A",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm",
+        "command_validation": true
+      },
+      "zone": "z_a"
+    },
+    {
+      "id": "n_plc_a",
+      "type": "edge_device",
+      "name": "PLC – line A",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      },
+      "zone": "z_a"
+    },
+    {
+      "id": "n_plc_b",
+      "type": "edge_device",
+      "name": "PLC – line B",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      },
+      "zone": "z_b"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_write",
+      "from": "n_node_a",
+      "to": "n_plc_b",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

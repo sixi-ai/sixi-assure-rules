@@ -1,0 +1,133 @@
+# C4 — structural validators of the Architect Assistant (prompt §6.3, ADR-032/033). Deterministic
+# CEL over the C4 reading of the graph model: findings only from rules, never from the LLM.
+pack: c4
+version: 0.1.0
+regimes: [MCSB, NIST, ISO, MSFT, OWASP, MAESTRO]
+rules:
+  - id: STR-001
+    title: Component declared without a containing element
+    scope: node
+    severity: low
+    condition: 'attr(n, "c4_level", "") == "component" && attr(n, "c4_parent", "") == ""'
+    message: "{{n.name}} is declared at C4 component level but names no containing container (c4_parent)."
+    clauses: [NIST:AIRMF:MAP]
+    remediation: "Set attrs.c4_parent to the container the component belongs to, or lift it to container level."
+    fixtures: { positive: fixtures/STR-001.pos.json, negative: fixtures/STR-001.neg.json }
+    tags: [c4, structure]
+
+  - id: STR-002
+    title: Relationship crosses a boundary without authentication
+    scope: edge
+    severity: high
+    condition: |
+      e.kind in ["calls","reads","writes","delegates","executes"] &&
+      e.from.type != "user" && e.from.type != "external_party" &&
+      size(e.from.group_ids) + size(e.to.group_ids) > 0 &&
+      !e.from.group_ids.exists(gid, gid in e.to.group_ids) &&
+      e.auth in ["", "none", "unknown"]
+    message: "{{e.from.name}} → {{e.to.name}} crosses a boundary without an authenticated identity (auth={{e.auth}})."
+    clauses: [NIST:800-207:S2, MCSB:v1:IM-1, MSFT:EntraAgentID]
+    remediation: "Authenticate the hop with a managed identity, an agent identity or OBO token exchange scoped to the callee."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/auth", value: managed_identity }
+    fixtures: { positive: fixtures/STR-002.pos.json, negative: fixtures/STR-002.neg.json }
+    tags: [c4, zero-trust, boundary]
+
+  - id: STR-003
+    title: Accepted decision without a citation
+    scope: graph
+    severity: medium
+    condition: |
+      attr(g, "decisions", []).exists(d, d.status == "accepted" && (!("citations" in d) || size(d.citations) == 0))
+    message: "At least one accepted architecture decision carries no citation (clause or documentation)."
+    clauses: [NIST:AIRMF:GOVERN, ISO:42001:A.3.2]
+    remediation: "Attach the clause ids and the documentation the decision rests on before accepting it (citation coverage of accepted decisions)."
+    fixtures: { positive: fixtures/STR-003.pos.json, negative: fixtures/STR-003.neg.json }
+    tags: [c4, decisions, citations]
+
+  - id: STR-004
+    title: Container calls other components without a workload identity
+    scope: node
+    severity: high
+    condition: |
+      n.type in ["app","api","gateway","tool","mcp_server"] &&
+      g.out(n.id, "").exists(x, x.kind in ["calls","reads","writes","executes","delegates"]) &&
+      !(attr(n, "identity", "") in ["managed_identity","agent_id"]) &&
+      !g.out(n.id, "").exists(x, x.auth in ["managed_identity","agent_id","obo","oauth_client","mtls"])
+    message: "{{n.name}} calls other components but declares no workload identity, and none of its outgoing hops is authenticated with one."
+    clauses: [MCSB:v1:IM-3, MCSB:v1:IM-1, NIST:800-207:S2]
+    remediation: "Give the container a managed identity (identity=managed_identity) and authenticate its outgoing calls with it (auth=managed_identity, mtls or oauth_client); agents use agent_id (ZT-002)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/identity", value: managed_identity }
+    fixtures: { positive: fixtures/STR-004.pos.json, negative: fixtures/STR-004.neg.json }
+    tags: [c4, identity, zero-trust]
+
+  - id: STR-005
+    title: Agent reaches an MCP server with no gateway on the path
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type == "agent" && e.to.type == "mcp_server" &&
+      !g.pathThrough(e.from.id, e.to.id, "gateway")
+    message: "{{e.from.name}} reaches MCP server {{e.to.name}} directly: no gateway on the path enforces tool allow-lists, scopes and call logging."
+    clauses: [OWASP:AgenticTop10:ASI02, OWASP:AgenticTop10:ASI03, MAESTRO:L7]
+    remediation: "Put an authenticated MCP gateway between the agent and the server (per-tool allow-list, audience-scoped tokens, call audit); keep the direct route closed."
+    patch_template:
+      - { op: add, path: "/nodes/-", value: { id: "{{new:gw}}", type: gateway, name: "MCP gateway", layer: platform, attrs: { kind: api, logging: true } } }
+      - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:gw}}" }
+      - { op: add, path: "/edges/-", value: { id: "{{new:e}}", from: "{{new:gw}}", to: "{{e.to.id}}", kind: "{{e.kind}}", auth: managed_identity, encryption: tls, attrs: { logged: true } } }
+    fixtures: { positive: fixtures/STR-005.pos.json, negative: fixtures/STR-005.neg.json }
+    tags: [c4, agentic, mcp, gateway]
+
+  - id: STR-006
+    title: Service-to-service relationship authenticated with a shared secret
+    scope: edge
+    severity: medium
+    condition: |
+      e.auth in ["api_key","password","connection_string"] &&
+      !(e.from.type in ["user","external_party"]) &&
+      !(e.kind in ["reads","writes"] && e.to.type == "datastore")
+    severity_override:
+      - { when: 'size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids)', severity: high }
+    message: "{{e.from.name}} → {{e.to.name}} authenticates with a shared secret ({{e.auth}}) instead of a workload identity."
+    clauses: [MCSB:v1:IM-8, MCSB:v1:IM-3, NIST:800-207:S2]
+    remediation: "Replace the secret with a workload identity (auth=managed_identity, agent_id, oauth_client or mtls); where a secret is unavoidable keep it in a secret store and rotate it. Datastore reads/writes are assessed by ZT-001."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/auth", value: managed_identity }
+    fixtures: { positive: fixtures/STR-006.pos.json, negative: fixtures/STR-006.neg.json }
+    tags: [c4, identity, secrets, boundary]
+
+  - id: STR-007
+    title: Context-level element without any relationship
+    scope: node
+    severity: low
+    condition: |
+      (attr(n, "c4_level", "") == "context" ||
+       (attr(n, "c4_level", "") == "" &&
+        (attr(n, "c4_kind", "") in ["Person","SoftwareSystem","ExternalSystem"] ||
+         (attr(n, "c4_kind", "") == "" && n.type in ["user","human_step","product","external_party","saas"])))) &&
+      size(g.in(n.id, "")) == 0 && size(g.out(n.id, "")) == 0
+    message: "{{n.name}} is a context-level element (person or system) with no relationship to anything else in the model."
+    clauses: [NIST:AIRMF:MAP]
+    remediation: "Relate the element to the systems it uses or serves, or remove it: an unconnected element is not assessed by any relationship rule and the context view cannot place it."
+    fixtures: { positive: fixtures/STR-007.pos.json, negative: fixtures/STR-007.neg.json }
+    tags: [c4, structure, orphan]
+
+  - id: STR-008
+    title: C4 parent is missing or not above the element
+    scope: node
+    severity: low
+    condition: |
+      attr(n, "c4_parent", "") != "" && (
+        attr(n, "c4_parent", "") == n.id ||
+        !g.nodes.exists(p, p.id == attr(n, "c4_parent", "")) ||
+        (attr(n, "c4_level", "") in ["context","container","component","code"] &&
+         g.nodes.exists(p, p.id == attr(n, "c4_parent", "") &&
+           attr(p, "c4_level", "") in ["context","container","component","code"] &&
+           {"context": 0, "container": 1, "component": 2, "code": 3}[attr(p, "c4_level", "")] >=
+           {"context": 0, "container": 1, "component": 2, "code": 3}[attr(n, "c4_level", "")])))
+    message: "{{n.name}} names {{attr(n,'c4_parent','')}} as its C4 parent, but that element is missing, is the element itself, or is not at a higher C4 level."
+    clauses: [NIST:AIRMF:MAP]
+    remediation: "Point c4_parent at an existing element one level up (component → container, container → system), or clear it."
+    fixtures: { positive: fixtures/STR-008.pos.json, negative: fixtures/STR-008.neg.json }
+    tags: [c4, structure, parents]

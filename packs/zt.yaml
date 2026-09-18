@@ -1,0 +1,117 @@
+# ZT — identity & zero trust (docs/03 §ZT). Deterministic CEL; the LLM never creates findings.
+pack: zt
+version: 0.1.0
+regimes: [MCSB, NIST, FINMA, OWASP, MAESTRO, ISO]
+rules:
+  - id: ZT-001
+    title: Shared secret on service-to-data edge
+    scope: edge
+    severity: high
+    condition: |
+      e.kind in ["reads","writes"] && e.to.type == "datastore" &&
+      e.auth in ["password","connection_string","api_key"]
+    message: "{{e.from.name}} accesses {{e.to.name}} with a shared secret ({{e.auth}})."
+    clauses: [MCSB:v1:IM-1, MCSB:v1:IM-3, NIST:800-207:S2, FINMA:2023/1:Rz-AccessMgmt]
+    remediation: "Set auth=managed_identity (agent_id for agents); keep only unavoidable secrets in a secret store; add a private endpoint."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/auth", value: managed_identity }
+    fixtures: { positive: fixtures/ZT-001.pos.json, negative: fixtures/ZT-001.neg.json }
+    tags: [identity, zero-trust, secrets]
+
+  - id: ZT-002
+    title: Agent without dedicated identity
+    scope: node
+    severity: high
+    condition: 'n.type == "agent" && attr(n, "identity", "none") in ["none","shared","user_impersonation"]'
+    message: "Agent {{n.name}} has no dedicated identity ({{attr(n,'identity','none')}})."
+    clauses: [MSFT:EntraAgentID, FINMA:08/2024:Governance]
+    remediation: "Assign an Entra agent identity (identity=agent_id); record an owner attestation; enable access reviews."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/identity", value: agent_id }
+    fixtures: { positive: fixtures/ZT-002.pos.json, negative: fixtures/ZT-002.neg.json }
+    tags: [identity, agent]
+
+  - id: ZT-003
+    title: Agent-to-agent delegation without OBO
+    scope: edge
+    severity: high
+    condition: 'e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent" && e.auth != "obo"'
+    message: "{{e.from.name}} delegates to {{e.to.name}} without on-behalf-of token exchange (auth={{e.auth}})."
+    clauses: [NIST:800-207:S3, MSFT:EntraAgentID]
+    remediation: "Use OBO token exchange on every hop (auth=obo); audit each hop."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/auth", value: obo }
+    fixtures: { positive: fixtures/ZT-003.pos.json, negative: fixtures/ZT-003.neg.json }
+    tags: [identity, agent, delegation]
+
+  - id: ZT-004
+    title: Standing broad RBAC scope
+    scope: node
+    severity: high
+    condition: 'attr(n, "rbac_scope", "") in ["subscription_contributor","owner"]'
+    message: "{{n.name}} holds a standing {{attr(n,'rbac_scope','')}} role."
+    clauses: [MCSB:v1:PA-7, CIS:Azure:1.x]
+    remediation: "Replace with a scoped custom role; no standing privilege for non-human identities; use PIM for humans."
+    fixtures: { positive: fixtures/ZT-004.pos.json, negative: fixtures/ZT-004.neg.json }
+    tags: [identity, privilege]
+
+  - id: ZT-005
+    title: Admin access without PIM/JIT
+    scope: edge
+    severity: medium
+    condition: 'e.from.type == "user" && attr(e.from, "population", "") == "admin" && !attr(e.from, "pim", false)'
+    message: "Admin population {{e.from.name}} reaches {{e.to.name}} without PIM/JIT elevation."
+    clauses: [MCSB:v1:PA-2]
+    remediation: "Require Privileged Identity Management with just-in-time activation and approval for admin access."
+    fixtures: { positive: fixtures/ZT-005.pos.json, negative: fixtures/ZT-005.neg.json }
+    tags: [identity, privilege, admin]
+
+  - id: ZT-006
+    title: Public app or API accessed with an API key
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type in ["user","external_party"] && e.to.type in ["app","api"] &&
+      e.auth == "api_key" && attr(e.to, "exposure", "") == "public"
+    message: "{{e.from.name}} authenticates to public {{e.to.name}} with a static API key."
+    clauses: [MCSB:v1:IM-2]
+    remediation: "Use OIDC/OAuth 2.0 with short-lived tokens; front the API with a gateway that validates tokens."
+    fixtures: { positive: fixtures/ZT-006.pos.json, negative: fixtures/ZT-006.neg.json }
+    tags: [identity, api]
+
+  - id: ZT-007
+    title: Secrets kept outside a secret store
+    scope: node
+    severity: high
+    condition: 'attr(n, "secrets_in", "secret_store") in ["config","code","env_plain"]'
+    message: "{{n.name}} keeps secrets in {{attr(n,'secrets_in','secret_store')}} instead of a secret store."
+    clauses: [MCSB:v1:IM-8, ISO:27001:A.8.24]
+    remediation: "Move secrets to Key Vault (secrets_in=secret_store); rotate exposed secrets; reference by managed identity."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/secrets_in", value: secret_store }
+    fixtures: { positive: fixtures/ZT-007.pos.json, negative: fixtures/ZT-007.neg.json }
+    tags: [secrets]
+
+  - id: ZT-008
+    title: Agent calls tool/MCP server without authentication
+    scope: edge
+    severity: high
+    condition: 'e.from.type == "agent" && e.to.type in ["tool","mcp_server"] && e.auth in ["none","unknown"]'
+    message: "{{e.from.name}} reaches {{e.to.name}} without authentication (auth={{e.auth}})."
+    clauses: [OWASP:AgenticTop10:ASI03, MAESTRO:L7]
+    remediation: "Route through an authenticated MCP gateway; per-tool scopes; log tool calls."
+    fixtures: { positive: fixtures/ZT-008.pos.json, negative: fixtures/ZT-008.neg.json }
+    tags: [identity, agent, mcp]
+
+  - id: ZT-009
+    title: Public app reached by a user without MFA
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type == "user" && e.to.type in ["app","api","agent"] &&
+      !attr(e.from, "mfa", false) && attr(e.to, "exposure", "") == "public"
+    message: "{{e.from.name}} reaches public {{e.to.name}} without multi-factor authentication."
+    clauses: [FINMA:2023/1:Rz-Cyber, MCSB:v1:IM-6]
+    remediation: "Enforce MFA or passwordless (FIDO2) sign-in for this population; conditional access policies."
+    fixtures: { positive: fixtures/ZT-009.pos.json, negative: fixtures/ZT-009.neg.json }
+    tags: [identity, mfa]

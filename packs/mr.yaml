@@ -1,0 +1,64 @@
+# MR — the Machinery Regulation (EU) 2023/1230 where AI acts on machinery (docs/03 §MR). What a design can evidence:
+# a self-evolving machine-learning safety function goes to a notified body, every intervention in a machine leaves a
+# tracing log, a self-evolving safety system records its safety-related decisions, and whoever adds an AI command path
+# to machinery has assessed whether that is a substantial modification. Every condition gates on regime("MR").
+# The Regulation applies from 20 January 2027; the delegated acts adding AI requirements to Annex III apply by
+# 2 August 2028 (Art. 8, as amended by Regulation (EU) 2026/1744) and are not loaded.
+pack: mr
+version: 0.1.0
+regimes: [MR]
+rules:
+  - id: MR-001
+    title: Self-evolving ML safety function without third-party conformity assessment
+    scope: node
+    severity: high
+    condition: |
+      regime("MR") && attr(n, "safety_function", false) && attr(n, "self_evolving", false) &&
+      !(attr(n, "conformity_route", "") in ["module_b_c", "module_h", "module_g"])
+    message: "{{n.name}} ensures a safety function with self-evolving machine-learning behaviour, an Annex I Part A category, but no notified-body procedure is recorded (conformity_route={{attr(n, 'conformity_route', 'not declared')}})."
+    clauses: [MR:2023/1230:AnnexI-A5, MR:2023/1230:AnnexI-A6, MR:2023/1230:Art25(2), AIACT:2024/1689:Art6]
+    remediation: "Plan the conformity assessment with a notified body — EU type-examination with conformity to type (module_b_c), full quality assurance (module_h) or unit verification (module_g) — and record it; or keep the learning out of the safety function and freeze the model that ensures it."
+    fixtures: { positive: fixtures/MR-001.pos.json, negative: fixtures/MR-001.neg.json }
+    tags: [machinery, machine-learning, conformity-assessment]
+
+  - id: MR-002
+    title: Machine write leaves no tracing log of the intervention
+    scope: edge
+    severity: high
+    condition: |
+      regime("MR") && e.kind in ["writes","executes"] && e.to.type == "edge_device" &&
+      !attr(e.from, "intervention_log", false) && !attr(e.to, "intervention_log", false)
+    message: "{{e.from.name}} writes {{e.to.name}}, and neither records the intervention: the machine must collect evidence of legitimate and illegitimate interventions and keep a tracing log for five years."
+    clauses: [MR:2023/1230:AnnexIII-1.1.9, MR:2023/1230:AnnexIII-1.2.1(f)]
+    remediation: "Record every command, software upload and configuration change where it reaches the machine — who or what sent it, the value, the outcome — in a tamper-evident tracing log kept five years (intervention_log=true on the node that writes)."
+    patch_template:
+      - { op: add, path: "/nodes/{{e.from.id}}/attrs/intervention_log", value: true }
+    fixtures: { positive: fixtures/MR-002.pos.json, negative: fixtures/MR-002.neg.json }
+    tags: [machinery, intervention-log, traceability]
+
+  - id: MR-003
+    title: Self-evolving safety system does not record its safety decisions
+    scope: node
+    severity: high
+    condition: |
+      regime("MR") && attr(n, "safety_function", false) && attr(n, "self_evolving", false) &&
+      !g.nodes("log_sink").exists(l, attr(l, "retention_days", 0) >= 365 && g.dataFlows(n.id, l.id))
+    message: "{{n.name}} is a self-evolving safety system, but its data reaches no log kept for at least a year: the data of its safety-related decision-making must be recorded and retained for one year."
+    clauses: [MR:2023/1230:AnnexIII-1.2.1-SE, AIACT:2024/1689:Art12]
+    remediation: "Send the inputs, outputs and model version of each safety-related decision to a log sink with retention_days ≥ 365, and keep the system correctable at all times."
+    fixtures: { positive: fixtures/MR-003.pos.json, negative: fixtures/MR-003.neg.json }
+    tags: [machinery, self-evolving, decision-log]
+
+  - id: MR-004
+    title: AI command path on machinery without a substantial-modification assessment
+    scope: graph
+    severity: medium
+    condition: |
+      regime("MR") && attr(g, "substantial_modification", "") in ["", "unknown"] &&
+      g.writersInto("edge_device").exists(w,
+        (g.nodes("agent") + g.nodes("mcp_server") + g.nodes("llm_endpoint") + g.nodes("tool")).exists(x, g.dataFlows(x.id, w)))
+    message: "AI output can reach a component that writes a machine, and the architecture does not record whether this is a substantial modification: whoever substantially modifies machinery takes on the manufacturer's obligations."
+    clauses: [MR:2023/1230:Art3(16), MR:2023/1230:Art18, MR:2023/1230:Art25(4)]
+    remediation: "Assess with the machine's risk assessment whether the AI command path creates a new hazard or increases a risk that needs new protective measures, and record the result (substantial_modification) with the decision; if substantial, run the conformity assessment as the manufacturer."
+    fixtures: { positive: fixtures/MR-004.pos.json, negative: fixtures/MR-004.neg.json }
+    tags: [machinery, substantial-modification, governance]

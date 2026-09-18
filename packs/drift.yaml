@@ -1,0 +1,66 @@
+# DRIFT — knowledge drift detectors of the Architect Assistant Curator (phase A6, ADR-035). Deterministic
+# CEL over the model and the knowledge facts the engine exposes as `kb` (kb.available, kb.deprecated,
+# kb.freshness). Findings only from these rules, never from the LLM (CLAUDE.md §1.2). Without facts
+# (kb.available == false, empty maps) every rule here is silent: the golden set is evaluated without
+# facts, so drift never changes its precision/recall. The pack lists every regime because drift is a
+# property of the model against the knowledge base, not of one regime.
+pack: drift
+version: 0.1.0
+regimes: [FINMA, CH-CO, FADP, CH-ISG, DORA, AIACT, CRA, NIS2, ISO, MCSB, NIST, IEC, OWASP, MAESTRO, MSFT]
+rules:
+  - id: DRF-001
+    title: Element uses a service or feature the knowledge base records as deprecated
+    scope: node
+    severity: high
+    condition: |
+      kb.available &&
+      (attr(n, "provider_service", "") != "" || attr(n, "model", "") != "") &&
+      string(attr(n, "provider_service", "") != "" ? attr(n, "provider_service", "") : attr(n, "model", "")).lowerAscii() in kb.deprecated
+    message: "{{n.name}} uses {{attr(n,'provider_service','') != '' ? attr(n,'provider_service','') : attr(n,'model','')}}, which the knowledge base records as deprecated (replaced by {{kb.deprecated[string(attr(n,'provider_service','') != '' ? attr(n,'provider_service','') : attr(n,'model','')).lowerAscii()]}})."
+    clauses: [NIST:AIRMF:MANAGE, NIST:AIRMF:MAP]
+    remediation: "Review the recorded replacement against the element's purpose and record the decision (adopt the replacement, or keep the deprecated service with its end-of-support date and exit path as an accepted decision with a citation)."
+    fixtures: { positive: fixtures/DRF-001.pos.json, negative: fixtures/DRF-001.neg.json, kb: fixtures/DRF-001.kb.json }
+    tags: [drift, knowledge, deprecation]
+
+  - id: DRF-002
+    title: Accepted decision rests on a document that has moved on
+    scope: graph
+    severity: medium
+    condition: |
+      kb.available &&
+      attr(g, "decisions", []).exists(d, d.status == "accepted" && "citations" in d &&
+        d.citations.exists(c, c.kind == "document" && "url" in c &&
+          c.url in kb.freshness && kb.freshness[c.url] in ["superseded", "unreachable"]))
+    message: "Accepted decision(s) {{attr(g,'decisions',[]).filter(d, d.status == 'accepted' && 'citations' in d && d.citations.exists(c, c.kind == 'document' && 'url' in c && c.url in kb.freshness && kb.freshness[c.url] in ['superseded','unreachable'])).map(d, string(d.id)).join(', ')}} cite a document the knowledge base now records as superseded or unreachable."
+    clauses: [NIST:AIRMF:GOVERN, ISO:42001:A.3.2]
+    remediation: "Re-read the decision against the current document: re-cite the successor document and keep the decision, or mark it superseded by a new decision. A decision whose evidence moved on is recorded as drift, not as still-valid."
+    fixtures: { positive: fixtures/DRF-002.pos.json, negative: fixtures/DRF-002.neg.json, kb: fixtures/DRF-002.kb.json }
+    tags: [drift, knowledge, decisions, citations]
+
+  - id: DRF-003
+    title: Element documentation link is stale, superseded or unreachable
+    scope: node
+    severity: low
+    condition: |
+      kb.available &&
+      (n.external_ref != "" ? n.external_ref : string(attr(n, "external_ref", ""))) in kb.freshness &&
+      kb.freshness[n.external_ref != "" ? n.external_ref : string(attr(n, "external_ref", ""))] in ["stale", "superseded", "unreachable"]
+    message: "{{n.name}} points to {{n.external_ref != '' ? n.external_ref : attr(n,'external_ref','')}}, which the knowledge base records as {{kb.freshness[n.external_ref != '' ? n.external_ref : string(attr(n,'external_ref',''))]}} since the last sync."
+    clauses: [NIST:AIRMF:MAP]
+    remediation: "Point external_ref at the current document (the successor page for a superseded one, a re-verified URL for an unreachable one) and re-check the attributes the element declares against it."
+    fixtures: { positive: fixtures/DRF-003.pos.json, negative: fixtures/DRF-003.neg.json, kb: fixtures/DRF-003.kb.json }
+    tags: [drift, knowledge, documentation]
+
+  - id: DRF-004
+    title: Relationship names a deprecated feature or protocol
+    scope: edge
+    severity: low
+    condition: |
+      kb.available &&
+      ((e.label != "" && e.label.lowerAscii() in kb.deprecated) ||
+       (e.protocol != "" && e.protocol.lowerAscii() in kb.deprecated))
+    message: "{{e.from.name}} → {{e.to.name}} is declared over {{e.label != '' && e.label.lowerAscii() in kb.deprecated ? e.label : e.protocol}}, which the knowledge base records as deprecated (replaced by {{kb.deprecated[(e.label != '' && e.label.lowerAscii() in kb.deprecated ? e.label : e.protocol).lowerAscii()]}})."
+    clauses: [NIST:AIRMF:MANAGE, NIST:AIRMF:MAP]
+    remediation: "Review the recorded replacement for the relationship (API, feature or protocol) and record the decision; relabel the edge once the replacement is adopted."
+    fixtures: { positive: fixtures/DRF-004.pos.json, negative: fixtures/DRF-004.neg.json, kb: fixtures/DRF-004.kb.json }
+    tags: [drift, knowledge, deprecation, relationships]

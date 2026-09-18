@@ -1,0 +1,66 @@
+{
+  "id": "arch_fx_tpr_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture TPR-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FINMA",
+      "DORA",
+      "CH-ISG",
+      "CRA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "CISO on-call within 1 h; NCSC within 24 h (ISG); DORA Art. 19.",
+    "dr_tested_at": "2026-06-30"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      }
+    },
+    {
+      "id": "n_saas",
+      "type": "saas",
+      "name": "Core banking SaaS",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "provider": "other",
+        "outsourcing_registered": true,
+        "criticality": "critical",
+        "exit_strategy": true,
+        "geo_redundant": true,
+        "rto_min": 60,
+        "rpo_min": 15,
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_saas",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

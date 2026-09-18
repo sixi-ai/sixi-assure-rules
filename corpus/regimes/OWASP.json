@@ -1,0 +1,828 @@
+[
+  {
+    "id": "OWASP:LLMTop10:LLM01",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM01:2025",
+    "title": "Prompt Injection",
+    "summary": "User or content-supplied prompts alter the behaviour or output of the model in unintended ways, including through indirect content the model ingests.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "prompt-injection",
+      "input",
+      "ai",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM01",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM01; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:LLMTop10:LLM02",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM02:2025",
+    "title": "Sensitive Information Disclosure",
+    "summary": "The model or application exposes sensitive information, such as personal data, credentials or proprietary content, through its outputs or context.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "data-leak",
+      "privacy",
+      "secrets",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM02",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM02; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:LLMTop10:LLM03",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM03:2025",
+    "title": "Supply Chain",
+    "summary": "Vulnerabilities enter through the LLM supply chain: third-party models, model weights, datasets, plug-ins and libraries.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "supply-chain",
+      "third-party",
+      "models",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM04",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM04; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:LLMTop10:LLM04",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM04:2025",
+    "title": "Data and Model Poisoning",
+    "summary": "Training, fine-tuning or embedding data is contaminated so that the model learns biased, backdoored or unsafe behaviour.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "poisoning",
+      "training-data",
+      "integrity",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM05",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM05; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:LLMTop10:LLM05",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM05:2025",
+    "title": "Improper Output Handling",
+    "summary": "Model output is passed to downstream components without sufficient validation, encoding or sanitisation, enabling injection into other systems.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "output-handling",
+      "validation",
+      "injection",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM10",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM10; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:LLMTop10:LLM06",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM06:2025",
+    "title": "Excessive Agency",
+    "summary": "The application grants the model too much autonomy, functionality or permission, so that model errors or manipulation lead to consequential actions.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "autonomy",
+      "permissions",
+      "tools",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM03",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM03; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:LLMTop10:LLM07",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM07:2025",
+    "title": "System Prompt Leakage",
+    "summary": "System prompts and the instructions or secrets they contain are disclosed to users or attackers.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "prompt",
+      "disclosure",
+      "secrets",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM08",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM08; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:LLMTop10:LLM08",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM08:2025",
+    "title": "Vector and Embedding Weaknesses",
+    "summary": "Weaknesses in vector stores, embeddings and retrieval pipelines allow data leakage, poisoning or manipulation of retrieved context.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "rag",
+      "embeddings",
+      "retrieval",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM09",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM09; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:LLMTop10:LLM09",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM09:2025",
+    "title": "Misinformation",
+    "summary": "The system produces false or misleading information that users rely on, including fabricated facts and unsafe code suggestions.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "misinformation",
+      "accuracy",
+      "reliability",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM07",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM07; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:LLMTop10:LLM10",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2025 (OWASP Gen AI Security Project)",
+    "ref": "LLM10:2025",
+    "title": "Unbounded Consumption",
+    "summary": "Uncontrolled consumption of tokens, compute or downstream services causes cost, denial of service or model extraction.",
+    "excerpt": "",
+    "version": "2024-11-17",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/llm-top-10/",
+    "tags": [
+      "rate-limit",
+      "cost",
+      "availability",
+      "llm"
+    ],
+    "superseded_by": "OWASP:LLMTop10-2026:LLM06",
+    "licence": "owasp",
+    "verified": true,
+    "note": "Identifier and title verified 2026-09-10 against genai.owasp.org; the 2025 list was published on 17 November 2024. Descriptions are paraphrased. Superseded 2026-09-16 by the 2026 edition entry OWASP:LLMTop10-2026:LLM06; kept because rule packs and golden-set fixtures cite the 2025 id."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI01",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI01",
+    "title": "Agent Goal Hijack",
+    "summary": "Attackers manipulate an agent's objectives, task selection or decision pathways through prompt-based manipulation, deceptive tool outputs, malicious artefacts or forged agent-to-agent messages, because agents cannot reliably separate instructions from content.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "goal-hijack",
+      "prompt-injection",
+      "agent",
+      "orchestration"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI02",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI02",
+    "title": "Tool Misuse",
+    "summary": "An agent applies legitimate tools in unsafe or unintended ways — through prompt injection, misalignment, unsafe delegation or ambiguous instructions — leading to data exfiltration, manipulated tool output or workflow hijacking.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "tools",
+      "least-privilege",
+      "mcp",
+      "agent"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted. Title reconciled 2026-09-16 against the OWASP Gen AI Security Project announcement of 9 December 2025, which is the canonical short form; the longer form previously held here came from pre-release material. Previous form: \"Tool Misuse and Exploitation\"."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI03",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI03",
+    "title": "Identity & Privilege Abuse",
+    "summary": "Dynamic trust and delegation between agents are exploited to escalate access, hijack privileges or act without attribution, because agents often lack a distinct governed identity of their own.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "identity",
+      "privilege",
+      "delegation",
+      "agent"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted. Title reconciled 2026-09-16 against the OWASP Gen AI Security Project announcement of 9 December 2025, which is the canonical short form; the longer form previously held here came from pre-release material. Previous form: \"Identity and Privilege Abuse\"."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI04",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI04",
+    "title": "Agentic Supply Chain Vulnerabilities",
+    "summary": "Agents, tools, models, datasets, registries and agentic interfaces such as MCP or A2A come from third parties and may be malicious, compromised or tampered with, including components composed at runtime.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "supply-chain",
+      "third-party",
+      "mcp",
+      "agent"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI05",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI05",
+    "title": "Unexpected Code Execution",
+    "summary": "Code-generation features or embedded tool access are exploited so that generated or injected code executes on hosts or in containers, bypassing controls designed for ordinary tool use.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "code-execution",
+      "sandbox",
+      "tools",
+      "agent"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted. Title reconciled 2026-09-16 against the OWASP Gen AI Security Project announcement of 9 December 2025, which is the canonical short form; the longer form previously held here came from pre-release material. Previous form: \"Unexpected Code Execution (RCE)\"."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI06",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI06",
+    "title": "Memory & Context Poisoning",
+    "summary": "Adversaries corrupt or seed an agent's stored or retrieved context — memory, summaries, embeddings or RAG stores — so that later reasoning, planning or tool use becomes biased or unsafe.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "memory",
+      "rag",
+      "poisoning",
+      "agent"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI07",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI07",
+    "title": "Insecure Inter-Agent Communication",
+    "summary": "Messages between autonomous agents lack authentication, integrity, confidentiality or semantic validation, allowing interception, spoofing or manipulation of agent intents across transport, routing and discovery layers.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "inter-agent",
+      "authentication",
+      "integrity",
+      "agent"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI08",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI08",
+    "title": "Cascading Failures",
+    "summary": "A single fault such as a hallucination, malicious input, corrupted tool or poisoned memory propagates across autonomous agents and compounds into system-wide harm.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "cascading",
+      "resilience",
+      "blast-radius",
+      "agent"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI09",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI09",
+    "title": "Human-Agent Trust Exploitation",
+    "summary": "The trust that users place in fluent, apparently expert agents is exploited to influence decisions, extract information or obtain approval for actions without independent validation.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "trust",
+      "oversight",
+      "approval",
+      "agent"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted."
+  },
+  {
+    "id": "OWASP:AgenticTop10:ASI10",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for Agentic Applications 2026 (OWASP Gen AI Security Project, Agentic Security Initiative)",
+    "ref": "ASI10",
+    "title": "Rogue Agents",
+    "summary": "Malicious or compromised agents deviate from their intended function or authorised scope and act harmfully or deceptively, with loss of behavioural integrity and governance after the drift begins.",
+    "excerpt": "",
+    "version": "2025-12-09",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/",
+    "tags": [
+      "rogue",
+      "governance",
+      "containment",
+      "agent"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official PDF (Version 2026, December 2025) downloaded from genai.owasp.org; the document is licensed CC BY-SA 4.0 and is paraphrased here, not quoted."
+  },
+  {
+    "id": "OWASP:ASVS:V1",
+    "regime": "OWASP",
+    "doc": "OWASP Application Security Verification Standard 5.0.0",
+    "ref": "Chapter V1",
+    "title": "Encoding and Sanitization",
+    "summary": "Requirements for output encoding, escaping and sanitisation so that untrusted content cannot be interpreted as code or commands by interpreters and downstream components.",
+    "excerpt": "",
+    "version": "2025-05-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://github.com/OWASP/ASVS/tree/master/5.0/en",
+    "tags": [
+      "encoding",
+      "sanitisation",
+      "injection",
+      "appsec"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Chapter number and title verified 2026-09-10 against the OWASP ASVS repository (5.0/en); the frontispiece states Version 5.0.0, May 2025. Requirement-level text is paraphrased, not quoted."
+  },
+  {
+    "id": "OWASP:ASVS:V6",
+    "regime": "OWASP",
+    "doc": "OWASP Application Security Verification Standard 5.0.0",
+    "ref": "Chapter V6",
+    "title": "Authentication",
+    "summary": "Requirements for authenticating users and services, covering credential handling, factors and recovery.",
+    "excerpt": "",
+    "version": "2025-05-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://github.com/OWASP/ASVS/tree/master/5.0/en",
+    "tags": [
+      "authentication",
+      "identity",
+      "credentials",
+      "appsec"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Chapter number and title verified 2026-09-10 against the OWASP ASVS repository (5.0/en); the frontispiece states Version 5.0.0, May 2025. Requirement-level text is paraphrased, not quoted."
+  },
+  {
+    "id": "OWASP:ASVS:V8",
+    "regime": "OWASP",
+    "doc": "OWASP Application Security Verification Standard 5.0.0",
+    "ref": "Chapter V8",
+    "title": "Authorization",
+    "summary": "Requirements for enforcing authorization decisions consistently at every access to functions and data.",
+    "excerpt": "",
+    "version": "2025-05-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://github.com/OWASP/ASVS/tree/master/5.0/en",
+    "tags": [
+      "authorisation",
+      "access-control",
+      "least-privilege",
+      "appsec"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Chapter number and title verified 2026-09-10 against the OWASP ASVS repository (5.0/en); the frontispiece states Version 5.0.0, May 2025. Requirement-level text is paraphrased, not quoted."
+  },
+  {
+    "id": "OWASP:ASVS:V16",
+    "regime": "OWASP",
+    "doc": "OWASP Application Security Verification Standard 5.0.0",
+    "ref": "Chapter V16",
+    "title": "Security Logging and Error Handling",
+    "summary": "Requirements for security logging, log content and protection, and for safe error handling.",
+    "excerpt": "",
+    "version": "2025-05-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://github.com/OWASP/ASVS/tree/master/5.0/en",
+    "tags": [
+      "logging",
+      "error-handling",
+      "monitoring",
+      "appsec"
+    ],
+    "licence": "owasp",
+    "verified": true,
+    "note": "Chapter number and title verified 2026-09-10 against the OWASP ASVS repository (5.0/en); the frontispiece states Version 5.0.0, May 2025. Requirement-level text is paraphrased, not quoted."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM01",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM01:2026",
+    "title": "Prompt Injection",
+    "summary": "User- or content-supplied input steers the model away from its intended behaviour, including through indirect content the model ingests. Design time can only evidence the mitigating structure — isolation of untrusted input, a content-safety component, an output-handling step — never the absence of the flaw.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "prompt-injection",
+      "input",
+      "llm",
+      "ai"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 1st in the 2025 edition."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM02",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM02:2026",
+    "title": "Sensitive Information Disclosure",
+    "summary": "The model or its surrounding application reveals personal data, credentials or proprietary content. The drawing evidences which classified stores feed the model and whether redaction sits on the path.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "disclosure",
+      "privacy",
+      "llm",
+      "data"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 2nd in the 2025 edition."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM03",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM03:2026",
+    "title": "Excessive Agency",
+    "summary": "An agent holds more capability, permission or autonomy than its task needs. Design time is where this is decided: how many tools an agent holds, which of them write, and whether a human approval step sits before a consequential action.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "agency",
+      "autonomy",
+      "tools",
+      "approval"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 6th in the 2025 edition."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM04",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM04:2026",
+    "title": "Supply Chain",
+    "summary": "Models, adapters, packages and tools enter the system from third parties without provenance or pinning. The drawing evidences origin, pinning and vetting per component.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "supply-chain",
+      "provenance",
+      "third-party",
+      "llm"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 3rd in the 2025 edition."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM05",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM05:2026",
+    "title": "Data and Model Poisoning",
+    "summary": "Training, fine-tuning or retrieval data is manipulated to change model behaviour. The drawing evidences which ingestion flows reach a training or retrieval store and whether anything filters them.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "poisoning",
+      "training-data",
+      "retrieval",
+      "integrity"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 4th in the 2025 edition."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM06",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM06:2026",
+    "title": "Unbounded Consumption",
+    "summary": "Uncontrolled inference volume or cost, including denial of wallet. Design time evidences rate limits, token limits and a gateway; the behaviour itself is runtime.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "rate-limit",
+      "cost",
+      "availability",
+      "llm"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 10th in the 2025 edition. Two independent secondary sources disagree on positions 6 and 7 (Unbounded Consumption and Misinformation) — treat the rank as unconfirmed."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM07",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM07:2026",
+    "title": "Misinformation",
+    "summary": "The model produces confident, wrong output that a person or a downstream system acts on. Design time evidences an evaluation component and a human step, not the output's truth.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "misinformation",
+      "evaluation",
+      "oversight",
+      "llm"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 9th in the 2025 edition. Two independent secondary sources disagree on positions 6 and 7 (Unbounded Consumption and Misinformation) — treat the rank as unconfirmed."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM08",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM08:2026",
+    "title": "Hidden Context Exposure",
+    "summary": "Everything assembled into the context window can leak or be manipulated — the system prompt, retrieved documents, memory, tool responses and application state. This widens the 2025 System Prompt Leakage entry to every store that feeds the context, which is exactly what the drawing enumerates.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "context",
+      "memory",
+      "retrieval",
+      "disclosure"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 7th (as System Prompt Leakage) in the 2025 edition."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM09",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM09:2026",
+    "title": "Vector and Embedding Weaknesses",
+    "summary": "Retrieval stores and embeddings leak across tenants or users, or are manipulated. The drawing evidences access trimming, tenancy and the classification of each index.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "vector",
+      "embeddings",
+      "retrieval",
+      "acl"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 8th in the 2025 edition."
+  },
+  {
+    "id": "OWASP:LLMTop10-2026:LLM10",
+    "regime": "OWASP",
+    "doc": "OWASP Top 10 for LLM Applications 2026 (OWASP Gen AI Security Project)",
+    "ref": "LLM10:2026",
+    "title": "Improper Output Handling",
+    "summary": "Model output is passed to a downstream interpreter, browser or system call without validation or encoding. The drawing evidences whether an output-handling component exists between the model and the consumer.",
+    "excerpt": "",
+    "version": "2026-08-03",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "tags": [
+      "output-handling",
+      "injection",
+      "downstream",
+      "llm"
+    ],
+    "licence": "owasp",
+    "verified": false,
+    "note": "Not verified against the published list: the OWASP GenAI resource page fetched on 2026-09-16 confirms the 2026 edition and its date but renders client-side and does not enumerate the entries, so the rank and title come from a secondary compilation (docs/research/04 §2.1 [13][14]). Verify the exact publication day (the resource page gives 3 August 2026, the legacy project page 4 August 2026) and the entries against the published PDF before citing the rank in an export. Ranked 5th in the 2025 edition."
+  }
+]

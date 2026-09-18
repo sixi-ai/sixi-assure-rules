@@ -1,0 +1,105 @@
+{
+  "id": "arch_fx_agt_006_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture AGT-006 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "autonomous",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_tool_x",
+      "type": "tool",
+      "name": "Script runner tool",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "scripts.run"
+        ],
+        "vetted": true,
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "executes_code"
+        ]
+      }
+    },
+    {
+      "id": "n_hs",
+      "type": "human_step",
+      "name": "Approval (four-eyes)",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "operations"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_tool_x",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_agent",
+      "to": "n_hs",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e3",
+      "from": "n_hs",
+      "to": "n_tool_x",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

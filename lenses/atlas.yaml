@@ -1,0 +1,163 @@
+# MITRE ATLAS lens — explanation layer for the AI and agent rule packs.
+# Data only: no loader reads this file in slice 1 (see lenses/README.md).
+# A lens NEVER produces a finding (CLAUDE.md §1.2); it names the attack technique that the
+# structural weakness a rule already found would enable.
+lens: atlas
+version: v2026.09
+source: https://github.com/mitre-atlas/atlas-data/releases
+licence: Apache-2.0
+attribution: "MITRE ATLAS™, © 2021–2026 The MITRE Corporation, released under the Apache License 2.0."
+accessed: 2026-09-16
+notes: |
+  Ids and names were read from the ATLAS-2026.09.yaml release asset (content release v2026.09, published
+  15 September 2026: 16 tactics, 208 technique entries of which 120 are top-level, 40 mitigations,
+  73 case studies). The atlas.mitre.org website renders client-side and returns nothing to an automated
+  fetch, so the release asset is the source of truth here.
+  Coverage is deliberately partial. It covers packs/ai.yaml and packs/agt.yaml only; other
+  packs are out of scope for this release. Rules with no clearly applicable technique are absent:
+  AI-005 and AI-014 (an incomplete inventory or an unscoped evaluation is a governance gap, not an
+  attack), AI-006 (a missing risk-tier declaration is a legal classification), AI-011 (absent logging
+  removes evidence rather than enabling a named technique) and AI-013 (missing model documentation).
+  AML.T0098 "AI Agent Tool Credential Harvesting" was reported by a secondary source before this pass
+  and is confirmed present in v2026.09 under that exact name.
+map:
+  AI-001:
+    - id: AML.T0040
+      name: AI Model Inference API Access
+      why: A model endpoint called without a gateway is reachable directly, which is the access this technique needs.
+    - id: AML.T0024
+      name: Exfiltration via AI Inference API
+      why: With no gateway there is no place to inspect or bound what leaves through the inference path.
+    - id: AML.T0034
+      name: Cost Harvesting
+      why: An ungated endpoint has no rate or token ceiling, so an adversary can drive spend.
+  AI-002:
+    - id: AML.T0051
+      name: LLM Prompt Injection
+      why: A user-facing agent with no content-safety component ingests untrusted text unfiltered.
+    - id: AML.T0054
+      name: LLM Jailbreak
+      why: Nothing on the path screens attempts to override the model's instructions.
+    - id: AML.T0093
+      name: Prompt Infiltration via Public-Facing Application
+      why: The public application is the injection surface the technique describes.
+  AI-003:
+    - id: AML.T0053
+      name: AI Agent Tool Invocation
+      why: Without an approval step the agent's tool call is the adversary's execution primitive.
+    - id: AML.T0101
+      name: Data Destruction via AI Agent Tool Invocation
+      why: A consequential action with no human step can be destructive and irreversible.
+  AI-004:
+    - id: AML.T0031
+      name: Erode AI Model Integrity
+      why: With no evaluation or drift-monitoring node, degradation of model behaviour is not observed.
+  AI-007:
+    - id: AML.T0048.003
+      name: User Harm
+      why: A user who is not told they are talking to an AI system can be misled by its output.
+  AI-008:
+    - id: AML.T0053
+      name: AI Agent Tool Invocation
+      why: Unrestricted tool scopes turn one invocation into access far beyond the task.
+    - id: AML.T0086
+      name: Exfiltration via AI Agent Tool Invocation
+      why: An unscoped tool can read and forward data the agent should never reach.
+    - id: AML.T0098
+      name: AI Agent Tool Credential Harvesting
+      why: Broad scopes typically include the credentials the tool holds for its backend.
+  AI-009:
+    - id: AML.T0010
+      name: AI Supply Chain Compromise
+      why: An unvetted third-party tool or MCP server is an unmanaged supply-chain entry point.
+    - id: AML.T0010.005
+      name: AI Agent Tool
+      why: The sub-technique names the agent tool itself as the compromised supply-chain element.
+    - id: AML.T0110
+      name: AI Agent Tool Poisoning
+      why: Nothing established that the tool behaves as described before the agent was given it.
+  AI-010:
+    - id: AML.T0034.002
+      name: Agentic Resource Consumption
+      why: An autonomous agent with no rate limit can consume resources without bound.
+    - id: AML.T0029
+      name: Denial of AI Service
+      why: With no kill switch a runaway or driven agent cannot be stopped.
+  AI-012:
+    - id: AML.T0048
+      name: External Harms
+      why: Unmarked generated output is consumed as if it were authored, which is how these harms land.
+    - id: AML.T0048.001
+      name: Reputational Harm
+      why: Output attributed to the organisation but produced by a model carries its name.
+    - id: AML.T0088
+      name: Generate Deepfakes
+      why: Marking is the control that separates synthetic media from authentic media.
+  AI-015:
+    - id: AML.T0043
+      name: Craft Adversarial Data
+      why: Robustness was never evaluated, so crafted inputs are untested against this system.
+    - id: AML.T0031
+      name: Erode AI Model Integrity
+      why: Without robustness and bias coverage a gradual loss of integrity is not detected.
+  AGT-001:
+    - id: AML.T0074
+      name: Masquerading
+      why: A tool that takes the name of another tool is masquerading as trusted infrastructure.
+    - id: AML.T0110
+      name: AI Agent Tool Poisoning
+      why: Name shadowing is how a poisoned tool gets selected in place of the legitimate one.
+  AGT-002:
+    - id: AML.T0110
+      name: AI Agent Tool Poisoning
+      why: A declared behaviour that hides a second action is the poisoned-tool pattern.
+    - id: AML.T0011.002
+      name: Poisoned AI Agent Tool
+      why: The undeclared action is delivered through the tool the agent already trusts.
+  AGT-003:
+    - id: AML.T0051
+      name: LLM Prompt Injection
+      why: Third-party content ingested without content safety is the indirect-injection channel.
+    - id: AML.T0070
+      name: RAG Poisoning
+      why: Unfiltered third-party content that reaches a retrieval store poisons retrieval.
+    - id: AML.T0080
+      name: AI Agent Context Poisoning
+      why: The same content reaches the agent's context and persists there.
+    - id: AML.T0099
+      name: AI Agent Tool Data Poisoning
+      why: Content returned by a tool is data the agent acts on without screening.
+  AGT-004:
+    - id: AML.T0109
+      name: AI Supply Chain Rug Pull
+      why: An unpinned tool or MCP server can change after it was assessed.
+    - id: AML.T0010.005
+      name: AI Agent Tool
+      why: The agent tool is the supply-chain element that moves under the drawing.
+    - id: AML.T0115.002
+      name: AI Agent Tools
+      why: Publishing a poisoned version is effective precisely when nothing pins the version.
+  AGT-005:
+    - id: AML.T0053
+      name: AI Agent Tool Invocation
+      why: An unvetted tool that can write is invoked with the agent's authority.
+    - id: AML.T0101
+      name: Data Destruction via AI Agent Tool Invocation
+      why: The write capability is what makes the invocation destructive.
+    - id: AML.T0086
+      name: Exfiltration via AI Agent Tool Invocation
+      why: An unvetted tool is also an outbound channel nobody assessed.
+  AGT-006:
+    - id: AML.T0102
+      name: Generate Malicious Commands
+      why: An autonomous agent reaching a code-executing tool turns generated text into commands.
+    - id: AML.T0053
+      name: AI Agent Tool Invocation
+      why: The code-execution tool is invoked with no approval between intent and effect.
+    - id: AML.T0105
+      name: Escape to Host
+      why: Code execution is the precondition for leaving the sandbox it runs in.
+  AGT-007:
+    - id: AML.T0010
+      name: AI Supply Chain Compromise
+      why: A third-party component that declares no capabilities cannot be assessed as a supply-chain risk.

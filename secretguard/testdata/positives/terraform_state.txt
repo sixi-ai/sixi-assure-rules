@@ -1,0 +1,27 @@
+{
+  "version": 4,
+  "terraform_version": "1.9.5",
+  "serial": 12,
+  "lineage": "3f1a0c2e-0000-4000-8000-000000000000",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "azurerm_key_vault_secret",
+      "name": "example",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "name": "example-only"
+          },
+          "sensitive_attributes": [
+            [
+              "value"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

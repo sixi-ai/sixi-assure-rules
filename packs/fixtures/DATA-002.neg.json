@@ -1,0 +1,67 @@
+{
+  "id": "arch_fx_data_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DATA-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FADP",
+      "FINMA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_idx",
+      "type": "vector_index",
+      "name": "AI Search index",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "data_class": "cid",
+        "acl_trimming": true,
+        "redaction": true,
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_idx",
+      "kind": "reads",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      },
+      "data_class": "cid"
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

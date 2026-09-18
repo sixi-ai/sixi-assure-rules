@@ -1,0 +1,71 @@
+{
+  "id": "arch_fx_ot_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-003 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "CRA",
+      "NIS2",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited",
+    "incident_reporting": "Plant CSIRT within 24 h (NIS2 Art. 23); CRA Art. 14 via the PSIRT."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_ag",
+      "type": "agent",
+      "name": "Assistant",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Proposes machine commands",
+        "owner": "Fixture owner",
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_brk",
+      "type": "app",
+      "name": "Command broker",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_kv",
+      "type": "secret_store",
+      "name": "Key Vault (command signing)",
+      "layer": "identity",
+      "source": "design",
+      "attrs": {
+        "key_use": "command_signing"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_brk_kv",
+      "from": "n_brk",
+      "to": "n_kv",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

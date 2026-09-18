@@ -1,0 +1,1406 @@
+{
+  "id": "arch_tpl_glassbox_ot_agent",
+  "tenant_id": "tenant_templates",
+  "version": 1,
+  "name": "GlassBox Edge – AI assistant grounded in live OT telemetry",
+  "attrs": {
+    "owner": "Head of Manufacturing IT",
+    "criticality": "high",
+    "materiality": "medium",
+    "ai_act_tier": "limited",
+    "regimes": [
+      "AIACT",
+      "CRA",
+      "NIS2",
+      "IEC",
+      "ISO",
+      "FADP",
+      "FDA",
+      "EU-GMP",
+      "MR",
+      "GAMP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "description": "AI assistant for the operators and QA of a fictional biopharma plant (GlassBox Pharma AG, Basel): two bioreactor lines on two NVIDIA Jetson edge nodes and Azure. The model never touches the PLC: the agent proposes a command, a human approves it under their own identity, a broker signs it with a key the agent cannot reach, and the Jetson validates signature, freshness, nonce, allow-list, range and state before it writes.",
+    "incident_reporting": "CRA Art. 14: actively exploited vulnerabilities reported through the PSIRT within 24 h; NIS2 Art. 23: early warning to the national CSIRT within 24 h via the plant CSIRT; a budget or attack alert stops ingress (kill switch).",
+    "substantial_modification": "not_substantial",
+    "decisions": [
+      {
+        "id": "ADR-001",
+        "title": "The model never touches the PLC",
+        "status": "accepted",
+        "context": "The assistant reads live process data and may suggest actions on a GMP production line.",
+        "decision": "AI components only propose commands. A human approves each command in the approval console under their own identity; the command broker, which no AI component can call, signs it and sends it cloud-to-device; the validator on the Jetson checks signature, freshness, nonce, allow-list, range and machine state before it writes the PLC.",
+        "consequences": "Every machine action has a named approver and a device verdict on the audit trail; a compromised prompt can at most propose.",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "AIACT:2024/1689:Art14"
+          },
+          {
+            "kind": "clause",
+            "id": "IEC:62443-3-3:Standard"
+          },
+          {
+            "kind": "clause",
+            "id": "OWASP:LLMTop10:LLM06"
+          }
+        ],
+        "proposed_by": "Head of Manufacturing IT",
+        "decided_by": "Head of Manufacturing IT",
+        "decided_at": "2026-09-15T08:00:00Z"
+      },
+      {
+        "id": "ADR-002",
+        "title": "AI Act: limited risk, Art. 50 transparency",
+        "status": "accepted",
+        "context": "The assistant explains process data and drafts reports; people decide on every command and every batch.",
+        "decision": "Classify the assistant as a limited-risk AI system: disclose the AI in the interface and mark drafted reports as AI-generated. It is not a safety component of the machine; if it became one, the Annex I route applies.",
+        "consequences": "Disclosure and output marking are design attributes the rules check; the classification is revisited when the intended purpose changes.",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "AIACT:2024/1689:Art50(1)"
+          },
+          {
+            "kind": "clause",
+            "id": "AIACT:2024/1689:Art50(2)"
+          }
+        ],
+        "proposed_by": "Head of Manufacturing IT",
+        "decided_by": "Head of Manufacturing IT",
+        "decided_at": "2026-09-15T08:00:00Z"
+      },
+      {
+        "id": "ADR-003",
+        "title": "Command-signing keys in a managed HSM, verified on the device",
+        "status": "accepted",
+        "context": "The demo signs commands with a per-device HMAC key held in Key Vault.",
+        "decision": "In production, sign with asymmetric keys in Key Vault Managed HSM reachable only by the broker's identity; each Jetson verifies with the public key.",
+        "consequences": "No secret on the device can forge a command; key rotation does not touch the devices' trust anchor.",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "ISO:27001:A.8.24"
+          },
+          {
+            "kind": "clause",
+            "id": "CRA:2024/2847:AnnexI"
+          }
+        ],
+        "proposed_by": "Head of Manufacturing IT",
+        "decided_by": "Head of Manufacturing IT",
+        "decided_at": "2026-09-15T08:00:00Z"
+      },
+      {
+        "id": "ADR-004",
+        "title": "Machinery Regulation: the command path is not a substantial modification",
+        "status": "accepted",
+        "context": "Adding an AI assistant that proposes setpoints to existing bioreactor skids could make the plant the manufacturer of the modified machinery (Art. 18).",
+        "decision": "Assessed with the skids' risk assessment: commands stay inside the manufacturer's allow-list, value ranges and machine states, checked on the device before any write, so the path creates no new hazard and needs no new guard or protective device. The validator records every command and its verdict in a tracing log kept five years.",
+        "consequences": "The plant does not take on the manufacturer's obligations for the skids; any change to the allow-list, the ranges or the validator reopens the assessment.",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "MR:2023/1230:Art3(16)"
+          },
+          {
+            "kind": "clause",
+            "id": "MR:2023/1230:Art18"
+          },
+          {
+            "kind": "clause",
+            "id": "MR:2023/1230:AnnexIII-1.2.1(f)"
+          }
+        ],
+        "proposed_by": "Head of Manufacturing IT",
+        "decided_by": "Head of Manufacturing IT",
+        "decided_at": "2026-09-15T08:00:00Z"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "n_plc_a",
+      "type": "edge_device",
+      "name": "PLC / OPC UA server – BR-101",
+      "layer": "edge",
+      "zone": "g_line_a",
+      "source": "design",
+      "position": {
+        "x": 40,
+        "y": 80
+      },
+      "attrs": {
+        "site": "GlassBox Pharma AG – Basel",
+        "attestation": "none",
+        "egress_policy": true,
+        "owner": "Head of Manufacturing IT"
+      }
+    },
+    {
+      "id": "n_jetson_a",
+      "type": "edge_gateway",
+      "name": "Jetson A – edge node BR-101",
+      "layer": "edge",
+      "zone": "g_line_a",
+      "source": "design",
+      "position": {
+        "x": 40,
+        "y": 240
+      },
+      "attrs": {
+        "site": "GlassBox Pharma AG – Basel",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "sbom": true,
+        "cra_scope": true,
+        "egress_policy": true,
+        "disk_encryption": true,
+        "owner": "Head of Manufacturing IT",
+        "version": "4.1",
+        "x_device_identity": "DPS enrolment, key in the TPM"
+      }
+    },
+    {
+      "id": "n_model_a",
+      "type": "edge_model",
+      "name": "Anomaly model – BR-101 (z-score, versioned)",
+      "layer": "edge",
+      "zone": "g_line_a",
+      "source": "design",
+      "position": {
+        "x": 280,
+        "y": 80
+      },
+      "attrs": {
+        "hosted_on": "n_jetson_a",
+        "owner": "Head of Manufacturing IT",
+        "version": "1.0",
+        "purpose": "Scores deviations from the validated envelope on the device; only signed 30 s summaries leave the site."
+      }
+    },
+    {
+      "id": "n_validator_a",
+      "type": "app",
+      "name": "Command validator – Jetson A",
+      "layer": "edge",
+      "zone": "g_line_a",
+      "source": "design",
+      "position": {
+        "x": 280,
+        "y": 240
+      },
+      "attrs": {
+        "hosted_on": "n_jetson_a",
+        "exposure": "internal",
+        "command_validation": true,
+        "intervention_log": true,
+        "owner": "Head of Manufacturing IT",
+        "x_checks": "signature, validity <= 60 s, unused nonce, allow-list, range, machine state"
+      }
+    },
+    {
+      "id": "n_plc_b",
+      "type": "edge_device",
+      "name": "PLC / OPC UA server – BR-201",
+      "layer": "edge",
+      "zone": "g_line_b",
+      "source": "design",
+      "position": {
+        "x": 560,
+        "y": 80
+      },
+      "attrs": {
+        "site": "GlassBox Pharma AG – Basel",
+        "attestation": "none",
+        "egress_policy": true,
+        "owner": "Head of Manufacturing IT"
+      }
+    },
+    {
+      "id": "n_jetson_b",
+      "type": "edge_gateway",
+      "name": "Jetson B – edge node BR-201",
+      "layer": "edge",
+      "zone": "g_line_b",
+      "source": "design",
+      "position": {
+        "x": 560,
+        "y": 240
+      },
+      "attrs": {
+        "site": "GlassBox Pharma AG – Basel",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "sbom": true,
+        "cra_scope": true,
+        "egress_policy": true,
+        "disk_encryption": true,
+        "owner": "Head of Manufacturing IT",
+        "version": "4.1",
+        "x_device_identity": "DPS enrolment, key in the TPM"
+      }
+    },
+    {
+      "id": "n_model_b",
+      "type": "edge_model",
+      "name": "Anomaly model – BR-201 (z-score, versioned)",
+      "layer": "edge",
+      "zone": "g_line_b",
+      "source": "design",
+      "position": {
+        "x": 800,
+        "y": 80
+      },
+      "attrs": {
+        "hosted_on": "n_jetson_b",
+        "owner": "Head of Manufacturing IT",
+        "version": "1.0",
+        "purpose": "Scores deviations from the validated envelope on the device; only signed 30 s summaries leave the site."
+      }
+    },
+    {
+      "id": "n_validator_b",
+      "type": "app",
+      "name": "Command validator – Jetson B",
+      "layer": "edge",
+      "zone": "g_line_b",
+      "source": "design",
+      "position": {
+        "x": 800,
+        "y": 240
+      },
+      "attrs": {
+        "hosted_on": "n_jetson_b",
+        "exposure": "internal",
+        "command_validation": true,
+        "intervention_log": true,
+        "owner": "Head of Manufacturing IT",
+        "x_checks": "signature, validity <= 60 s, unused nonce, allow-list, range, machine state"
+      }
+    },
+    {
+      "id": "n_hub",
+      "type": "broker",
+      "name": "Azure IoT Hub – conduit",
+      "layer": "platform",
+      "zone": "g_conduit",
+      "source": "design",
+      "position": {
+        "x": 300,
+        "y": 460
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure IoT Hub",
+        "network_exposure": "private",
+        "x_note": "per-device identities, no shared keys; device-to-cloud summaries, cloud-to-device commands"
+      }
+    },
+    {
+      "id": "n_op_a",
+      "type": "user",
+      "name": "Line operator – BR-101",
+      "layer": "human",
+      "zone": "g_users",
+      "source": "design",
+      "position": {
+        "x": -440,
+        "y": 660
+      },
+      "attrs": {
+        "population": "employee",
+        "mfa": true,
+        "x_authn": "Entra ID with on-behalf-of token exchange"
+      }
+    },
+    {
+      "id": "n_op_b",
+      "type": "user",
+      "name": "Line operator – BR-201",
+      "layer": "human",
+      "zone": "g_users",
+      "source": "design",
+      "position": {
+        "x": -440,
+        "y": 790
+      },
+      "attrs": {
+        "population": "employee",
+        "mfa": true,
+        "x_authn": "Entra ID with on-behalf-of token exchange"
+      }
+    },
+    {
+      "id": "n_qa",
+      "type": "user",
+      "name": "QA reviewer (both lines, PII masked)",
+      "layer": "human",
+      "zone": "g_users",
+      "source": "design",
+      "position": {
+        "x": -440,
+        "y": 920
+      },
+      "attrs": {
+        "population": "employee",
+        "mfa": true,
+        "x_authn": "Entra ID with on-behalf-of token exchange"
+      }
+    },
+    {
+      "id": "n_contractor",
+      "type": "user",
+      "name": "Contractor (alarms of own line)",
+      "layer": "human",
+      "zone": "g_users",
+      "source": "design",
+      "position": {
+        "x": -440,
+        "y": 1050
+      },
+      "attrs": {
+        "population": "partner",
+        "mfa": true,
+        "x_authn": "Entra ID with on-behalf-of token exchange"
+      }
+    },
+    {
+      "id": "n_approver",
+      "type": "user",
+      "name": "Command approver",
+      "layer": "human",
+      "zone": "g_users",
+      "source": "design",
+      "position": {
+        "x": -440,
+        "y": 1180
+      },
+      "attrs": {
+        "population": "employee",
+        "mfa": true,
+        "x_authn": "Entra ID with on-behalf-of token exchange"
+      }
+    },
+    {
+      "id": "n_frontdoor",
+      "type": "gateway",
+      "name": "Azure Front Door (WAF)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 540
+      },
+      "attrs": {
+        "kind": "waf",
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure Front Door",
+        "logging": true
+      }
+    },
+    {
+      "id": "n_web",
+      "type": "app",
+      "name": "GlassBox web: telemetry, chat, attack mode, trail",
+      "layer": "app",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 680
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure Static Web Apps",
+        "exposure": "public",
+        "authn": "oidc",
+        "ai_disclosure": true,
+        "identity": "managed_identity"
+      }
+    },
+    {
+      "id": "n_apim",
+      "type": "gateway",
+      "name": "API Management – AI gateway",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 280,
+        "y": 680
+      },
+      "attrs": {
+        "kind": "ai",
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure API Management",
+        "logging": true,
+        "token_limits": true,
+        "x_policies": "validate-jwt, per-IP limits, daily token budget, MCP pass-through, full log"
+      }
+    },
+    {
+      "id": "n_ingest",
+      "type": "api",
+      "name": "Ingest – signature verification",
+      "layer": "app",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 600,
+        "y": 680
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure Container Apps",
+        "identity": "managed_identity",
+        "exposure": "internal",
+        "owner": "Head of Manufacturing IT"
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Assistant – LangGraph loop",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 840
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "identity": "managed_identity",
+        "autonomy": "assisted",
+        "owner": "Head of Manufacturing IT",
+        "materiality": "medium",
+        "purpose": "Answers questions about live process data against the validated envelope, drafts deviation reports and proposes commands; it never executes them.",
+        "kill_switch": true,
+        "rate_limit": true,
+        "content_safety": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "gamp_category": "custom",
+        "supplier_assessed": true,
+        "tool_scopes": [
+          "telemetry.read",
+          "alarms.read",
+          "deviation_report.draft",
+          "command.propose"
+        ],
+        "x_loop_policy": "step, tool, write and token budgets checked before spending; no retry after a denial; named stop reasons"
+      }
+    },
+    {
+      "id": "n_interrupt",
+      "type": "human_step",
+      "name": "Pre-write interrupt – operator confirms the command text",
+      "layer": "human",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 600,
+        "y": 840
+      },
+      "attrs": {
+        "role": "line operator",
+        "approval_for": [
+          "command proposal",
+          "deviation report"
+        ],
+        "approval_identity": "separate"
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "MCP tool server – OT tools",
+      "layer": "app",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 280,
+        "y": 840
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure Container Apps",
+        "origin": "first_party",
+        "vetted": true,
+        "logged": true,
+        "identity": "managed_identity",
+        "scopes": [
+          "telemetry.read",
+          "alarms.read",
+          "deviation_report.draft",
+          "command.propose"
+        ],
+        "write_capable": true,
+        "capabilities": [
+          "queries_database",
+          "modifies_state"
+        ],
+        "integrity": "pinned",
+        "owner": "Head of Manufacturing IT",
+        "x_note": "allow-list and strict JSON schema per tool; claims taken once from the token"
+      }
+    },
+    {
+      "id": "n_foundry",
+      "type": "llm_endpoint",
+      "name": "Microsoft Foundry – small model",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 1000
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Microsoft Foundry",
+        "network": "private",
+        "model_card": true,
+        "outsourcing_registered": true,
+        "purpose": "Language model for the assistant and for the LLM-as-judge.",
+        "owner": "Head of Manufacturing IT",
+        "materiality": "medium"
+      }
+    },
+    {
+      "id": "n_safety",
+      "type": "api",
+      "name": "Azure AI Content Safety – Prompt Shields",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 280,
+        "y": 1000
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure AI Content Safety",
+        "exposure": "internal",
+        "x_screens": "user prompts; OPC UA alarm text and operator comments, as documents"
+      }
+    },
+    {
+      "id": "n_sql",
+      "type": "datastore",
+      "name": "Azure SQL – lines, summaries, alarms, commands",
+      "layer": "data",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 600,
+        "y": 1000
+      },
+      "attrs": {
+        "engine": "sql",
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure SQL Database",
+        "data_class": "pii",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "criticality": "high",
+        "row_level_security": true,
+        "gamp_category": "configured",
+        "supplier_assessed": true,
+        "x_masking": "operator names masked for QA"
+      }
+    },
+    {
+      "id": "n_approval",
+      "type": "human_step",
+      "name": "Approval console – the approver signs",
+      "layer": "human",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 1160
+      },
+      "attrs": {
+        "role": "command approver",
+        "approval_for": [
+          "command"
+        ],
+        "approval_identity": "separate"
+      }
+    },
+    {
+      "id": "n_broker",
+      "type": "app",
+      "name": "Command broker – sign and send",
+      "layer": "app",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 280,
+        "y": 1160
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure Container Apps",
+        "identity": "managed_identity",
+        "exposure": "internal",
+        "owner": "Head of Manufacturing IT",
+        "x_note": "signs {command_id, device_id, command, params, nonce, exp} and sends it cloud-to-device; never an MCP tool"
+      }
+    },
+    {
+      "id": "n_kv",
+      "type": "secret_store",
+      "name": "Key Vault – command signing keys",
+      "layer": "identity",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 600,
+        "y": 1160
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure Key Vault Managed HSM",
+        "key_use": "command_signing",
+        "network_exposure": "private"
+      }
+    },
+    {
+      "id": "n_audit",
+      "type": "log_sink",
+      "name": "Audit trail – append-only, hash-chained",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 280,
+        "y": 1320
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "retention_days": 3650,
+        "immutable": true,
+        "x_chain": "identity, scope decision, shield verdicts, command lifecycle and device verdict of every step"
+      }
+    },
+    {
+      "id": "n_appins",
+      "type": "log_sink",
+      "name": "Application Insights – OTel GenAI traces",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 600,
+        "y": 1320
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Application Insights",
+        "retention_days": 365,
+        "x_budget": "daily cap; a budget alert triggers the kill switch"
+      }
+    },
+    {
+      "id": "n_eval",
+      "type": "evaluation",
+      "name": "Eval harness – golden set and attack suite (CI gate)",
+      "layer": "ai",
+      "zone": "g_evidence",
+      "source": "design",
+      "position": {
+        "x": 1040,
+        "y": 680
+      },
+      "attrs": {
+        "owner": "Head of Manufacturing IT",
+        "purpose": "Task success, groundedness, tool-call correctness and attack success rate on the real graph; a regression blocks the merge.",
+        "evaluates": [
+          "accuracy",
+          "robustness",
+          "prompt_injection"
+        ],
+        "provider": "other",
+        "provider_service": "GitHub Actions"
+      }
+    },
+    {
+      "id": "n_dashboard",
+      "type": "app",
+      "name": "Trust Dashboard (public)",
+      "layer": "app",
+      "zone": "g_evidence",
+      "source": "design",
+      "position": {
+        "x": 1040,
+        "y": 840
+      },
+      "attrs": {
+        "region": "switzerlandnorth",
+        "provider": "azure",
+        "provider_service": "Azure Static Web Apps",
+        "exposure": "public",
+        "identity": "managed_identity"
+      }
+    },
+    {
+      "id": "n_defender",
+      "type": "saas",
+      "name": "Defender for Cloud – posture",
+      "layer": "platform",
+      "zone": "g_evidence",
+      "source": "design",
+      "position": {
+        "x": 1040,
+        "y": 1000
+      },
+      "attrs": {
+        "provider": "azure",
+        "provider_service": "Microsoft Defender for Cloud",
+        "outsourcing_registered": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_plc_jetson_a",
+      "from": "n_plc_a",
+      "to": "n_jetson_a",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {
+        "description": "process tags and alarm text"
+      },
+      "protocol": "opcua"
+    },
+    {
+      "id": "e_jetson_model_a",
+      "from": "n_jetson_a",
+      "to": "n_model_a",
+      "kind": "calls",
+      "auth": "none",
+      "encryption": "none",
+      "attrs": {},
+      "protocol": "in-process"
+    },
+    {
+      "id": "e_jetson_hub_a",
+      "from": "n_jetson_a",
+      "to": "n_hub",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {
+        "logged": true,
+        "description": "signed 30 s summaries (device-to-cloud)"
+      },
+      "protocol": "mqtt"
+    },
+    {
+      "id": "e_hub_jetson_a",
+      "from": "n_hub",
+      "to": "n_jetson_a",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {
+        "logged": true,
+        "description": "human-signed commands (cloud-to-device)"
+      },
+      "protocol": "mqtt"
+    },
+    {
+      "id": "e_jetson_validator_a",
+      "from": "n_jetson_a",
+      "to": "n_validator_a",
+      "kind": "calls",
+      "auth": "none",
+      "encryption": "none",
+      "attrs": {},
+      "protocol": "in-process"
+    },
+    {
+      "id": "e_validator_plc_a",
+      "from": "n_validator_a",
+      "to": "n_plc_a",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {
+        "consequence": "high",
+        "logged": true,
+        "description": "the only write path to the machine"
+      },
+      "protocol": "opcua"
+    },
+    {
+      "id": "e_plc_jetson_b",
+      "from": "n_plc_b",
+      "to": "n_jetson_b",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {
+        "description": "process tags and alarm text"
+      },
+      "protocol": "opcua"
+    },
+    {
+      "id": "e_jetson_model_b",
+      "from": "n_jetson_b",
+      "to": "n_model_b",
+      "kind": "calls",
+      "auth": "none",
+      "encryption": "none",
+      "attrs": {},
+      "protocol": "in-process"
+    },
+    {
+      "id": "e_jetson_hub_b",
+      "from": "n_jetson_b",
+      "to": "n_hub",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {
+        "logged": true,
+        "description": "signed 30 s summaries (device-to-cloud)"
+      },
+      "protocol": "mqtt"
+    },
+    {
+      "id": "e_hub_jetson_b",
+      "from": "n_hub",
+      "to": "n_jetson_b",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {
+        "logged": true,
+        "description": "human-signed commands (cloud-to-device)"
+      },
+      "protocol": "mqtt"
+    },
+    {
+      "id": "e_jetson_validator_b",
+      "from": "n_jetson_b",
+      "to": "n_validator_b",
+      "kind": "calls",
+      "auth": "none",
+      "encryption": "none",
+      "attrs": {},
+      "protocol": "in-process"
+    },
+    {
+      "id": "e_validator_plc_b",
+      "from": "n_validator_b",
+      "to": "n_plc_b",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {
+        "consequence": "high",
+        "logged": true,
+        "description": "the only write path to the machine"
+      },
+      "protocol": "opcua"
+    },
+    {
+      "id": "e_ingest_hub",
+      "from": "n_ingest",
+      "to": "n_hub",
+      "kind": "subscribes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "amqp"
+    },
+    {
+      "id": "e_ingest_sql",
+      "from": "n_ingest",
+      "to": "n_sql",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "tds"
+    },
+    {
+      "id": "e_ingest_audit",
+      "from": "n_ingest",
+      "to": "n_audit",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_op_a_front",
+      "from": "n_op_a",
+      "to": "n_frontdoor",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_op_b_front",
+      "from": "n_op_b",
+      "to": "n_frontdoor",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_qa_front",
+      "from": "n_qa",
+      "to": "n_frontdoor",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_contractor_front",
+      "from": "n_contractor",
+      "to": "n_frontdoor",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_frontdoor_web",
+      "from": "n_frontdoor",
+      "to": "n_web",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_web_apim",
+      "from": "n_web",
+      "to": "n_apim",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {
+        "description": "user token (line, role)"
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_apim_agent",
+      "from": "n_apim",
+      "to": "n_agent",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_apim_appins",
+      "from": "n_apim",
+      "to": "n_appins",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_agent_apim",
+      "from": "n_agent",
+      "to": "n_apim",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true,
+        "description": "model calls and MCP tools through the gateway"
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_apim_foundry",
+      "from": "n_apim",
+      "to": "n_foundry",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true,
+        "prompt_contains": "internal"
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_apim_mcp",
+      "from": "n_apim",
+      "to": "n_mcp",
+      "kind": "calls",
+      "auth": "obo",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_agent_safety",
+      "from": "n_agent",
+      "to": "n_safety",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_mcp_sql_read",
+      "from": "n_mcp",
+      "to": "n_sql",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "description": "session context per line"
+      },
+      "protocol": "tds"
+    },
+    {
+      "id": "e_agent_interrupt",
+      "from": "n_agent",
+      "to": "n_interrupt",
+      "kind": "executes",
+      "auth": "none",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "medium",
+        "logged": true,
+        "description": "propose_command pauses the graph before the write"
+      }
+    },
+    {
+      "id": "e_interrupt_mcp",
+      "from": "n_interrupt",
+      "to": "n_mcp",
+      "kind": "writes",
+      "auth": "obo",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "medium",
+        "logged": true,
+        "description": "pending_approval row"
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_mcp_sql_write",
+      "from": "n_mcp",
+      "to": "n_sql",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "medium",
+        "logged": true
+      },
+      "protocol": "tds"
+    },
+    {
+      "id": "e_agent_audit",
+      "from": "n_agent",
+      "to": "n_audit",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_agent_appins",
+      "from": "n_agent",
+      "to": "n_appins",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_approver_approval",
+      "from": "n_approver",
+      "to": "n_approval",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_approval_broker",
+      "from": "n_approval",
+      "to": "n_broker",
+      "kind": "executes",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high",
+        "logged": true
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_broker_sql",
+      "from": "n_broker",
+      "to": "n_sql",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "description": "the approved command"
+      },
+      "protocol": "tds"
+    },
+    {
+      "id": "e_broker_kv",
+      "from": "n_broker",
+      "to": "n_kv",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "description": "signing key"
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_broker_hub",
+      "from": "n_broker",
+      "to": "n_hub",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high",
+        "logged": true,
+        "description": "cloud-to-device send of the signed command"
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_broker_audit",
+      "from": "n_broker",
+      "to": "n_audit",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_eval_apim",
+      "from": "n_eval",
+      "to": "n_apim",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {
+        "description": "drives the real graph with real claims"
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_eval_dashboard",
+      "from": "n_eval",
+      "to": "n_dashboard",
+      "kind": "writes",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {
+        "description": "results.json"
+      },
+      "protocol": "https"
+    },
+    {
+      "id": "e_eval_appins",
+      "from": "n_eval",
+      "to": "n_appins",
+      "kind": "reads",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    },
+    {
+      "id": "e_defender_hub",
+      "from": "n_defender",
+      "to": "n_hub",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "protocol": "https"
+    }
+  ],
+  "groups": [
+    {
+      "id": "g_edge",
+      "kind": "zone",
+      "name": "Edge – Basel plant (IEC 62443 level 1–2)",
+      "node_ids": [],
+      "attrs": {
+        "region": "ch",
+        "description": "Two bioreactor lines; raw process data never leaves the site."
+      }
+    },
+    {
+      "id": "g_line_a",
+      "kind": "zone",
+      "name": "Zone – line BR-101",
+      "parent": "g_edge",
+      "node_ids": [
+        "n_plc_a",
+        "n_jetson_a",
+        "n_model_a",
+        "n_validator_a"
+      ],
+      "attrs": {
+        "region": "ch"
+      }
+    },
+    {
+      "id": "g_line_b",
+      "kind": "zone",
+      "name": "Zone – line BR-201",
+      "parent": "g_edge",
+      "node_ids": [
+        "n_plc_b",
+        "n_jetson_b",
+        "n_model_b",
+        "n_validator_b"
+      ],
+      "attrs": {
+        "region": "ch"
+      }
+    },
+    {
+      "id": "g_conduit",
+      "kind": "zone",
+      "name": "Conduit – Azure IoT Hub",
+      "node_ids": [
+        "n_hub"
+      ],
+      "attrs": {
+        "region": "switzerlandnorth",
+        "description": "IEC 62443 conduit between the line zones and the cloud zone."
+      }
+    },
+    {
+      "id": "g_users",
+      "kind": "zone",
+      "name": "Personas",
+      "node_ids": [
+        "n_op_a",
+        "n_op_b",
+        "n_qa",
+        "n_contractor",
+        "n_approver"
+      ]
+    },
+    {
+      "id": "g_cloud",
+      "kind": "zone",
+      "name": "Azure – Switzerland North",
+      "node_ids": [
+        "n_frontdoor",
+        "n_web",
+        "n_apim",
+        "n_ingest",
+        "n_agent",
+        "n_interrupt",
+        "n_mcp",
+        "n_foundry",
+        "n_safety",
+        "n_sql",
+        "n_approval",
+        "n_broker",
+        "n_kv",
+        "n_audit",
+        "n_appins"
+      ],
+      "attrs": {
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "g_evidence",
+      "kind": "zone",
+      "name": "Evidence and governance",
+      "node_ids": [
+        "n_eval",
+        "n_dashboard",
+        "n_defender"
+      ]
+    },
+    {
+      "id": "g_runtime_tb",
+      "kind": "trust_boundary",
+      "name": "Agent runtime (Container Apps, managed identity)",
+      "node_ids": [
+        "n_agent",
+        "n_mcp",
+        "n_interrupt"
+      ]
+    },
+    {
+      "id": "g_command_tb",
+      "kind": "trust_boundary",
+      "name": "Command path – human approval, signing, device validation",
+      "node_ids": [
+        "n_approval",
+        "n_broker",
+        "n_kv"
+      ]
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

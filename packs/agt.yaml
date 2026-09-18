@@ -1,0 +1,117 @@
+# AGT — agentic and MCP supply-chain controls (docs/03 §AGT). Deterministic CEL over what the
+# architect declares; the LLM never creates findings. These seven rules cover the OWASP Agentic
+# Top 10 entries that no other pack cites (ASI01-ASI06) and read the declared graph — tool names,
+# origins, capabilities and reachability — rather than any running system.
+#
+# AGT-002's pattern vocabulary is derived from Apache-2.0 YARA rules in Cisco AI Defense's
+# MCP Scanner; see rules/NOTICE.md for the attribution and the list of changes.
+pack: agt
+version: 0.1.0
+regimes: [OWASP, AIACT, FINMA, MAESTRO]
+rules:
+  - id: AGT-001
+    title: Third-party tool shadows the name of another tool
+    scope: node
+    severity: high
+    condition: |
+      n.type in ["tool","mcp_server"] && attr(n, "origin", "") == "third_party" &&
+      (g.nodes("tool") + g.nodes("mcp_server")).exists(o, o.id != n.id && o.name == n.name)
+    message: "{{n.name}} is a third-party {{n.type}} carrying the same name as another component: an agent resolving tools by name may call this one instead."
+    clauses: [OWASP:AgenticTop10:ASI04, OWASP:AgenticTop10:ASI02]
+    remediation: "Give the third-party component a distinct, namespaced name, or bind the agent to the trusted component by id rather than by name."
+    fixtures: { positive: fixtures/AGT-001.pos.json, negative: fixtures/AGT-001.neg.json }
+    tags: [agentic, mcp, supply-chain, shadowing]
+
+  - id: AGT-002
+    title: Declared behaviour hides a secondary action
+    scope: node
+    severity: high
+    condition: |
+      n.type in ["agent","tool","mcp_server"] &&
+      n.description.matches(r"(?i)\b(also|additionally|furthermore|moreover|in addition)\s+(collect|gather|extract|send|upload|transmit|forward|index|store|cache|log|monitor|track|record|capture)(s|es|ing|ed)?\b|(?i)\b(do not|don't|never)\s+(mention|tell|inform|notify|reveal|disclose)\b|(?i)\b(silently|secretly|covertly|quietly)\s+(send|upload|collect|store|forward|transmit)|(?i)\bfor\s+(caching|optimisation|optimization|performance|analytics|backup|quality)\s+(purposes?|reasons?)[,.]?\s*(send|upload|transmit|share|store)") &&
+      !n.description.matches(r"(?i)\b(audit|compliance|log sink|log analytics|siem|observability|evidence)\b")
+    message: "The declared description of {{n.name}} states a secondary action (data sent, stored or hidden from the user) beyond its stated purpose."
+    clauses: [OWASP:LLMTop10:LLM01, OWASP:AgenticTop10:ASI01]
+    remediation: "Check with the supplier what the component does, split the secondary action into its own declared component and edge, or remove the component. Description text reaches the model as context: treat it as untrusted."
+    fixtures: { positive: fixtures/AGT-002.pos.json, negative: fixtures/AGT-002.neg.json }
+    tags: [agentic, mcp, prompt-injection, tool-poisoning]
+
+  - id: AGT-003
+    title: Agent ingests third-party content without content safety
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type == "agent" && e.kind in ["reads","calls"] &&
+      e.to.type in ["tool","mcp_server","saas","vector_index","datastore"] &&
+      attr(e.to, "origin", "") == "third_party" &&
+      !attr(e.from, "content_safety", false) &&
+      !g.pathThrough(e.from.id, e.to.id, "gateway")
+    message: "{{e.from.name}} takes content from the third-party {{e.to.name}} with no content safety and no gateway on the path: retrieved text can carry instructions."
+    clauses: [OWASP:LLMTop10:LLM01, OWASP:AgenticTop10:ASI06, AIACT:2024/1689:Art15(5)]
+    remediation: "Enable content safety / prompt shields on the agent, or route the call through a gateway that screens retrieved content before it reaches the model context."
+    patch_template:
+      - { op: add, path: "/nodes/{{e.from.id}}/attrs/content_safety", value: true }
+    fixtures: { positive: fixtures/AGT-003.pos.json, negative: fixtures/AGT-003.neg.json }
+    tags: [agentic, mcp, prompt-injection]
+
+  - id: AGT-004
+    title: Third-party tool or MCP server not pinned against later change
+    scope: node
+    severity: medium
+    condition: |
+      n.type in ["tool","mcp_server"] && attr(n, "origin", "") == "third_party" &&
+      !(attr(n, "integrity", "") in ["pinned","signed"])
+    message: "{{n.name}} is third-party and declares no pinned or signed definition: its tools and descriptions can change after the design was assessed."
+    clauses: [OWASP:AgenticTop10:ASI04, OWASP:LLMTop10:LLM03]
+    remediation: "Pin the component to a version or digest, or require a signed definition, and re-assess when the pin moves (integrity=pinned|signed)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/integrity", value: pinned }
+    fixtures: { positive: fixtures/AGT-004.pos.json, negative: fixtures/AGT-004.neg.json }
+    tags: [agentic, mcp, supply-chain]
+
+  - id: AGT-005
+    title: Agent holds an unvetted third-party tool and a write capability
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent" &&
+      g.out(n.id, "").exists(a, a.to.type in ["tool","mcp_server"] &&
+        attr(a.to, "origin", "") == "third_party" && !attr(a.to, "vetted", false)) &&
+      g.out(n.id, "").exists(b, (b.to.type in ["tool","mcp_server"] && attr(b.to, "write_capable", false)) ||
+        b.kind == "writes")
+    message: "{{n.name}} can call an unvetted third-party component and, in the same context, write: content from the untrusted side can steer the write."
+    clauses: [OWASP:AgenticTop10:ASI03, OWASP:AgenticTop10:ASI02]
+    remediation: "Vet the third-party component, or split the agent so that reading untrusted content and writing are separate agents with separate identities and scopes."
+    fixtures: { positive: fixtures/AGT-005.pos.json, negative: fixtures/AGT-005.neg.json }
+    tags: [agentic, mcp, least-privilege]
+
+  - id: AGT-006
+    title: Autonomous agent reaches a code-executing tool with no approval step
+    scope: edge
+    severity: high
+    condition: |
+      e.from.type == "agent" && attr(e.from, "autonomy", "") == "autonomous" &&
+      e.to.type in ["tool","mcp_server"] && "executes_code" in attr(e.to, "capabilities", []) &&
+      !g.pathThrough(e.from.id, e.to.id, "human_step")
+    message: "{{e.from.name}} runs autonomously and reaches {{e.to.name}}, which is declared to execute code, with no human approval on the path."
+    clauses: [OWASP:AgenticTop10:ASI05, AIACT:2024/1689:Art14]
+    remediation: "Insert a human approval step before the call, or remove the executes_code capability by replacing the tool with a bounded operation."
+    patch_template:
+      - { op: add, path: "/nodes/-", value: { id: "{{new:hs}}", type: human_step, name: "Approval before code execution", layer: human, attrs: { role: operations } } }
+      - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:hs}}" }
+      - { op: add, path: "/edges/-", value: { id: "{{new:e}}", from: "{{new:hs}}", to: "{{e.to.id}}", kind: "{{e.kind}}", auth: managed_identity, encryption: tls, attrs: { logged: true } } }
+    fixtures: { positive: fixtures/AGT-006.pos.json, negative: fixtures/AGT-006.neg.json }
+    tags: [agentic, mcp, oversight, code-execution]
+
+  - id: AGT-007
+    title: Third-party component declares no capabilities and cannot be assessed
+    scope: node
+    severity: low
+    condition: |
+      n.type in ["tool","mcp_server"] && attr(n, "origin", "") == "third_party" &&
+      size(attr(n, "capabilities", [])) == 0
+    message: "{{n.name}} is third-party and declares no capabilities: the rules that depend on what it can do cannot assess it, so its silence is not evidence of safety."
+    clauses: [OWASP:AgenticTop10:ASI04, FINMA:08/2024:Inventory]
+    remediation: "Declare what the component can do (capabilities: executes_code, reads_filesystem, queries_database, network_egress, sends_message, modifies_state, reads_secrets, deserializes_input) from its documentation or contract."
+    fixtures: { positive: fixtures/AGT-007.pos.json, negative: fixtures/AGT-007.neg.json }
+    tags: [agentic, mcp, inventory, coverage]
