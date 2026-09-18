@@ -61,7 +61,10 @@ var EvidenceTypes = []string{"model_created", "patch_accepted", "finding_status"
 	// evidenced by their own accepted patches).
 	"assistant_architect_run",
 	// ADR-041: an input path refused a credential-shaped value (path hash + detector only, never the value).
-	"secret_rejected"}
+	"secret_rejected",
+	// ADR-060: a person decided a draft session an agent drew (draft id, agent key, batch count,
+	// batch hashes, rationale hash — never the ops or the rationale text).
+	"draft_accepted", "draft_rejected"}
 
 // Evidence types added by ADR-028 and ADR-034.
 const (
@@ -69,6 +72,12 @@ const (
 	EvidenceSpotCheck      = "spot_check"
 	EvidenceArchitectRun   = "assistant_architect_run"
 	EvidenceSecretRejected = "secret_rejected"
+)
+
+// Evidence types added by ADR-060 (draft sessions).
+const (
+	EvidenceDraftAccepted = "draft_accepted"
+	EvidenceDraftRejected = "draft_rejected"
 )
 
 // Finding status constants.
