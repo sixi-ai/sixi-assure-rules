@@ -1,0 +1,528 @@
+[
+  {
+    "id": "OSFI:E-23:A.2",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section A.2-A.3 (scope and application)",
+    "title": "Scope and application",
+    "summary": "Applies to all federally regulated financial institutions, including foreign bank and insurance branches, on a risk basis proportional to size, strategy, risk profile, complexity and interconnectedness. Models expressly include AI and machine-learning methods.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "scope",
+      "model-risk",
+      "ai",
+      "proportionality"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission. Published 11 September 2025 with an effective date of 1 May 2027, as stated on the guideline page.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:B.2",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section B.2 (Principle 1.2)",
+    "title": "Model risk management framework",
+    "summary": "The framework sets the institution's appetite for model risk and the processes to identify, assess, manage, monitor and report it, with clear guidance for model identification, the model inventory, model risk ratings and lifecycle governance, and it covers models or data sourced externally, including from third-party vendors under Guideline B-10.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "framework",
+      "governance",
+      "model-risk",
+      "third-party"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:B.3",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section B.3 (Principle 1.3)",
+    "title": "Use of models appropriate to the business purpose",
+    "summary": "Models are deployed only where they meaningfully contribute to decision-making, risk assessment or a business purpose and deliver reliable outcomes consistent with their intended use.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "intended-use",
+      "model-risk",
+      "governance",
+      "deployment"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:C.1",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section C.1 (Principle 2.1)",
+    "title": "Model identification and the enterprise model inventory",
+    "summary": "The institution identifies and tracks all models in use or recently decommissioned, including vendor and third-party models, triages them for non-negligible inherent model risk, and stores those that carry it in an enterprise-level model inventory that is comprehensive, accurate, evergreen and under robust controls.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "inventory",
+      "identification",
+      "model-risk",
+      "third-party"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission. The closest fit in this guideline to a typed architecture graph: the drawing is an inventory of model nodes with their dependencies and data sources.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:C.2",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section C.2 (Principle 2.2)",
+    "title": "Model risk rating",
+    "summary": "The institution sets a model risk rating approach that assesses the key dimensions of model risk and assigns a provisional rating to new models, updating it when the model changes materially in substance or usage.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "risk-rating",
+      "model-risk",
+      "classification",
+      "governance"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:C.3",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section C.3 (Principle 2.3)",
+    "title": "Risk management intensity",
+    "summary": "The scope, scale and intensity of model risk management is commensurate with the risk the model introduces.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "proportionality",
+      "model-risk",
+      "controls",
+      "governance"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:D.2-Data",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section D.2 (Principle 3.2), model data",
+    "title": "Model data suitable for the intended use",
+    "summary": "Data used to develop a model must be suitable for its intended use. A drawing evidences which stores feed a model and how they are classified; it never evidences data quality.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "data",
+      "model-risk",
+      "lineage",
+      "development"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:D.2-Review",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section D.2 (Principle 3.4), model review",
+    "title": "Independent assessment of conceptual soundness and performance",
+    "summary": "The institution has a process to assess independently the conceptual soundness and performance of its models.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "review",
+      "independence",
+      "model-risk",
+      "validation"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:D.2-Deployment",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section D.2 (Principle 3.5), model deployment",
+    "title": "Deployment in an environment with quality and change control",
+    "summary": "Models are deployed into an environment with quality and change-control processes, which matters most for AI and machine-learning models that depend on several components, dynamic data sources and third-party elements.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "deployment",
+      "change-control",
+      "environment",
+      "model-risk"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:D.2-Monitoring",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Section D.2 (Principle 3.6), monitoring and decommission",
+    "title": "Standards for model monitoring and decommission",
+    "summary": "The institution defines standards for monitoring models in production and for decommissioning them.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "monitoring",
+      "decommission",
+      "drift",
+      "model-risk"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:E-23:Appendix1",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline E-23 — Model Risk Management (2027)",
+    "ref": "Appendix 1",
+    "title": "Information tracking for models",
+    "summary": "For each identified model the institution maintains at least a model id, name and description, risk rating, owner, developer and origin (internally developed or vendor); for models in the inventory it also maintains version, deployment date, reviewer, approver, model dependencies, data sources and description, approved uses, limitations, last review date, monitoring status and next review date.",
+    "excerpt": "",
+    "version": "2025-09-11",
+    "effective": "2027-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/guideline-e-23-model-risk-management-2027",
+    "tags": [
+      "inventory",
+      "metadata",
+      "dependencies",
+      "data-sources",
+      "model-risk"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission. Every field except the review and approval dates is either a node attribute or an edge in the typed graph, which is what makes an E-23-shaped inventory exportable from a drawing.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-13:2.1",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-13 — Technology and Cyber Risk Management",
+    "ref": "Section 2.1 (Principle 4)",
+    "title": "Technology architecture",
+    "summary": "The institution implements a technology architecture framework with supporting processes so that solutions are built in line with business, technology and security requirements, and keeps that architecture comprehensive.",
+    "excerpt": "",
+    "version": "2022-07-31",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management",
+    "tags": [
+      "architecture",
+      "governance",
+      "design",
+      "technology-risk"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission. Effective 1 January 2024 per the final guideline letter of 2022; the guideline page itself carries the publication date of 31 July 2022.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-13:2.2",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-13 — Technology and Cyber Risk Management",
+    "ref": "Section 2.2 (Principle 5)",
+    "title": "Technology asset management",
+    "summary": "The institution maintains an updated inventory of all technology assets supporting business processes or functions, classifies them, records their configurations, provides for safe disposal and manages technology currency.",
+    "excerpt": "",
+    "version": "2022-07-31",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management",
+    "tags": [
+      "inventory",
+      "assets",
+      "classification",
+      "technology-risk"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-13:2.9",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-13 — Technology and Cyber Risk Management",
+    "ref": "Section 2.9 (Principle 12)",
+    "title": "Disaster recovery",
+    "summary": "The institution maintains an enterprise disaster recovery programme aligned with business continuity management, manages key dependencies and tests recovery scenarios.",
+    "excerpt": "",
+    "version": "2022-07-31",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management",
+    "tags": [
+      "recovery",
+      "continuity",
+      "dependencies",
+      "testing"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-13:3.2",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-13 — Technology and Cyber Risk Management",
+    "ref": "Section 3.2 (Principle 15)",
+    "title": "Defend — layered preventive cyber security controls",
+    "summary": "The institution designs and maintains multi-layer preventive controls: secure-by-design practices, strong cryptography and key management, enhanced controls for critical and external-facing assets, data protection and loss prevention, identity and access management and enforced configuration baselines.",
+    "excerpt": "",
+    "version": "2022-07-31",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management",
+    "tags": [
+      "secure-by-design",
+      "cryptography",
+      "identity",
+      "segmentation"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-13:3.3",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-13 — Technology and Cyber Risk Management",
+    "ref": "Section 3.3 (Principle 16)",
+    "title": "Detect — continuous, centralised security logging",
+    "summary": "The institution maintains continuous security logging for technology assets and defence layers, with central tools to aggregate, correlate and manage security event logs and enable timely access during an investigation.",
+    "excerpt": "",
+    "version": "2022-07-31",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/technology-cyber-risk-management",
+    "tags": [
+      "logging",
+      "detection",
+      "monitoring",
+      "investigation"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-10:1.2",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-10 — Third-Party Risk Management",
+    "ref": "Section 1.2 (Principle 2)",
+    "title": "Third-party risk management framework",
+    "summary": "The institution establishes an enterprise-wide framework with clear accountabilities, policies and processes covering the whole lifecycle of third-party arrangements, and reviews it regularly.",
+    "excerpt": "",
+    "version": "2023-04-30",
+    "effective": "2024-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/third-party-risk-management-guideline",
+    "tags": [
+      "third-party",
+      "framework",
+      "governance",
+      "lifecycle"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission. Effective 1 May 2024 per OSFI's news release announcing the guideline; the guideline page carries the publication date of 30 April 2023.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-10:2.2.3",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-10 — Third-Party Risk Management",
+    "ref": "Section 2.2.3",
+    "title": "Concentration risk",
+    "summary": "Concentration risk is assessed before entering an arrangement and on an ongoing basis, across geography, supplier and subcontractor, within business units and legal entities and across the institution.",
+    "excerpt": "",
+    "version": "2023-04-30",
+    "effective": "2024-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/third-party-risk-management-guideline",
+    "tags": [
+      "concentration",
+      "third-party",
+      "dependencies",
+      "risk"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission. Countable from the graph in the same way as DORA Art. 29: how many critical dependencies rest on one provider node.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-10:2.3.2",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-10 — Third-Party Risk Management",
+    "ref": "Section 2.3.2 (Principle 7)",
+    "title": "Data security and controls, including data location",
+    "summary": "The institution and the third party maintain measures to protect the confidentiality, integrity and availability of records and data throughout the arrangement, and set out each party's responsibilities, including where data is located.",
+    "excerpt": "",
+    "version": "2023-04-30",
+    "effective": "2024-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/third-party-risk-management-guideline",
+    "tags": [
+      "data-location",
+      "third-party",
+      "confidentiality",
+      "integrity"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-10:2.3.5",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-10 — Third-Party Risk Management",
+    "ref": "Section 2.3.5",
+    "title": "Contingency and exit strategy",
+    "summary": "Contingency and exit plans are established in proportion to the risk and criticality of each third-party arrangement so that operations continue in normal and stressed conditions.",
+    "excerpt": "",
+    "version": "2023-04-30",
+    "effective": "2024-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/third-party-risk-management-guideline",
+    "tags": [
+      "exit",
+      "third-party",
+      "continuity",
+      "portability"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  },
+  {
+    "id": "OSFI:B-10:4.3",
+    "regime": "OSFI",
+    "doc": "OSFI Guideline B-10 — Third-Party Risk Management",
+    "ref": "Section 4.3-4.4",
+    "title": "Cloud-specific requirements and portability",
+    "summary": "The institution develops cloud-specific requirements so that cloud adoption is planned and strategic, optimises interoperability, augments existing controls in data protection, key management and container management, and considers cloud portability.",
+    "excerpt": "",
+    "version": "2023-04-30",
+    "effective": "2024-05-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/third-party-risk-management-guideline",
+    "tags": [
+      "cloud",
+      "portability",
+      "key-management",
+      "third-party"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Section headings and content verified 2026-09-16 against the guideline page fetched from osfi-bsif.gc.ca. Crown copyright: Sixi Assure stores the section reference, the official heading and its own paraphrase only — OSFI guideline text is never reproduced, because Government of Canada material may not be reproduced for commercial redistribution without written permission.",
+    "redacted": "licence"
+  }
+]

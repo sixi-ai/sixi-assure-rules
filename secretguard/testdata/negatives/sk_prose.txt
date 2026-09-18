@@ -1,0 +1,1 @@
+Do not paste an sk- prefixed provider key into a description: security is expressed as a claim, so set auth: api_key on the edge and keep the key in Key Vault. The same applies to AKIA-style identifiers and to anything that looks like a bearer token.

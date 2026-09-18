@@ -1,0 +1,51 @@
+{
+  "id": "arch_fx_c4_004.pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture C4-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "attrs": {
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Orders API",
+      "layer": "app",
+      "attrs": {
+        "exposure": "internal"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_api",
+      "kind": "calls",
+      "auth": "none",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

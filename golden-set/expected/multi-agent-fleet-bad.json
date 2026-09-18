@@ -1,0 +1,151 @@
+[
+  {
+    "rule_id": "AGT-001",
+    "ids": [
+      "n_tool_market_docs"
+    ]
+  },
+  {
+    "rule_id": "AGT-002",
+    "ids": [
+      "n_tool_market_docs"
+    ]
+  },
+  {
+    "rule_id": "AGT-003",
+    "ids": [
+      "e_orch_market_docs"
+    ]
+  },
+  {
+    "rule_id": "AGT-004",
+    "ids": [
+      "n_mcp_market",
+      "n_tool_market",
+      "n_tool_market_docs"
+    ]
+  },
+  {
+    "rule_id": "AGT-007",
+    "ids": [
+      "n_mcp_market",
+      "n_tool_market",
+      "n_tool_market_docs"
+    ]
+  },
+  {
+    "rule_id": "AI-001",
+    "ids": [
+      "e_research_llm"
+    ]
+  },
+  {
+    "rule_id": "AI-002",
+    "ids": [
+      "e_user_orch"
+    ]
+  },
+  {
+    "rule_id": "AI-004",
+    "ids": [
+      "arch_demo_multi_agent_bad"
+    ]
+  },
+  {
+    "rule_id": "AI-005",
+    "ids": [
+      "n_w_draft"
+    ]
+  },
+  {
+    "rule_id": "AI-007",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "AI-008",
+    "ids": [
+      "e_draft_docs"
+    ]
+  },
+  {
+    "rule_id": "AI-010",
+    "ids": [
+      "n_w_research"
+    ]
+  },
+  {
+    "rule_id": "AI-011",
+    "ids": [
+      "e_orch_research"
+    ]
+  },
+  {
+    "rule_id": "AI-012",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "AI-013",
+    "ids": [
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "LOG-001",
+    "ids": [
+      "arch_demo_multi_agent_bad"
+    ]
+  },
+  {
+    "rule_id": "LOG-004",
+    "ids": [
+      "e_research_llm"
+    ]
+  },
+  {
+    "rule_id": "LOG-005",
+    "ids": [
+      "e_draft_docs"
+    ]
+  },
+  {
+    "rule_id": "STR-005",
+    "ids": [
+      "e_draft_docs"
+    ]
+  },
+  {
+    "rule_id": "STR-006",
+    "ids": [
+      "e_research_llm"
+    ]
+  },
+  {
+    "rule_id": "TPR-001",
+    "ids": [
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "ZT-002",
+    "ids": [
+      "n_w_draft"
+    ]
+  },
+  {
+    "rule_id": "ZT-003",
+    "ids": [
+      "e_orch_draft",
+      "e_orch_research"
+    ]
+  },
+  {
+    "rule_id": "ZT-008",
+    "ids": [
+      "e_draft_docs"
+    ]
+  }
+]

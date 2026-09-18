@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: vet, test, eval
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: gofmt
+        run: |
+          out="$(gofmt -l .)"
+          if [ -n "$out" ]; then echo "not gofmt-clean:"; echo "$out"; exit 1; fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./...
+
+      - name: golden-set eval
+        run: go run ./cmd/assure-eval -packs packs -policy policy.yaml -models golden-set/models -expected golden-set/expected
+
+      - name: example model
+        run: go run ./cmd/assure-check examples/agentic-ai-on-azure-bad-twin.json
+
+      - name: corpus licence inventory
+        run: python3 scripts/redact_corpus.py --dst corpus --inventory-only

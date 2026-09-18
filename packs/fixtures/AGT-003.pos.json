@@ -1,0 +1,74 @@
+{
+  "id": "arch_fx_agt_003_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture AGT-003 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": false
+      }
+    },
+    {
+      "id": "n_tool_tp",
+      "type": "tool",
+      "name": "Market quotes tool",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "market.read"
+        ],
+        "vetted": true,
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "network_egress"
+        ],
+        "integrity": "pinned"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_tool_tp",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,93 @@
+{
+  "id": "arch_fx_c4_005.neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture C4-005 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Research agent",
+      "layer": "ai",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Research summaries",
+        "owner": "Head of Research"
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Docs MCP server",
+      "layer": "ai",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "docs.read"
+        ],
+        "vetted": true,
+        "logged": true
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "MCP gateway",
+      "layer": "platform",
+      "attrs": {
+        "kind": "api",
+        "logging": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_mcp",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_agent",
+      "to": "n_gw",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e3",
+      "from": "n_gw",
+      "to": "n_mcp",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

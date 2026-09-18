@@ -1,0 +1,210 @@
+# AI — AI-specific controls (docs/03 §AI). Deterministic CEL; the LLM never creates findings.
+pack: ai
+version: 0.2.0
+regimes: [AIACT, FINMA, OWASP, ISO, MAESTRO, DORA, MSFT]
+rules:
+  - id: AI-001
+    title: LLM called without an AI gateway
+    scope: edge
+    severity: high
+    condition: |
+      e.from.type in ["agent","app"] && e.to.type == "llm_endpoint" &&
+      !g.pathThrough(e.from.id, e.to.id, "gateway")
+    message: "{{e.from.name}} calls {{e.to.name}} directly: no token limits, content safety or prompt/response logging."
+    clauses: [MSFT:APIM-GenAI, FINMA:08/2024:Monitoring]
+    remediation: "Route through an AI gateway (APIM GenAI policies: token limits, content safety, logging); Private Link."
+    patch_template:
+      - { op: add, path: "/nodes/-", value: { id: "{{new:gw}}", type: gateway, name: "AI gateway (APIM)", layer: platform, attrs: { kind: ai, logging: true, token_limits: true, content_safety: true } } }
+      - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:gw}}" }
+      - { op: add, path: "/edges/-", value: { id: "{{new:e}}", from: "{{new:gw}}", to: "{{e.to.id}}", kind: calls, auth: managed_identity, encryption: tls, attrs: { logged: true } } }
+    fixtures: { positive: fixtures/AI-001.pos.json, negative: fixtures/AI-001.neg.json }
+    tags: [ai, gateway, logging]
+
+  - id: AI-002
+    title: User-facing agent without content safety
+    scope: edge
+    severity: medium
+    condition: 'e.from.type == "user" && e.to.type == "agent" && !attr(e.to, "content_safety", false)'
+    message: "{{e.to.name}} takes input from {{e.from.name}} without prompt shields / content safety."
+    clauses: [OWASP:LLMTop10:LLM01, AIACT:2024/1689:Art15, AIACT:2024/1689:Art15(5)]
+    remediation: "Enable content safety and prompt shields on the agent or its gateway (content_safety=true)."
+    patch_template:
+      - { op: add, path: "/nodes/{{e.to.id}}/attrs/content_safety", value: true }
+    fixtures: { positive: fixtures/AI-002.pos.json, negative: fixtures/AI-002.neg.json }
+    tags: [ai, prompt-injection]
+
+  - id: AI-003
+    title: Consequential agent action without human approval
+    scope: edge
+    severity: high
+    condition: |
+      e.from.type == "agent" && e.kind in ["writes","executes"] && attr(e, "consequence", "") == "high" &&
+      !g.pathThrough(e.from.id, e.to.id, "human_step")
+    message: "{{e.from.name}} performs a high-consequence {{e.kind}} on {{e.to.name}} with no human approval step."
+    clauses: [AIACT:2024/1689:Art14, FINMA:08/2024:Governance]
+    remediation: "Insert a human approval step before the action; make the action reversible; add a kill switch."
+    patch_template:
+      - { op: add, path: "/nodes/-", value: { id: "{{new:hs}}", type: human_step, name: "Approval (four-eyes)", layer: human, attrs: { role: operations } } }
+      - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:hs}}" }
+      - { op: add, path: "/edges/-", value: { id: "{{new:e}}", from: "{{new:hs}}", to: "{{e.to.id}}", kind: "{{e.kind}}", auth: managed_identity, encryption: tls, attrs: { consequence: high, logged: true } } }
+    fixtures: { positive: fixtures/AI-003.pos.json, negative: fixtures/AI-003.neg.json }
+    tags: [ai, oversight]
+
+  - id: AI-004
+    title: Agents without an evaluation / drift-monitoring node
+    scope: graph
+    severity: medium
+    condition: 'g.has("agent") && !g.has("evaluation")'
+    message: "The architecture runs agents but declares no evaluation or drift monitoring."
+    clauses: [FINMA:08/2024:Testing, ISO:42001:A.6.2.4]
+    remediation: "Add an evaluation node (golden-set evaluation, drift monitoring) fed from the log sink."
+    fixtures: { positive: fixtures/AI-004.pos.json, negative: fixtures/AI-004.neg.json }
+    tags: [ai, evaluation]
+
+  - id: AI-005
+    title: Incomplete AI inventory fields
+    scope: node
+    severity: medium
+    condition: |
+      n.type in ["agent","llm_endpoint"] &&
+      (attr(n, "purpose", "") == "" || attr(n, "owner", "") == "" || attr(n, "materiality", "") == "")
+    message: "{{n.name}} is missing inventory fields (purpose/owner/materiality)."
+    clauses: [FINMA:08/2024:Inventory]
+    remediation: "Complete purpose, owner and materiality; they feed the AI inventory export."
+    fixtures: { positive: fixtures/AI-005.pos.json, negative: fixtures/AI-005.neg.json }
+    tags: [ai, inventory]
+
+  - id: AI-006
+    title: AI Act risk tier not declared
+    scope: graph
+    severity: medium
+    condition: 'g.has("agent") && attr(g, "ai_act_tier", "") == ""'
+    message: "The architecture runs agents but no AI Act risk tier is declared."
+    clauses: [AIACT:2024/1689:Art6]
+    remediation: "Declare the AI Act tier (minimal/limited/high_risk/gpai) on the architecture."
+    fixtures: { positive: fixtures/AI-006.pos.json, negative: fixtures/AI-006.neg.json }
+    tags: [ai, ai-act]
+
+  - id: AI-007
+    title: User-facing agent without AI disclosure
+    scope: node
+    severity: medium
+    condition: 'n.type == "agent" && g.in(n.id, "calls").exists(x, x.from.type == "user") && !attr(n, "ai_disclosure", false)'
+    message: "{{n.name}} interacts with users without disclosing that they are talking to an AI system."
+    clauses: [AIACT:2024/1689:Art50, AIACT:2024/1689:Art50(1)]
+    remediation: "Add a disclosure banner / message at the start of the interaction (ai_disclosure=true)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/ai_disclosure", value: true }
+    fixtures: { positive: fixtures/AI-007.pos.json, negative: fixtures/AI-007.neg.json }
+    tags: [ai, transparency]
+
+  - id: AI-008
+    title: Tool or MCP server with unrestricted scopes
+    scope: edge
+    severity: high
+    condition: |
+      e.from.type == "agent" && e.to.type in ["tool","mcp_server"] &&
+      (attr(e.to, "scopes", "*") == "*" || size(attr(e.to, "scopes", "")) == 0)
+    message: "{{e.from.name}} uses {{e.to.name}} with unrestricted or undeclared scopes."
+    clauses: [OWASP:AgenticTop10:ASI02, MAESTRO:L7]
+    remediation: "Declare least-privilege scopes on the tool and an allow-list on the agent (tool_scopes)."
+    fixtures: { positive: fixtures/AI-008.pos.json, negative: fixtures/AI-008.neg.json }
+    tags: [ai, tools, least-privilege]
+
+  - id: AI-009
+    title: Third-party tool or MCP server not vetted
+    scope: node
+    severity: medium
+    condition: 'n.type in ["tool","mcp_server"] && attr(n, "origin", "") == "third_party" && !attr(n, "vetted", false)'
+    message: "Third-party {{n.name}} is not vetted or registered."
+    clauses: [DORA:2022/2554:Art28, FINMA:2018/3:DueDiligence]
+    remediation: "Perform due diligence, register the provider and record the vetting (vetted=true)."
+    fixtures: { positive: fixtures/AI-009.pos.json, negative: fixtures/AI-009.neg.json }
+    tags: [ai, third-party, tools]
+
+  - id: AI-010
+    title: Autonomous agent without kill switch and rate limit
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") == "autonomous" &&
+      !(attr(n, "kill_switch", false) && attr(n, "rate_limit", false))
+    message: "Autonomous agent {{n.name}} lacks a kill switch and/or rate limits."
+    clauses: [FINMA:08/2024:Governance, ISO:42001:A.9.4]
+    remediation: "Add a kill switch and rate limits (tokens, tool calls, spend) for autonomous agents."
+    fixtures: { positive: fixtures/AI-010.pos.json, negative: fixtures/AI-010.neg.json }
+    tags: [ai, agent, controls]
+
+  - id: AI-011
+    title: Hop to an autonomous agent not logged
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type == "agent" && e.to.type == "agent" && attr(e.to, "autonomy", "") == "autonomous" &&
+      !attr(e, "logged", false)
+    message: "{{e.from.name}} → {{e.to.name}} (autonomous) hop has no trace."
+    clauses: [AIACT:2024/1689:Art12]
+    remediation: "Emit a per-hop trace (correlation id, task, tokens) to the log sink (logged=true on the edge)."
+    patch_template:
+      - { op: add, path: "/edges/{{e.id}}/attrs/logged", value: true }
+    fixtures: { positive: fixtures/AI-011.pos.json, negative: fixtures/AI-011.neg.json }
+    tags: [ai, agent, logging]
+
+  # AI-012 to AI-015 come from the COMPL-AI review (docs/upstream-analysis-2026-09-compl-ai.md):
+  # runtime benchmarks translated into what an architect can declare, cited to the paragraph.
+  - id: AI-012
+    title: User-facing agent output not marked as AI-generated
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && regime("AIACT") &&
+      g.in(n.id, "calls").exists(x, x.from.type in ["user","app","api","gateway"]) &&
+      !attr(n, "output_marking", false)
+    message: "{{n.name}} answers people directly and declares no machine-readable marking of the text it generates."
+    clauses: [AIACT:2024/1689:Art50(2)]
+    remediation: "Mark generated output as artificially generated in a machine-readable way (provider watermark, content credentials) and record it on the agent (output_marking=true)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/output_marking", value: true }
+    fixtures: { positive: fixtures/AI-012.pos.json, negative: fixtures/AI-012.neg.json }
+    tags: [ai, transparency, marking]
+
+  - id: AI-013
+    title: LLM endpoint without model documentation
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "llm_endpoint" && !attr(n, "model_card", false) &&
+      ((regime("AIACT") && attr(g, "ai_act_tier", "") in ["", "high_risk", "gpai"]) || regime("FINMA"))
+    message: "{{n.name}} declares no model documentation: its capabilities, limitations and accuracy metrics cannot be evidenced from this design."
+    clauses: [AIACT:2024/1689:Art13(3)(b), AIACT:2024/1689:Art53(1)(b), FINMA:08/2024:Explainability]
+    remediation: "Obtain the provider's model documentation (model card, system card or the Annex XII information), keep it with the design and record it (model_card=true)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/model_card", value: true }
+    fixtures: { positive: fixtures/AI-013.pos.json, negative: fixtures/AI-013.neg.json }
+    tags: [ai, documentation, model-card]
+
+  - id: AI-014
+    title: Evaluation declares no scope
+    scope: node
+    severity: low
+    condition: |
+      n.type == "evaluation" && size(attr(n, "evaluates", [])) == 0 &&
+      ((regime("AIACT") && attr(g, "ai_act_tier", "") in ["", "high_risk", "gpai"]) || regime("FINMA"))
+    message: "{{n.name}} declares nothing about what it evaluates: accuracy, robustness or bias coverage cannot be assessed, so its presence is not evidence."
+    clauses: [AIACT:2024/1689:AnnexIV(2)(g), AIACT:2024/1689:Art15(1), FINMA:08/2024:Testing]
+    remediation: "Declare the evaluation scope (evaluates: accuracy, robustness, bias, fairness, toxicity, prompt_injection, calibration, drift) from the evaluation plan."
+    fixtures: { positive: fixtures/AI-014.pos.json, negative: fixtures/AI-014.neg.json }
+    tags: [ai, evaluation, coverage]
+
+  - id: AI-015
+    title: High-risk system evaluated without robustness and bias coverage
+    scope: node
+    severity: high
+    condition: |
+      n.type == "evaluation" && attr(g, "ai_act_tier", "") == "high_risk" &&
+      !(["robustness","bias"].all(s, s in attr(n, "evaluates", [])))
+    message: "{{n.name}} evaluates a high-risk system without declaring robustness and bias in its scope."
+    clauses: [AIACT:2024/1689:Art15(1), AIACT:2024/1689:Art15(4), AIACT:2024/1689:Art9(2)]
+    remediation: "Add robustness (input perturbation, consistency) and bias (representation across groups) to the evaluation scope and its plan."
+    fixtures: { positive: fixtures/AI-015.pos.json, negative: fixtures/AI-015.neg.json }
+    tags: [ai, evaluation, robustness, bias]

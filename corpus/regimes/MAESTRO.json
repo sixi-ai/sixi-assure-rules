@@ -1,0 +1,177 @@
+[
+  {
+    "id": "MAESTRO:L1",
+    "regime": "MAESTRO",
+    "doc": "Cloud Security Alliance — Agentic AI Threat Modeling Framework: MAESTRO",
+    "ref": "Layer 1",
+    "title": "Foundation Models",
+    "summary": "The layer of core AI models such as large language models; threats at this layer concern the model itself, including its training, weights and behaviour.",
+    "excerpt": "",
+    "version": "2025-02-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro",
+    "tags": [
+      "threat-model",
+      "model",
+      "agent",
+      "layers"
+    ],
+    "licence": "csa",
+    "verified": true,
+    "note": "Layer names verified 2026-09-10 against the CSA article of 6 February 2025; used as a threat-modelling reference, not a regulatory requirement.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MAESTRO:L2",
+    "regime": "MAESTRO",
+    "doc": "Cloud Security Alliance — Agentic AI Threat Modeling Framework: MAESTRO",
+    "ref": "Layer 2",
+    "title": "Data Operations",
+    "summary": "The layer covering data processing, storage and retrieval pipelines, including RAG stores; threats concern data poisoning, leakage and integrity.",
+    "excerpt": "",
+    "version": "2025-02-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro",
+    "tags": [
+      "threat-model",
+      "data",
+      "rag",
+      "layers"
+    ],
+    "licence": "csa",
+    "verified": true,
+    "note": "Layer names verified 2026-09-10 against the CSA article of 6 February 2025.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MAESTRO:L3",
+    "regime": "MAESTRO",
+    "doc": "Cloud Security Alliance — Agentic AI Threat Modeling Framework: MAESTRO",
+    "ref": "Layer 3",
+    "title": "Agent Frameworks",
+    "summary": "The layer of tools and frameworks used to build agents, including orchestration, tool interfaces and plug-in mechanisms.",
+    "excerpt": "",
+    "version": "2025-02-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro",
+    "tags": [
+      "threat-model",
+      "framework",
+      "tools",
+      "layers"
+    ],
+    "licence": "csa",
+    "verified": true,
+    "note": "Layer names verified 2026-09-10 against the CSA article of 6 February 2025.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MAESTRO:L4",
+    "regime": "MAESTRO",
+    "doc": "Cloud Security Alliance — Agentic AI Threat Modeling Framework: MAESTRO",
+    "ref": "Layer 4",
+    "title": "Deployment and Infrastructure",
+    "summary": "The layer of cloud or on-premises hosting on which agents run, including compute, network and identity infrastructure.",
+    "excerpt": "",
+    "version": "2025-02-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro",
+    "tags": [
+      "threat-model",
+      "infrastructure",
+      "deployment",
+      "layers"
+    ],
+    "licence": "csa",
+    "verified": true,
+    "note": "Layer names verified 2026-09-10 against the CSA article of 6 February 2025.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MAESTRO:L5",
+    "regime": "MAESTRO",
+    "doc": "Cloud Security Alliance — Agentic AI Threat Modeling Framework: MAESTRO",
+    "ref": "Layer 5",
+    "title": "Evaluation and Observability",
+    "summary": "The layer covering monitoring, evaluation and performance assessment of agents, including traces, metrics and drift detection.",
+    "excerpt": "",
+    "version": "2025-02-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro",
+    "tags": [
+      "threat-model",
+      "evaluation",
+      "observability",
+      "layers"
+    ],
+    "licence": "csa",
+    "verified": true,
+    "note": "Layer names verified 2026-09-10 against the CSA article of 6 February 2025.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MAESTRO:L6",
+    "regime": "MAESTRO",
+    "doc": "Cloud Security Alliance — Agentic AI Threat Modeling Framework: MAESTRO",
+    "ref": "Layer 6 (cross-cutting)",
+    "title": "Security and Compliance (cross-cutting layer)",
+    "summary": "The security and governance layer of the MAESTRO framework. CSA describes it as cutting across all other layers rather than sitting between L5 and L7, so a component is assigned to L1-L5 or L7 and the L6 concerns are attached to it — never instead of it.",
+    "excerpt": "",
+    "version": "2025-02-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro",
+    "tags": [
+      "threat-model",
+      "security",
+      "compliance",
+      "layers"
+    ],
+    "licence": "csa",
+    "verified": true,
+    "note": "Layer names verified 2026-09-10 against the CSA article of 6 February 2025. Correction 2026-09-16: recorded as the vertical, cross-cutting layer. Any rule that assigns a component to exactly one layer must exclude L6.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MAESTRO:L7",
+    "regime": "MAESTRO",
+    "doc": "Cloud Security Alliance — Agentic AI Threat Modeling Framework: MAESTRO",
+    "ref": "Layer 7",
+    "title": "Agent Ecosystem",
+    "summary": "The top layer where agents interface with marketplaces, applications, tools and users; threats concern untrusted third-party agents and tools, delegation and trust boundaries in the ecosystem.",
+    "excerpt": "",
+    "version": "2025-02-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro",
+    "tags": [
+      "threat-model",
+      "ecosystem",
+      "third-party",
+      "layers"
+    ],
+    "licence": "csa",
+    "verified": true,
+    "note": "Layer names verified 2026-09-10 against the CSA article of 6 February 2025; the framework also describes cross-layer threats such as supply chain attacks and lateral movement.",
+    "redacted": "licence"
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "CH-CO:958f",
+    "regime": "CH-CO",
+    "doc": "Swiss Code of Obligations (CO), SR 220",
+    "ref": "Art. 958f",
+    "title": "Keeping and retaining accounting records",
+    "summary": "Accounting records, accounting vouchers, the annual report and the audit report must be retained for ten years from the end of the financial year; records may be kept electronically provided they correspond to the underlying transactions and can be made readable again at any time.",
+    "excerpt": "The accounting records and the accounting vouchers together with the annual report and the audit report must be retained for ten years. The retention period begins on expiry of the financial year.",
+    "version": "2024-01-01",
+    "effective": "2013-01-01",
+    "applies_to": [
+      "all",
+      "finma_supervised"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/27/317_321_377/en",
+    "tags": [
+      "retention",
+      "records",
+      "evidence",
+      "accounting"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the Fedlex English translation of the Code of Obligations (version of 1 January 2024); the translation has no legal force."
+  },
+  {
+    "id": "CH-CO:962",
+    "regime": "CH-CO",
+    "doc": "Swiss Code of Obligations (CO), SR 220",
+    "ref": "Art. 962",
+    "title": "Financial statements in accordance with a recognised financial reporting standard",
+    "summary": "Certain undertakings — listed companies where the exchange requires it, larger cooperatives and foundations subject to an ordinary audit — must prepare financial statements under a recognised financial reporting standard, and qualified members may request them.",
+    "excerpt": "In addition to annual accounts under this Title, the following must prepare financial statements in accordance with a recognised financial reporting standard: 1. companies whose equity securities are listed on a stock market, if the stock market so requires; 2. cooperatives with a minimum of 2000 members; 3. foundations that are required by law to have an ordinary audit.",
+    "version": "2024-01-01",
+    "effective": "2013-01-01",
+    "applies_to": [
+      "all",
+      "finma_supervised"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/27/317_321_377/en",
+    "tags": [
+      "reporting",
+      "accounting",
+      "records",
+      "standards"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Cited together with Art. 958f as the Swiss books-and-records baseline; it is a financial reporting duty, not itself a retention rule."
+  }
+]

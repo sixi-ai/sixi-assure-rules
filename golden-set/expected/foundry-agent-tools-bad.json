@@ -1,0 +1,100 @@
+[
+  {
+    "rule_id": "AGT-004",
+    "ids": [
+      "n_mcp_fx"
+    ]
+  },
+  {
+    "rule_id": "AGT-005",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "AGT-007",
+    "ids": [
+      "n_mcp_fx"
+    ]
+  },
+  {
+    "rule_id": "AI-003",
+    "ids": [
+      "e_agent_ledger"
+    ]
+  },
+  {
+    "rule_id": "AI-008",
+    "ids": [
+      "e_agent_mcp_fx"
+    ]
+  },
+  {
+    "rule_id": "AI-009",
+    "ids": [
+      "n_mcp_fx"
+    ]
+  },
+  {
+    "rule_id": "AI-010",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "AI-012",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "AI-013",
+    "ids": [
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "AI-014",
+    "ids": [
+      "n_eval"
+    ]
+  },
+  {
+    "rule_id": "DATA-004",
+    "ids": [
+      "n_ledger"
+    ]
+  },
+  {
+    "rule_id": "LOG-005",
+    "ids": [
+      "e_agent_mcp_fx",
+      "e_agent_tool_cust",
+      "e_agent_tool_ticket"
+    ]
+  },
+  {
+    "rule_id": "TPR-002",
+    "ids": [
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "ZT-001",
+    "ids": [
+      "e_tool_cust_ledger"
+    ]
+  },
+  {
+    "rule_id": "ZT-004",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "ZT-008",
+    "ids": [
+      "e_agent_mcp_fx"
+    ]
+  }
+]

@@ -1,0 +1,4 @@
+Signing material pasted into a node description by mistake:
+-----BEGIN RSA PRIVATE KEY-----
+RVhBTVBMRS1ub3QtYS1yZWFsLXByaXZhdGUta2V5LWZvci10ZXN0cy1vbmx5
+-----END RSA PRIVATE KEY-----

@@ -1,0 +1,60 @@
+{
+  "id": "arch_fx_drf_001_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DRF-001 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Chat completion endpoint",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "purpose": "Fixture model",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "provider_service": "Azure AI Foundry Agent Service"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_gw",
+      "to": "n_llm",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,127 @@
+[
+  {
+    "id": "MSFT:EntraAgentID",
+    "regime": "MSFT",
+    "doc": "Microsoft Entra product documentation — Microsoft Entra Agent ID",
+    "ref": "Entra Agent ID",
+    "title": "Microsoft Entra Agent ID",
+    "summary": "Product guidance describing an identity and security framework that extends Microsoft Entra capabilities to AI agents, giving assistive, autonomous and user-like agents governed non-human identities that can be authenticated, authorised, governed and audited.",
+    "excerpt": "",
+    "version": "2026-06-18",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/entra/agent-id/what-is-microsoft-entra-agent-id",
+    "tags": [
+      "identity",
+      "agent",
+      "non-human-identity",
+      "governance"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Verified 2026-09-10 via the official Microsoft Learn article 'What is Microsoft Entra?' (article date 2026-06-18), which describes Agent ID and links to the article recorded as source_url; that target article itself was not retrievable from this environment.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:APIM-GenAI",
+    "regime": "MSFT",
+    "doc": "Azure API Management documentation — AI gateway capabilities",
+    "ref": "AI gateway capabilities",
+    "title": "AI gateway capabilities in Azure API Management",
+    "summary": "Product guidance describing how Azure API Management can front language model APIs, MCP servers and agent APIs to authenticate access with managed identities, apply token limits and quotas, enforce content safety, load balance backends and log prompts, completions and token metrics.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/api-management/genai-gateway-capabilities",
+    "tags": [
+      "gateway",
+      "token-limits",
+      "content-safety",
+      "logging"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Verified 2026-09-10 against the Microsoft Learn article (article date 2026-05-29, page updated 2026-06-25).",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:APIM-TokenLimit",
+    "regime": "MSFT",
+    "doc": "Azure API Management documentation — AI gateway capabilities",
+    "ref": "Token rate limiting and quotas",
+    "title": "LLM token limit policy",
+    "summary": "Product guidance describing the token limit policy that enforces tokens-per-minute limits or token quotas per consumer key on language model APIs, including pre-calculation of prompt tokens at the gateway.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/api-management/genai-gateway-capabilities",
+    "tags": [
+      "rate-limit",
+      "tokens",
+      "quota",
+      "gateway"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Verified 2026-09-10 against the Microsoft Learn article on AI gateway capabilities.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:APIM-ContentSafety",
+    "regime": "MSFT",
+    "doc": "Azure API Management documentation — AI gateway capabilities",
+    "ref": "Security and safety",
+    "title": "Content safety enforcement at the AI gateway",
+    "summary": "Product guidance describing gateway policies that moderate prompts with Azure AI Content Safety and that authenticate access to AI services with managed identities or OAuth via credential manager.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/api-management/genai-gateway-capabilities",
+    "tags": [
+      "content-safety",
+      "gateway",
+      "managed-identity",
+      "moderation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Verified 2026-09-10 against the Microsoft Learn article on AI gateway capabilities.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:APIM-LLMLogging",
+    "regime": "MSFT",
+    "doc": "Azure API Management documentation — AI gateway capabilities",
+    "ref": "Observability and governance",
+    "title": "Logging of prompts, completions and token metrics",
+    "summary": "Product guidance describing how the gateway can log prompts and completions to Azure Monitor and emit token consumption metrics with custom dimensions for billing, auditing and governance of AI APIs.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/api-management/genai-gateway-capabilities",
+    "tags": [
+      "logging",
+      "metrics",
+      "observability",
+      "gateway"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Verified 2026-09-10 against the Microsoft Learn article on AI gateway capabilities.",
+    "redacted": "licence"
+  }
+]

@@ -1,0 +1,65 @@
+{
+  "id": "arch_fx_cra_001_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CRA-001 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FINMA",
+      "DORA",
+      "CH-ISG",
+      "CRA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "CISO on-call within 1 h; NCSC within 24 h (ISG); DORA Art. 19.",
+    "dr_tested_at": "2026-06-30"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_dev",
+      "type": "edge_device",
+      "name": "Edge device",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": true,
+        "sbom": false
+      }
+    },
+    {
+      "id": "n_egw",
+      "type": "edge_gateway",
+      "name": "Edge gateway",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "egress_policy": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_dev",
+      "to": "n_egw",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

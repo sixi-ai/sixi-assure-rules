@@ -1,0 +1,28 @@
+# TPR — third parties and outsourcing (docs/03 §TPR/GOV/CRA). Split from gov.yaml: both rules cite FINMA and DORA
+# clauses only, so the pack applies only where one of those regimes is enabled — an OT plant under CRA and IEC 62443
+# is not told about an outsourcing register it has no clause for.
+pack: tpr
+version: 0.1.0
+regimes: [FINMA, DORA]
+rules:
+  - id: TPR-001
+    title: External service not in the outsourcing register
+    scope: node
+    severity: high
+    condition: 'n.type in ["llm_endpoint","saas"] && !attr(n, "outsourcing_registered", false)'
+    message: "{{n.name}} is not recorded in the outsourcing register."
+    clauses: [FINMA:2018/3:Register, DORA:2022/2554:Art28(3)]
+    remediation: "Add a register entry with audit and access rights (outsourcing_registered=true)."
+    fixtures: { positive: fixtures/TPR-001.pos.json, negative: fixtures/TPR-001.neg.json }
+    tags: [third-party, outsourcing]
+
+  - id: TPR-002
+    title: Critical external service without exit strategy
+    scope: node
+    severity: medium
+    condition: 'n.type in ["llm_endpoint","saas"] && attr(n, "criticality", "") == "critical" && !attr(n, "exit_strategy", false)'
+    message: "Critical external service {{n.name}} has no exit strategy."
+    clauses: [DORA:2022/2554:Art28(8), FINMA:2018/3:Exit]
+    remediation: "Document an exit plan (alternative provider, data portability, transition time) (exit_strategy=true)."
+    fixtures: { positive: fixtures/TPR-002.pos.json, negative: fixtures/TPR-002.neg.json }
+    tags: [third-party, exit]

@@ -1,0 +1,83 @@
+{
+  "id": "arch_fx_data_006_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DATA-006 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FADP",
+      "FINMA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "Gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "purpose": "Fixture model",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "outsourcing_registered": true,
+        "exit_strategy": true
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Log Analytics",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_gw",
+      "to": "n_llm",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "prompt_contains": "pii"
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_gw",
+      "to": "n_logs",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

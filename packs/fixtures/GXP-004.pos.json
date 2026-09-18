@@ -1,0 +1,79 @@
+{
+  "id": "arch_fx_gxp_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture GXP-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "GAMP",
+      "EU-GMP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_lims",
+      "type": "app",
+      "name": "LIMS – configured product",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "gamp_category": "configured"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Batch records",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "sql",
+        "data_class": "confidential",
+        "region": "switzerlandnorth",
+        "backup": true,
+        "gamp_category": "configured",
+        "supplier_assessed": true
+      }
+    },
+    {
+      "id": "n_audit",
+      "type": "log_sink",
+      "name": "Audit trail",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_lims_db",
+      "from": "n_lims",
+      "to": "n_db",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_lims_audit",
+      "from": "n_lims",
+      "to": "n_audit",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

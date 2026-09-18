@@ -1,0 +1,52 @@
+{
+  "id": "arch_fx_c4_006.neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture C4-006 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "attrs": {
+        "exposure": "internal",
+        "identity": "managed_identity"
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Orders API",
+      "layer": "app",
+      "attrs": {
+        "exposure": "internal"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_api",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

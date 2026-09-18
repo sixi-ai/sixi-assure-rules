@@ -1,0 +1,61 @@
+{
+  "id": "arch_fx_c4_005.pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture C4-005 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Research agent",
+      "layer": "ai",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Research summaries",
+        "owner": "Head of Research"
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Docs MCP server",
+      "layer": "ai",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "docs.read"
+        ],
+        "vetted": true,
+        "logged": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_mcp",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,61 @@
+# GXP — electronic records and signatures in GMP-regulated systems (docs/03 §GXP). Cites 21 CFR Part 11 (FDA) and
+# EudraLex Volume 4 GMP Annex 11, revision 1 (EU-GMP); the texts were checked against eCFR and the Commission PDF.
+# Every condition gates on a declared regime: the pack speaks only where GxP record-keeping is declared. GAMP 5 is
+# industry guidance, not law — its sections are cited beside the clause that carries the obligation, never instead of it.
+pack: gxp
+version: 0.2.0
+regimes: [FDA, EU-GMP, GAMP]
+rules:
+  - id: GXP-001
+    title: No immutable audit trail for GxP records
+    scope: graph
+    severity: high
+    condition: '(regime("FDA") || regime("EU-GMP")) && !g.nodes("log_sink").exists(l, attr(l, "immutable", false))'
+    message: "GxP record-keeping applies, but the architecture models no immutable audit trail that records who created, changed or deleted data, when and why."
+    clauses: [FDA:21CFR11:11.10(e), EU-GMP:Annex11:9, EU-GMP:Annex11:12]
+    remediation: "Add a secure, computer-generated, time-stamped audit trail that changes cannot obscure (a log sink with immutable=true and a retention at least as long as the records), and review it regularly."
+    fixtures: { positive: fixtures/GXP-001.pos.json, negative: fixtures/GXP-001.neg.json }
+    tags: [gxp, audit-trail, records]
+
+  - id: GXP-002
+    title: Electronic approval not bound to the signer's own identity
+    scope: node
+    severity: high
+    condition: |
+      n.type == "human_step" && size(attr(n, "approval_for", [])) > 0 && attr(n, "approval_identity", "") != "separate" &&
+      (regime("FDA") || regime("EU-GMP"))
+    message: "{{n.name}} records approvals, but they are not declared as signed under the approver's own identity (approval_identity={{attr(n, 'approval_identity', 'not declared')}}): an electronic signature must be unique to one person and linked to its record."
+    clauses: [FDA:21CFR11:11.100(a), FDA:21CFR11:11.200(a), FDA:21CFR11:11.70, EU-GMP:Annex11:14]
+    remediation: "Sign each approval under the approver's own identity — never a shared or service identity — and link the signature, with name, date, time and meaning, to the record it approves (approval_identity=separate)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/approval_identity", value: separate }
+    fixtures: { positive: fixtures/GXP-002.pos.json, negative: fixtures/GXP-002.neg.json }
+    tags: [gxp, electronic-signatures, identity]
+
+  - id: GXP-003
+    title: GxP data store without backups
+    scope: node
+    severity: high
+    condition: |
+      n.type == "datastore" && attr(n, "data_class", "") != "public" && !attr(n, "backup", false) &&
+      (regime("FDA") || regime("EU-GMP"))
+    message: "{{n.name}} holds GMP-relevant data without backups: records must stay retrievable, readable and accurate throughout their retention period."
+    clauses: [FDA:21CFR11:11.10(c), EU-GMP:Annex11:7, GAMP:5-Ed2:O9]
+    remediation: "Back up the store regularly and check during validation, and periodically after, that the backups can be restored intact (backup=true)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/backup", value: true }
+    fixtures: { positive: fixtures/GXP-003.pos.json, negative: fixtures/GXP-003.neg.json }
+    tags: [gxp, backup, retention]
+
+  - id: GXP-004
+    title: Configured or custom GxP software without a supplier assessment
+    scope: node
+    severity: medium
+    condition: |
+      attr(n, "gamp_category", "") in ["configured", "custom"] && !attr(n, "supplier_assessed", false) &&
+      (regime("GAMP") || regime("FDA") || regime("EU-GMP"))
+    message: "{{n.name}} is {{attr(n, 'gamp_category', '')}} software in a GxP system, but no assessment of its supplier or development team is recorded: what the supplier does for quality decides what you still have to verify yourself."
+    clauses: [GAMP:5-Ed2:M2, GAMP:5-Ed2:M4, EU-GMP:Annex11:3, FDA:21CFR11:11.10]
+    remediation: "Assess the supplier, or the team that wrote the code, against the risk of the system — quality system, development and testing practice, support and updates — file the assessment, and let its outcome set the verification you do yourself (supplier_assessed=true)."
+    fixtures: { positive: fixtures/GXP-004.pos.json, negative: fixtures/GXP-004.neg.json }
+    tags: [gxp, supplier, gamp, risk-based]

@@ -1,0 +1,100 @@
+{
+  "id": "arch_fx_ot_006_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-006 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "CRA",
+      "NIS2",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited",
+    "incident_reporting": "Plant CSIRT within 24 h (NIS2 Art. 23); CRA Art. 14 via the PSIRT."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_appr",
+      "type": "human_step",
+      "name": "Approval console",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "approver",
+        "approval_identity": "separate"
+      }
+    },
+    {
+      "id": "n_brk",
+      "type": "app",
+      "name": "Command broker",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_val",
+      "type": "app",
+      "name": "Command validator",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "command_validation": true
+      }
+    },
+    {
+      "id": "n_plc",
+      "type": "edge_device",
+      "name": "PLC",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_appr_brk",
+      "from": "n_appr",
+      "to": "n_brk",
+      "kind": "executes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_brk_val",
+      "from": "n_brk",
+      "to": "n_val",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_val_plc",
+      "from": "n_val",
+      "to": "n_plc",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

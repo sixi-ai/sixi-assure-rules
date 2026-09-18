@@ -1,0 +1,51 @@
+{
+  "id": "arch_demo_webapp_sql_bad",
+  "tenant_id": "tenant_demo",
+  "name": "Web app + SQL + Key Vault (no AI) (bad twin)",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Online Banking",
+    "description": "Bad twin of webapp-sql-keyvault: the WAF was removed and customers sign in without MFA, secrets live in code/config, the SQL database is publicly reachable with a connection string over unencrypted/unknown transport, has no backup, geo-redundancy or RTO/RPO, uses platform-managed keys; logs are kept 90 days on a mutable tier; no incident reporting path and no DR test recorded.",
+    "criticality": "high",
+    "allowed_regions": ["switzerlandnorth", "switzerlandwest"],
+    "regimes": ["FINMA", "FADP", "MCSB", "DORA"],
+    "decisions": [
+      { "id": "dec_bad_1", "title": "Keep the SQL password in app settings", "status": "accepted", "proposed_by": "demo architect",
+        "decision": "Accepted for speed; no clause or documentation was attached (STR-003)." }
+    ]
+  },
+  "groups": [
+    { "id": "g_users", "kind": "zone", "name": "Users", "node_ids": ["n_user"] },
+    { "id": "g_cloud", "kind": "zone", "name": "Cloud – Switzerland North", "node_ids": ["n_entra", "n_web", "n_api", "n_sql", "n_kv", "n_logs"],
+      "attrs": { "region": "switzerlandnorth" } }
+  ],
+  "nodes": [
+    { "id": "n_user", "type": "user", "name": "Retail customer", "layer": "human", "zone": "g_users", "position": { "x": 40, "y": 200 }, "source": "design",
+      "attrs": { "population": "customer", "mfa": false } },
+    { "id": "n_entra", "type": "identity_provider", "name": "Entra ID (customer identities)", "layer": "identity", "zone": "g_cloud", "position": { "x": 480, "y": 80 }, "source": "design",
+      "attrs": {} },
+    { "id": "n_web", "type": "app", "name": "Online banking web app", "layer": "app", "zone": "g_cloud", "position": { "x": 480, "y": 200 }, "source": "design",
+      "attrs": { "exposure": "public", "waf": false, "authn": "oidc", "secrets_in": "code", "criticality": "high", "region": "switzerlandnorth" } },
+    { "id": "n_api", "type": "api", "name": "Accounts API", "layer": "app", "zone": "g_cloud", "position": { "x": 700, "y": 200 }, "source": "design",
+      "attrs": { "exposure": "internal", "authn": "oauth", "secrets_in": "config", "criticality": "high", "region": "switzerlandnorth" } },
+    { "id": "n_kv", "type": "secret_store", "name": "Key Vault", "layer": "identity", "zone": "g_cloud", "position": { "x": 700, "y": 440 }, "source": "design",
+      "attrs": { "region": "switzerlandnorth" } },
+    { "id": "n_sql", "type": "datastore", "name": "Accounts SQL DB", "layer": "data", "zone": "g_cloud", "position": { "x": 920, "y": 200 }, "source": "design",
+      "attrs": { "engine": "azure_sql", "data_class": "cid", "region": "switzerlandnorth", "network_exposure": "public", "encryption_key": "pmk", "backup": false, "geo_redundant": false, "criticality": "critical", "retention_days": 3650 } },
+    { "id": "n_logs", "type": "log_sink", "name": "Log Analytics (90-day workspace)", "layer": "platform", "zone": "g_cloud", "position": { "x": 920, "y": 320 }, "source": "design",
+      "attrs": { "retention_days": 90, "immutable": false, "region": "switzerlandnorth" } }
+  ],
+  "edges": [
+    { "id": "e_user_web",   "from": "n_user", "to": "n_web",   "kind": "calls",         "protocol": "https", "auth": "oauth_client",      "encryption": "tls",     "data_class": "cid",      "attrs": {} },
+    { "id": "e_web_entra",  "from": "n_web",  "to": "n_entra", "kind": "authenticates", "protocol": "https", "auth": "oauth_client",      "encryption": "tls",     "data_class": "pii",      "attrs": {} },
+    { "id": "e_web_api",    "from": "n_web",  "to": "n_api",   "kind": "calls",         "protocol": "https", "auth": "managed_identity",  "encryption": "tls",     "data_class": "cid",      "attrs": {} },
+    { "id": "e_api_sql_r",  "from": "n_api",  "to": "n_sql",   "kind": "reads",         "protocol": "tds",   "auth": "connection_string", "encryption": "none",    "data_class": "cid",      "attrs": {} },
+    { "id": "e_api_sql_w",  "from": "n_api",  "to": "n_sql",   "kind": "writes",        "protocol": "tds",   "auth": "connection_string", "encryption": "unknown", "data_class": "cid",      "attrs": {} },
+    { "id": "e_web_kv",     "from": "n_web",  "to": "n_kv",    "kind": "reads",         "protocol": "https", "auth": "managed_identity",  "encryption": "tls",     "data_class": "secret",   "attrs": {} },
+    { "id": "e_api_kv",     "from": "n_api",  "to": "n_kv",    "kind": "reads",         "protocol": "https", "auth": "managed_identity",  "encryption": "tls",     "data_class": "secret",   "attrs": {} },
+    { "id": "e_web_logs",   "from": "n_web",  "to": "n_logs",  "kind": "writes",        "protocol": "https", "auth": "managed_identity",  "encryption": "tls",     "data_class": "internal", "attrs": {} },
+    { "id": "e_api_logs",   "from": "n_api",  "to": "n_logs",  "kind": "writes",        "protocol": "https", "auth": "managed_identity",  "encryption": "tls",     "data_class": "internal", "attrs": {} }
+  ],
+  "findings": [],
+  "evidence": []
+}

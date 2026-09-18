@@ -1,0 +1,79 @@
+{
+  "id": "arch_fx_ot_005_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-005 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "CRA",
+      "NIS2",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited",
+    "incident_reporting": "Plant CSIRT within 24 h (NIS2 Art. 23); CRA Art. 14 via the PSIRT."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_dev",
+      "type": "edge_device",
+      "name": "Line device",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      }
+    },
+    {
+      "id": "n_hub",
+      "type": "broker",
+      "name": "IoT Hub",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_ag",
+      "type": "agent",
+      "name": "Assistant",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Proposes machine commands",
+        "owner": "Fixture owner",
+        "content_safety": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_dev_hub",
+      "from": "n_dev",
+      "to": "n_hub",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e_ag_hub",
+      "from": "n_ag",
+      "to": "n_hub",
+      "kind": "subscribes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

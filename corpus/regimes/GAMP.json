@@ -1,0 +1,679 @@
+[
+  {
+    "id": "GAMP:5-Ed2:Ch3",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Chapter 3",
+    "title": "Life Cycle Approach",
+    "summary": "Sets the computerised system life cycle — concept, project, operation, retirement — with specification and verification scaled to risk, and critical thinking applied through the life cycle rather than a fixed document set.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "life-cycle",
+      "validation",
+      "critical-thinking",
+      "framework"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:Ch5",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Chapter 5",
+    "title": "Quality Risk Management",
+    "summary": "The science-based quality risk management process GAMP applies to computerised systems: identify what can harm the patient, the product or the data, judge the risk, and let it decide the rigour of specification, review and testing.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "risk-management",
+      "patient-safety",
+      "data-integrity",
+      "process"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:Ch7",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Chapter 7",
+    "title": "Supplier Activities",
+    "summary": "What the guide expects of suppliers and service providers of GxP systems: a quality management system, requirements and specifications, design reviews, software production and testing, release, documentation and support during operation.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "supplier",
+      "service-provider",
+      "quality-system",
+      "life-cycle"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:M1",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix M1",
+    "title": "Validation Planning",
+    "summary": "How the validation plan of a computerised system is framed and scoped, including the leverage of supplier activities and existing information.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "validation",
+      "planning",
+      "documentation"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:M2",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix M2",
+    "title": "Supplier Assessment",
+    "summary": "How a regulated company assesses a supplier of a GxP system — its quality system, development and support practices — and how the outcome of that assessment scales the verification the company still has to do itself.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "supplier",
+      "assessment",
+      "risk-based",
+      "outsourcing"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:M3",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix M3",
+    "title": "Science-Based Quality Risk Management",
+    "summary": "The worked risk-management method: functions assessed for impact on patient safety, product quality and data integrity, with controls and verification chosen from the resulting risk class.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "risk-management",
+      "controls",
+      "data-integrity",
+      "method"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:M4",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix M4",
+    "title": "Categories of Software and Hardware",
+    "summary": "The GAMP software categories — 1 infrastructure, 3 non-configured, 4 configured, 5 custom — used to scale the life-cycle effort. The second edition presents categories 3 to 5 as a continuum for systems built from mixed components, not as a checklist.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "software-categories",
+      "risk-based",
+      "configuration",
+      "custom-code"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:M11",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix M11",
+    "title": "IT Infrastructure",
+    "summary": "Risk-based good practice for the platforms a GxP system runs on, including qualified infrastructure and the services a cloud or hosting provider delivers.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "infrastructure",
+      "cloud",
+      "platform",
+      "qualification"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:M12",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix M12",
+    "title": "Critical Thinking",
+    "summary": "Critical thinking as a named practice: knowledgeable people decide what a system needs, in proportion to risk and to what is already known, instead of applying one fixed set of documents to every system.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "critical-thinking",
+      "risk-based",
+      "effort",
+      "judgement"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:D1",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix D1",
+    "title": "Specifying Requirements",
+    "summary": "How requirements for a GxP system are written so they can be verified: unambiguous, testable and traceable to the risk they address.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "requirements",
+      "traceability",
+      "specification",
+      "verification"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:D5",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix D5",
+    "title": "Testing of Computerized Systems",
+    "summary": "How testing is planned, performed and recorded for computerised systems, with the depth of testing following the risk and the category of the software.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "testing",
+      "verification",
+      "risk-based",
+      "evidence"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:D11",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix D11",
+    "title": "Artificial Intelligence and Machine Learning (AI/ML)",
+    "summary": "The second edition's appendix on AI and machine learning in GxP systems: what the technology is, and how to integrate such a system and show it is fit for its intended use in a regulated environment.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "artificial-intelligence",
+      "machine-learning",
+      "fitness-for-use",
+      "gxp"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:O8",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix O8",
+    "title": "Periodic Review",
+    "summary": "The periodic review of a computerised system in operation: whether it still works as intended and whether its records, changes, incidents and controls are still adequate.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "periodic-review",
+      "operation",
+      "monitoring",
+      "records"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:O9",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix O9",
+    "title": "Backup and Restore",
+    "summary": "Backup and restore of GxP systems and their data, including the checks that the data can be brought back complete and readable.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "backup",
+      "restore",
+      "retention",
+      "operation"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:O11",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix O11",
+    "title": "Security Management",
+    "summary": "Security management of a computerised system in operation: access control, the separation of duties behind approvals, and the monitoring that supports the record's integrity.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "security",
+      "access-control",
+      "operation",
+      "integrity"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:O13",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix O13",
+    "title": "Archiving and Retrieval",
+    "summary": "Archiving of GxP records and their retrieval throughout the retention period, including readability after platform or format changes.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "archiving",
+      "retrieval",
+      "retention",
+      "records"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:5-Ed2:S4",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "ref": "Appendix S4",
+    "title": "Patch and Update Management",
+    "summary": "How patches and updates to a GxP system are assessed, tested and released without losing the validated state.",
+    "excerpt": "",
+    "version": "2022-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "tags": [
+      "patching",
+      "change-management",
+      "operation",
+      "risk-based"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2022-TOC/ISPE-GAMP5-Ed2_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:Ch1.3",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Section 1.3",
+    "title": "EU AI Act",
+    "summary": "The guide's positioning against the EU AI Act: an AI-enabled GxP system may also be a regulated AI system, so the two sets of obligations are read together rather than separately.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "ai-act",
+      "scope",
+      "regulatory-overlap",
+      "artificial-intelligence"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:Ch7.5",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Section 7.5",
+    "title": "AI-Specific Security Measures",
+    "summary": "Security measures specific to AI-enabled systems that suppliers are expected to provide, beyond the general good practices for GxP software.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "security",
+      "supplier",
+      "artificial-intelligence",
+      "controls"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:P2",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Appendix P2",
+    "title": "Project Phase",
+    "summary": "The project phase of an AI-enabled system: model requirements and design space, case data set creation and data split, iterative experimentation, selection of the release candidate, testing and release reporting.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "model-development",
+      "data-sets",
+      "testing",
+      "release",
+      "artificial-intelligence"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:P3",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Appendix P3",
+    "title": "Operation Phase",
+    "summary": "The operation phase of an AI-enabled system: monitoring its performance and the data it sees, handling change and retraining, and keeping the system fit for its intended use.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "monitoring",
+      "drift",
+      "retraining",
+      "operation",
+      "artificial-intelligence"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:M2",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Appendix M2",
+    "title": "Supplier Management",
+    "summary": "Managing suppliers of AI-enabled systems and models, including what the regulated company must know about a supplied model, its data and its updates.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "supplier",
+      "assessment",
+      "models",
+      "artificial-intelligence"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:M6",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Appendix M6",
+    "title": "Fit for Purpose Data and Data Quality",
+    "summary": "What makes the data behind an AI-enabled GxP system fit for purpose: provenance, quality, representativeness and the controls that keep it so.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "data-quality",
+      "provenance",
+      "data-governance",
+      "artificial-intelligence"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:M7",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Appendix M7",
+    "title": "Data and Model Governance and Management",
+    "summary": "Governance of data and models across their life: versions, lineage, access, approval of changes, and the records that show which model and data produced a result.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "model-governance",
+      "versioning",
+      "lineage",
+      "records",
+      "artificial-intelligence"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:M9",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Appendix M9",
+    "title": "Trustworthy AI",
+    "summary": "The trustworthiness properties an AI-enabled GxP system is expected to show — among them human oversight, robustness, transparency and fairness — and how they are addressed through the life cycle.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "trustworthy-ai",
+      "human-oversight",
+      "robustness",
+      "transparency"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:M11",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Appendix M11",
+    "title": "Categories of Software and Hardware",
+    "summary": "How the GAMP software categories are read for AI-enabled systems, where a configured product, a supplied model and custom code often sit in one system.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "software-categories",
+      "risk-based",
+      "models",
+      "artificial-intelligence"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  },
+  {
+    "id": "GAMP:AI:S4",
+    "regime": "GAMP",
+    "doc": "ISPE GAMP Guide: Artificial Intelligence (2025)",
+    "ref": "Appendix S4",
+    "title": "Explainable AI (XAI)",
+    "summary": "Explainability of AI-enabled systems: what the techniques can and cannot show, and how explanation supports the review of a result by a person.",
+    "excerpt": "",
+    "version": "2025-07-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-guide-artificial-intelligence",
+    "tags": [
+      "explainability",
+      "transparency",
+      "human-oversight",
+      "artificial-intelligence"
+    ],
+    "licence": "ispe",
+    "verified": false,
+    "note": "Reference and title taken 2026-09-16 from ISPE's published table of contents (ispe.org/sites/default/files/publications/guidance-documents/2025-TOC/GAMP_Guide-AI_TOC.pdf). The guide itself is licensed to the purchaser for personal non-commercial use, so no text is held and the summary states the scope of the section only: verified stays false because the wording cannot be checked here.",
+    "redacted": "licence"
+  }
+]

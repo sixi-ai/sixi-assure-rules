@@ -1,0 +1,157 @@
+{
+  "id": "arch_fx_ot_007_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-007 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "CRA",
+      "NIS2",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited",
+    "incident_reporting": "Plant CSIRT within 24 h (NIS2 Art. 23); CRA Art. 14 via the PSIRT."
+  },
+  "groups": [
+    {
+      "id": "z_a",
+      "kind": "zone",
+      "name": "Zone – line A",
+      "node_ids": [
+        "n_dev_a"
+      ]
+    },
+    {
+      "id": "z_b",
+      "kind": "zone",
+      "name": "Zone – line B",
+      "node_ids": [
+        "n_dev_b"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_dev_a",
+      "type": "edge_device",
+      "name": "Line A device",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      },
+      "zone": "z_a"
+    },
+    {
+      "id": "n_dev_b",
+      "type": "edge_device",
+      "name": "Line B device",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      },
+      "zone": "z_b"
+    },
+    {
+      "id": "n_hub",
+      "type": "broker",
+      "name": "IoT Hub",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_ingest",
+      "type": "api",
+      "name": "Ingest",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Telemetry DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_tool",
+      "type": "mcp_server",
+      "name": "OT tools",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "telemetry.read"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_a_hub",
+      "from": "n_dev_a",
+      "to": "n_hub",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e_b_hub",
+      "from": "n_dev_b",
+      "to": "n_hub",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e_ingest_hub",
+      "from": "n_ingest",
+      "to": "n_hub",
+      "kind": "subscribes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_ingest_db",
+      "from": "n_ingest",
+      "to": "n_db",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_tool_db",
+      "from": "n_tool",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}
