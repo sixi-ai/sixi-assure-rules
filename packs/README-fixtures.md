@@ -5,8 +5,11 @@ tenant `tenant_fixtures`); `fixtures/<RULE>.neg.json` (`arch_fx_<rule>_neg`) is 
 single attribute/edge changed so the rule is silent. Conventions:
 
 - 2–4 nodes, ≤ 3 edges, no groups/positions. `attrs.regimes` make the owning pack apply and `regime()`
-  guards hold: zt MCSB+NIST · net MCSB+IEC · data FADP+FINMA · log FINMA+AIACT · ai AIACT+OWASP · agt AIACT+OWASP · res DORA ·
-  gov FINMA+DORA+CH-ISG+CRA · c4 MCSB+NIST · drift MCSB+NIST. `allowed_regions` = switzerlandnorth/west.
+  guards hold: zt MCSB+NIST · net MCSB+IEC · data FADP+FINMA · log FINMA+AIACT · ai AIACT+OWASP · agt AIACT+OWASP · a2a AIACT+OWASP ·
+  res DORA · gov FINMA+DORA+CH-ISG+CRA · c4 MCSB+NIST · drift MCSB+NIST. `allowed_regions` = switzerlandnorth/west.
+- Boundary rules (STR-002, STR-006, ATA-001, ATA-002) need groups, because "across a boundary" means the endpoints
+  share none: the ATA fixtures put the caller in a `zone` and the peer in its own zone plus a `trust_boundary`, and the
+  negative changes the declared attribute (`integrity`, `auth`), never the grouping.
 - Drift rules (DRF-*) read knowledge facts: `fixtures/<RULE>.kb.json` (`{"deprecated": {...}, "freshness": {...}}`)
   is declared as `fixtures.kb` and applied to **both** fixtures, so the negative changes the model (e.g. names
   the replacement service or the fresh url), never the facts. Without a kb file `kb.available` is false.
@@ -27,6 +30,7 @@ Matrix — rule → element the positive fixture fires on (fixture ids follow th
 | ai | AI-001→`e1` · AI-002→`e1` · AI-003→`e1` · AI-004→`arch_fx_ai_004_pos` · AI-005→`n_agent` · AI-006→`arch_fx_ai_006_pos` · AI-007→`n_agent` · AI-008→`e1` · AI-009→`n_mcp` · AI-010→`n_agent` · AI-011→`e1` · AI-012→`n_agent` · AI-013→`n_llm` · AI-014→`n_eval` · AI-015→`n_eval` |
 | res | RES-001→`n_db` · RES-002→`n_db` · RES-003→`arch_fx_res_003_pos` |
 | agt | AGT-001→`n_tool_tp` · AGT-002→`n_tool` · AGT-003→`e1` · AGT-004→`n_tool_tp` · AGT-005→`n_agent` · AGT-006→`e1` · AGT-007→`n_tool_tp` |
+| a2a | ATA-001→`e1` · ATA-002→`e1` · ATA-003→`e1` (ATA-003 keeps both agents in one zone, so 001/002 stay silent) |
 | gov | CRA-001→`n_dev` · CRA-002→`n_prod` · GOV-001→`arch_fx_gov_001_pos` · GOV-002→`arch_fx_gov_002_pos` · TPR-001→`n_llm` · TPR-002→`n_saas` |
 | c4 | STR-001→`n_comp` · STR-002→`e1` · STR-003→`arch_fx_c4_003.pos` · STR-004→`n_app` · STR-005→`e1` · STR-006→`e1` · STR-007→`n_user` · STR-008→`n_comp` |
 | drift | DRF-001→`n_llm` · DRF-002→`arch_fx_drf_002_pos` · DRF-003→`n_gw` · DRF-004→`e1` (each with `DRF-00N.kb.json`) |

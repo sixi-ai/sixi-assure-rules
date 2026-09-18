@@ -1,0 +1,88 @@
+{
+  "id": "arch_fx_ata_003_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ATA-003 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited"
+  },
+  "groups": [
+    {
+      "id": "g_home",
+      "kind": "zone",
+      "name": "Our agent runtime",
+      "node_ids": [
+        "n_orch",
+        "n_peer"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Orchestrator agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the A2A pack.",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "output_marking": true
+      }
+    },
+    {
+      "id": "n_peer",
+      "type": "agent",
+      "name": "Worker agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the A2A pack.",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "output_marking": true,
+        "integrity": "signed"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_orch",
+      "to": "n_peer",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "secret",
+      "attrs": {
+        "logged": true,
+        "prompt_contains": "secrets"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

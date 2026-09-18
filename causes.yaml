@@ -41,6 +41,11 @@ causes:
     sentence: Every caller — person or workload — proves who it is with its own identity or a strong sign-in, delegation carries the user, and secrets live in a secret store.
     rules: [ZT-001, ZT-002, ZT-003, ZT-006, ZT-007, ZT-008, ZT-009, STR-004, STR-006]
 
+  - id: inter-agent-trust
+    title: Inter-agent trust
+    sentence: An agent delegates only to a peer whose card it has verified, over a hop the transport authenticates, and never puts a credential inside the message itself.
+    rules: [ATA-001, ATA-002, ATA-003]
+
   - id: least-privilege
     title: Least privilege
     sentence: An identity holds the narrowest scope that still lets it work, and broad or administrative access is granted only for the moment it is needed.
