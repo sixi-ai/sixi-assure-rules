@@ -1637,7 +1637,9 @@
             "evidence_record",
             "spot_check",
             "assistant_architect_run",
-            "secret_rejected"
+            "secret_rejected",
+            "draft_accepted",
+            "draft_rejected"
           ]
         },
         "ts": {

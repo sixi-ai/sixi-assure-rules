@@ -21,8 +21,9 @@ import (
 	"github.com/sixi-ai/sixi-assure-rules/rules"
 )
 
-// goldenModelCount is the size of the golden set (docs/09 §2).
-const goldenModelCount = 12
+// goldenModelCount is the size of the golden set (docs/09 §2): 6 templates and their 6 bad twins,
+// plus the A2A pair that exercises the a2a pack (ADR-062 C3).
+const goldenModelCount = 14
 
 // packsNotInGoldenModels are packs no hand-authored golden model can exercise, with the reason
 // and where they are covered instead. Every entry is a deliberate gap: keep this list empty

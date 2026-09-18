@@ -1,0 +1,77 @@
+# A2A — agent-to-agent communication (docs/03 §ATA, ADR-062). Deterministic CEL over what the
+# architect declares about an A2A hop; the LLM never creates findings.
+#
+# These three rules are the design-time reading of `OWASP:AgenticTop10:ASI07` ("Insecure
+# Inter-Agent Communication"): messages between autonomous agents that lack authentication,
+# integrity or confidentiality, across transport, routing *and discovery* — the agent card being
+# the discovery layer. No clause in the corpus names the A2A specification itself (corpus/regimes
+# holds no A2A record), so nothing here cites one: ASI07 carries the obligation and the further
+# citations are the identity clauses the hop breaks. A clause is never invented (CLAUDE.md §1.4).
+#
+# Vocabulary, all of it already in the schema (docs/02 — this pack adds no attribute):
+#   * an A2A hop is an edge whose `protocol` is "a2a" (the spelling the golden-set templates use,
+#     e.g. multi-agent-fleet.json's orchestrator → worker delegations);
+#   * "across a boundary" is read exactly as STR-002 reads it — the two endpoints share no group,
+#     so the hop leaves the zone, trust boundary, region, subscription or site it started in;
+#   * a verified agent card is `attrs.integrity` = signed (the signature was checked against the
+#     peer's published JWKS) or pinned (a fetched copy is pinned), the same attribute AGT-004 uses
+#     for a tool definition, because it answers the same question: can this definition change
+#     under us after the design was assessed;
+#   * a credential inside the payload is `attrs.prompt_contains` = secrets or `data_class` = secret
+#     on the hop — the architect's own declaration of what the messages carry.
+#
+# Overlaps are deliberate and documented in docs/03: STR-002 covers a boundary hop with no
+# authentication at all, STR-006 a shared secret on any service-to-service hop, DATA-006 secrets in
+# a prompt to an LLM endpoint. ATA-002 and ATA-003 are the A2A reading of the same shortcuts, and
+# they cite ASI07 because an A2A message is forwarded, logged and replayed by further agents.
+pack: a2a
+version: 0.1.0
+regimes: [OWASP, AIACT, FINMA, MAESTRO, MCSB, NIST]
+rules:
+  - id: ATA-001
+    title: A2A peer across a boundary declares no verified agent card
+    scope: edge
+    severity: high
+    condition: |
+      e.protocol.lowerAscii() == "a2a" &&
+      e.to.type in ["agent","app","api","saas","external_party","mcp_server"] &&
+      size(e.from.group_ids) + size(e.to.group_ids) > 0 &&
+      !e.from.group_ids.exists(gid, gid in e.to.group_ids) &&
+      !(attr(e.to, "integrity", "") in ["signed","pinned"])
+    message: "{{e.from.name}} speaks A2A to {{e.to.name}} across a boundary and {{e.to.name}} declares no verified agent card (integrity={{attr(e.to,'integrity','none')}}): nothing ties the skills, endpoint and security scheme the card advertises to the agent's provider, and they can change after the design was assessed."
+    clauses: [OWASP:AgenticTop10:ASI07, OWASP:AgenticTop10:ASI04, MAESTRO:L7]
+    remediation: "Verify the peer's agent card signature against the JWKS its provider publishes and record the outcome as integrity=signed; where the provider signs nothing, pin a fetched copy of the card (integrity=pinned) and re-assess when the pin moves."
+    patch_template:
+      - { op: add, path: "/nodes/{{e.to.id}}/attrs/integrity", value: signed }
+    fixtures: { positive: fixtures/ATA-001.pos.json, negative: fixtures/ATA-001.neg.json }
+    tags: [a2a, agentic, agent-card, supply-chain, boundary]
+
+  - id: ATA-002
+    title: A2A hop across a boundary authenticated with an API key or HTTP Basic
+    scope: edge
+    severity: high
+    condition: |
+      e.protocol.lowerAscii() == "a2a" &&
+      e.auth in ["api_key","password"] &&
+      size(e.from.group_ids) + size(e.to.group_ids) > 0 &&
+      !e.from.group_ids.exists(gid, gid in e.to.group_ids)
+    message: "{{e.from.name}} → {{e.to.name}} speaks A2A across a boundary authenticated with {{e.auth}}: a shared secret names no agent, cannot be scoped to one skill and cannot be withdrawn from one caller."
+    clauses: [OWASP:AgenticTop10:ASI07, MCSB:v1:IM-8, NIST:800-207:S2]
+    remediation: "Authenticate the hop with OAuth 2.0 client credentials (auth=oauth_client), the calling agent's own identity (agent_id) or mutual TLS, carried in the transport's Authorization header; keep API keys and HTTP Basic inside a single trust boundary."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/auth", value: oauth_client }
+    fixtures: { positive: fixtures/ATA-002.pos.json, negative: fixtures/ATA-002.neg.json }
+    tags: [a2a, identity, secrets, boundary]
+
+  - id: ATA-003
+    title: Credential carried inside the A2A message payload
+    scope: edge
+    severity: critical
+    condition: |
+      e.protocol.lowerAscii() == "a2a" &&
+      (attr(e, "prompt_contains", "") == "secrets" || e.data_class == "secret")
+    message: "The A2A messages {{e.from.name}} sends {{e.to.name}} are declared to carry credentials (data_class={{e.data_class}}, prompt_contains={{attr(e,'prompt_contains','none')}}): a task payload is stored with the task, logged, and passed on to whatever agent the peer delegates to, so the secret travels further than the hop."
+    clauses: [OWASP:AgenticTop10:ASI07, OWASP:AgenticTop10:ASI03, MCSB:v1:IM-8]
+    remediation: "Move the credential into the transport: OAuth 2.0 client credentials or mutual TLS in the Authorization header, with the secret held in a secret store. Where the peer needs access of its own, delegate with a scoped token it obtains itself rather than handing it yours. The declaration describes the design, so change the design — not the label."
+    fixtures: { positive: fixtures/ATA-003.pos.json, negative: fixtures/ATA-003.neg.json }
+    tags: [a2a, secrets, identity, payload]

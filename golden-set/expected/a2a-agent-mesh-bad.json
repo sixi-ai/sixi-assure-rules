@@ -1,0 +1,26 @@
+[
+  {
+    "rule_id": "ATA-001",
+    "ids": [
+      "e_orch_partner"
+    ]
+  },
+  {
+    "rule_id": "ATA-002",
+    "ids": [
+      "e_orch_partner"
+    ]
+  },
+  {
+    "rule_id": "ATA-003",
+    "ids": [
+      "e_orch_partner"
+    ]
+  },
+  {
+    "rule_id": "STR-006",
+    "ids": [
+      "e_orch_partner"
+    ]
+  }
+]
