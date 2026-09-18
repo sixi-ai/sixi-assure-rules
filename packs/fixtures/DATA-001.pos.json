@@ -1,0 +1,63 @@
+{
+  "id": "arch_fx_data_001_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DATA-001 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FADP",
+      "FINMA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_crm",
+      "type": "datastore",
+      "name": "CRM export",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "blob",
+        "data_class": "pii",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      }
+    },
+    {
+      "id": "n_idx",
+      "type": "vector_index",
+      "name": "AI Search index",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "data_class": "cid",
+        "acl_trimming": true,
+        "redaction": false,
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_crm",
+      "to": "n_idx",
+      "kind": "flows",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {},
+      "data_class": "pii"
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

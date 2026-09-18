@@ -1,0 +1,199 @@
+[
+  {
+    "id": "CH-ISG:Art74a-c",
+    "regime": "CH-ISG",
+    "doc": "Bundesgesetz über die Informationssicherheit beim Bund (ISG), SR 128",
+    "ref": "Art. 74a to 74c",
+    "title": "Duty to report cyberattacks on critical infrastructures",
+    "summary": "Authorities and organisations operating critical infrastructures must ensure that cyberattacks on their IT resources are reported to the National Cyber Security Centre (BACS); Art. 74b lists the bodies subject to the duty and Art. 74c allows the Federal Council to exempt bodies whose incidents have only minor effects.",
+    "excerpt": "Behörden und Organisationen nach Artikel 74b müssen dafür sorgen, dass dem BACS Cyberangriffe auf ihre Informatikmittel gemeldet werden.",
+    "version": "2025-04-01",
+    "effective": "2025-04-01",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/232/de",
+    "tags": [
+      "incident",
+      "reporting",
+      "critical-infrastructure",
+      "cyberattack"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Composite reference used by rule packs. Verified 2026-09-10 against the German Fedlex text (version of 1 April 2025); the 24-hour deadline is set in Art. 74e, recorded separately. Scope correction 2026-09-16: the reporting duty spans Art. 74a to 74h, not 74a to 74e — Art. 74f (transmission), 74g (breach of the duty) and 74h (disregard of a BACS order, in force since 1 October 2025) complete it, and the 14-day window to complete a report is Art. 16(1) of the Cybersecurity Ordinance, not the Act."
+  },
+  {
+    "id": "CH-ISG:Art74a",
+    "regime": "CH-ISG",
+    "doc": "Bundesgesetz über die Informationssicherheit beim Bund (ISG), SR 128",
+    "ref": "Art. 74a",
+    "title": "Grundsätze (principles of the reporting duty)",
+    "summary": "Sets the principle that the authorities and organisations listed in Article 74b must ensure cyberattacks on their IT resources are reported to the National Cyber Security Centre (BACS).",
+    "excerpt": "Behörden und Organisationen nach Artikel 74b müssen dafür sorgen, dass dem BACS Cyberangriffe auf ihre Informatikmittel gemeldet werden.",
+    "version": "2025-04-01",
+    "effective": "2025-04-01",
+    "applies_to": [
+      "critical_infrastructure"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/232/de",
+    "tags": [
+      "incident",
+      "reporting",
+      "critical-infrastructure",
+      "bacs"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the German Fedlex text (version of 1 April 2025)."
+  },
+  {
+    "id": "CH-ISG:Art74b",
+    "regime": "CH-ISG",
+    "doc": "Bundesgesetz über die Informationssicherheit beim Bund (ISG), SR 128",
+    "ref": "Art. 74b",
+    "title": "Meldepflichtige Behörden und Organisationen (bodies subject to the reporting duty)",
+    "summary": "Lists the authorities and organisations subject to the reporting duty, covering federal and cantonal authorities, universities, energy and water suppliers, financial institutions, healthcare providers, telecommunications providers and other operators of critical infrastructure.",
+    "excerpt": "",
+    "version": "2025-04-01",
+    "effective": "2025-04-01",
+    "applies_to": [
+      "critical_infrastructure",
+      "finma_supervised"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/232/de",
+    "tags": [
+      "scope",
+      "critical-infrastructure",
+      "reporting",
+      "sectors"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Summary paraphrases the catalogue of addressees; consult the official text for the exact list applicable to an entity."
+  },
+  {
+    "id": "CH-ISG:Art74c",
+    "regime": "CH-ISG",
+    "doc": "Bundesgesetz über die Informationssicherheit beim Bund (ISG), SR 128",
+    "ref": "Art. 74c",
+    "title": "Ausnahmen von der Meldepflicht (exemptions from the reporting duty)",
+    "summary": "Allows the Federal Council to exempt authorities and organisations from the reporting duty where cyberattacks against them would have only minor effects on the economy or the population.",
+    "excerpt": "",
+    "version": "2025-04-01",
+    "effective": "2025-04-01",
+    "applies_to": [
+      "critical_infrastructure"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/232/de",
+    "tags": [
+      "exemption",
+      "reporting",
+      "critical-infrastructure",
+      "scope"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the German Fedlex text (version of 1 April 2025)."
+  },
+  {
+    "id": "CH-ISG:Art74e",
+    "regime": "CH-ISG",
+    "doc": "Bundesgesetz über die Informationssicherheit beim Bund (ISG), SR 128",
+    "ref": "Art. 74e",
+    "title": "Meldefrist (reporting deadline)",
+    "summary": "Requires the report of a cyberattack to be submitted to the National Cyber Security Centre within 24 hours of its discovery.",
+    "excerpt": "innert 24 Stunden nach der Entdeckung des Cyberangriffs",
+    "version": "2025-04-01",
+    "effective": "2025-04-01",
+    "applies_to": [
+      "critical_infrastructure"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/232/de",
+    "tags": [
+      "incident",
+      "reporting",
+      "deadline",
+      "critical-infrastructure"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Excerpt is a short phrase from the German text; consult the official text for the full provision, including completion of incomplete reports. The 14-day window for completing a report is granted under Art. 16(1) of the Cybersecurity Ordinance (SR 128.51), recorded as CH-ISG:128.51:Art16 — the Act itself sets only the 24-hour deadline."
+  },
+  {
+    "id": "CH-ISG:Art74g",
+    "regime": "CH-ISG",
+    "doc": "Information Security Act (ISG), SR 128",
+    "ref": "Art. 74g",
+    "title": "Verletzung der Meldepflicht (breach of the reporting duty)",
+    "summary": "Where there are signs that the reporting duty has been breached, BACS informs the body concerned and sets a reasonable deadline to report; if the body still does not report, BACS issues a formal order with a new deadline and a reference to the penalty in Art. 74h.",
+    "excerpt": "Bestehen Anzeichen für eine Verletzung der Meldepflicht, so informiert das BACS die meldepflichtige Behörde oder Organisation darüber und setzt ihr eine angemessene Frist, um der Meldepflicht nachzukommen.",
+    "version": "2025-10-01",
+    "effective": "2025-10-01",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/232/de",
+    "tags": [
+      "reporting",
+      "enforcement",
+      "incident",
+      "deadline"
+    ],
+    "licence": "ch-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the German Fedlex text of the Information Security Act (SR 128), consolidated version of 1 October 2025. In force since 1 October 2025."
+  },
+  {
+    "id": "CH-ISG:Art74h",
+    "regime": "CH-ISG",
+    "doc": "Information Security Act (ISG), SR 128",
+    "ref": "Art. 74h",
+    "title": "Missachten von Verfügungen des BACS (disregard of BACS orders)",
+    "summary": "A fine of up to CHF 100,000 may be imposed on anyone who wilfully fails to follow a final BACS order, or the decision of an appeal body, that referred to this penalty. The fine punishes defiance of a final order, not a late report.",
+    "excerpt": "Mit Busse bis zu 100 000 Franken wird bestraft, wer einer vom BACS unter Hinweis auf die Strafdrohung dieses Artikels erlassenen rechtskräftigen Verfügung oder dem Entscheid einer Rechtsmittelinstanz vorsätzlich nicht Folge leistet.",
+    "version": "2025-10-01",
+    "effective": "2025-10-01",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/232/de",
+    "tags": [
+      "penalty",
+      "enforcement",
+      "reporting",
+      "incident"
+    ],
+    "licence": "ch-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the German Fedlex text of the Information Security Act (SR 128), consolidated version of 1 October 2025. In force since 1 October 2025. Art. 6 of the Federal Act on Administrative Criminal Law applies in business operations, with a reduced fine of up to CHF 20,000 against the business."
+  },
+  {
+    "id": "CH-ISG:128.51:Art16",
+    "regime": "CH-ISG",
+    "doc": "Cybersecurity Ordinance (CSV), SR 128.51",
+    "ref": "Art. 16",
+    "title": "Frist zur Erfassung der Meldung (deadline for completing the report)",
+    "summary": "Where not all required information is known within the 24-hour reporting deadline, BACS grants the body 14 days to complete the report; if information is still missing at the end of that period BACS asks the body to complete it at once or to confirm that the information does not exist.",
+    "excerpt": "Sind innerhalb der Meldefrist von 24 Stunden nach der Entdeckung des Cyberangriffs nicht alle erforderlichen Informationen bekannt, so gewährt das BACS der betreffenden Behörde oder Organisation eine Frist von 14 Tagen zur Ergänzung der Meldung.",
+    "version": "2025-04-01",
+    "effective": "2025-04-01",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2025/169/de",
+    "tags": [
+      "reporting",
+      "deadline",
+      "incident",
+      "ordinance"
+    ],
+    "licence": "ch-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the German Fedlex text of the Cybersecurity Ordinance (SR 128.51) of 7 March 2025, consolidated version of 1 April 2025 (AS 2025 169). Filed under the CH-ISG regime because the Ordinance implements the Act; the 14-day window is an ordinance rule, not a statutory one."
+  }
+]

@@ -1,0 +1,96 @@
+{
+  "id": "arch_fx_mr_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture MR-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MR"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Operations agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "managed_identity",
+        "autonomy": "assisted",
+        "purpose": "Proposes setpoints",
+        "owner": "Fixture owner"
+      }
+    },
+    {
+      "id": "n_broker",
+      "type": "app",
+      "name": "Command broker",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_writer",
+      "type": "app",
+      "name": "Command validator",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "command_validation": true,
+        "intervention_log": true
+      }
+    },
+    {
+      "id": "n_plc",
+      "type": "edge_device",
+      "name": "PLC line 1",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant Basel",
+        "attestation": "tpm"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_agent_broker",
+      "from": "n_agent",
+      "to": "n_broker",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_broker_writer",
+      "from": "n_broker",
+      "to": "n_writer",
+      "kind": "publishes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_writer_plc",
+      "from": "n_writer",
+      "to": "n_plc",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

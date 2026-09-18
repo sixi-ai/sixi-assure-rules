@@ -1,0 +1,350 @@
+[
+  {
+    "id": "CRA:2024/2847:Art13",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Art. 13",
+    "title": "Obligations of manufacturers",
+    "summary": "Manufacturers must design, develop and produce products with digital elements in accordance with the essential cybersecurity requirements of Annex I, Part I, and must document a cybersecurity risk assessment that is maintained during the support period.",
+    "excerpt": "When placing a product with digital elements on the market, manufacturers shall ensure that it has been designed, developed and produced in accordance with the essential cybersecurity requirements set out in Part I of Annex I.",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "secure-by-design",
+      "risk",
+      "product-security",
+      "documentation"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF obtained from the EU Publications Office (CELEX 32024R2847). Status 2026-09-16: no harmonised standard has been cited in the Official Journal under the CRA and no notified body has been listed, so conformity must still be argued from first principles against the essential requirements."
+  },
+  {
+    "id": "CRA:2024/2847:Art14",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Art. 14",
+    "title": "Reporting obligations of manufacturers",
+    "summary": "Manufacturers must notify actively exploited vulnerabilities and severe incidents to the coordinating CSIRT and ENISA via the single reporting platform: an early warning within 24 hours, a fuller notification within 72 hours and a final report within 14 days of a mitigation being available.",
+    "excerpt": "A manufacturer shall notify any actively exploited vulnerability contained in the product with digital elements that it becomes aware of simultaneously to the CSIRT designated as coordinator … and to ENISA.",
+    "version": "2024-11-20",
+    "effective": "2026-09-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "vulnerability",
+      "reporting",
+      "incident",
+      "disclosure"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Article 14 applies from 11 September 2026 (Art. 71(2)). Status 2026-09-16: the obligation is live — ENISA's Single Reporting Platform went into service on 11 September 2026, the same day Art. 14 started to apply. The deadlines are an early warning within 24 hours, a notification within 72 hours, and a final report within 14 days of a corrective measure for a vulnerability or within one month of the 72-hour notification for a severe incident."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I",
+    "title": "Essential cybersecurity requirements",
+    "summary": "Part I sets product properties such as secure-by-default configuration, no known exploitable vulnerabilities, protection against unauthorised access, confidentiality and integrity of data, minimisation of attack surface and recording of security-relevant activity; Part II sets vulnerability handling requirements.",
+    "excerpt": "Products with digital elements shall be designed, developed and produced in such a way that they ensure an appropriate level of cybersecurity based on the risks.",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "secure-by-default",
+      "encryption",
+      "access-control",
+      "logging"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32024R2847). Status 2026-09-16: no harmonised standard has been cited in the Official Journal under the CRA and no notified body has been listed, so conformity must still be argued from first principles against the essential requirements. Citation form: Annex I, Part I is point (1) followed by point (2) with lettered sub-points (a)-(m); there is no 'Annex I, 2(1)-2(13)'. Sub-point records exist for (2)(d), (e), (f), (j), (l) and (m), and for Part II points (7) and (8)."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexII",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex II",
+    "title": "Information and instructions to the user",
+    "summary": "Products with digital elements must be accompanied by manufacturer contact details, a single point of contact for vulnerability reporting and the coordinated vulnerability disclosure policy, the intended purpose and security properties, and the end date of the support period.",
+    "excerpt": "At minimum, the product with digital elements shall be accompanied by: 1. the name, registered trade name or registered trademark of the manufacturer … 2. the single point of contact where information about vulnerabilities of the product with digital elements can be reported and received …",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "documentation",
+      "disclosure",
+      "support-period",
+      "transparency"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32024R2847). Status 2026-09-16: no harmonised standard has been cited in the Official Journal under the CRA and no notified body has been listed, so conformity must still be argued from first principles against the essential requirements."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI-II",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I and Annex II",
+    "title": "Essential cybersecurity requirements with user information and instructions",
+    "summary": "Read together, the annexes require products with digital elements to meet the essential cybersecurity and vulnerability-handling requirements and to ship with the prescribed user information, including the vulnerability reporting contact and support period.",
+    "excerpt": "",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "secure-by-design",
+      "documentation",
+      "vulnerability",
+      "product-security"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Composite reference used by rule packs; Annex I and Annex II are recorded separately. Status 2026-09-16: no harmonised standard has been cited in the Official Journal under the CRA and no notified body has been listed, so conformity must still be argued from first principles against the essential requirements. Secure update distribution and dissemination are Annex I, Part II, points (7) and (8) — not Part I."
+  },
+  {
+    "id": "CRA:2024/2847:Art71",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Art. 71",
+    "title": "Entry into force and application",
+    "summary": "The Regulation applies from 11 December 2027, except that the manufacturer reporting obligations in Article 14 apply from 11 September 2026 and Chapter IV on notification of conformity assessment bodies applies from 11 June 2026.",
+    "excerpt": "This Regulation shall apply from 11 December 2027. However, Article 14 shall apply from 11 September 2026 and Chapter IV (Articles 35 to 51) shall apply from 11 June 2026.",
+    "version": "2024-11-20",
+    "effective": "2024-12-10",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "dates",
+      "application",
+      "transition"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Entry into force is the twentieth day following publication in the Official Journal (published 20 November 2024)."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI-PtI-2(d)",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I, Part I, point (2)(d)",
+    "title": "Protection from unauthorised access",
+    "summary": "Products must be protected from unauthorised access by appropriate control mechanisms, including authentication and identity or access management systems, and must report on possible unauthorised access.",
+    "excerpt": "ensure protection from unauthorised access by appropriate control mechanisms, including but not limited to authentication, identity or access management systems, and report on possible unauthorised access",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "access-control",
+      "authentication",
+      "product-security",
+      "reporting"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32024R2847). Citation form: Annex I, Part I is point (1) followed by point (2) with lettered sub-points (a)-(m); there is no 'Annex I, 2(1)-2(13)'."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI-PtI-2(e)",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I, Part I, point (2)(e)",
+    "title": "Confidentiality of stored, transmitted or processed data",
+    "summary": "Products must protect the confidentiality of stored, transmitted or otherwise processed data, such as by encrypting relevant data at rest or in transit by state of the art mechanisms.",
+    "excerpt": "protect the confidentiality of stored, transmitted or otherwise processed data, personal or other, such as by encrypting relevant data at rest or in transit by state of the art mechanisms, and by using other technical means",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "encryption",
+      "confidentiality",
+      "product-security",
+      "data"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32024R2847). Citation form: Annex I, Part I is point (1) followed by point (2) with lettered sub-points (a)-(m); there is no 'Annex I, 2(1)-2(13)'."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI-PtI-2(f)",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I, Part I, point (2)(f)",
+    "title": "Integrity of data, commands, programs and configuration",
+    "summary": "Products must protect the integrity of stored, transmitted or otherwise processed data and of commands, programs and configuration against unauthorised manipulation or modification, and must report on corruptions. The coverage of commands and configuration is routinely dropped from vendor summaries.",
+    "excerpt": "protect the integrity of stored, transmitted or otherwise processed data, personal or other, commands, programs and configuration against any manipulation or modification not authorised by the user, and report on corruptions",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "integrity",
+      "product-security",
+      "configuration",
+      "tamper"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32024R2847). Citation form: Annex I, Part I is point (1) followed by point (2) with lettered sub-points (a)-(m); there is no 'Annex I, 2(1)-2(13)'."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI-PtI-2(j)",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I, Part I, point (2)(j)",
+    "title": "Limitation of attack surfaces",
+    "summary": "Products must be designed, developed and produced to limit attack surfaces, including external interfaces. On a drawing this is the count and exposure of the interfaces a product node offers.",
+    "excerpt": "limit attack surfaces, including external interfaces",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "attack-surface",
+      "interfaces",
+      "product-security",
+      "exposure"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32024R2847). Citation form: Annex I, Part I is point (1) followed by point (2) with lettered sub-points (a)-(m); there is no 'Annex I, 2(1)-2(13)'."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI-PtI-2(l)",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I, Part I, point (2)(l)",
+    "title": "Recording and monitoring of relevant internal activity",
+    "summary": "Products must provide security-related information by recording and monitoring relevant internal activity, including access to or modification of data, services or functions, with an opt-out mechanism for the user.",
+    "excerpt": "provide security related information by recording and monitoring relevant internal activity, including the access to or modification of data, services or functions, with an opt-out mechanism for the user",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "logging",
+      "monitoring",
+      "product-security",
+      "evidence"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32024R2847). Citation form: Annex I, Part I is point (1) followed by point (2) with lettered sub-points (a)-(m); there is no 'Annex I, 2(1)-2(13)'."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI-PtI-2(m)",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I, Part I, point (2)(m)",
+    "title": "Secure permanent removal of data and settings",
+    "summary": "Products must let users securely and easily remove all data and settings on a permanent basis and, where such data can be transferred to other products or systems, ensure the transfer is secure. This sub-point is absent from most summaries.",
+    "excerpt": "provide the possibility for users to securely and easily remove on a permanent basis all data and settings and, where such data can be transferred to other products or systems, ensure that this is done in a secure manner",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "deletion",
+      "portability",
+      "product-security",
+      "data"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32024R2847). Citation form: Annex I, Part I is point (1) followed by point (2) with lettered sub-points (a)-(m); there is no 'Annex I, 2(1)-2(13)'."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI-PtII-(7)",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I, Part II, point (7)",
+    "title": "Secure distribution of updates",
+    "summary": "Manufacturers must securely distribute updates so that vulnerabilities are fixed or mitigated in a timely manner and, where applicable for security updates, automatically. Secure update distribution belongs to Part II, not Part I.",
+    "excerpt": "securely distribute updates for products with digital elements to ensure that vulnerabilities are fixed or mitigated in a timely manner and, where applicable for security updates, in an automatic manner",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "updates",
+      "distribution",
+      "vulnerability",
+      "product-security"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32024R2847). Citation form: Annex I, Part I is point (1) followed by point (2) with lettered sub-points (a)-(m); there is no 'Annex I, 2(1)-2(13)'."
+  },
+  {
+    "id": "CRA:2024/2847:AnnexI-PtII-(8)",
+    "regime": "CRA",
+    "doc": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "ref": "Annex I, Part II, point (8)",
+    "title": "Dissemination of security updates without delay and free of charge",
+    "summary": "Where security updates are available, manufacturers must disseminate them without delay and, unless otherwise agreed for a tailor-made product, free of charge, with advisory messages telling users what action to take.",
+    "excerpt": "ensure that, where security updates are available to address identified security issues, they are disseminated without delay and … free of charge, accompanied by advisory messages providing users with the relevant information, including on potential action to be taken",
+    "version": "2024-11-20",
+    "effective": "2027-12-11",
+    "applies_to": [
+      "provider",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+    "tags": [
+      "updates",
+      "disclosure",
+      "vulnerability",
+      "product-security"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32024R2847). Citation form: Annex I, Part I is point (1) followed by point (2) with lettered sub-points (a)-(m); there is no 'Annex I, 2(1)-2(13)'."
+  }
+]

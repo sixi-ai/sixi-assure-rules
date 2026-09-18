@@ -1,0 +1,66 @@
+{
+  "id": "arch_fx_c4_002.pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture C4-002 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_a",
+      "kind": "zone",
+      "name": "App zone",
+      "node_ids": [
+        "n_app"
+      ],
+      "attrs": {}
+    },
+    {
+      "id": "g_b",
+      "kind": "zone",
+      "name": "Data zone",
+      "node_ids": [
+        "n_db"
+      ],
+      "attrs": {}
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "attrs": {}
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Orders DB",
+      "layer": "data",
+      "attrs": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "none",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

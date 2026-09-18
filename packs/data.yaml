@@ -1,0 +1,80 @@
+# DATA — data protection & residency (docs/03 §DATA). Deterministic CEL; the LLM never creates findings.
+pack: data
+version: 0.2.0
+regimes: [FADP, FINMA, ISO, MCSB, DORA, OWASP]
+rules:
+  - id: DATA-001
+    title: Sensitive data embedded without classification or redaction
+    scope: edge
+    severity: high
+    condition: |
+      e.to.type == "vector_index" && attr(e.from, "data_class", "") in ["pii","cid","phi"] &&
+      !(attr(e.to, "redaction", false) || attr(e.to, "classification", false))
+    message: "{{e.from.name}} ({{attr(e.from,'data_class','')}}) is indexed into {{e.to.name}} without classification or redaction."
+    clauses: [FADP:2023:Art7-8, GDPR:Art25, FINMA:2023/1:Rz-CriticalData]
+    remediation: "Classify and redact/pseudonymise PII/CID before embedding; record it on the index (classification/redaction=true)."
+    fixtures: { positive: fixtures/DATA-001.pos.json, negative: fixtures/DATA-001.neg.json }
+    tags: [data, privacy, rag]
+
+  - id: DATA-002
+    title: Retrieval over a sensitive index without ACL trimming
+    scope: edge
+    severity: high
+    condition: |
+      (e.from.type == "vector_index" && attr(e.from, "data_class", "") in ["confidential","pii","cid"] &&
+       !attr(e.from, "acl_trimming", false)) ||
+      (e.kind == "reads" && e.to.type == "vector_index" && attr(e.to, "data_class", "") in ["confidential","pii","cid"] &&
+       !attr(e.to, "acl_trimming", false))
+    message: "Retrieval {{e.from.name}} → {{e.to.name}} returns sensitive chunks without security-filtered (ACL-trimmed) search."
+    clauses: [ISO:27001:A.5.15]
+    remediation: "Enable security-filtered retrieval (document-level ACLs propagated to the index; acl_trimming=true)."
+    fixtures: { positive: fixtures/DATA-002.pos.json, negative: fixtures/DATA-002.neg.json }
+    tags: [data, rag, access-control]
+
+  - id: DATA-003
+    title: Sensitive data outside allowed regions
+    scope: node
+    severity: high
+    condition: 'attr(n, "data_class", "") in ["pii","cid","phi"] && !(attr(n, "region", "") in tenant.allowed_regions)'
+    message: "{{n.name}} holds {{attr(n,'data_class','')}} data in region '{{attr(n,'region','')}}', outside the allowed regions."
+    clauses: [FADP:2023:Art16, FINMA:2018/3:Outsourcing]
+    remediation: "Move the resource to an allowed region or document a cross-border transfer assessment."
+    fixtures: { positive: fixtures/DATA-003.pos.json, negative: fixtures/DATA-003.neg.json }
+    tags: [data, residency]
+
+  - id: DATA-004
+    title: Sensitive datastore without customer-managed keys
+    scope: node
+    severity: low
+    condition: |
+      n.type == "datastore" && attr(n, "data_class", "") in ["confidential","pii","cid","secret"] &&
+      attr(n, "encryption_key", "pmk") != "cmk"
+    message: "{{n.name}} ({{attr(n,'data_class','')}}) is encrypted with platform-managed keys."
+    clauses: [MCSB:v1:DP-5]
+    remediation: "Use customer-managed keys in Key Vault (encryption_key=cmk) with rotation."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/encryption_key", value: cmk }
+    fixtures: { positive: fixtures/DATA-004.pos.json, negative: fixtures/DATA-004.neg.json }
+    tags: [data, encryption]
+
+  - id: DATA-005
+    title: Critical datastore without backups
+    scope: node
+    severity: high
+    condition: 'n.type == "datastore" && attr(n, "criticality", "") == "critical" && !attr(n, "backup", false)'
+    message: "Critical datastore {{n.name}} has no backup declared."
+    clauses: [DORA:2022/2554:Art12, FINMA:2023/1:Rz-BCM]
+    remediation: "Enable backups with tested restore procedures (backup=true); document restore tests."
+    fixtures: { positive: fixtures/DATA-005.pos.json, negative: fixtures/DATA-005.neg.json }
+    tags: [data, resilience, backup]
+
+  - id: DATA-006
+    title: PII or secrets sent to an LLM endpoint
+    scope: edge
+    severity: high
+    condition: 'e.to.type == "llm_endpoint" && attr(e, "prompt_contains", "") in ["pii","secrets"]'
+    message: "{{e.from.name}} sends {{attr(e,'prompt_contains','')}} in prompts to {{e.to.name}}."
+    clauses: [FADP:2023:Art7, OWASP:LLMTop10:LLM02]
+    remediation: "Redact PII/secrets before the prompt; system-prompt hygiene; never place secrets in prompts."
+    fixtures: { positive: fixtures/DATA-006.pos.json, negative: fixtures/DATA-006.neg.json }
+    tags: [data, privacy, llm]

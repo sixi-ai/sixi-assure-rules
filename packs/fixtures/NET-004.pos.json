@@ -1,0 +1,57 @@
+{
+  "id": "arch_fx_net_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture NET-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "IEC"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_egw",
+      "type": "edge_gateway",
+      "name": "Edge gateway",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "egress_policy": false
+      }
+    },
+    {
+      "id": "n_broker",
+      "type": "broker",
+      "name": "IoT Hub",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "network_exposure": "private"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_egw",
+      "to": "n_broker",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

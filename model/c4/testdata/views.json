@@ -1,0 +1,68 @@
+{
+  "context": [
+    "n_user",
+    "n_web"
+  ],
+  "container": [
+    "n_entra",
+    "n_web",
+    "n_kv",
+    "n_apim",
+    "n_agent",
+    "n_logs",
+    "n_aigw",
+    "n_search",
+    "n_sql",
+    "n_llm"
+  ],
+  "component": [
+    "n_agent",
+    "n_logs",
+    "n_eval"
+  ],
+  "kinds": {
+    "n_agent": "container/Agent",
+    "n_aigw": "container/Gateway",
+    "n_apim": "container/Gateway",
+    "n_entra": "container/Identity",
+    "n_eval": "component/Container",
+    "n_kv": "container/DataStore",
+    "n_llm": "container/Container",
+    "n_logs": "container/DataStore",
+    "n_search": "container/DataStore",
+    "n_sql": "container/DataStore",
+    "n_user": "context/Person",
+    "n_waf": "container/Gateway",
+    "n_web": "context/SoftwareSystem"
+  },
+  "crosses": {
+    "e_agent_entra": [
+      "g_agent_tb"
+    ],
+    "e_agent_kv": [
+      "g_agent_tb"
+    ],
+    "e_agent_logs": [
+      "g_agent_tb"
+    ],
+    "e_agent_search": [
+      "g_agent_tb"
+    ],
+    "e_agent_sql": [
+      "g_agent_tb"
+    ],
+    "e_aigw_llm": [
+      "g_agent_tb"
+    ],
+    "e_aigw_logs": [
+      "g_agent_tb"
+    ],
+    "e_apim_agent": [
+      "g_agent_tb"
+    ],
+    "e_user_waf": [
+      "g_cloud",
+      "g_users"
+    ]
+  }
+}

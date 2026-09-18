@@ -1,0 +1,97 @@
+# Causes (docs/03 §Causes): the design invariants the rules evidence. Every rule of every pack belongs to exactly one cause.
+#
+# A finding is a symptom; a cause is the invariant the design broke, stated positively in plain
+# words. The taxonomy is authored by hand — never inferred from tags at runtime — so it stays
+# reviewable. Loading fails when a rule has no cause or a listed rule id does not exist
+# (rules/causes.go). Order: most consequential invariant first (physical harm,
+# records integrity), hygiene last (structure, import).
+causes:
+  - id: command-path
+    title: Command path
+    sentence: Nothing an AI component does reaches a machine without a human approval under the approver's own identity and a validation on the device.
+    rules: [OT-001, OT-002, OT-003, OT-006, MR-002, MR-004]
+
+  - id: zone-segregation
+    title: Zone segregation
+    sentence: Traffic between plant zones, the edge and the data layer passes a named conduit, and data from one zone stays readable only to that zone.
+    rules: [OT-004, OT-007, NET-004, NET-005, STR-002]
+
+  - id: human-approval
+    title: Human approval and control
+    sentence: A consequential action waits for a person who approves it under their own identity, and that person can stop or slow the agent at any time.
+    rules: [AI-003, AI-010, AGT-006, GXP-002]
+
+  - id: records-retention
+    title: Records and retention
+    sentence: What the system and its agents did is written to a sink nobody can edit, kept as long as the regime asks, and restorable from a backup.
+    rules: [LOG-001, LOG-002, LOG-003, LOG-004, LOG-005, GXP-001, GXP-003, MR-003, AI-011]
+
+  - id: untrusted-input
+    title: Untrusted input
+    sentence: Text and data that arrive from outside the design — users, the plant floor, third-party content — pass a content-safety check before a model or agent reads them.
+    rules: [AI-002, OT-005, AGT-003]
+
+  - id: tool-supply-chain
+    title: Third-party tools and MCP
+    sentence: An agent reaches only tools that were vetted, pinned to a known version and declare what they do, and that cannot silently take a new name or a new action.
+    rules: [AGT-001, AGT-002, AGT-004, AGT-005, AGT-007, AI-009]
+
+  - id: identity
+    title: Identity, not shared secrets
+    sentence: Every caller — person or workload — proves who it is with its own identity or a strong sign-in, delegation carries the user, and secrets live in a secret store.
+    rules: [ZT-001, ZT-002, ZT-003, ZT-006, ZT-007, ZT-008, ZT-009, STR-004, STR-006]
+
+  - id: least-privilege
+    title: Least privilege
+    sentence: An identity holds the narrowest scope that still lets it work, and broad or administrative access is granted only for the moment it is needed.
+    rules: [ZT-004, ZT-005, AI-008]
+
+  - id: network-exposure
+    title: Network exposure
+    sentence: Nothing sits open on the public network; calls in and out pass a gateway that can see, filter and cut them, and every hop is encrypted.
+    rules: [NET-001, NET-002, NET-003, NET-006, AI-001, STR-005]
+
+  - id: data-protection
+    title: Data protection and residency
+    sentence: Sensitive data is classified before use, shown only to callers entitled to it, encrypted with the owner's own keys, kept in the chosen regions and never handed to a model unfiltered.
+    rules: [DATA-001, DATA-002, DATA-003, DATA-004, DATA-006]
+
+  - id: ai-transparency
+    title: AI transparency and inventory
+    sentence: People are told when they deal with AI and which output it produced, and every AI component is listed with its purpose, risk tier and model documentation.
+    rules: [AI-005, AI-006, AI-007, AI-012, AI-013]
+
+  - id: evaluation-monitoring
+    title: Evaluation and monitoring
+    sentence: Every AI component is evaluated against a stated scope that covers the risks it carries, and watched afterwards for drift.
+    rules: [AI-004, AI-014, AI-015]
+
+  - id: resilience
+    title: Resilience and continuity
+    sentence: A component the business depends on survives the loss of a site — it is replicated or backed up, it has a stated recovery time, and the recovery has been rehearsed.
+    rules: [RES-001, RES-002, RES-003, DATA-005]
+
+  - id: supplier-conformity
+    title: Supplier and product conformity
+    sentence: A product or outside service the design leans on is assessed before use and carries its own evidence — register entry, SBOM, signed updates, exit plan.
+    rules: [MR-001, GXP-004, CRA-001, CRA-002, TPR-001, TPR-002]
+
+  - id: governance-ownership
+    title: Governance and reporting
+    sentence: The architecture has a named owner and a written path for reporting an incident to the people and authorities that must hear about it.
+    rules: [GOV-001, GOV-002]
+
+  - id: structure-quality
+    title: Structure quality
+    sentence: The model reads as one structure — every element sits inside its parent, connects to something, and every accepted decision names the source it rests on.
+    rules: [STR-001, STR-003, STR-007, STR-008]
+
+  - id: knowledge-freshness
+    title: Knowledge freshness
+    sentence: The design names services, features and documents that are still current, and every link it cites still resolves to the text it relies on.
+    rules: [DRF-001, DRF-002, DRF-003, DRF-004]
+
+  - id: import-fidelity
+    title: Import fidelity
+    sentence: Everything that arrives from an import is typed and named, so the rules read it as the component it really is.
+    rules: [IMP-001]

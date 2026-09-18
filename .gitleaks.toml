@@ -1,0 +1,24 @@
+# gitleaks configuration.
+#
+# The default rule set applies. The allowlist below names the one place in this repository where
+# credential-shaped strings exist on purpose: the test vectors of the secret guard.
+#
+# `secretguard/` is the detector that refuses an architecture model carrying a credential. To test
+# a detector you need strings that look exactly like the thing it detects, so
+# `secretguard/testdata/positives/*.txt` holds synthetic AWS keys, Google API keys, GitHub and Slack
+# tokens, JWTs, PEM blocks, connection strings and SAS tokens. Every one of them is invented — the
+# bodies read `EXAMPLE`, `notareal…`, `example-only` — and none is, or ever was, a real credential.
+# See `secretguard/README.md`.
+title = "Sixi Assure Rules"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Synthetic test vectors of the secret guard — credential-shaped by design, never real"
+paths = [
+  '''secretguard/testdata/.*''',
+  '''secretguard/.*_test\.go''',
+  '''secretguard/detectors\.go''',
+  '''model/validate_secretguard_test\.go''',
+]

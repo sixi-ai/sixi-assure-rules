@@ -1,0 +1,7 @@
+{
+  "deprecated": {
+    "azure openai on your data": "azure ai foundry agent service",
+    "azure/openai-on-your-data": "azure ai foundry agent service"
+  },
+  "freshness": {}
+}

@@ -1,0 +1,165 @@
+[
+  {
+    "id": "CSA:AICM:v1.1",
+    "regime": "CSA",
+    "doc": "CSA AI Controls Matrix (AICM) v1.1",
+    "ref": "AICM v1.1",
+    "title": "AI Controls Matrix v1.1",
+    "summary": "A vendor-agnostic control framework for cloud-based AI systems, built on the CSA Cloud Controls Matrix: 247 control objectives across 18 security domains, released 22 June 2026, with mappings to ISO/IEC 42001, ISO/IEC 27001 and BSI AIC4. Sixi Assure cites domains and control ids as a crosswalk; a finding always comes from a rule and a clause, never from the matrix alone.",
+    "excerpt": "",
+    "version": "2026-06-22",
+    "effective": "",
+    "applies_to": [
+      "all",
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1",
+    "tags": [
+      "aicm",
+      "controls",
+      "crosswalk",
+      "ai",
+      "cloud"
+    ],
+    "licence": "csa",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the CSA artifact page fetched from cloudsecurityalliance.org. The page states 247 control objectives across 18 security domains and the mappings; it does not enumerate the domains. Licence: CSA material is not openly licensed and CSA sells commercial licences for its matrices, so Sixi Assure stores the control or domain identifier and its own paraphrase only — AICM control text is never reproduced. Confirm the terms with CSA before any wider use.",
+    "redacted": "licence"
+  },
+  {
+    "id": "CSA:AICM:MDS",
+    "regime": "CSA",
+    "doc": "CSA AI Controls Matrix (AICM) v1.1",
+    "ref": "Domain MDS",
+    "title": "Model Development Security",
+    "summary": "The domain added in v1.1 for the security of model development: a model registry or training pipeline node, its boundary and what feeds it are the design-time evidence; whether the pipeline enforces anything is not.",
+    "excerpt": "",
+    "version": "2026-06-22",
+    "effective": "",
+    "applies_to": [
+      "all",
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1",
+    "tags": [
+      "mds",
+      "model-development",
+      "pipeline",
+      "supply-chain"
+    ],
+    "licence": "csa",
+    "verified": false,
+    "note": "Not verified: the CSA artifact page fetched on 2026-09-16 does not enumerate the domains, so the domain code and name come from docs/research/04 §4.1 [29] (secondary). Licence: CSA material is not openly licensed and CSA sells commercial licences for its matrices, so Sixi Assure stores the control or domain identifier and its own paraphrase only — AICM control text is never reproduced. Confirm the terms with CSA before any wider use.",
+    "redacted": "licence"
+  },
+  {
+    "id": "CSA:AICM:Model-Security",
+    "regime": "CSA",
+    "doc": "CSA AI Controls Matrix (AICM) v1.1",
+    "ref": "Domain: Model Security",
+    "title": "Model Security",
+    "summary": "The AI-specific domain covering protection of the model itself. Design-time evidence is the model node's placement, exposure and the gateway in front of it.",
+    "excerpt": "",
+    "version": "2026-06-22",
+    "effective": "",
+    "applies_to": [
+      "all",
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/07/10/introducing-the-csa-ai-controls-matrix-a-comprehensive-framework-for-trustworthy-ai",
+    "tags": [
+      "model-security",
+      "ai",
+      "controls",
+      "exposure"
+    ],
+    "licence": "csa",
+    "verified": false,
+    "note": "Not verified against the matrix: the domain name is taken from CSA's own announcement of the AICM (10 July 2025, this record's source_url), which names several domains in prose but does not publish the full list of eighteen. Licence: CSA material is not openly licensed and CSA sells commercial licences for its matrices, so Sixi Assure stores the control or domain identifier and its own paraphrase only — AICM control text is never reproduced. Confirm the terms with CSA before any wider use.",
+    "redacted": "licence"
+  },
+  {
+    "id": "CSA:AICM:Identity-and-Access-Management",
+    "regime": "CSA",
+    "doc": "CSA AI Controls Matrix (AICM) v1.1",
+    "ref": "Domain: Identity & Access Management",
+    "title": "Identity and Access Management",
+    "summary": "The cloud-inherited domain covering identity and access. Design-time evidence is the identity declared on each workload and the authentication declared on each flow.",
+    "excerpt": "",
+    "version": "2026-06-22",
+    "effective": "",
+    "applies_to": [
+      "all",
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/07/10/introducing-the-csa-ai-controls-matrix-a-comprehensive-framework-for-trustworthy-ai",
+    "tags": [
+      "identity",
+      "access-control",
+      "controls",
+      "cloud"
+    ],
+    "licence": "csa",
+    "verified": false,
+    "note": "Not verified against the matrix: the domain name is taken from CSA's own announcement of the AICM (10 July 2025, this record's source_url), which names several domains in prose but does not publish the full list of eighteen. Licence: CSA material is not openly licensed and CSA sells commercial licences for its matrices, so Sixi Assure stores the control or domain identifier and its own paraphrase only — AICM control text is never reproduced. Confirm the terms with CSA before any wider use.",
+    "redacted": "licence"
+  },
+  {
+    "id": "CSA:AICM:Data-Security-and-Privacy-Lifecycle-Management",
+    "regime": "CSA",
+    "doc": "CSA AI Controls Matrix (AICM) v1.1",
+    "ref": "Domain: Data Security & Privacy Lifecycle Management",
+    "title": "Data Security and Privacy Lifecycle Management",
+    "summary": "The domain covering data protection across its lifecycle. Design-time evidence is the classification of each store, the encryption and key custody declared on it and the regions it sits in.",
+    "excerpt": "",
+    "version": "2026-06-22",
+    "effective": "",
+    "applies_to": [
+      "all",
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/blog/2025/07/10/introducing-the-csa-ai-controls-matrix-a-comprehensive-framework-for-trustworthy-ai",
+    "tags": [
+      "data",
+      "privacy",
+      "lifecycle",
+      "controls"
+    ],
+    "licence": "csa",
+    "verified": false,
+    "note": "Not verified against the matrix: the domain name is taken from CSA's own announcement of the AICM (10 July 2025, this record's source_url), which names several domains in prose but does not publish the full list of eighteen. Licence: CSA material is not openly licensed and CSA sells commercial licences for its matrices, so Sixi Assure stores the control or domain identifier and its own paraphrase only — AICM control text is never reproduced. Confirm the terms with CSA before any wider use.",
+    "redacted": "licence"
+  },
+  {
+    "id": "CSA:AI-CAIQ:v1.1",
+    "regime": "CSA",
+    "doc": "CSA AI Controls Matrix (AICM) v1.1",
+    "ref": "AI-CAIQ v1.1",
+    "title": "Consensus Assessment Initiative Questionnaire for AI",
+    "summary": "The questionnaire that accompanies the AICM and underpins a STAR Level 1 self-assessment. The questions of the form \"is X architecturally present?\" are the ones a drawing can evidence; process, contract and personnel questions are not. A STAR level is an audit outcome and is never a Sixi Assure output.",
+    "excerpt": "",
+    "version": "2026-06-22",
+    "effective": "",
+    "applies_to": [
+      "all",
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1",
+    "tags": [
+      "ai-caiq",
+      "questionnaire",
+      "self-assessment",
+      "evidence"
+    ],
+    "licence": "csa",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the CSA artifact page fetched from cloudsecurityalliance.org. The artifact page lists the AI-CAIQ among the files in the v1.1 download. Licence: CSA material is not openly licensed and CSA sells commercial licences for its matrices, so Sixi Assure stores the control or domain identifier and its own paraphrase only — AICM control text is never reproduced. Confirm the terms with CSA before any wider use.",
+    "redacted": "licence"
+  }
+]

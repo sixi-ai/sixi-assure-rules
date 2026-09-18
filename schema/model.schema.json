@@ -1,0 +1,1873 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sixi.ai/schemas/model.schema.json",
+  "title": "Sixi Assure architecture model",
+  "description": "Typed graph model (docs/02). Single source of truth; Go validation and Zod schemas derive from this file. Invariants that JSON Schema cannot express are listed in $comment and enforced in the model package.",
+  "$comment": "Server-enforced invariants (docs/02 §4): (1) edge endpoints reference existing node ids; (2) no self-loops except agent→agent 'delegates' with auth=obo; (3) a node belongs to at most one zone group (node.zone must match the zone group listing it) and may belong to many trust boundaries; (4) source=observed nodes are read-only; (5) region attrs must be known Azure regions or a generic region code; (6) findings and evidence reference existing ids; (7) ids are unique across nodes, edges, groups and findings. 'x-required-attrs' lists attributes that must be completed for inventory purposes — their absence is reported by rules (e.g. AI-005), not rejected by validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "tenant_id",
+    "name",
+    "version",
+    "attrs",
+    "groups",
+    "nodes",
+    "edges",
+    "findings",
+    "evidence"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "tenant_id": {
+      "$ref": "#/$defs/id"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "attrs": {
+      "$ref": "#/$defs/architectureAttrs"
+    },
+    "groups": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/group"
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 20000,
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "$ref": "#/$defs/evidenceRef"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:-]{0,63}$"
+    },
+    "shortText": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "longText": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "regionCode": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{0,40}$",
+      "$comment": "validated against the Azure region list plus generic codes (eu, us, ch, uk, global, unknown) in Go"
+    },
+    "nodeType": {
+      "type": "string",
+      "enum": [
+        "user",
+        "external_party",
+        "edge_device",
+        "edge_gateway",
+        "edge_model",
+        "broker",
+        "dmz",
+        "data_diode",
+        "network",
+        "identity_provider",
+        "app",
+        "api",
+        "agent",
+        "tool",
+        "mcp_server",
+        "llm_endpoint",
+        "gateway",
+        "vector_index",
+        "datastore",
+        "queue",
+        "log_sink",
+        "secret_store",
+        "human_step",
+        "saas",
+        "evaluation",
+        "product"
+      ]
+    },
+    "layer": {
+      "type": "string",
+      "enum": [
+        "edge",
+        "network",
+        "platform",
+        "app",
+        "data",
+        "ai",
+        "identity",
+        "human"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "design",
+        "declared",
+        "observed"
+      ]
+    },
+    "edgeKind": {
+      "type": "string",
+      "enum": [
+        "calls",
+        "reads",
+        "writes",
+        "publishes",
+        "subscribes",
+        "delegates",
+        "authenticates",
+        "flows",
+        "executes"
+      ]
+    },
+    "edgeAuth": {
+      "type": "string",
+      "enum": [
+        "managed_identity",
+        "agent_id",
+        "obo",
+        "oauth_client",
+        "mtls",
+        "api_key",
+        "password",
+        "connection_string",
+        "none",
+        "unknown"
+      ]
+    },
+    "edgeEncryption": {
+      "type": "string",
+      "enum": [
+        "tls",
+        "mtls",
+        "none",
+        "unknown"
+      ]
+    },
+    "dataClass": {
+      "type": "string",
+      "enum": [
+        "public",
+        "internal",
+        "confidential",
+        "pii",
+        "phi",
+        "cid",
+        "secret"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "info"
+      ]
+    },
+    "findingStatus": {
+      "type": "string",
+      "enum": [
+        "open",
+        "fixed",
+        "accepted",
+        "false_positive"
+      ]
+    },
+    "groupKind": {
+      "type": "string",
+      "enum": [
+        "zone",
+        "trust_boundary",
+        "region",
+        "subscription",
+        "site"
+      ]
+    },
+    "regime": {
+      "type": "string",
+      "enum": [
+        "FINMA",
+        "CH-CO",
+        "FADP",
+        "CH-ISG",
+        "DORA",
+        "AIACT",
+        "CRA",
+        "NIS2",
+        "ISO",
+        "MCSB",
+        "NIST",
+        "IEC",
+        "OWASP",
+        "MAESTRO",
+        "MSFT",
+        "FDA",
+        "EU-GMP",
+        "MR",
+        "GAMP", "GDPR", "OSFI", "CSA"]
+    },
+    "criticality": {
+      "type": "string",
+      "enum": [
+        "",
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "materiality": {
+      "type": "string",
+      "enum": [
+        "",
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "aiActTier": {
+      "type": "string",
+      "enum": [
+        "",
+        "minimal",
+        "limited",
+        "high_risk",
+        "prohibited",
+        "gpai"
+      ]
+    },
+    "boolish": {
+      "type": "boolean"
+    },
+    "scopes": {
+      "oneOf": [
+        {
+          "type": "string",
+          "const": "*"
+        },
+        {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/$defs/shortText"
+          }
+        }
+      ]
+    },
+    "capabilities": {
+      "$comment": "Declared capability classes of a tool or MCP server (docs/02 §3). Design-time declaration by the architect, never observed.",
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "executes_code",
+          "reads_filesystem",
+          "queries_database",
+          "network_egress",
+          "sends_message",
+          "modifies_state",
+          "reads_secrets",
+          "deserializes_input"
+        ]
+      }
+    },
+    "integrity": {
+      "$comment": "How the tool or MCP server definition is fixed against later change (rug pull).",
+      "type": "string",
+      "enum": [
+        "",
+        "none",
+        "pinned",
+        "signed"
+      ]
+    },
+    "evaluationScope": {
+      "$comment": "What an evaluation node is declared to cover (docs/02 §3). A design-time declaration of scope; results are never recorded here.",
+      "type": "array",
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "accuracy",
+          "robustness",
+          "bias",
+          "fairness",
+          "toxicity",
+          "prompt_injection",
+          "calibration",
+          "drift"
+        ]
+      }
+    },
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "architectureAttrs": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "$ref": "#/$defs/shortText"
+        },
+        "description": {
+          "$ref": "#/$defs/longText"
+        },
+        "criticality": {
+          "$ref": "#/$defs/criticality"
+        },
+        "ai_act_tier": {
+          "$ref": "#/$defs/aiActTier"
+        },
+        "materiality": {
+          "$ref": "#/$defs/materiality"
+        },
+        "allowed_regions": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/regionCode"
+          }
+        },
+        "regimes": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/regime"
+          }
+        },
+        "incident_reporting": {
+          "$ref": "#/$defs/longText"
+        },
+        "substantial_modification": {
+          "type": "string",
+          "enum": [
+            "",
+            "not_substantial",
+            "substantial",
+            "unknown"
+          ],
+          "$comment": "docs/03 §MR: whether the AI command path is a substantial modification of the machinery it acts on (Regulation (EU) 2023/1230 Art. 3(16), 18), as assessed with the risk assessment"
+        },
+        "dr_tested_at": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "external_ref": {
+          "$ref": "#/$defs/shortText"
+        },
+        "decisions": {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "$ref": "#/$defs/decision"
+          }
+        }
+      },
+      "patternProperties": {
+        "^x_[A-Za-z0-9_]{1,60}$": {
+          "$ref": "#/$defs/extValue"
+        }
+      },
+      "additionalProperties": false
+    },
+    "extValue": {
+      "type": [
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ],
+      "$comment": "x_ attrs are free-form scalars (max 2000 chars for strings)",
+      "maxLength": 2000
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "name",
+        "node_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "$ref": "#/$defs/groupKind"
+        },
+        "name": {
+          "$ref": "#/$defs/shortText"
+        },
+        "node_ids": {
+          "type": "array",
+          "maxItems": 5000,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "parent": {
+          "$ref": "#/$defs/id"
+        },
+        "position": {
+          "$ref": "#/$defs/position"
+        },
+        "size": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "w": {
+              "type": "number",
+              "minimum": 0
+            },
+            "h": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "attrs": {
+          "type": "object",
+          "properties": {
+            "region": {
+              "$ref": "#/$defs/regionCode"
+            },
+            "description": {
+              "$ref": "#/$defs/longText"
+            }
+          },
+          "patternProperties": {
+            "^x_[A-Za-z0-9_]{1,60}$": {
+              "$ref": "#/$defs/extValue"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "name",
+        "layer",
+        "attrs"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "$ref": "#/$defs/nodeType"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "layer": {
+          "$ref": "#/$defs/layer"
+        },
+        "zone": {
+          "$ref": "#/$defs/id"
+        },
+        "source": {
+          "$ref": "#/$defs/source",
+          "default": "design"
+        },
+        "position": {
+          "$ref": "#/$defs/position"
+        },
+        "positions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "l1": {
+              "$ref": "#/$defs/position"
+            },
+            "l2": {
+              "$ref": "#/$defs/position"
+            },
+            "l3": {
+              "$ref": "#/$defs/position"
+            }
+          }
+        },
+        "icon": {
+          "$ref": "#/$defs/shortText"
+        },
+        "description": {
+          "$ref": "#/$defs/longText"
+        },
+        "external_ref": {
+          "$ref": "#/$defs/shortText"
+        },
+        "attrs": {
+          "$ref": "#/$defs/nodeAttrs"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "agent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/agent"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "llm_endpoint"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/llm_endpoint"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "gateway"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/gateway"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "datastore"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/datastore"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "vector_index"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/vector_index"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "tool",
+                  "mcp_server"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/tool"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "log_sink"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/log_sink"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "edge_device",
+                  "edge_gateway"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/edge"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "human_step"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/human_step"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "app",
+                  "api"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/app"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/user"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "product"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/product"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "saas"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/saas"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "edge_model"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/edge_model"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "secret_store"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/secret_store"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "nodeAttrs": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "$ref": "#/$defs/shortText"
+        },
+        "criticality": {
+          "$ref": "#/$defs/criticality"
+        },
+        "materiality": {
+          "$ref": "#/$defs/materiality"
+        },
+        "region": {
+          "$ref": "#/$defs/regionCode"
+        },
+        "data_class": {
+          "$ref": "#/$defs/dataClass"
+        },
+        "network_exposure": {
+          "type": "string",
+          "enum": [
+            "",
+            "private",
+            "public",
+            "unknown"
+          ]
+        },
+        "rbac_scope": {
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "reader",
+            "contributor",
+            "subscription_contributor",
+            "owner",
+            "custom"
+          ]
+        },
+        "geo_redundant": {
+          "$ref": "#/$defs/boolish"
+        },
+        "backup": {
+          "$ref": "#/$defs/boolish"
+        },
+        "rto_min": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rpo_min": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "retention_days": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "external_ref": {
+          "$ref": "#/$defs/shortText"
+        },
+        "purpose": {
+          "$ref": "#/$defs/longText"
+        },
+        "cra_scope": {
+          "$ref": "#/$defs/boolish"
+        },
+        "sbom": {
+          "$ref": "#/$defs/boolish"
+        },
+        "identity": {
+          "type": "string",
+          "enum": [
+            "",
+            "agent_id",
+            "managed_identity",
+            "shared",
+            "user_impersonation",
+            "none",
+            "unknown"
+          ]
+        },
+        "autonomy": {
+          "type": "string",
+          "enum": [
+            "",
+            "assisted",
+            "semi",
+            "autonomous"
+          ]
+        },
+        "kill_switch": {
+          "$ref": "#/$defs/boolish"
+        },
+        "ai_disclosure": {
+          "$ref": "#/$defs/boolish"
+        },
+        "rate_limit": {
+          "$ref": "#/$defs/boolish"
+        },
+        "tool_scopes": {
+          "$ref": "#/$defs/scopes"
+        },
+        "content_safety": {
+          "$ref": "#/$defs/boolish"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "",
+            "azure",
+            "anthropic",
+            "openai",
+            "google",
+            "aws",
+            "mistral",
+            "self_hosted",
+            "other"
+          ]
+        },
+        "network": {
+          "type": "string",
+          "enum": [
+            "",
+            "private",
+            "public",
+            "unknown"
+          ]
+        },
+        "model": {
+          "$ref": "#/$defs/shortText"
+        },
+        "outsourcing_registered": {
+          "$ref": "#/$defs/boolish"
+        },
+        "exit_strategy": {
+          "$ref": "#/$defs/boolish"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "",
+            "api",
+            "ai",
+            "waf"
+          ]
+        },
+        "logging": {
+          "$ref": "#/$defs/boolish"
+        },
+        "token_limits": {
+          "$ref": "#/$defs/boolish"
+        },
+        "semantic_cache": {
+          "$ref": "#/$defs/boolish"
+        },
+        "engine": {
+          "$ref": "#/$defs/shortText"
+        },
+        "encryption_key": {
+          "type": "string",
+          "enum": [
+            "",
+            "pmk",
+            "cmk"
+          ]
+        },
+        "acl_trimming": {
+          "$ref": "#/$defs/boolish"
+        },
+        "row_level_security": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "docs/03 §OT: the store enforces row-level security per caller context (e.g. SESSION_CONTEXT per OT zone)"
+        },
+        "gamp_category": {
+          "type": "string",
+          "enum": [
+            "",
+            "infrastructure",
+            "non_configured",
+            "configured",
+            "custom",
+            "unknown"
+          ],
+          "$comment": "docs/03 §GXP: GAMP software category of this component (1 infrastructure, 3 non-configured, 4 configured, 5 custom); categories 3-5 are a continuum, not a checklist"
+        },
+        "supplier_assessed": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "docs/03 §GXP: the supplier of this component, or the team that built it, has been assessed (GAMP 5 Appendix M2) and the assessment is on file"
+        },
+        "safety_function": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "docs/03 §MR: the component performs or ensures a safety function of machinery"
+        },
+        "self_evolving": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "docs/03 §MR: fully or partially self-evolving behaviour using machine learning, i.e. it keeps learning after being placed on the market or put into service"
+        },
+        "conformity_route": {
+          "type": "string",
+          "enum": [
+            "",
+            "module_a",
+            "module_b_c",
+            "module_h",
+            "module_g",
+            "unknown"
+          ],
+          "$comment": "docs/03 §MR: the conformity assessment procedure applied (Regulation (EU) 2023/1230 Art. 25): internal production control (A), EU type-examination + conformity to type (B+C), full quality assurance (H), unit verification (G)"
+        },
+        "intervention_log": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "docs/03 §MR: the node records evidence of every intervention in the machine (commands, software, configuration) in a tracing log kept five years"
+        },
+        "redaction": {
+          "$ref": "#/$defs/boolish"
+        },
+        "classification": {
+          "$ref": "#/$defs/boolish"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "",
+            "first_party",
+            "third_party"
+          ]
+        },
+        "scopes": {
+          "$ref": "#/$defs/scopes"
+        },
+        "vetted": {
+          "$ref": "#/$defs/boolish"
+        },
+        "logged": {
+          "$ref": "#/$defs/boolish"
+        },
+        "write_capable": {
+          "$ref": "#/$defs/boolish"
+        },
+        "capabilities": {
+          "$ref": "#/$defs/capabilities"
+        },
+        "integrity": {
+          "$ref": "#/$defs/integrity"
+        },
+        "output_marking": {
+          "$ref": "#/$defs/boolish"
+        },
+        "model_card": {
+          "$ref": "#/$defs/boolish"
+        },
+        "evaluates": {
+          "$ref": "#/$defs/evaluationScope"
+        },
+        "immutable": {
+          "$ref": "#/$defs/boolish"
+        },
+        "site": {
+          "$ref": "#/$defs/shortText"
+        },
+        "attestation": {
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "tpm",
+            "dice",
+            "secure_element",
+            "unknown"
+          ]
+        },
+        "secure_boot": {
+          "$ref": "#/$defs/boolish"
+        },
+        "disk_encryption": {
+          "$ref": "#/$defs/boolish"
+        },
+        "ota_signed": {
+          "$ref": "#/$defs/boolish"
+        },
+        "egress_policy": {
+          "$ref": "#/$defs/boolish"
+        },
+        "command_validation": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "docs/03 §OT: this node validates every command before it acts on a machine (signature, freshness, nonce, allow-list, range, state)"
+        },
+        "role": {
+          "$ref": "#/$defs/shortText"
+        },
+        "approval_for": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/shortText"
+          }
+        },
+        "approval_identity": {
+          "type": "string",
+          "enum": [
+            "",
+            "separate",
+            "agent",
+            "shared",
+            "unknown"
+          ],
+          "$comment": "docs/03 §OT: the identity an approval is signed under; separate = the approver's own, distinct from the agent's and the executor's"
+        },
+        "exposure": {
+          "type": "string",
+          "enum": [
+            "",
+            "internal",
+            "public",
+            "unknown"
+          ]
+        },
+        "waf": {
+          "$ref": "#/$defs/boolish"
+        },
+        "authn": {
+          "type": "string",
+          "enum": [
+            "",
+            "oidc",
+            "oauth",
+            "saml",
+            "api_key",
+            "basic",
+            "mtls",
+            "none",
+            "unknown"
+          ]
+        },
+        "secrets_in": {
+          "type": "string",
+          "enum": [
+            "",
+            "secret_store",
+            "config",
+            "code",
+            "env_plain",
+            "unknown"
+          ]
+        },
+        "key_use": {
+          "type": "string",
+          "enum": [
+            "",
+            "command_signing",
+            "data_encryption",
+            "secrets",
+            "unknown"
+          ],
+          "$comment": "docs/03 §OT: what a secret store's keys are for; command_signing keys authorise machine commands"
+        },
+        "population": {
+          "type": "string",
+          "enum": [
+            "",
+            "customer",
+            "employee",
+            "admin",
+            "partner"
+          ]
+        },
+        "mfa": {
+          "$ref": "#/$defs/boolish"
+        },
+        "pim": {
+          "$ref": "#/$defs/boolish"
+        },
+        "version": {
+          "$ref": "#/$defs/shortText"
+        },
+        "c4_level": {
+          "$ref": "#/$defs/c4Level"
+        },
+        "c4_kind": {
+          "$ref": "#/$defs/c4Kind"
+        },
+        "c4_parent": {
+          "type": "string",
+          "maxLength": 64,
+          "$comment": "ADR-032: id of the containing SoftwareSystem/Container element (C4 parent); empty = top level"
+        },
+        "hosted_on": {
+          "type": "string",
+          "maxLength": 64,
+          "$comment": "docs/02 §3: id of the node this component runs on (same host or process); calls between co-located nodes need no transport encryption"
+        },
+        "provider_service": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "ADR-032: provider service slug, e.g. azure/aks, azure/openai"
+        }
+      },
+      "patternProperties": {
+        "^x_[A-Za-z0-9_]{1,60}$": {
+          "$ref": "#/$defs/extValue"
+        }
+      },
+      "additionalProperties": false
+    },
+    "attrs": {
+      "agent": {
+        "x-required-attrs": [
+          "identity",
+          "autonomy",
+          "purpose",
+          "owner"
+        ],
+        "x-optional-attrs": [
+          "materiality",
+          "kill_switch",
+          "ai_disclosure",
+          "rate_limit",
+          "tool_scopes",
+          "content_safety",
+          "criticality",
+          "region",
+          "output_marking",
+          "gamp_category",
+          "supplier_assessed"
+        ]
+      },
+      "llm_endpoint": {
+        "x-required-attrs": [
+          "provider",
+          "region",
+          "network"
+        ],
+        "x-optional-attrs": [
+          "model",
+          "content_safety",
+          "outsourcing_registered",
+          "exit_strategy",
+          "purpose",
+          "owner",
+          "materiality",
+          "criticality",
+          "output_marking",
+          "model_card",
+          "gamp_category",
+          "supplier_assessed"
+        ]
+      },
+      "gateway": {
+        "x-required-attrs": [
+          "kind"
+        ],
+        "x-optional-attrs": [
+          "logging",
+          "token_limits",
+          "content_safety",
+          "semantic_cache",
+          "region"
+        ]
+      },
+      "datastore": {
+        "x-required-attrs": [
+          "engine",
+          "data_class",
+          "region"
+        ],
+        "x-optional-attrs": [
+          "network_exposure",
+          "encryption_key",
+          "backup",
+          "geo_redundant",
+          "criticality",
+          "retention_days",
+          "rto_min",
+          "rpo_min",
+          "row_level_security",
+          "gamp_category",
+          "supplier_assessed"
+        ]
+      },
+      "vector_index": {
+        "x-required-attrs": [
+          "data_class"
+        ],
+        "x-optional-attrs": [
+          "acl_trimming",
+          "redaction",
+          "classification",
+          "region"
+        ]
+      },
+      "tool": {
+        "x-required-attrs": [
+          "origin",
+          "scopes"
+        ],
+        "x-optional-attrs": [
+          "vetted",
+          "logged",
+          "write_capable",
+          "owner",
+          "capabilities",
+          "integrity",
+          "hosted_on",
+          "gamp_category",
+          "supplier_assessed"
+        ]
+      },
+      "log_sink": {
+        "x-required-attrs": [
+          "retention_days"
+        ],
+        "x-optional-attrs": [
+          "immutable",
+          "region"
+        ]
+      },
+      "edge": {
+        "x-required-attrs": [
+          "site",
+          "attestation"
+        ],
+        "x-optional-attrs": [
+          "secure_boot",
+          "disk_encryption",
+          "ota_signed",
+          "egress_policy",
+          "cra_scope",
+          "sbom",
+          "version",
+          "command_validation",
+          "hosted_on",
+          "intervention_log",
+          "safety_function",
+          "self_evolving",
+          "conformity_route"
+        ]
+      },
+      "human_step": {
+        "x-required-attrs": [
+          "role"
+        ],
+        "x-optional-attrs": [
+          "approval_for",
+          "approval_identity"
+        ]
+      },
+      "app": {
+        "x-required-attrs": [
+          "exposure"
+        ],
+        "x-optional-attrs": [
+          "waf",
+          "authn",
+          "secrets_in",
+          "criticality",
+          "region",
+          "rbac_scope",
+          "command_validation",
+          "hosted_on",
+          "intervention_log",
+          "gamp_category",
+          "supplier_assessed"
+        ]
+      },
+      "user": {
+        "x-required-attrs": [
+          "population"
+        ],
+        "x-optional-attrs": [
+          "mfa",
+          "pim"
+        ]
+      },
+      "product": {
+        "x-required-attrs": [
+          "cra_scope"
+        ],
+        "x-optional-attrs": [
+          "sbom",
+          "secure_boot",
+          "ota_signed",
+          "version",
+          "owner"
+        ]
+      },
+      "saas": {
+        "x-required-attrs": [
+          "provider"
+        ],
+        "x-optional-attrs": [
+          "outsourcing_registered",
+          "exit_strategy",
+          "criticality",
+          "region",
+          "data_class",
+          "gamp_category",
+          "supplier_assessed"
+        ]
+      },
+      "evaluation": {
+        "x-required-attrs": [
+          "owner",
+          "purpose"
+        ],
+        "x-optional-attrs": [
+          "evaluates"
+        ]
+      },
+      "edge_model": {
+        "x-required-attrs": [],
+        "x-optional-attrs": [
+          "purpose",
+          "owner",
+          "version",
+          "hosted_on",
+          "safety_function",
+          "self_evolving",
+          "conformity_route",
+          "gamp_category",
+          "supplier_assessed"
+        ]
+      },
+      "secret_store": {
+        "x-required-attrs": [],
+        "x-optional-attrs": [
+          "key_use",
+          "network_exposure",
+          "region"
+        ]
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "from",
+        "to",
+        "kind",
+        "auth",
+        "encryption"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "from": {
+          "$ref": "#/$defs/id"
+        },
+        "to": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "$ref": "#/$defs/edgeKind"
+        },
+        "label": {
+          "$ref": "#/$defs/shortText"
+        },
+        "protocol": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "auth": {
+          "$ref": "#/$defs/edgeAuth"
+        },
+        "encryption": {
+          "$ref": "#/$defs/edgeEncryption"
+        },
+        "data_class": {
+          "$ref": "#/$defs/dataClass"
+        },
+        "attrs": {
+          "type": "object",
+          "properties": {
+            "logged": {
+              "$ref": "#/$defs/boolish"
+            },
+            "consequence": {
+              "type": "string",
+              "enum": [
+                "",
+                "low",
+                "medium",
+                "high"
+              ]
+            },
+            "prompt_contains": {
+              "type": "string",
+              "enum": [
+                "",
+                "none",
+                "pii",
+                "secrets",
+                "cid",
+                "internal"
+              ]
+            },
+            "description": {
+              "$ref": "#/$defs/longText"
+            }
+          },
+          "patternProperties": {
+            "^x_[A-Za-z0-9_]{1,60}$": {
+              "$ref": "#/$defs/extValue"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "rule_id",
+        "pack",
+        "severity",
+        "status",
+        "ids",
+        "message"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "rule_id": {
+          "type": "string",
+          "pattern": "^[A-Z]{2,5}-[0-9]{3}$"
+        },
+        "pack": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "severity": {
+          "$ref": "#/$defs/severity"
+        },
+        "status": {
+          "$ref": "#/$defs/findingStatus"
+        },
+        "ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "title": {
+          "$ref": "#/$defs/shortText"
+        },
+        "message": {
+          "$ref": "#/$defs/longText"
+        },
+        "clauses": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "string",
+            "maxLength": 80
+          }
+        },
+        "remediation": {
+          "$ref": "#/$defs/longText"
+        },
+        "has_patch": {
+          "type": "boolean"
+        },
+        "cause": {
+          "type": "string",
+          "maxLength": 40,
+          "$comment": "cause id from rules/causes.yaml (docs/03 §Causes); decorated from the loaded catalog, empty when the rule is not mapped"
+        },
+        "first_seen_version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status_reason": {
+          "$ref": "#/$defs/longText"
+        },
+        "status_actor": {
+          "$ref": "#/$defs/shortText"
+        },
+        "status_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "ts",
+        "hash"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "model_created",
+            "patch_accepted",
+            "finding_status",
+            "export_generated",
+            "share_created",
+            "llm_call",
+            "evidence_record",
+            "spot_check",
+            "assistant_architect_run",
+            "secret_rejected"
+          ]
+        },
+        "ts": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "actor": {
+          "$ref": "#/$defs/shortText"
+        }
+      }
+    },
+    "patchOp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "path"
+      ],
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": [
+            "add",
+            "remove",
+            "replace",
+            "move",
+            "copy",
+            "test"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "maxLength": 300,
+          "$comment": "RFC 6901 pointer; array segments under /nodes /edges /groups /findings may be an element id instead of an index"
+        },
+        "from": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "value": {}
+      }
+    },
+    "patch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ops"
+      ],
+      "properties": {
+        "patch_id": {
+          "$ref": "#/$defs/id"
+        },
+        "proposed_by": {
+          "type": "string",
+          "enum": [
+            "agent",
+            "user",
+            "rule"
+          ]
+        },
+        "rationale": {
+          "$ref": "#/$defs/longText"
+        },
+        "clauses": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "string",
+            "maxLength": 80
+          }
+        },
+        "finding_id": {
+          "$ref": "#/$defs/id"
+        },
+        "ops": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 500,
+          "items": {
+            "$ref": "#/$defs/patchOp"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "proposed",
+            "accepted",
+            "rejected"
+          ]
+        }
+      }
+    },
+    "c4Level": {
+      "type": "string",
+      "enum": [
+        "",
+        "context",
+        "container",
+        "component",
+        "code"
+      ],
+      "$comment": "ADR-032: C4 level of the element; empty = derived from the node type"
+    },
+    "c4Kind": {
+      "type": "string",
+      "enum": [
+        "",
+        "Person",
+        "SoftwareSystem",
+        "ExternalSystem",
+        "Container",
+        "Component",
+        "DataStore",
+        "Queue",
+        "Agent",
+        "Tool",
+        "MCPServer",
+        "Identity",
+        "Gateway"
+      ],
+      "$comment": "ADR-032: C4 element kind; empty = derived from the node type"
+    },
+    "citationKind": {
+      "type": "string",
+      "enum": [
+        "clause",
+        "document"
+      ]
+    },
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/citationKind"
+        },
+        "id": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "clause id REGIME:DOC:REF when kind=clause"
+        },
+        "url": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "title": {
+          "$ref": "#/$defs/shortText"
+        },
+        "fetched_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "",
+            "fresh",
+            "stale",
+            "superseded",
+            "unreachable",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "$ref": "#/$defs/shortText"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "proposed",
+            "accepted",
+            "rejected",
+            "superseded"
+          ]
+        },
+        "context": {
+          "$ref": "#/$defs/longText"
+        },
+        "decision": {
+          "$ref": "#/$defs/longText"
+        },
+        "consequences": {
+          "$ref": "#/$defs/longText"
+        },
+        "citations": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/citation"
+          }
+        },
+        "proposed_by": {
+          "$ref": "#/$defs/shortText"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "decided_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "decided_by": {
+          "$ref": "#/$defs/shortText"
+        },
+        "superseded_by": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "$comment": "ADR-032: an architecture decision record kept on the model; acceptance is a patch the user accepts, hence evidence"
+    }
+  }
+}

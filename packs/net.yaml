@@ -1,0 +1,89 @@
+# NET — network (docs/03 §NET). Deterministic CEL; the LLM never creates findings.
+pack: net
+version: 0.1.0
+regimes: [MCSB, IEC, CRA, ISO, DORA, FINMA, OWASP]
+rules:
+  - id: NET-001
+    title: Datastore exposed to the public network
+    scope: node
+    severity: high
+    condition: 'n.type == "datastore" && attr(n, "network_exposure", "") == "public"'
+    message: "{{n.name}} is reachable from the public network."
+    clauses: [MCSB:v1:NS-2, FINMA:2023/1:Rz-Cyber]
+    remediation: "Use a Private Endpoint and deny public network access (network_exposure=private)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/network_exposure", value: private }
+    fixtures: { positive: fixtures/NET-001.pos.json, negative: fixtures/NET-001.neg.json }
+    tags: [network, datastore]
+
+  - id: NET-002
+    title: LLM endpoint not on a private network
+    scope: edge
+    severity: medium
+    condition: 'e.to.type == "llm_endpoint" && attr(e.to, "network", "public") != "private"'
+    message: "{{e.from.name}} calls {{e.to.name}} over a non-private network (network={{attr(e.to,'network','public')}})."
+    clauses: [MCSB:v1:NS-2]
+    remediation: "Enable Private Link to Foundry / Azure OpenAI and disable public network access (network=private)."
+    patch_template:
+      - { op: add, path: "/nodes/{{e.to.id}}/attrs/network", value: private }
+    fixtures: { positive: fixtures/NET-002.pos.json, negative: fixtures/NET-002.neg.json }
+    tags: [network, llm]
+
+  - id: NET-003
+    title: Public app or API without a gateway/WAF in front
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type == "user" && e.to.type in ["app","api"] && attr(e.to, "exposure", "") == "public" &&
+      !g.pathThrough(e.from.id, e.to.id, "gateway")
+    message: "{{e.from.name}} reaches public {{e.to.name}} with no WAF or API gateway on the path."
+    clauses: [MCSB:v1:NS-6, OWASP:ASVS:V1]
+    remediation: "Place a WAF (Front Door / Application Gateway) or API gateway in front of the public endpoint."
+    fixtures: { positive: fixtures/NET-003.pos.json, negative: fixtures/NET-003.neg.json }
+    tags: [network, waf, gateway]
+
+  - id: NET-004
+    title: Edge egress without an egress policy
+    scope: edge
+    severity: high
+    condition: |
+      e.from.type in ["edge_gateway","edge_device"] && e.to.layer != "edge" &&
+      !attr(e.from, "egress_policy", false)
+    message: "{{e.from.name}} sends traffic off the edge layer to {{e.to.name}} without an egress allow-list."
+    clauses: [IEC:62443-3-3:SR5.1, CRA:2024/2847:AnnexI]
+    remediation: "Define a fail-closed egress allow-list on the edge device/gateway (egress_policy=true)."
+    fixtures: { positive: fixtures/NET-004.pos.json, negative: fixtures/NET-004.neg.json }
+    tags: [network, edge, ot]
+
+  - id: NET-005
+    title: Edge traffic reaches a datastore without a broker/DMZ conduit
+    scope: edge
+    severity: high
+    condition: |
+      e.from.layer == "edge" && e.to.type == "datastore" &&
+      !g.pathThrough(e.from.id, e.to.id, "broker") && !g.pathThrough(e.from.id, e.to.id, "dmz")
+    message: "{{e.from.name}} writes to {{e.to.name}} directly; no broker or DMZ conduit separates the OT zone."
+    clauses: [IEC:62443-3-3:SR5.1, IEC:62443-3-2:Zones]
+    remediation: "Route edge telemetry through a broker (IoT Hub / IoT Operations) or a DMZ conduit between zones."
+    fixtures: { positive: fixtures/NET-005.pos.json, negative: fixtures/NET-005.neg.json }
+    tags: [network, edge, ot, zones]
+
+  - id: NET-006
+    title: Unencrypted or unknown transport encryption
+    scope: edge
+    severity: high
+    # A call between co-located components (one hosted_on the other, or both on the same host) stays inside one
+    # process or device: encryption "none" is then not a transport gap. "unknown" is always reported.
+    condition: |
+      e.encryption in ["none","unknown"] &&
+      !(e.encryption == "none" && (attr(e.from, "hosted_on", "") == e.to.id || attr(e.to, "hosted_on", "") == e.from.id ||
+        (attr(e.from, "hosted_on", "") != "" && attr(e.from, "hosted_on", "") == attr(e.to, "hosted_on", ""))))
+    severity_override:
+      - { when: 'e.encryption == "unknown"', severity: medium }
+    message: "{{e.from.name}} → {{e.to.name}} transport encryption is {{e.encryption}}."
+    clauses: [ISO:27001:A.8.24, DORA-RTS:2024/1774:Art6]
+    remediation: "Enforce TLS 1.2+ (mTLS for service-to-service); record the encryption on the edge."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/encryption", value: tls }
+    fixtures: { positive: fixtures/NET-006.pos.json, negative: fixtures/NET-006.neg.json }
+    tags: [network, encryption]

@@ -1,0 +1,75 @@
+{
+  "id": "arch_fx_net_005_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture NET-005 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "IEC"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_dev",
+      "type": "edge_device",
+      "name": "Edge device",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": true,
+        "sbom": true
+      }
+    },
+    {
+      "id": "n_broker",
+      "type": "broker",
+      "name": "IoT Hub",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "network_exposure": "private"
+      }
+    },
+    {
+      "id": "n_lake",
+      "type": "datastore",
+      "name": "Telemetry lake",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "blob",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_dev",
+      "to": "n_lake",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

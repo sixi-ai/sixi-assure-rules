@@ -1,0 +1,2 @@
+The integration note pasted the bearer token used between the gateway and the agent:
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJleGFtcGxlLW9ubHkiLCJuYW1lIjoibm90IGEgcmVhbCB0b2tlbiIsImlhdCI6MTUxNjIzOTAyMn0.EXAMPLEnotarealsignature0123456789abcdef

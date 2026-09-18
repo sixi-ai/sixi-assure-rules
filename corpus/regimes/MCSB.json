@@ -1,0 +1,1052 @@
+[
+  {
+    "id": "MCSB:v1:IM-1",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "IM-1",
+    "title": "Use centralized identity and authentication system",
+    "summary": "Recommends governing identities and authentication for cloud and non-cloud resources through one centralized identity and authentication system rather than local authentication methods.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management",
+    "tags": [
+      "identity",
+      "authentication",
+      "centralisation",
+      "zero-trust"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-03-30); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:IM-2",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "IM-2",
+    "title": "Protect identity and authentication systems",
+    "summary": "Recommends treating the identity and authentication system itself as a high-value asset: restrict privileged roles, require strong authentication for privileged access and monitor high-risk activity.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management",
+    "tags": [
+      "identity",
+      "privileged-access",
+      "monitoring",
+      "hardening"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-03-30); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:IM-3",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "IM-3",
+    "title": "Manage application identities securely and automatically",
+    "summary": "Recommends using managed application identities instead of human accounts or embedded credentials for applications and code, with automated credential rotation.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management",
+    "tags": [
+      "identity",
+      "managed-identity",
+      "secrets",
+      "automation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-03-30); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:IM-4",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "IM-4",
+    "title": "Authenticate server and services",
+    "summary": "Recommends authenticating remote servers and services from the client side, typically through TLS certificate validation and, where appropriate, mutual authentication.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management",
+    "tags": [
+      "tls",
+      "authentication",
+      "encryption",
+      "certificates"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-03-30); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:IM-5",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "IM-5",
+    "title": "Use single sign-on (SSO) for application access",
+    "summary": "Recommends single sign-on for application access to reduce duplicate accounts and simplify authentication across cloud and on-premises environments.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management",
+    "tags": [
+      "identity",
+      "sso",
+      "authentication",
+      "access-control"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-03-30); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:IM-6",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "IM-6",
+    "title": "Use strong authentication controls",
+    "summary": "Recommends enforcing passwordless or multi-factor authentication for all access to resources, starting with administrators and privileged users.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management",
+    "tags": [
+      "mfa",
+      "authentication",
+      "passwordless",
+      "identity"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-03-30); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:IM-7",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "IM-7",
+    "title": "Restrict resource access based on conditions",
+    "summary": "Recommends validating trusted signals such as user risk, device state and location before granting access, as part of a zero-trust access model.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management",
+    "tags": [
+      "conditional-access",
+      "zero-trust",
+      "risk",
+      "access-control"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-03-30); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:IM-8",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "IM-8",
+    "title": "Restrict the exposure of credentials and secrets",
+    "summary": "Recommends keeping credentials and secrets out of code and configuration files, storing them in a key vault or secret store and scanning source code for credentials.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management",
+    "tags": [
+      "secrets",
+      "key-vault",
+      "credentials",
+      "scanning"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-03-30); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:IM-9",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "IM-9",
+    "title": "Secure user access to existing applications",
+    "summary": "Recommends fronting legacy or non-native cloud applications with solutions such as application proxy, single sign-on or a cloud access security broker to enforce central strong authentication and monitoring.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management",
+    "tags": [
+      "identity",
+      "legacy",
+      "proxy",
+      "monitoring"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-03-30); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:PA-1",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "PA-1",
+    "title": "Separate and limit highly privileged/administrative users",
+    "summary": "Recommends identifying all high business impact accounts and limiting the number of privileged and administrative accounts across control, management and data planes.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access",
+    "tags": [
+      "privileged-access",
+      "least-privilege",
+      "identity",
+      "separation-of-duties"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:PA-2",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "PA-2",
+    "title": "Avoid standing access for user accounts and permissions",
+    "summary": "Recommends replacing standing privileges with just-in-time assignment of privileged access to resource tiers.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access",
+    "tags": [
+      "privileged-access",
+      "just-in-time",
+      "least-privilege",
+      "identity"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:PA-3",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "PA-3",
+    "title": "Manage lifecycle of identities and entitlements",
+    "summary": "Recommends automating the identity and access lifecycle, covering request, review, approval, provisioning and de-provisioning.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access",
+    "tags": [
+      "identity",
+      "lifecycle",
+      "entitlements",
+      "automation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:PA-4",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "PA-4",
+    "title": "Review and reconcile user access regularly",
+    "summary": "Recommends reviewing privileged account entitlements regularly to confirm that granted access is still valid.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access",
+    "tags": [
+      "access-review",
+      "privileged-access",
+      "governance",
+      "identity"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:PA-5",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "PA-5",
+    "title": "Set up emergency access",
+    "summary": "Recommends preparing emergency (break-glass) access so that an organisation is not locked out of critical cloud infrastructure, with tightly controlled and monitored credentials.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access",
+    "tags": [
+      "break-glass",
+      "privileged-access",
+      "continuity",
+      "monitoring"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:PA-6",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "PA-6",
+    "title": "Use privileged access workstations",
+    "summary": "Recommends performing privileged tasks from secured, isolated and centrally managed workstations.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access",
+    "tags": [
+      "privileged-access",
+      "workstation",
+      "hardening",
+      "identity"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:PA-7",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "PA-7",
+    "title": "Follow just enough administration (least privilege) principle",
+    "summary": "Recommends managing permissions at a fine-grained level through role-based access control so that identities hold only the privileges their role requires.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access",
+    "tags": [
+      "least-privilege",
+      "rbac",
+      "authorisation",
+      "identity"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:PA-8",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "PA-8",
+    "title": "Determine access process for cloud provider support",
+    "summary": "Recommends establishing an approval process and secure channel for cloud provider support access to customer data.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access",
+    "tags": [
+      "support-access",
+      "approval",
+      "third-party",
+      "data"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-1",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-1",
+    "title": "Establish network segmentation boundaries",
+    "summary": "Recommends aligning virtual network deployment with the enterprise segmentation strategy and isolating higher-risk workloads behind network controls.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "segmentation",
+      "network",
+      "isolation",
+      "zones"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-2",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-2",
+    "title": "Secure cloud native services with network controls",
+    "summary": "Recommends establishing private access points for cloud services, for example private endpoints, and disabling or restricting public network access where possible.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "private-endpoint",
+      "network",
+      "public-access",
+      "isolation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-3",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-3",
+    "title": "Deploy firewall at the edge of enterprise network",
+    "summary": "Recommends deploying a firewall for advanced filtering of traffic to and from external networks and, where useful, between internal segments.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "firewall",
+      "egress",
+      "network",
+      "filtering"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-4",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-4",
+    "title": "Deploy intrusion detection/intrusion prevention systems (IDS/IPS)",
+    "summary": "Recommends inspecting network and payload traffic with IDS/IPS tuned to produce high-quality alerts for the SIEM.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "ids",
+      "detection",
+      "network",
+      "monitoring"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-5",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-5",
+    "title": "Deploy DDOS protection",
+    "summary": "Recommends deploying distributed denial-of-service protection for networks and applications exposed to public networks.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "ddos",
+      "availability",
+      "network",
+      "protection"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-6",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-6",
+    "title": "Deploy web application firewall",
+    "summary": "Recommends deploying a web application firewall with appropriate rules to protect web applications and APIs from application-layer attacks.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "waf",
+      "api",
+      "ingress",
+      "application-security"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-7",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-7",
+    "title": "Simplify network security configuration",
+    "summary": "Recommends using central tools to simplify and standardise management of network security rules in complex environments.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "network",
+      "configuration",
+      "management",
+      "policy"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-8",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-8",
+    "title": "Detect and disable insecure services and protocols",
+    "summary": "Recommends discovering and disabling insecure services and protocols, or applying compensating controls where they cannot be disabled.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "protocols",
+      "hardening",
+      "tls",
+      "network"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-9",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-9",
+    "title": "Connect on-premises or cloud network privately",
+    "summary": "Recommends using private connectivity such as VPN or dedicated circuits between cloud and on-premises or co-location environments.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "private-connectivity",
+      "vpn",
+      "network",
+      "hybrid"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:NS-10",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "NS-10",
+    "title": "Ensure Domain Name System (DNS) security",
+    "summary": "Recommends securing DNS resolution, separating public and private resolution and mitigating common DNS attacks such as dangling records and poisoning.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-network-security",
+    "tags": [
+      "dns",
+      "network",
+      "resolution",
+      "protection"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:DP-1",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "DP-1",
+    "title": "Discover, classify, and label sensitive data",
+    "summary": "Recommends maintaining an inventory of sensitive data and using tooling to discover, classify and label it.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-data-protection",
+    "tags": [
+      "data",
+      "classification",
+      "discovery",
+      "inventory"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:DP-2",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "DP-2",
+    "title": "Monitor anomalies and threats targeting sensitive data",
+    "summary": "Recommends monitoring for anomalous activity around sensitive data, such as unusual or large transfers that may indicate exfiltration.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-data-protection",
+    "tags": [
+      "data",
+      "monitoring",
+      "exfiltration",
+      "detection"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:DP-3",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "DP-3",
+    "title": "Encrypt sensitive data in transit",
+    "summary": "Recommends encrypting data in transit and enforcing modern TLS for application and management traffic.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-data-protection",
+    "tags": [
+      "encryption",
+      "tls",
+      "transit",
+      "data"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:DP-4",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "DP-4",
+    "title": "Enable data at rest encryption by default",
+    "summary": "Recommends enabling encryption at rest by default for services and, where not enabled by default, at storage, file or database level.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-data-protection",
+    "tags": [
+      "encryption",
+      "at-rest",
+      "data",
+      "defaults"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:DP-5",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "DP-5",
+    "title": "Use customer-managed key option in data at rest encryption when required",
+    "summary": "Recommends defining where regulatory requirements call for customer-managed keys and implementing encryption at rest with those keys, accepting the added key lifecycle effort.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-data-protection",
+    "tags": [
+      "encryption",
+      "cmk",
+      "keys",
+      "compliance"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:DP-6",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "DP-6",
+    "title": "Use a secure key management process",
+    "summary": "Recommends documenting and implementing a cryptographic key management standard covering generation, distribution, storage, rotation and revocation in a secured key vault service.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-data-protection",
+    "tags": [
+      "keys",
+      "key-management",
+      "rotation",
+      "key-vault"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:DP-7",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "DP-7",
+    "title": "Use a secure certificate management process",
+    "summary": "Recommends managing the certificate lifecycle centrally, avoiding self-signed and wildcard certificates for critical services and automating renewal.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-data-protection",
+    "tags": [
+      "certificates",
+      "lifecycle",
+      "tls",
+      "automation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:DP-8",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "DP-8",
+    "title": "Ensure security of key and certificate repository",
+    "summary": "Recommends hardening the key vault service itself through access control, network restrictions, logging, monitoring and backup.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-data-protection",
+    "tags": [
+      "key-vault",
+      "hardening",
+      "access-control",
+      "logging"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:LT-1",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "LT-1",
+    "title": "Enable threat detection capabilities",
+    "summary": "Recommends monitoring known resource types for threats and anomalies and tuning analytics rules to produce high-quality alerts.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection",
+    "tags": [
+      "detection",
+      "threats",
+      "alerts",
+      "monitoring"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:LT-2",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "LT-2",
+    "title": "Enable threat detection for identity and access management",
+    "summary": "Recommends detecting identity threats by monitoring sign-in and access anomalies such as excessive failed logins and stale accounts.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection",
+    "tags": [
+      "identity",
+      "detection",
+      "sign-in",
+      "monitoring"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:LT-3",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "LT-3",
+    "title": "Enable logging for security investigation",
+    "summary": "Recommends enabling logging across resource tiers so that security investigations, response and compliance needs can be met.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection",
+    "tags": [
+      "logging",
+      "investigation",
+      "audit",
+      "evidence"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:LT-4",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "LT-4",
+    "title": "Enable network logging for security investigation",
+    "summary": "Recommends enabling network service logs such as flow logs, firewall, WAF and DNS logs to support investigation, threat hunting and alerting.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection",
+    "tags": [
+      "logging",
+      "network",
+      "flow-logs",
+      "investigation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:LT-5",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "LT-5",
+    "title": "Centralize security log management and analysis",
+    "summary": "Recommends centralising log storage and analysis, with defined owners, access, storage location and retention for each log source, typically in a SIEM.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection",
+    "tags": [
+      "logging",
+      "siem",
+      "centralisation",
+      "retention"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:LT-6",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "LT-6",
+    "title": "Configure log storage retention",
+    "summary": "Recommends planning log retention according to compliance, regulatory and business requirements and configuring retention at each logging service.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection",
+    "tags": [
+      "retention",
+      "logging",
+      "archival",
+      "compliance"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MCSB:v1:LT-7",
+    "regime": "MCSB",
+    "doc": "Microsoft cloud security benchmark v1",
+    "ref": "LT-7",
+    "title": "Use approved time synchronization sources",
+    "summary": "Recommends using approved time synchronization sources so that log timestamps, including date, time and time zone, are consistent.",
+    "excerpt": "",
+    "version": "2025-04-23",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection",
+    "tags": [
+      "time",
+      "logging",
+      "timestamps",
+      "integrity"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Control identifier and heading verified 2026-09-10 against the Microsoft Learn page (article date 2025-04-23, page updated 2026-02-03); benchmark guidance is paraphrased, not quoted.",
+    "redacted": "licence"
+  }
+]

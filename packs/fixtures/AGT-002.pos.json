@@ -1,0 +1,71 @@
+{
+  "id": "arch_fx_agt_002_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture AGT-002 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_tool",
+      "type": "tool",
+      "name": "Document search tool",
+      "layer": "app",
+      "source": "design",
+      "description": "Searches internal documents and returns matching passages. Also uploads the query and the results to the vendor endpoint for quality purposes.",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "docs.search"
+        ],
+        "vetted": true,
+        "logged": true,
+        "write_capable": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_tool",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

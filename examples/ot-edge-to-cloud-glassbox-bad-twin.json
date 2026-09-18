@@ -1,0 +1,416 @@
+{
+  "id": "arch_demo_edge_iot_bad",
+  "tenant_id": "tenant_demo",
+  "name": "OT / edge-to-cloud GlassBox — bad twin (flat network, shared secrets, no update path)",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Plant Engineering",
+    "description": "Bad twin of edge-iot-glassbox: the data diode is gone and the edge gateway has no egress allow-list; a shadow vibration sensor writes straight to the telemetry lake over unknown transport; PLC traffic is unencrypted; devices lack secure boot / signed updates / SBOM; the lake holds camera PII in West Europe with platform-managed keys, no backup, no geo-redundancy, no RTO/RPO; logs kept 30 days; no incident reporting path (ISG/DORA) and no DR test recorded.",
+    "criticality": "high",
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "regimes": [
+      "CRA",
+      "CH-ISG",
+      "IEC",
+      "DORA"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_site",
+      "kind": "zone",
+      "name": "Site – Plant A",
+      "node_ids": [
+        "n_plc1",
+        "n_cam2",
+        "n_vib3",
+        "n_egw",
+        "n_emodel",
+        "n_product"
+      ],
+      "attrs": {
+        "region": "ch",
+        "description": "Production zone (IEC 62443 zone), Plant A, Switzerland."
+      }
+    },
+    {
+      "id": "g_conduit",
+      "kind": "zone",
+      "name": "Conduit – Plant A DMZ",
+      "node_ids": [
+        "n_dmz"
+      ],
+      "attrs": {
+        "region": "ch"
+      }
+    },
+    {
+      "id": "g_cloud",
+      "kind": "zone",
+      "name": "Cloud",
+      "node_ids": [
+        "n_broker",
+        "n_eh",
+        "n_blob",
+        "n_logs"
+      ]
+    },
+    {
+      "id": "g_plant_a",
+      "kind": "site",
+      "name": "Plant A",
+      "node_ids": [
+        "n_plc1",
+        "n_cam2",
+        "n_vib3",
+        "n_egw",
+        "n_emodel",
+        "n_product",
+        "n_dmz"
+      ]
+    },
+    {
+      "id": "g_ot_tb",
+      "kind": "trust_boundary",
+      "name": "OT / IT boundary",
+      "node_ids": [
+        "n_dmz"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_plc1",
+      "type": "edge_device",
+      "name": "PLC – line 1",
+      "layer": "edge",
+      "zone": "g_site",
+      "position": {
+        "x": 40,
+        "y": 80
+      },
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": false,
+        "disk_encryption": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": true,
+        "sbom": true,
+        "version": "fw 4.2.1"
+      }
+    },
+    {
+      "id": "n_cam2",
+      "type": "edge_device",
+      "name": "Vision camera – line 2",
+      "layer": "edge",
+      "zone": "g_site",
+      "position": {
+        "x": 40,
+        "y": 200
+      },
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "disk_encryption": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": true,
+        "sbom": false,
+        "version": "fw 2.8.0"
+      }
+    },
+    {
+      "id": "n_vib3",
+      "type": "edge_device",
+      "name": "Vibration sensor array – line 3 (shadow uplink)",
+      "layer": "edge",
+      "zone": "g_site",
+      "position": {
+        "x": 40,
+        "y": 320
+      },
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "none",
+        "secure_boot": true,
+        "disk_encryption": false,
+        "ota_signed": false,
+        "cra_scope": true,
+        "sbom": true,
+        "version": "fw 1.9.3"
+      }
+    },
+    {
+      "id": "n_product",
+      "type": "product",
+      "name": "Edge appliance (product)",
+      "layer": "edge",
+      "zone": "g_site",
+      "position": {
+        "x": 40,
+        "y": 440
+      },
+      "source": "design",
+      "attrs": {
+        "cra_scope": true,
+        "secure_boot": true,
+        "ota_signed": true,
+        "version": "2.3.0",
+        "owner": "Head of Plant Engineering"
+      }
+    },
+    {
+      "id": "n_egw",
+      "type": "edge_gateway",
+      "name": "Plant edge gateway",
+      "layer": "edge",
+      "zone": "g_site",
+      "position": {
+        "x": 260,
+        "y": 200
+      },
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "disk_encryption": true,
+        "ota_signed": true,
+        "egress_policy": false,
+        "cra_scope": true,
+        "sbom": true,
+        "version": "2.3.0",
+        "owner": "Head of Plant Engineering"
+      }
+    },
+    {
+      "id": "n_emodel",
+      "type": "edge_model",
+      "name": "Anomaly detection model (ONNX, on-device)",
+      "layer": "edge",
+      "zone": "g_site",
+      "position": {
+        "x": 480,
+        "y": 80
+      },
+      "source": "design",
+      "attrs": {
+        "purpose": "Detects vibration and vision anomalies locally.",
+        "owner": "Head of Plant Engineering",
+        "version": "1.4.0"
+      }
+    },
+    {
+      "id": "n_dmz",
+      "type": "dmz",
+      "name": "Site DMZ (MQTT relay)",
+      "layer": "network",
+      "zone": "g_conduit",
+      "position": {
+        "x": 700,
+        "y": 200
+      },
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_broker",
+      "type": "broker",
+      "name": "IoT Operations / IoT Hub (MQTT broker)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 920,
+        "y": 200
+      },
+      "source": "design",
+      "attrs": {
+        "region": "westeurope",
+        "network_exposure": "private"
+      }
+    },
+    {
+      "id": "n_eh",
+      "type": "queue",
+      "name": "Event Hubs (telemetry)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1140,
+        "y": 200
+      },
+      "source": "design",
+      "attrs": {
+        "region": "westeurope",
+        "network_exposure": "private"
+      }
+    },
+    {
+      "id": "n_blob",
+      "type": "datastore",
+      "name": "Telemetry lake (Blob, Capture, camera frames)",
+      "layer": "data",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1360,
+        "y": 200
+      },
+      "source": "design",
+      "attrs": {
+        "engine": "blob",
+        "data_class": "pii",
+        "region": "westeurope",
+        "network_exposure": "private",
+        "encryption_key": "pmk",
+        "backup": false,
+        "geo_redundant": false,
+        "criticality": "critical",
+        "retention_days": 1825
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Log Analytics (30-day workspace)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1360,
+        "y": 320
+      },
+      "source": "design",
+      "attrs": {
+        "retention_days": 30,
+        "immutable": false,
+        "region": "westeurope"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_plc1_egw",
+      "from": "n_plc1",
+      "to": "n_egw",
+      "kind": "publishes",
+      "protocol": "opcua",
+      "auth": "mtls",
+      "encryption": "none",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_cam2_egw",
+      "from": "n_cam2",
+      "to": "n_egw",
+      "kind": "publishes",
+      "protocol": "mqtt",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "data_class": "pii",
+      "attrs": {}
+    },
+    {
+      "id": "e_vib3_blob",
+      "from": "n_vib3",
+      "to": "n_blob",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "api_key",
+      "encryption": "unknown",
+      "data_class": "internal",
+      "label": "shadow uplink (bypasses gateway, DMZ and broker)",
+      "attrs": {}
+    },
+    {
+      "id": "e_egw_emodel",
+      "from": "n_egw",
+      "to": "n_emodel",
+      "kind": "calls",
+      "protocol": "grpc",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "data_class": "confidential",
+      "label": "local inference",
+      "attrs": {}
+    },
+    {
+      "id": "e_egw_dmz",
+      "from": "n_egw",
+      "to": "n_dmz",
+      "kind": "publishes",
+      "protocol": "mqtt",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "data_class": "pii",
+      "attrs": {}
+    },
+    {
+      "id": "e_dmz_broker",
+      "from": "n_dmz",
+      "to": "n_broker",
+      "kind": "publishes",
+      "protocol": "mqtt",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "data_class": "pii",
+      "attrs": {}
+    },
+    {
+      "id": "e_broker_eh",
+      "from": "n_broker",
+      "to": "n_eh",
+      "kind": "publishes",
+      "protocol": "amqp",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {}
+    },
+    {
+      "id": "e_eh_blob",
+      "from": "n_eh",
+      "to": "n_blob",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "pii",
+      "label": "Event Hubs Capture",
+      "attrs": {}
+    },
+    {
+      "id": "e_broker_logs",
+      "from": "n_broker",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_eh_logs",
+      "from": "n_eh",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

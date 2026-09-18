@@ -1,0 +1,132 @@
+[
+  {
+    "id": "IEC:62443-3-2:Zones",
+    "regime": "IEC",
+    "doc": "IEC 62443-3-2:2020, Security for industrial automation and control systems — Part 3-2: Security risk assessment for system design",
+    "ref": "Part 3-2 (zones and conduits)",
+    "title": "Security risk assessment for system design — partitioning into zones and conduits",
+    "summary": "This part of IEC 62443 addresses the security risk assessment carried out when designing an industrial automation and control system, including partitioning the system under consideration into zones and conduits and deriving target security levels for them.",
+    "excerpt": "",
+    "version": "2020-06-24",
+    "effective": "",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://webstore.iec.ch/publication/30727",
+    "tags": [
+      "zones",
+      "conduits",
+      "segmentation",
+      "risk"
+    ],
+    "licence": "iec",
+    "verified": true,
+    "note": "Standard number, full title and publication date verified 2026-09-10 via the IEC webstore. IEC text is copyright-protected and is not reproduced; the zone/conduit requirement (ZCR) clause numbering has not been verified against the standard.",
+    "redacted": "licence"
+  },
+  {
+    "id": "IEC:62443-3-3:Standard",
+    "regime": "IEC",
+    "doc": "IEC 62443-3-3:2013, Industrial communication networks — Network and system security — Part 3-3: System security requirements and security levels",
+    "ref": "Part 3-3",
+    "title": "System security requirements and security levels",
+    "summary": "This part defines system security requirements (SRs) grouped into seven foundational requirements and the security levels associated with them for industrial automation and control systems.",
+    "excerpt": "",
+    "version": "2013-08-07",
+    "effective": "",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://webstore.iec.ch/publication/7033",
+    "tags": [
+      "system-requirements",
+      "security-levels",
+      "ics",
+      "standards"
+    ],
+    "licence": "iec",
+    "verified": true,
+    "note": "Standard number, full title, edition 1.0 and publication date verified 2026-09-10 via the IEC webstore; requirement text is not reproduced (IEC licence).",
+    "redacted": "licence"
+  },
+  {
+    "id": "IEC:62443-3-3:SR5.1",
+    "regime": "IEC",
+    "doc": "IEC 62443-3-3:2013, Industrial communication networks — Network and system security — Part 3-3: System security requirements and security levels",
+    "ref": "SR 5.1",
+    "title": "SR 5.1 — Network segmentation (foundational requirement FR 5, Restricted data flow)",
+    "summary": "System security requirement addressing the logical segmentation of control system networks from other networks so that data flow between zones is restricted.",
+    "excerpt": "",
+    "version": "2013-08-07",
+    "effective": "",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://webstore.iec.ch/publication/7033",
+    "tags": [
+      "segmentation",
+      "network",
+      "restricted-data-flow",
+      "ics"
+    ],
+    "licence": "iec",
+    "verified": false,
+    "note": "The standard's identity was verified via the IEC webstore on 2026-09-10, but the SR 5.1 requirement title and text could not be verified because IEC standards are not publicly available; the title given here is a cautious paraphrase and must be confirmed against the purchased standard before use in an export.",
+    "redacted": "licence"
+  },
+  {
+    "id": "IEC:62443-4-2:Standard",
+    "regime": "IEC",
+    "doc": "IEC 62443-4-2:2019, Security for industrial automation and control systems — Part 4-2: Technical security requirements for IACS components",
+    "ref": "Part 4-2",
+    "title": "Technical security requirements for IACS components",
+    "summary": "This part defines component requirements (CRs) for embedded devices, network components, host devices and software applications, derived from the foundational requirements of the IEC 62443 series.",
+    "excerpt": "",
+    "version": "2019-02-27",
+    "effective": "",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://webstore.iec.ch/publication/34421",
+    "tags": [
+      "component-requirements",
+      "devices",
+      "ics",
+      "standards"
+    ],
+    "licence": "iec",
+    "verified": true,
+    "note": "Standard number, full title, edition 1.0 and publication date verified 2026-09-10 via the IEC webstore; requirement text is not reproduced (IEC licence).",
+    "redacted": "licence"
+  },
+  {
+    "id": "IEC:62443-4-2:CR3.x",
+    "regime": "IEC",
+    "doc": "IEC 62443-4-2:2019, Security for industrial automation and control systems — Part 4-2: Technical security requirements for IACS components",
+    "ref": "CR 3.x",
+    "title": "CR 3.x — Component requirements under foundational requirement FR 3 (System integrity)",
+    "summary": "The family of component requirements addressing integrity of communication, protection from malicious code, integrity verification of software and information, and related integrity controls for IACS components.",
+    "excerpt": "",
+    "version": "2019-02-27",
+    "effective": "",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://webstore.iec.ch/publication/34421",
+    "tags": [
+      "integrity",
+      "components",
+      "firmware",
+      "ics"
+    ],
+    "licence": "iec",
+    "verified": false,
+    "note": "Family-level reference used by rule packs. The standard's identity was verified via the IEC webstore on 2026-09-10; individual CR 3.x titles could not be verified because IEC standards are not publicly available.",
+    "redacted": "licence"
+  }
+]

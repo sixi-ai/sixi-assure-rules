@@ -1,0 +1,512 @@
+[
+  {
+    "id": "FDA:21CFR11:11.1",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.1",
+    "title": "Scope",
+    "summary": "Part 11 sets the criteria under which FDA considers electronic records and electronic signatures trustworthy, reliable and equivalent to paper records and handwritten signatures; it applies to records kept or submitted under FDA record requirements.",
+    "excerpt": "(a) The regulations in this part set forth the criteria under which the agency considers electronic records, electronic signatures, and handwritten signatures executed to electronic records to be trustworthy, reliable, and generally equivalent to paper records and handwritten signatures executed on paper.",
+    "version": "2022-02-01",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-A/section-11.1",
+    "tags": [
+      "scope",
+      "electronic-records",
+      "electronic-signatures"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10",
+    "title": "Controls for closed systems",
+    "summary": "Operators of closed systems must use procedures and controls that ensure the authenticity, integrity and, where appropriate, confidentiality of electronic records, and that a signer cannot readily repudiate a signed record.",
+    "excerpt": "Persons who use closed systems to create, modify, maintain, or transmit electronic records shall employ procedures and controls designed to ensure the authenticity, integrity, and, when appropriate, the confidentiality of electronic records, and to ensure that the signer cannot readily repudiate the signed record as not genuine. Such procedures and controls shall include the following:",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10",
+    "tags": [
+      "integrity",
+      "authenticity",
+      "controls",
+      "closed-system"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(a)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(a)",
+    "title": "Validation of systems",
+    "summary": "Systems must be validated to show accuracy, reliability, consistent intended performance and the ability to detect invalid or altered records.",
+    "excerpt": "(a) Validation of systems to ensure accuracy, reliability, consistent intended performance, and the ability to discern invalid or altered records.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(a)",
+    "tags": [
+      "validation",
+      "integrity",
+      "gxp"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(b)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(b)",
+    "title": "Accurate and complete copies of records",
+    "summary": "The system must be able to produce accurate and complete copies of records in human-readable and electronic form for FDA inspection, review and copying.",
+    "excerpt": "(b) The ability to generate accurate and complete copies of records in both human readable and electronic form suitable for inspection, review, and copying by the agency.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(b)",
+    "tags": [
+      "records",
+      "inspection",
+      "export"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(c)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(c)",
+    "title": "Protection of records throughout the retention period",
+    "summary": "Records must be protected so they can be retrieved accurately and readily for as long as they must be retained.",
+    "excerpt": "(c) Protection of records to enable their accurate and ready retrieval throughout the records retention period.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(c)",
+    "tags": [
+      "retention",
+      "backup",
+      "records"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(d)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(d)",
+    "title": "Limiting system access to authorized individuals",
+    "summary": "Access to the system must be limited to authorized individuals.",
+    "excerpt": "(d) Limiting system access to authorized individuals.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(d)",
+    "tags": [
+      "access-control",
+      "authorization",
+      "gxp"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(e)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(e)",
+    "title": "Secure, time-stamped audit trails",
+    "summary": "Secure, computer-generated, time-stamped audit trails must independently record operator entries and actions that create, modify or delete records; changes must not obscure earlier information, and audit trails are kept at least as long as the records.",
+    "excerpt": "(e) Use of secure, computer-generated, time-stamped audit trails to independently record the date and time of operator entries and actions that create, modify, or delete electronic records. Record changes shall not obscure previously recorded information. Such audit trail documentation shall be retained for a period at least as long as that required for the subject electronic records and shall …",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(e)",
+    "tags": [
+      "audit-trail",
+      "logging",
+      "retention",
+      "integrity"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(f)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(f)",
+    "title": "Operational system checks",
+    "summary": "Operational system checks must enforce the permitted sequencing of steps and events where appropriate.",
+    "excerpt": "(f) Use of operational system checks to enforce permitted sequencing of steps and events, as appropriate.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(f)",
+    "tags": [
+      "sequencing",
+      "workflow",
+      "controls"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(g)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(g)",
+    "title": "Authority checks",
+    "summary": "Authority checks must ensure that only authorized individuals can use the system, sign records electronically, access input or output devices, alter records or perform the operation at hand.",
+    "excerpt": "(g) Use of authority checks to ensure that only authorized individuals can use the system, electronically sign a record, access the operation or computer system input or output device, alter a record, or perform the operation at hand.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(g)",
+    "tags": [
+      "authorization",
+      "access-control",
+      "electronic-signatures"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(h)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(h)",
+    "title": "Device checks",
+    "summary": "Device checks must, where appropriate, determine whether the source of a data input or an operational instruction is valid.",
+    "excerpt": "(h) Use of device (e.g., terminal) checks to determine, as appropriate, the validity of the source of data input or operational instruction.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(h)",
+    "tags": [
+      "device",
+      "input-validation",
+      "commands"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(i)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(i)",
+    "title": "Qualified personnel",
+    "summary": "People who develop, maintain or use electronic record and signature systems must have the education, training and experience for their tasks.",
+    "excerpt": "(i) Determination that persons who develop, maintain, or use electronic record/electronic signature systems have the education, training, and experience to perform their assigned tasks.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(i)",
+    "tags": [
+      "training",
+      "personnel",
+      "competence"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(j)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(j)",
+    "title": "Accountability for actions under electronic signatures",
+    "summary": "Written policies must hold individuals accountable for actions taken under their electronic signatures, to deter record and signature falsification.",
+    "excerpt": "(j) The establishment of, and adherence to, written policies that hold individuals accountable and responsible for actions initiated under their electronic signatures, in order to deter record and signature falsification.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(j)",
+    "tags": [
+      "accountability",
+      "policy",
+      "electronic-signatures"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.10(k)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.10(k)",
+    "title": "Controls over systems documentation",
+    "summary": "Distribution of, access to and use of system operation and maintenance documentation must be controlled, with revision and change control that keeps a time-sequenced audit trail of documentation changes.",
+    "excerpt": "(k) Use of appropriate controls over systems documentation including: (1) Adequate controls over the distribution of, access to, and use of documentation for system operation and maintenance. (2) Revision and change control procedures to maintain an audit trail that documents time-sequenced development and modification of systems documentation.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.10#p-11.10(k)",
+    "tags": [
+      "documentation",
+      "change-control",
+      "audit-trail"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.30",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.30",
+    "title": "Controls for open systems",
+    "summary": "Open systems need the closed-system controls as appropriate plus measures such as document encryption and digital signature standards to ensure record authenticity, integrity and confidentiality from creation to receipt.",
+    "excerpt": "Persons who use open systems to create, modify, maintain, or transmit electronic records shall employ procedures and controls designed to ensure the authenticity, integrity, and, as appropriate, the confidentiality of electronic records from the point of their creation to the point of their receipt. Such procedures and controls shall include those identified in § 11.10, as appropriate, and …",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.30",
+    "tags": [
+      "open-system",
+      "encryption",
+      "digital-signatures",
+      "integrity"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.50",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.50",
+    "title": "Signature manifestations",
+    "summary": "Signed electronic records must show the signer's printed name, the date and time of signing and the meaning of the signature (such as review, approval, responsibility or authorship), under the same controls as the records.",
+    "excerpt": "(a) Signed electronic records shall contain information associated with the signing that clearly indicates all of the following: (1) The printed name of the signer; (2) The date and time when the signature was executed; and (3) The meaning (such as review, approval, responsibility, or authorship) associated with the signature. (b) The items identified in paragraphs (a)(1), (a)(2), and (a)(3) of …",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.50",
+    "tags": [
+      "electronic-signatures",
+      "approval",
+      "records"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.70",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.70",
+    "title": "Signature/record linking",
+    "summary": "Signatures executed to electronic records must be linked to their records so they cannot be excised, copied or transferred to falsify a record by ordinary means.",
+    "excerpt": "Electronic signatures and handwritten signatures executed to electronic records shall be linked to their respective electronic records to ensure that the signatures cannot be excised, copied, or otherwise transferred to falsify an electronic record by ordinary means.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-B/section-11.70",
+    "tags": [
+      "electronic-signatures",
+      "integrity",
+      "non-repudiation"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.100(a)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.100(a)",
+    "title": "Electronic signature unique to one individual",
+    "summary": "Each electronic signature must be unique to one individual and never reused by or reassigned to anyone else.",
+    "excerpt": "(a) Each electronic signature shall be unique to one individual and shall not be reused by, or reassigned to, anyone else.",
+    "version": "2023-03-02",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-C/section-11.100#p-11.100(a)",
+    "tags": [
+      "electronic-signatures",
+      "identity",
+      "uniqueness"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.100(b)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.100(b)",
+    "title": "Identity verification before issuing a signature",
+    "summary": "An organization must verify an individual's identity before it establishes or assigns that individual's electronic signature or any element of it.",
+    "excerpt": "(b) Before an organization establishes, assigns, certifies, or otherwise sanctions an individual's electronic signature, or any element of such electronic signature, the organization shall verify the identity of the individual.",
+    "version": "2023-03-02",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-C/section-11.100#p-11.100(b)",
+    "tags": [
+      "identity",
+      "electronic-signatures",
+      "onboarding"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.100(c)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.100(c)",
+    "title": "Letter to FDA on the legal equivalence of electronic signatures",
+    "summary": "Persons using electronic signatures must declare to FDA, in a letter with a handwritten signature, that their electronic signatures are intended as the legally binding equivalent of handwritten signatures, and repeat that statement for a specific signature on request.",
+    "excerpt": "(c) Persons using electronic signatures shall, prior to or at the time of such use, certify to the agency that the electronic signatures in their system, used on or after August 20, 1997, are intended to be the legally binding equivalent of traditional handwritten signatures.",
+    "version": "2023-03-02",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-C/section-11.100#p-11.100(c)",
+    "tags": [
+      "electronic-signatures",
+      "certification-letter",
+      "legal-equivalence"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.200(a)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.200(a)",
+    "title": "Non-biometric electronic signature components and controls",
+    "summary": "Signatures not based on biometrics must use at least two distinct identification components (such as an ID code and password), be used only by their genuine owners, and be administered so that misuse would require two or more individuals to collaborate.",
+    "excerpt": "(a) Electronic signatures that are not based upon biometrics shall: (1) Employ at least two distinct identification components such as an identification code and password. (i) When an individual executes a series of signings during a single, continuous period of controlled system access, the first signing shall be executed using all electronic signature components; subsequent signings shall be …",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-C/section-11.200#p-11.200(a)",
+    "tags": [
+      "electronic-signatures",
+      "authentication",
+      "identity"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.200(b)",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.200(b)",
+    "title": "Biometric electronic signatures",
+    "summary": "Signatures based on biometrics must be designed so that nobody other than their genuine owner can use them.",
+    "excerpt": "(b) Electronic signatures based upon biometrics shall be designed to ensure that they cannot be used by anyone other than their genuine owners.",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-C/section-11.200#p-11.200(b)",
+    "tags": [
+      "biometrics",
+      "electronic-signatures",
+      "identity"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  },
+  {
+    "id": "FDA:21CFR11:11.300",
+    "regime": "FDA",
+    "doc": "21 CFR Part 11 (FDA) — Electronic Records; Electronic Signatures",
+    "ref": "§ 11.300",
+    "title": "Controls for identification codes/passwords",
+    "summary": "Where signatures combine ID codes and passwords, controls must keep each combination unique, review and revise issuances periodically, deauthorize lost or compromised tokens, detect and report unauthorized use, and test token devices.",
+    "excerpt": "Persons who use electronic signatures based upon use of identification codes in combination with passwords shall employ controls to ensure their security and integrity. Such controls shall include:",
+    "version": "2016-12-29",
+    "effective": "1997-08-20",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11/subpart-C/section-11.300",
+    "tags": [
+      "passwords",
+      "credentials",
+      "monitoring",
+      "electronic-signatures"
+    ],
+    "licence": "public",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the eCFR point-in-time text (versioner API, title 21 part 11, date 2026-09-11; latest amendment of the part 2023-03-02). US federal regulation, public domain."
+  }
+]

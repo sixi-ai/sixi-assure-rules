@@ -1,0 +1,4 @@
+Data plane wiring copied out of the deployment template:
+postgres://appuser:EXAMPLEnotarealpassword@db.internal.example:5432/assure?sslmode=require
+mongodb+srv://reader:EXAMPLEnotarealpassword@cluster0.example.test/records
+Server=tcp:example.database.windows.example,1433;Initial Catalog=assure;User ID=app;Password=EXAMPLEnotarealpassword;

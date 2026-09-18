@@ -1,0 +1,440 @@
+[
+  {
+    "id": "FINMA:2023/1:Rz-ICT",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2023/1 \"Operational risks and resilience — banks\"",
+    "ref": "IV.B ICT risk management, margin nos. 47–60",
+    "title": "ICT risk management",
+    "summary": "The circular sets FINMA's supervisory expectations for managing information and communication technology risk in supervised banks, including governance of the ICT environment, an up-to-date inventory of ICT assets and their dependencies, and change and incident management.",
+    "excerpt": "",
+    "version": "2024-01-01",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "ict-risk",
+      "governance",
+      "inventory",
+      "operational-risk"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2023-01-20221207.pdf, Circular 2023/1 dated 7 December 2022, in force 1 January 2024); section and margin numbers from its table of contents."
+  },
+  {
+    "id": "FINMA:2023/1:Rz-Cyber",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2023/1 \"Operational risks and resilience — banks\"",
+    "ref": "IV.C Cyber risk management, margin nos. 61–70",
+    "title": "Cyber risk management",
+    "summary": "Addresses FINMA's expectations for identifying, protecting against, detecting and responding to cyber threats affecting critical functions and data, including vulnerability and threat management and reporting of successful cyber attacks to FINMA.",
+    "excerpt": "",
+    "version": "2024-01-01",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "cyber",
+      "detection",
+      "vulnerability",
+      "operational-risk"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2023-01-20221207.pdf, Circular 2023/1 dated 7 December 2022, in force 1 January 2024); section and margin numbers from its table of contents."
+  },
+  {
+    "id": "FINMA:2023/1:Rz-AccessMgmt",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2023/1 \"Operational risks and resilience — banks\"",
+    "ref": "IV.D Critical data risk management, margin nos. 71–82 (access to critical data)",
+    "title": "Access to critical data — authorisation system, need-to-know, privileged access",
+    "summary": "Within the management of critical data, access to critical data and processing functionalities is restricted to persons who need it for their tasks (need-to-know and least privilege), an authorisation system is in place and reviewed regularly, persons with privileged access are subject to increased requirements and kept on an up-to-date list.",
+    "excerpt": "Access to critical data and processing functionalities shall be restricted to persons who require this to carry out their tasks. The institution must have an authorisation system in place. Access to this authorisation system must be afforded particular protection and reviewed on a regular basis.",
+    "version": "2024-01-01",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "identity",
+      "access-control",
+      "least-privilege",
+      "review"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2023-01-20221207.pdf, Circular 2023/1 dated 7 December 2022, in force 1 January 2024); section and margin numbers from its table of contents. The circular has no separate access-management section; the previous record named one that does not exist, so the record is re-anchored to the critical-data provisions that carry these requirements. Correction 2026-09-16 (verified against the German circular PDF on finma.ch): sections IV.D and IV.E had no transition period and have applied in full since 1 January 2024. The transitional rule in Rz 113 concerns operational resilience only — one year for Rz 106-109 and the first tests under Rz 110, two years (to 1 January 2026) for Rz 102, 104 and 111 (see FINMA:2023/1:Rz-OpRes)."
+  },
+  {
+    "id": "FINMA:2023/1:Rz-BCM",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2023/1 \"Operational risks and resilience — banks\"",
+    "ref": "IV.E Business continuity management (BCM), margin nos. 83–96",
+    "title": "Business continuity management",
+    "summary": "Covers FINMA's expectations for business continuity and recovery, including business impact analysis for critical functions, continuity and recovery plans with defined tolerances for disruption, and regular testing of those plans.",
+    "excerpt": "",
+    "version": "2024-01-01",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "continuity",
+      "recovery",
+      "backup",
+      "testing"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2023-01-20221207.pdf, Circular 2023/1 dated 7 December 2022, in force 1 January 2024); section and margin numbers from its table of contents. Correction 2026-09-16 (verified against the German circular PDF on finma.ch): sections IV.D and IV.E had no transition period and have applied in full since 1 January 2024. The transitional rule in Rz 113 concerns operational resilience only — one year for Rz 106-109 and the first tests under Rz 110, two years (to 1 January 2026) for Rz 102, 104 and 111 (see FINMA:2023/1:Rz-OpRes)."
+  },
+  {
+    "id": "FINMA:2023/1:Rz-CriticalData",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2023/1 \"Operational risks and resilience — banks\"",
+    "ref": "IV.D Critical data risk management, margin nos. 71–82",
+    "title": "Management of critical data",
+    "summary": "Addresses FINMA's expectations that institutions identify their critical data, assign ownership, and protect the confidentiality, integrity and availability of that data across its lifecycle.",
+    "excerpt": "The institution shall identify its critical data in a systematic and comprehensive way, categorise it on the basis of its criticality and define clear responsibilities. The critical data defined by the institution must be managed throughout its entire life-cycle.",
+    "version": "2024-01-01",
+    "effective": "2024-01-01",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "data",
+      "classification",
+      "ownership",
+      "integrity"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2023-01-20221207.pdf, Circular 2023/1 dated 7 December 2022, in force 1 January 2024); section and margin numbers from its table of contents. Correction 2026-09-16 (verified against the German circular PDF on finma.ch): sections IV.D and IV.E had no transition period and have applied in full since 1 January 2024. The transitional rule in Rz 113 concerns operational resilience only — one year for Rz 106-109 and the first tests under Rz 110, two years (to 1 January 2026) for Rz 102, 104 and 111 (see FINMA:2023/1:Rz-OpRes)."
+  },
+  {
+    "id": "FINMA:2018/3:Outsourcing",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2018/3 \"Outsourcing — banks and insurers\"",
+    "ref": "IV.A Joint provisions, margin nos. 7–9; V.D Responsibility, margin no. 23",
+    "title": "Outsourcing of significant functions",
+    "summary": "Sets FINMA's expectations for outsourcing significant functions, including that the institution remains responsible for the outsourced function, defines the service in a written agreement and retains the ability to supervise and control the service provider.",
+    "excerpt": "The company remains accountable to FINMA in the same way as it would if it performed the outsourced function itself. Proper business conduct must be assured at all times.",
+    "version": "2021-01-01",
+    "effective": "2018-04-01",
+    "applies_to": [
+      "finma_supervised",
+      "third_party"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "outsourcing",
+      "third-party",
+      "responsibility",
+      "contract"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2018-03-01012021.pdf, Circular 2018/3 dated 21 September 2017, in force 1 April 2018, last amended 4 November 2020); section and margin numbers from its table of contents. Verified 2026-09-16: Circular 2018/3 is still in force, last amended 4 November 2020, with no revision or consultation pending. Pages asserting a revised Circular 2018/3 'as of 1 January 2026' with new materiality thresholds contradict FINMA's own sources and must not be ingested."
+  },
+  {
+    "id": "FINMA:2018/3:Register",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2018/3 \"Outsourcing — banks and insurers\"",
+    "ref": "V.A Inventory of outsourced functions, margin nos. 14–15.1",
+    "title": "Inventory of outsourced functions",
+    "summary": "Addresses the expectation that institutions maintain an up-to-date inventory or register of outsourced significant functions, recording the service providers, the functions concerned and the responsible persons.",
+    "excerpt": "An inventory of outsourced functions must be drawn up and kept up to date at all times. It must contain a description of the outsourced function and indicate the service provider (including subcontractors), the service recipient and the unit responsible within the outsourcing company.",
+    "version": "2021-01-01",
+    "effective": "2018-04-01",
+    "applies_to": [
+      "finma_supervised",
+      "third_party"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "register",
+      "inventory",
+      "third-party",
+      "outsourcing"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2018-03-01012021.pdf, Circular 2018/3 dated 21 September 2017, in force 1 April 2018, last amended 4 November 2020); section and margin numbers from its table of contents. Verified 2026-09-16: Circular 2018/3 is still in force, last amended 4 November 2020, with no revision or consultation pending. Pages asserting a revised Circular 2018/3 'as of 1 January 2026' with new materiality thresholds contradict FINMA's own sources and must not be ingested."
+  },
+  {
+    "id": "FINMA:2018/3:DueDiligence",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2018/3 \"Outsourcing — banks and insurers\"",
+    "ref": "V.B Selection, instruction and monitoring of the service provider, margin nos. 16–21",
+    "title": "Due diligence on service providers",
+    "summary": "Covers the expectation that institutions carry out due diligence when selecting a service provider, instruct it appropriately and monitor its performance and risk situation on an ongoing basis, including sub-outsourcing.",
+    "excerpt": "The service provider must be chosen with due regard to, and subject to checks of, its professional capabilities as well as its financial and human resources. Where multiple functions are outsourced to the same service provider, the concentration of risk must be taken into account.",
+    "version": "2021-01-01",
+    "effective": "2018-04-01",
+    "applies_to": [
+      "finma_supervised",
+      "third_party"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "due-diligence",
+      "third-party",
+      "monitoring",
+      "sub-outsourcing"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2018-03-01012021.pdf, Circular 2018/3 dated 21 September 2017, in force 1 April 2018, last amended 4 November 2020); section and margin numbers from its table of contents. Verified 2026-09-16: Circular 2018/3 is still in force, last amended 4 November 2020, with no revision or consultation pending. Pages asserting a revised Circular 2018/3 'as of 1 January 2026' with new materiality thresholds contradict FINMA's own sources and must not be ingested."
+  },
+  {
+    "id": "FINMA:2018/3:Exit",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2018/3 \"Outsourcing — banks and insurers\"",
+    "ref": "V.B margin no. 18.1 (orderly insourcing or transfer); V.H Agreement, margin nos. 32–35",
+    "title": "Exit and termination arrangements",
+    "summary": "Outsourcing companies must provide for insourcing the outsourced function or transferring it to another service provider in an orderly manner, consider the consequences of a change of provider when outsourcing, and keep the contractual right to terminate in an orderly way when subcontractors change.",
+    "excerpt": "Provision must be made for insourcing the outsourced function or transferring it to another service provider in an orderly manner.",
+    "version": "2021-01-01",
+    "effective": "2018-04-01",
+    "applies_to": [
+      "finma_supervised",
+      "third_party"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "exit",
+      "termination",
+      "third-party",
+      "continuity"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2018-03-01012021.pdf, Circular 2018/3 dated 21 September 2017, in force 1 April 2018, last amended 4 November 2020); section and margin numbers from its table of contents. Verified 2026-09-16: Circular 2018/3 is still in force, last amended 4 November 2020, with no revision or consultation pending. Pages asserting a revised Circular 2018/3 'as of 1 January 2026' with new materiality thresholds contradict FINMA's own sources and must not be ingested."
+  },
+  {
+    "id": "FINMA:2018/3:CID",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2018/3 \"Outsourcing — banks and insurers\"",
+    "ref": "V.E Security, margin nos. 24–25",
+    "title": "Security requirements for outsourced functions",
+    "summary": "Where security-relevant functions are outsourced, in particular in information technology, the company and the service provider must contractually agree security requirements and the company must monitor compliance with them; a security framework must ensure the outsourced function continues in an emergency, with the same care as if performed in-house.",
+    "excerpt": "Where security-relevant functions are outsourced (particularly in information technology), the company and the service provider must contractually agree security requirements. The company must monitor compliance with these requirements.",
+    "version": "2021-01-01",
+    "effective": "2018-04-01",
+    "applies_to": [
+      "finma_supervised",
+      "third_party"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "client-data",
+      "confidentiality",
+      "third-party",
+      "cross-border"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (finma-rs-2018-03-01012021.pdf, Circular 2018/3 dated 21 September 2017, in force 1 April 2018, last amended 4 November 2020); section and margin numbers from its table of contents. Correction: the previous record described a client-identifying-data section that Circular 2018/3 does not contain (client data secrecy in outsourcing rests on banking-secrecy practice, not on this circular). The id is kept so existing findings and exports keep resolving; DATA-001 now cites FINMA:2023/1:Rz-CriticalData instead, which is what indexing sensitive data actually engages. Verified 2026-09-16: Circular 2018/3 is still in force, last amended 4 November 2020, with no revision or consultation pending. Pages asserting a revised Circular 2018/3 'as of 1 January 2026' with new materiality thresholds contradict FINMA's own sources and must not be ingested."
+  },
+  {
+    "id": "FINMA:08/2024:Governance",
+    "regime": "FINMA",
+    "doc": "FINMA Guidance 08/2024 on governance and risk management when using artificial intelligence",
+    "ref": "Section 2.1 Governance",
+    "title": "Governance and accountability for AI use",
+    "summary": "FINMA's guidance sets out supervisory expectations that institutions define clear responsibilities and accountability for AI applications, including approval and control processes commensurate with the materiality of the application.",
+    "excerpt": "FINMA assessed whether supervised institutions with many or significant applications have AI governance in place, including a centrally managed inventory with a risk classification and resulting measures, the definition of responsibilities and accountabilities for the development, implementation, monitoring and use of AI, requirements for model testing and supporting system controls.",
+    "version": "2024-12-18",
+    "effective": "2024-12-18",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/finma-guidance/",
+    "tags": [
+      "governance",
+      "accountability",
+      "ai",
+      "oversight"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (20241218-finma-aufsichtsmitteilung-08-2024.pdf, FINMA Guidance 08/2024 dated 18 December 2024); section numbers from its contents."
+  },
+  {
+    "id": "FINMA:08/2024:Inventory",
+    "regime": "FINMA",
+    "doc": "FINMA Guidance 08/2024 on governance and risk management when using artificial intelligence",
+    "ref": "Section 2.2 Inventory and risk classification",
+    "title": "AI inventory and risk classification",
+    "summary": "Sets the expectation that institutions maintain an inventory of AI applications with their purpose, owner and materiality, and classify them by risk so that controls are proportionate.",
+    "excerpt": "FINMA assessed whether the supervised institutions had a sufficiently broad definition of AI, as traditional applications can also present similar risks and the same risks must be addressed in the same way. It then assessed the existence and completeness of AI inventories and the risk classification of AI applications.",
+    "version": "2024-12-18",
+    "effective": "2024-12-18",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/finma-guidance/",
+    "tags": [
+      "inventory",
+      "classification",
+      "ai",
+      "materiality"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (20241218-finma-aufsichtsmitteilung-08-2024.pdf, FINMA Guidance 08/2024 dated 18 December 2024); section numbers from its contents."
+  },
+  {
+    "id": "FINMA:08/2024:Monitoring",
+    "regime": "FINMA",
+    "doc": "FINMA Guidance 08/2024 on governance and risk management when using artificial intelligence",
+    "ref": "Section 2.4 Tests and ongoing monitoring (ongoing monitoring, data drift, exceptions)",
+    "title": "Monitoring of AI applications in operation",
+    "summary": "Sets the expectation that institutions monitor AI applications in operation, including their inputs, outputs and performance over time, so that drift, deterioration or misuse can be detected and addressed.",
+    "excerpt": "It also assessed whether the supervised institutions monitor changes in input data to ensure that models remain applicable in a changing environment (recognition and treatment of data drift). Monitoring also includes analysing cases in which the output has been ignored or changed by users, as such manual corrections can provide information about weaknesses.",
+    "version": "2024-12-18",
+    "effective": "2024-12-18",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/finma-guidance/",
+    "tags": [
+      "monitoring",
+      "drift",
+      "logging",
+      "ai"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (20241218-finma-aufsichtsmitteilung-08-2024.pdf, FINMA Guidance 08/2024 dated 18 December 2024); section numbers from its contents."
+  },
+  {
+    "id": "FINMA:08/2024:Testing",
+    "regime": "FINMA",
+    "doc": "FINMA Guidance 08/2024 on governance and risk management when using artificial intelligence",
+    "ref": "Section 2.4 Tests and ongoing monitoring (tests before and during use)",
+    "title": "Testing and validation of AI applications",
+    "summary": "Sets the expectation that AI applications are tested and validated before and during use, with test results documented and proportionate to the materiality of the application.",
+    "excerpt": "FINMA assessed whether the supervised institutions schedule tests to ensure the data quality and functionality of the AI applications, which include checks for accuracy, robustness and stability and, if necessary, bias.",
+    "version": "2024-12-18",
+    "effective": "2024-12-18",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/finma-guidance/",
+    "tags": [
+      "testing",
+      "validation",
+      "evaluation",
+      "ai"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (20241218-finma-aufsichtsmitteilung-08-2024.pdf, FINMA Guidance 08/2024 dated 18 December 2024); section numbers from its contents."
+  },
+  {
+    "id": "FINMA:08/2024:DataQuality",
+    "regime": "FINMA",
+    "doc": "FINMA Guidance 08/2024 on governance and risk management when using artificial intelligence",
+    "ref": "Section 2.3 Data quality",
+    "title": "Data quality for AI applications",
+    "summary": "Sets the expectation that institutions ensure the quality, completeness and appropriateness of data used by AI applications, and understand the limitations of that data.",
+    "excerpt": "FINMA assessed whether the supervised institutions have defined requirements in their internal rules and directives to ensure that data is complete, correct and of integrity and that the availability of and access to data is secured.",
+    "version": "2024-12-18",
+    "effective": "2024-12-18",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/finma-guidance/",
+    "tags": [
+      "data-quality",
+      "ai",
+      "data",
+      "controls"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (20241218-finma-aufsichtsmitteilung-08-2024.pdf, FINMA Guidance 08/2024 dated 18 December 2024); section numbers from its contents."
+  },
+  {
+    "id": "FINMA:08/2024:Explainability",
+    "regime": "FINMA",
+    "doc": "FINMA Guidance 08/2024 on governance and risk management when using artificial intelligence",
+    "ref": "Section 2.6 Explainability",
+    "title": "Explainability of AI results",
+    "summary": "Sets the expectation that the results of AI applications can be explained to the degree needed by the affected stakeholders, including staff, clients and supervisors, in line with the materiality of the use case.",
+    "excerpt": "Where decisions had to be justified to investors, clients, employees, the supervisory authority or the audit firm, FINMA assessed the explainability of the applications in greater depth. This includes understanding the drivers of the applications or the behaviour under different conditions in order to be able to assess the plausibility and robustness of the results.",
+    "version": "2024-12-18",
+    "effective": "2024-12-18",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/finma-guidance/",
+    "tags": [
+      "explainability",
+      "transparency",
+      "ai",
+      "documentation"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (20241218-finma-aufsichtsmitteilung-08-2024.pdf, FINMA Guidance 08/2024 dated 18 December 2024); section numbers from its contents."
+  },
+  {
+    "id": "FINMA:08/2024:IndependentReview",
+    "regime": "FINMA",
+    "doc": "FINMA Guidance 08/2024 on governance and risk management when using artificial intelligence",
+    "ref": "Section 2.7 Independent review",
+    "title": "Independent review of AI applications",
+    "summary": "Sets the expectation that material AI applications are subject to review by a function independent of the development team, with the depth of review proportionate to the risk.",
+    "excerpt": "For material applications, FINMA assessed whether the independent review included the submission of an objective, informed and unbiased opinion on the appropriateness and reliability of a process for a particular application and whether the results of the independent review were taken into account in the development of the application.",
+    "version": "2024-12-18",
+    "effective": "2024-12-18",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/finma-guidance/",
+    "tags": [
+      "independent-review",
+      "assurance",
+      "ai",
+      "governance"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-11 against the official PDF retrieved from finma.ch (20241218-finma-aufsichtsmitteilung-08-2024.pdf, FINMA Guidance 08/2024 dated 18 December 2024); section numbers from its contents."
+  },
+  {
+    "id": "FINMA:2023/1:Rz-OpRes",
+    "regime": "FINMA",
+    "doc": "FINMA Circular 2023/1 \"Operational risks and resilience — banks\"",
+    "ref": "V. Ensuring operational resilience, margin nos. 101–111",
+    "title": "Ensuring operational resilience",
+    "summary": "The institution identifies its critical functions and their tolerances for disruption, has them approved by the board, keeps an inventory of critical functions with the links and dependencies between the critical processes and resources needed to deliver them, covers them with continuity plans, and tests regularly that it can keep them within tolerance under severe but plausible scenarios.",
+    "excerpt": "Das Institut führt ein Inventar seiner kritischen Funktionen, das mindestens jährlich überprüft und aktualisiert wird. Dieses Inventar beinhaltet die Unterbrechungstoleranzen der kritischen Funktionen, sowie die Verbindungen und Abhängigkeiten zwischen den benötigten kritischen Prozessen und deren Ressourcen zur Erbringung der kritischen Funktionen.",
+    "version": "2024-01-01",
+    "effective": "2026-01-01",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/circulars/",
+    "tags": [
+      "resilience",
+      "critical-function",
+      "dependencies",
+      "inventory",
+      "continuity"
+    ],
+    "licence": "finma",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the German circular PDF fetched from finma.ch (finma-rs-2023-01-20221207.pdf), section V margin nos. 101-111 and the transitional rule Rz 113; the excerpt is Rz 108 in the German original. Staged application: Rz 101, 103 and the first reporting under Rz 105 from 1 January 2024; Rz 106-109 and the first tests under Rz 110 from 1 January 2025; Rz 102, 104 and 111 from 1 January 2026, which is the effective date recorded here."
+  }
+]

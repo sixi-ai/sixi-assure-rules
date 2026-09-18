@@ -1,0 +1,2 @@
+Storage wiring for the evidence container:
+DefaultEndpointsProtocol=https;AccountName=examplestore;AccountKey=RXhhbXBsZU5vdEFSZWFsQWNjb3VudEtleUZvclRlc3RzT25seTAxMjM0NTY3OA==;EndpointSuffix=core.windows.net

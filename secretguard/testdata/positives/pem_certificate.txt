@@ -1,0 +1,4 @@
+The mutual-TLS listener presents this certificate:
+-----BEGIN CERTIFICATE-----
+RVhBTVBMRS1ub3QtYS1yZWFsLWNlcnRpZmljYXRlLWZvci10ZXN0cy1vbmx5
+-----END CERTIFICATE-----

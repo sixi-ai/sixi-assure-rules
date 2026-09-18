@@ -1,0 +1,49 @@
+# GOV — governance (GOV) and products (CRA) (docs/03 §TPR/GOV/CRA). The third-party rules (TPR) live in tpr.yaml:
+# they cite FINMA and DORA only, so they apply only where those regimes are enabled.
+pack: gov
+version: 0.2.0
+regimes: [FINMA, ISO, CH-ISG, DORA, CRA, IEC, NIS2]
+rules:
+  - id: GOV-001
+    title: Architecture without an owner
+    scope: graph
+    severity: medium
+    condition: 'attr(g, "owner", "") == ""'
+    message: "No accountable owner is assigned to this architecture."
+    clauses: [FINMA:08/2024:Governance, ISO:42001:A.3.2]
+    remediation: "Assign an accountable owner (role or person) on the architecture."
+    fixtures: { positive: fixtures/GOV-001.pos.json, negative: fixtures/GOV-001.neg.json }
+    tags: [governance]
+
+  - id: GOV-002
+    title: Incident reporting path not defined (ISG / DORA / NIS2 / CRA)
+    scope: graph
+    severity: medium
+    condition: 'attr(g, "incident_reporting", "") == "" && (regime("ISG") || regime("DORA") || regime("NIS2") || regime("CRA"))'
+    message: "No incident reporting path / SLA is defined although ISG, DORA, NIS2 or CRA reporting duties apply."
+    clauses: [CH-ISG:Art74a-c, DORA:2022/2554:Art19, NIS2:2022/2555:Art23, CRA:2024/2847:Art14]
+    remediation: "Define the reporting path and SLA (NCSC within 24 h under ISG; DORA Art. 19 timelines; NIS2 Art. 23 early warning within 24 h; CRA Art. 14 reporting of actively exploited vulnerabilities)."
+    fixtures: { positive: fixtures/GOV-002.pos.json, negative: fixtures/GOV-002.neg.json }
+    tags: [governance, incident]
+
+  - id: CRA-001
+    title: CRA product without SBOM
+    scope: node
+    severity: medium
+    condition: 'n.type in ["product","edge_device","edge_gateway"] && attr(n, "cra_scope", false) && !attr(n, "sbom", false)'
+    message: "{{n.name}} is in CRA scope but has no SBOM."
+    clauses: [CRA:2024/2847:AnnexI-II]
+    remediation: "Produce an SBOM and a vulnerability-handling process for the product (sbom=true)."
+    fixtures: { positive: fixtures/CRA-001.pos.json, negative: fixtures/CRA-001.neg.json }
+    tags: [cra, product, sbom]
+
+  - id: CRA-002
+    title: CRA product without secure boot or signed updates
+    scope: node
+    severity: high
+    condition: 'n.type in ["product","edge_device","edge_gateway"] && attr(n, "cra_scope", false) && !(attr(n, "secure_boot", false) && attr(n, "ota_signed", false))'
+    message: "{{n.name}} is in CRA scope without secure boot and/or signed OTA updates."
+    clauses: [CRA:2024/2847:AnnexI, IEC:62443-4-2:CR3.x]
+    remediation: "Enable secure boot and signed OTA updates (secure_boot=true, ota_signed=true)."
+    fixtures: { positive: fixtures/CRA-002.pos.json, negative: fixtures/CRA-002.neg.json }
+    tags: [cra, product, firmware]

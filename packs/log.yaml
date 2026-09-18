@@ -1,0 +1,65 @@
+# LOG — logging & retention (docs/03 §LOG). Deterministic CEL; the LLM never creates findings.
+pack: log
+version: 0.1.0
+regimes: [AIACT, FINMA, CH-CO, DORA]
+rules:
+  - id: LOG-001
+    title: AI components without a log sink
+    scope: graph
+    severity: high
+    condition: '(g.has("agent") || g.has("llm_endpoint")) && !g.has("log_sink")'
+    message: "The architecture runs agents or LLM endpoints but has no log sink for prompts, responses and tool calls."
+    clauses: [AIACT:2024/1689:Art12, FINMA:08/2024:Monitoring]
+    remediation: "Add a log sink (Log Analytics / immutable storage) and route agent, gateway and tool logs to it."
+    patch_template:
+      - { op: add, path: "/nodes/-", value: { id: "{{new:ls}}", type: log_sink, name: "Log Analytics (immutable archive)", layer: platform, attrs: { retention_days: 3650, immutable: true } } }
+    fixtures: { positive: fixtures/LOG-001.pos.json, negative: fixtures/LOG-001.neg.json }
+    tags: [logging, ai]
+
+  - id: LOG-002
+    title: Log retention below the regime minimum
+    scope: node
+    severity: high
+    condition: 'n.type == "log_sink" && attr(n, "retention_days", 0) < required("retention_days")'
+    message: "{{n.name}} retains logs for {{attr(n,'retention_days',0)}} days; the enabled regimes require at least {{required('retention_days')}} days."
+    clauses: [CH-CO:958f, AIACT:2024/1689:Art26(6), DORA-RTS:2024/1774:Art12]
+    remediation: "Raise retention to the regime minimum on an immutable storage tier (CH-CO 3650 d; AI Act deployer 180 d)."
+    fixtures: { positive: fixtures/LOG-002.pos.json, negative: fixtures/LOG-002.neg.json }
+    tags: [logging, retention]
+
+  - id: LOG-003
+    title: Log sink not immutable (FINMA)
+    scope: node
+    severity: medium
+    condition: 'n.type == "log_sink" && !attr(n, "immutable", false) && regime("FINMA")'
+    message: "{{n.name}} is not immutable; business records must be protected from alteration."
+    clauses: [CH-CO:958f, DORA-RTS:2024/1774:Art12]
+    remediation: "Use WORM / immutable storage with legal hold for the log archive (immutable=true)."
+    fixtures: { positive: fixtures/LOG-003.pos.json, negative: fixtures/LOG-003.neg.json }
+    tags: [logging, immutability, finma]
+
+  - id: LOG-004
+    title: LLM traffic not logged through a gateway
+    scope: edge
+    severity: high
+    condition: |
+      e.from.type in ["agent","app"] && e.to.type == "llm_endpoint" &&
+      !g.pathThrough(e.from.id, e.to.id, "gateway")
+    message: "{{e.from.name}} → {{e.to.name}} bypasses any gateway; prompts and responses are not logged."
+    clauses: [AIACT:2024/1689:Art12, FINMA:08/2024:Monitoring]
+    remediation: "Route LLM calls through an AI gateway with prompt/response logging to the log sink."
+    fixtures: { positive: fixtures/LOG-004.pos.json, negative: fixtures/LOG-004.neg.json }
+    tags: [logging, llm, gateway]
+
+  - id: LOG-005
+    title: Agent tool calls not logged
+    scope: edge
+    severity: medium
+    condition: 'e.from.type == "agent" && e.to.type in ["tool","mcp_server"] && !attr(e, "logged", false)'
+    message: "Tool calls {{e.from.name}} → {{e.to.name}} are not logged."
+    clauses: [AIACT:2024/1689:Art12]
+    remediation: "Log every tool/MCP call (arguments hash, result, actor) to the log sink (logged=true on the edge)."
+    patch_template:
+      - { op: add, path: "/edges/{{e.id}}/attrs/logged", value: true }
+    fixtures: { positive: fixtures/LOG-005.pos.json, negative: fixtures/LOG-005.neg.json }
+    tags: [logging, agent, tools]

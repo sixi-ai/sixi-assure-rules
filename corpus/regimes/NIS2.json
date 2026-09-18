@@ -1,0 +1,276 @@
+[
+  {
+    "id": "NIS2:2022/2555:Art21",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS 2 Directive)",
+    "ref": "Art. 21",
+    "title": "Cybersecurity risk-management measures",
+    "summary": "Member States must ensure that essential and important entities take appropriate and proportionate technical, operational and organisational measures on an all-hazards basis, including risk analysis, incident handling, business continuity, supply chain security, access control, cryptography and multi-factor authentication.",
+    "excerpt": "Member States shall ensure that essential and important entities take appropriate and proportionate technical, operational and organisational measures to manage the risks posed to the security of network and information systems which those entities use for their operations or for the provision of their services …",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "risk",
+      "supply-chain",
+      "access-control",
+      "continuity"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Marker regime in v0: obligations apply through national transposition, which varies by Member State."
+  },
+  {
+    "id": "NIS2:2022/2555:Art23",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS 2 Directive)",
+    "ref": "Art. 23",
+    "title": "Reporting obligations",
+    "summary": "Essential and important entities must notify their CSIRT or competent authority without undue delay of any incident with a significant impact on their services, with an early warning, an incident notification and a final report under the deadlines in the Directive.",
+    "excerpt": "Each Member State shall ensure that essential and important entities notify, without undue delay, its CSIRT or, where applicable, its competent authority in accordance with paragraph 4 of any incident that has a significant impact on the provision of their services …",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "incident",
+      "reporting",
+      "notification",
+      "csirt"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Marker regime in v0; national transposition determines the applicable reporting channel and thresholds."
+  },
+  {
+    "id": "NIS2:2022/2555:Art41",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS 2 Directive)",
+    "ref": "Art. 41",
+    "title": "Transposition",
+    "summary": "Member States had to adopt and publish the measures necessary to comply with the Directive by 17 October 2024 and apply them from 18 October 2024.",
+    "excerpt": "By 17 October 2024, Member States shall adopt and publish the measures necessary to comply with this Directive. … They shall apply those measures from 18 October 2024.",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "dates",
+      "transposition",
+      "application"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Transposition status differs between Member States; check the applicable national law. Status note 2026-09-16: transposition is now materially different per Member State (some in force, some referred to the Court of Justice). The binding text is the national transposition, which differs per Member State: cite Art. 21 as the category and the national law by name. Never seed national status from third-party trackers — several were demonstrably wrong in September 2026."
+  },
+  {
+    "id": "NIS2:2022/2555:Art21(2)(c)",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS2)",
+    "ref": "Art. 21(2)(c)",
+    "title": "Business continuity, backup management and disaster recovery",
+    "summary": "One of the ten minimum risk-management measures: business continuity, such as backup management and disaster recovery, and crisis management. The drawing evidences declared backups, geo-redundancy, criticality and recovery objectives per store.",
+    "excerpt": "business continuity, such as backup management and disaster recovery, and crisis management",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "all",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "continuity",
+      "backup",
+      "recovery",
+      "resilience"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2555). The binding text is the national transposition, which differs per Member State: cite Art. 21 as the category and the national law by name. Never seed national status from third-party trackers — several were demonstrably wrong in September 2026."
+  },
+  {
+    "id": "NIS2:2022/2555:Art21(2)(d)",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS2)",
+    "ref": "Art. 21(2)(d)",
+    "title": "Supply chain security",
+    "summary": "Supply chain security, including security-related aspects of the relationship between the entity and its direct suppliers or service providers. The third-party nodes on the drawing are the direct-dependency map.",
+    "excerpt": "supply chain security, including security-related aspects concerning the relationships between each entity and its direct suppliers or service providers",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "all",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "supply-chain",
+      "third-party",
+      "dependencies",
+      "vendor"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2555). The binding text is the national transposition, which differs per Member State: cite Art. 21 as the category and the national law by name. Never seed national status from third-party trackers — several were demonstrably wrong in September 2026."
+  },
+  {
+    "id": "NIS2:2022/2555:Art21(2)(h)",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS2)",
+    "ref": "Art. 21(2)(h)",
+    "title": "Cryptography and encryption",
+    "summary": "Policies and procedures on the use of cryptography and, where appropriate, encryption. The drawing evidences encryption declared per flow, key custody on each store and the placement of a secret store.",
+    "excerpt": "policies and procedures regarding the use of cryptography and, where appropriate, encryption",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "all",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "encryption",
+      "cryptography",
+      "keys",
+      "confidentiality"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2555). The binding text is the national transposition, which differs per Member State: cite Art. 21 as the category and the national law by name. Never seed national status from third-party trackers — several were demonstrably wrong in September 2026."
+  },
+  {
+    "id": "NIS2:2022/2555:Art21(2)(i)",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS2)",
+    "ref": "Art. 21(2)(i)",
+    "title": "Human resources security, access control policies and asset management",
+    "summary": "Human resources security, access control policies and asset management. The node inventory is the asset register and the declared authentication per flow is the access-control evidence; the human-resources limb is out of a drawing's reach.",
+    "excerpt": "human resources security, access control policies and asset management",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "all",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "access-control",
+      "asset-management",
+      "inventory",
+      "identity"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2555). The binding text is the national transposition, which differs per Member State: cite Art. 21 as the category and the national law by name. Never seed national status from third-party trackers — several were demonstrably wrong in September 2026."
+  },
+  {
+    "id": "NIS2:2022/2555:Art21(2)(j)",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS2)",
+    "ref": "Art. 21(2)(j)",
+    "title": "Multi-factor or continuous authentication and secured communications",
+    "summary": "Use of multi-factor authentication or continuous authentication solutions, secured voice, video and text communications and secured emergency communication systems within the entity, where appropriate.",
+    "excerpt": "the use of multi-factor authentication or continuous authentication solutions, secured voice, video and text communications and secured emergency communication systems within the entity, where appropriate",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "all",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "mfa",
+      "authentication",
+      "identity",
+      "communications"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2555). The binding text is the national transposition, which differs per Member State: cite Art. 21 as the category and the national law by name. Never seed national status from third-party trackers — several were demonstrably wrong in September 2026."
+  },
+  {
+    "id": "NIS2:2024/2690:Art1",
+    "regime": "NIS2",
+    "doc": "Commission Implementing Regulation (EU) 2024/2690 (technical and methodological requirements)",
+    "ref": "Art. 1",
+    "title": "Subject matter — technical and methodological requirements for digital entity types",
+    "summary": "Directly applicable technical and methodological requirements for the Art. 21(2) measures, for DNS providers, TLD registries, cloud computing and data centre providers, CDN, managed service and managed security service providers, online marketplaces, search engines, social networking platforms and trust service providers, and the cases in which an incident is significant.",
+    "excerpt": "This Regulation … lays down the technical and the methodological requirements of the measures referred to in Article 21(2) of Directive (EU) 2022/2555 and further specifies the cases in which an incident shall be considered to be significant as referred to in Article 23(3) of Directive (EU) 2022/2555.",
+    "version": "2024-10-18",
+    "effective": "2024-11-07",
+    "applies_to": [
+      "all",
+      "third_party",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg_impl/2024/2690/oj",
+    "tags": [
+      "cloud",
+      "managed-service",
+      "requirements",
+      "scope"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (Commission Implementing Regulation (EU) 2024/2690, OJ L, 2024/2690, 18.10.2024). Unlike the Directive this Regulation is directly applicable — no transposition. Art. 16 sets entry into force on the twentieth day after publication in the OJ of 18 October 2024."
+  },
+  {
+    "id": "NIS2:2024/2690:Annex-6.8",
+    "regime": "NIS2",
+    "doc": "Commission Implementing Regulation (EU) 2024/2690 (technical and methodological requirements)",
+    "ref": "Annex, point 6.8",
+    "title": "Network segmentation",
+    "summary": "Relevant entities must segment systems into networks or zones on the basis of their risk assessment and segment their systems from third parties' systems, keeping systems critical to operation or safety in secured zones, deploying a demilitarised zone and restricting communication between and within zones to what the operation needs.",
+    "excerpt": "The relevant entities shall segment systems into networks or zones in accordance with the results of the risk assessment referred to in point 2.1. They shall segment their systems and networks from third parties' systems and networks.",
+    "version": "2024-10-18",
+    "effective": "2024-11-07",
+    "applies_to": [
+      "all",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg_impl/2024/2690/oj",
+    "tags": [
+      "segmentation",
+      "zones",
+      "network",
+      "dmz"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (Commission Implementing Regulation (EU) 2024/2690, OJ L, 2024/2690, 18.10.2024). The clearest design-time requirement in the NIS2 family: zones, boundaries and the flows that cross them are exactly what the typed graph holds."
+  },
+  {
+    "id": "NIS2:2024/2690:Annex-3.2",
+    "regime": "NIS2",
+    "doc": "Commission Implementing Regulation (EU) 2024/2690 (technical and methodological requirements)",
+    "ref": "Annex, point 3.2",
+    "title": "Monitoring and logging",
+    "summary": "Relevant entities must lay down procedures and use tools to monitor and log activities on their network and information systems, automate monitoring where feasible, define which assets are logged, review logs regularly and maintain and back up logs for a defined period.",
+    "excerpt": "The relevant entities shall lay down procedures and use tools to monitor and log activities on their network and information systems to detect events that could be considered as incidents.",
+    "version": "2024-10-18",
+    "effective": "2024-11-07",
+    "applies_to": [
+      "all",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg_impl/2024/2690/oj",
+    "tags": [
+      "logging",
+      "monitoring",
+      "detection",
+      "retention"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (Commission Implementing Regulation (EU) 2024/2690, OJ L, 2024/2690, 18.10.2024). A drawing evidences that a log sink exists and which paths reach it, never what the logs contain."
+  }
+]

@@ -1,0 +1,1 @@
+The retrieval agent calls the model gateway over mutual TLS inside the Swiss North region. Authentication between the gateway and the vector store is a managed identity; no shared secret is stored in the model. The data classification is confidential and the retention period is 90 days. Reviewers should check the OSFI E-23 obligations before the next release.

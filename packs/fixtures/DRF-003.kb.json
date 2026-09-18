@@ -1,0 +1,7 @@
+{
+  "deprecated": {},
+  "freshness": {
+    "https://learn.microsoft.com/en-us/azure/api-management/api-management-key-concepts": "stale",
+    "https://learn.microsoft.com/en-us/azure/api-management/genai-gateway-capabilities": "fresh"
+  }
+}

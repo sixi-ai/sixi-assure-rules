@@ -1,0 +1,149 @@
+[
+  {
+    "id": "FADP:2023:Art7",
+    "regime": "FADP",
+    "doc": "Federal Act on Data Protection (FADP), SR 235.1",
+    "ref": "Art. 7",
+    "title": "Data protection by design and data protection by default",
+    "summary": "The controller must arrange data processing technically and organisationally so that the data protection principles are respected from the planning stage, and must ensure by suitable default settings that processing is limited to the minimum required for the intended purpose.",
+    "excerpt": "The controller is obliged to arrange the data processing in technical and organisational terms so that the data protection regulations, and in particular the principles under Article 6, are respected. It shall take account of this from the planning stage.",
+    "version": "2023-09-01",
+    "effective": "2023-09-01",
+    "applies_to": [
+      "all",
+      "deployer"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/491/en",
+    "tags": [
+      "privacy",
+      "by-design",
+      "minimisation",
+      "defaults"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the Fedlex English translation (version of 1 September 2023); the translation is provided for information only and has no legal force."
+  },
+  {
+    "id": "FADP:2023:Art8",
+    "regime": "FADP",
+    "doc": "Federal Act on Data Protection (FADP), SR 235.1",
+    "ref": "Art. 8",
+    "title": "Data security",
+    "summary": "Controllers and processors must guarantee a level of data security appropriate to the risk through suitable technical and organisational measures aimed at avoiding breaches of data security; the Federal Council sets minimum requirements.",
+    "excerpt": "The controller and the processor shall guarantee a level of data security appropriate to the risk by taking suitable technical and organisational measures. The measures must make it possible to avoid breaches of data security.",
+    "version": "2023-09-01",
+    "effective": "2023-09-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/491/en",
+    "tags": [
+      "security",
+      "risk",
+      "encryption",
+      "privacy"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Minimum requirements are set out in the Data Protection Ordinance (DPO, SR 235.11)."
+  },
+  {
+    "id": "FADP:2023:Art7-8",
+    "regime": "FADP",
+    "doc": "Federal Act on Data Protection (FADP), SR 235.1",
+    "ref": "Art. 7 and 8",
+    "title": "Data protection by design and by default with data security",
+    "summary": "Read together, these Articles require privacy-preserving design and default settings and a level of data security appropriate to the risk, both assessed from the planning stage of a processing activity.",
+    "excerpt": "",
+    "version": "2023-09-01",
+    "effective": "2023-09-01",
+    "applies_to": [
+      "all",
+      "deployer"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/491/en",
+    "tags": [
+      "privacy",
+      "security",
+      "by-design",
+      "risk"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Composite reference used by rule packs; Articles 7 and 8 are recorded separately."
+  },
+  {
+    "id": "FADP:2023:Art16",
+    "regime": "FADP",
+    "doc": "Federal Act on Data Protection (FADP), SR 235.1",
+    "ref": "Art. 16",
+    "title": "Cross-border disclosure — principles",
+    "summary": "Personal data may be disclosed abroad if the Federal Council has recognised the destination as providing adequate protection, or otherwise only where adequate protection is guaranteed by a treaty, approved data protection clauses, specific guarantees or binding corporate rules.",
+    "excerpt": "Personal data may be disclosed abroad if the Federal Council has decided that the legislation of the State concerned or the international body guarantees an adequate level of protection.",
+    "version": "2023-09-01",
+    "effective": "2023-09-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/491/en",
+    "tags": [
+      "transfer",
+      "residency",
+      "third-country",
+      "privacy"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "The list of States with adequate protection is set out in Annex 1 to the Data Protection Ordinance."
+  },
+  {
+    "id": "FADP:2023:Art22",
+    "regime": "FADP",
+    "doc": "Federal Act on Data Protection (FADP), SR 235.1",
+    "ref": "Art. 22",
+    "title": "Data protection impact assessment",
+    "summary": "Where processing is likely to result in a high risk to the data subject's personality or fundamental rights, the controller must carry out a data protection impact assessment beforehand, describing the processing, evaluating the risks and setting out protective measures.",
+    "excerpt": "If processing is likely to result in a high risk to the data subject's personality or fundamental rights, the controller shall carry out a data protection impact assessment beforehand.",
+    "version": "2023-09-01",
+    "effective": "2023-09-01",
+    "applies_to": [
+      "all",
+      "deployer"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/491/en",
+    "tags": [
+      "risk",
+      "assessment",
+      "privacy",
+      "documentation"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "High risk arises in particular for large-scale processing of sensitive personal data or systematic large-scale monitoring of public areas (Art. 22(2))."
+  },
+  {
+    "id": "FADP:2023:Art24",
+    "regime": "FADP",
+    "doc": "Federal Act on Data Protection (FADP), SR 235.1",
+    "ref": "Art. 24",
+    "title": "Notification of data security breaches",
+    "summary": "The controller must notify the Federal Data Protection and Information Commissioner as quickly as possible of any breach of data security likely to result in a high risk to the data subject, stating the nature, consequences and measures taken; processors must notify controllers.",
+    "excerpt": "The controller shall notify the FDPIC of any breach of data security that is likely to lead to a high risk to the data subject's personality or fundamental rights as quickly as possible.",
+    "version": "2023-09-01",
+    "effective": "2023-09-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/491/en",
+    "tags": [
+      "breach",
+      "notification",
+      "incident",
+      "privacy"
+    ],
+    "licence": "admin.ch",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the Fedlex English translation (version of 1 September 2023). Confirmed 2026-09-16: Art. 24(1) requires notification 'as quickly as possible' (so rasch als möglich) and sets no hour count — the GDPR's 72-hour deadline does not apply under the FADP."
+  }
+]

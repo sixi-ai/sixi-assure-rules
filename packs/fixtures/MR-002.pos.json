@@ -1,0 +1,54 @@
+{
+  "id": "arch_fx_mr_002_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture MR-002 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MR"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_plc",
+      "type": "edge_device",
+      "name": "PLC line 1",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant Basel",
+        "attestation": "tpm"
+      }
+    },
+    {
+      "id": "n_writer",
+      "type": "app",
+      "name": "Setpoint service",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "command_validation": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_writer_plc",
+      "from": "n_writer",
+      "to": "n_plc",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

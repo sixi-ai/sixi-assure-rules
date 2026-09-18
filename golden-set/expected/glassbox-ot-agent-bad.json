@@ -1,0 +1,151 @@
+[
+  {
+    "rule_id": "AI-001",
+    "ids": [
+      "e_agent_foundry"
+    ]
+  },
+  {
+    "rule_id": "AI-012",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "CRA-002",
+    "ids": [
+      "n_jetson_a",
+      "n_jetson_b"
+    ]
+  },
+  {
+    "rule_id": "DATA-004",
+    "ids": [
+      "n_sql"
+    ]
+  },
+  {
+    "rule_id": "GOV-002",
+    "ids": [
+      "arch_demo_glassbox_ot_agent_bad"
+    ]
+  },
+  {
+    "rule_id": "GXP-002",
+    "ids": [
+      "n_approval"
+    ]
+  },
+  {
+    "rule_id": "GXP-004",
+    "ids": [
+      "n_agent",
+      "n_sql"
+    ]
+  },
+  {
+    "rule_id": "LOG-002",
+    "ids": [
+      "n_appins"
+    ]
+  },
+  {
+    "rule_id": "LOG-004",
+    "ids": [
+      "e_agent_foundry"
+    ]
+  },
+  {
+    "rule_id": "MR-002",
+    "ids": [
+      "e_jetson_a_plc_b",
+      "e_jetson_plc_b"
+    ]
+  },
+  {
+    "rule_id": "MR-004",
+    "ids": [
+      "arch_demo_glassbox_ot_agent_bad"
+    ]
+  },
+  {
+    "rule_id": "NET-001",
+    "ids": [
+      "n_sql"
+    ]
+  },
+  {
+    "rule_id": "NET-002",
+    "ids": [
+      "e_agent_foundry"
+    ]
+  },
+  {
+    "rule_id": "NET-003",
+    "ids": [
+      "e_contractor_front",
+      "e_op_a_front",
+      "e_op_b_front",
+      "e_qa_front"
+    ]
+  },
+  {
+    "rule_id": "OT-001",
+    "ids": [
+      "n_agent",
+      "n_mcp"
+    ]
+  },
+  {
+    "rule_id": "OT-002",
+    "ids": [
+      "e_jetson_a_plc_b",
+      "e_jetson_plc_b"
+    ]
+  },
+  {
+    "rule_id": "OT-003",
+    "ids": [
+      "n_kv"
+    ]
+  },
+  {
+    "rule_id": "OT-004",
+    "ids": [
+      "e_jetson_a_plc_b"
+    ]
+  },
+  {
+    "rule_id": "OT-005",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "OT-006",
+    "ids": [
+      "n_approval"
+    ]
+  },
+  {
+    "rule_id": "OT-007",
+    "ids": [
+      "n_sql"
+    ]
+  },
+  {
+    "rule_id": "STR-005",
+    "ids": [
+      "e_agent_mcp"
+    ]
+  },
+  {
+    "rule_id": "ZT-009",
+    "ids": [
+      "e_contractor_front",
+      "e_op_a_front",
+      "e_op_b_front",
+      "e_qa_front"
+    ]
+  }
+]

@@ -1,0 +1,77 @@
+{
+  "id": "arch_fx_mr_003_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture MR-003 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MR"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_gw",
+      "type": "edge_gateway",
+      "name": "Robot cell controller",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant Basel",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true
+      }
+    },
+    {
+      "id": "n_guard",
+      "type": "edge_model",
+      "name": "Person-detection guard (learns on site)",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "hosted_on": "n_gw",
+        "safety_function": true,
+        "self_evolving": true,
+        "conformity_route": "module_b_c"
+      }
+    },
+    {
+      "id": "n_log",
+      "type": "log_sink",
+      "name": "Safety decision log",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 90
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_gw_guard",
+      "from": "n_gw",
+      "to": "n_guard",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_guard_log",
+      "from": "n_guard",
+      "to": "n_log",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

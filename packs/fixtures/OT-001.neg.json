@@ -1,0 +1,142 @@
+{
+  "id": "arch_fx_ot_001_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-001 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "CRA",
+      "NIS2",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited",
+    "incident_reporting": "Plant CSIRT within 24 h (NIS2 Art. 23); CRA Art. 14 via the PSIRT."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_ag",
+      "type": "agent",
+      "name": "Assistant",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Proposes machine commands",
+        "owner": "Fixture owner",
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_brk",
+      "type": "app",
+      "name": "Command broker",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_hub",
+      "type": "broker",
+      "name": "IoT Hub",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_val",
+      "type": "app",
+      "name": "Command validator",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "command_validation": true
+      }
+    },
+    {
+      "id": "n_plc",
+      "type": "edge_device",
+      "name": "PLC",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      }
+    },
+    {
+      "id": "n_appr",
+      "type": "human_step",
+      "name": "Approval",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "approver",
+        "approval_identity": "separate"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_ag_appr",
+      "from": "n_ag",
+      "to": "n_appr",
+      "kind": "executes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_appr_brk",
+      "from": "n_appr",
+      "to": "n_brk",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_brk_hub",
+      "from": "n_brk",
+      "to": "n_hub",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_hub_val",
+      "from": "n_hub",
+      "to": "n_val",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e_val_plc",
+      "from": "n_val",
+      "to": "n_plc",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {
+        "consequence": "high"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

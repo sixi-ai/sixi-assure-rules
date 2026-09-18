@@ -1,0 +1,615 @@
+[
+  {
+    "id": "DORA:2022/2554:Art5",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 5",
+    "title": "Governance and organisation",
+    "summary": "The management body of a financial entity defines, approves, oversees and is accountable for the ICT risk management framework, including roles for ICT functions, digital operational resilience strategy and appropriate budget.",
+    "excerpt": "Financial entities shall have in place an internal governance and control framework that ensures an effective and prudent management of ICT risk, in accordance with Article 6(4), in order to achieve a high level of digital operational resilience.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "finma_supervised",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "governance",
+      "accountability",
+      "ict-risk",
+      "oversight"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF obtained from the EU Publications Office (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art6",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 6",
+    "title": "ICT risk management framework",
+    "summary": "Requires a sound, comprehensive and documented ICT risk management framework as part of the overall risk management system, reviewed at least yearly and audited periodically by ICT-competent auditors.",
+    "excerpt": "Financial entities shall have a sound, comprehensive and well-documented ICT risk management framework as part of their overall risk management system, which enables them to address ICT risk quickly, efficiently and comprehensively and to ensure a high level of digital operational resilience.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "ict-risk",
+      "framework",
+      "governance",
+      "audit"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art8",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 8",
+    "title": "Identification",
+    "summary": "Financial entities must identify, classify and document all ICT-supported business functions, roles, information assets and ICT assets and their dependencies, and review that classification at least yearly.",
+    "excerpt": "As part of the ICT risk management framework referred to in Article 6(1), financial entities shall identify, classify and adequately document all ICT supported business functions, roles and responsibilities, the information assets and ICT assets supporting those functions, and their roles and dependencies in relation to ICT risk.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "inventory",
+      "classification",
+      "assets",
+      "dependencies"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554). Confirmed 2026-09-16: this is the identification article the typed graph evidences directly (assets, dependencies, ICT-supported functions)."
+  },
+  {
+    "id": "DORA:2022/2554:Art9",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 9",
+    "title": "Protection and prevention",
+    "summary": "Financial entities must continuously monitor and control the security and functioning of ICT systems and implement security policies, procedures, protocols and tools that maintain availability, authenticity, integrity and confidentiality of data at rest, in use and in transit.",
+    "excerpt": "Financial entities shall design, procure and implement ICT security policies, procedures, protocols and tools that aim to ensure the resilience, continuity and availability of ICT systems, in particular for those supporting critical or important functions, and to maintain high standards of availability, authenticity, integrity and confidentiality of data, whether at rest, in use or in transit.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "encryption",
+      "protection",
+      "integrity",
+      "confidentiality"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art11",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 11",
+    "title": "Response and recovery",
+    "summary": "Requires a comprehensive ICT business continuity policy with response and recovery plans, regularly tested, so that critical or important functions can continue or be restored after ICT-related incidents.",
+    "excerpt": "As part of the ICT risk management framework referred to in Article 6(1) and based on the identification requirements set out in Article 8, financial entities shall put in place a comprehensive ICT business continuity policy, which may be adopted as a dedicated specific policy, forming an integral part of the overall business continuity policy of the financial entity.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "continuity",
+      "recovery",
+      "resilience",
+      "testing"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art11-12",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 11 and 12",
+    "title": "ICT business continuity, backup and restoration",
+    "summary": "Read together, these Articles require an ICT business continuity policy with response and recovery plans and documented backup, restoration and recovery procedures with redundant capacity sufficient for critical or important functions.",
+    "excerpt": "",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all",
+      "critical_infrastructure"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "continuity",
+      "backup",
+      "recovery",
+      "resilience"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Composite reference used by rule packs; the underlying Articles 11 and 12 are recorded separately."
+  },
+  {
+    "id": "DORA:2022/2554:Art12",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 12",
+    "title": "Backup policies and procedures, restoration and recovery procedures and methods",
+    "summary": "Financial entities must develop and document backup policies specifying scope and minimum frequency based on criticality, plus restoration and recovery procedures; backup systems must be logically and physically segregated from source systems.",
+    "excerpt": "For the purpose of ensuring the restoration of ICT systems and data with minimum downtime, limited disruption and loss, as part of their ICT risk management framework, financial entities shall develop and document: (a) backup policies and procedures … (b) restoration and recovery procedures and methods.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "backup",
+      "restoration",
+      "recovery",
+      "segregation"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554). Paragraph-level records added 2026-09-16 for 12(3) segregated restoration systems, 12(4) redundant ICT capacities and 12(5) the CSD secondary processing site."
+  },
+  {
+    "id": "DORA:2022/2554:Art17",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 17",
+    "title": "ICT-related incident management process",
+    "summary": "Requires a defined ICT-related incident management process to detect, manage and notify incidents, with recording of all incidents and significant cyber threats and root-cause analysis.",
+    "excerpt": "Financial entities shall define, establish and implement an ICT-related incident management process to detect, manage and notify ICT-related incidents.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "incident",
+      "detection",
+      "monitoring",
+      "root-cause"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art19",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 19",
+    "title": "Reporting of major ICT-related incidents and voluntary notification of significant cyber threats",
+    "summary": "Financial entities must report major ICT-related incidents to the relevant competent authority using initial, intermediate and final reports within the deadlines set by the Regulation and its technical standards, and may voluntarily notify significant cyber threats.",
+    "excerpt": "Financial entities shall report major ICT-related incidents to the relevant competent authority as referred to in Article 46 in accordance with paragraph 4 of this Article.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "incident",
+      "reporting",
+      "supervisor",
+      "notification"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art24",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 24",
+    "title": "General requirements for the performance of digital operational resilience testing",
+    "summary": "Financial entities other than microenterprises must establish, maintain and review a risk-based digital operational resilience testing programme as an integral part of the ICT risk management framework, executed by independent parties.",
+    "excerpt": "For the purpose of assessing preparedness for handling ICT-related incidents, of identifying weaknesses, deficiencies and gaps in digital operational resilience, and of promptly implementing corrective measures, financial entities … shall establish, maintain and review a sound and comprehensive digital operational resilience testing programme …",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "testing",
+      "resilience",
+      "assurance",
+      "programme"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art25",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 25",
+    "title": "Testing of ICT tools and systems",
+    "summary": "The testing programme must provide for appropriate tests such as vulnerability assessments and scans, network security assessments, gap analyses, source code reviews where feasible, scenario-based, compatibility, performance, end-to-end and penetration testing.",
+    "excerpt": "The digital operational resilience testing programme referred to in Article 24 shall provide … for the execution of appropriate tests, such as vulnerability assessments and scans, open source analyses, network security assessments, gap analyses, physical security reviews, questionnaires and scanning software solutions, source code reviews where feasible …",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "testing",
+      "vulnerability",
+      "assurance",
+      "penetration-testing"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art26",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 26",
+    "title": "Advanced testing of ICT tools, systems and processes based on TLPT",
+    "summary": "Identified financial entities must carry out threat-led penetration testing at least every three years, covering several or all critical or important functions and performed on live production systems.",
+    "excerpt": "Financial entities, other than entities referred to in Article 16(1), first subparagraph, and other than microenterprises, which are identified in accordance with paragraph 8, third subparagraph, of this Article, shall carry out at least every 3 years advanced testing by means of TLPT.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "testing",
+      "tlpt",
+      "red-team-scope",
+      "assurance"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Recorded as a design-time reference only; Sixi Assure does not perform penetration or threat-led testing."
+  },
+  {
+    "id": "DORA:2022/2554:Art24-26",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 24 to 26",
+    "title": "Digital operational resilience testing programme",
+    "summary": "Read together, these Articles require a risk-based testing programme, a defined set of tests of ICT tools and systems, and threat-led penetration testing at least every three years for identified entities.",
+    "excerpt": "",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "testing",
+      "resilience",
+      "assurance",
+      "programme"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Composite reference used by rule packs; the underlying Articles 24, 25 and 26 are recorded separately."
+  },
+  {
+    "id": "DORA:2022/2554:Art28",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 28",
+    "title": "General principles for the management of ICT third-party risk",
+    "summary": "Financial entities remain fully responsible for compliance when using ICT third-party service providers, must manage third-party risk within the ICT risk management framework, adopt a strategy on third-party risk and assess concentration risk before contracting.",
+    "excerpt": "Financial entities shall manage ICT third-party risk as an integral component of ICT risk within their ICT risk management framework as referred to in Article 6(1) …",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all",
+      "third_party"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "third-party",
+      "outsourcing",
+      "concentration",
+      "due-diligence"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art28(3)",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 28(3)",
+    "title": "Register of information on contractual arrangements",
+    "summary": "Financial entities must maintain and update, at entity, sub-consolidated and consolidated level, a register of information on all contractual arrangements for the use of ICT services, distinguishing those that support critical or important functions.",
+    "excerpt": "As part of their ICT risk management framework, financial entities shall maintain and update at entity level, and at sub-consolidated and consolidated levels, a register of information in relation to all contractual arrangements on the use of ICT services provided by ICT third-party service providers.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all",
+      "third_party"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "register",
+      "third-party",
+      "inventory",
+      "evidence"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554). Cycle facts (2026-09-16): the register template is Implementing Regulation (EU) 2024/2956; the ESAs' Joint Decision ESA 2024 22 of 8 November 2024 sets the 2026 reference date at 31 December 2025 with competent-authority submission to the ESAs by 31 March 2026. There is no single EU-wide entity-to-authority deadline — Art. 28(3) leaves that to each national competent authority."
+  },
+  {
+    "id": "DORA:2022/2554:Art28(8)",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 28(8)",
+    "title": "Exit strategies for ICT services supporting critical or important functions",
+    "summary": "For ICT services supporting critical or important functions, financial entities must put in place exit strategies allowing them to leave the arrangement without disrupting business, breaching regulatory requirements or harming service continuity and quality.",
+    "excerpt": "For ICT services supporting critical or important functions, financial entities shall put in place exit strategies. … Financial entities shall ensure that they are able to exit contractual arrangements without: (a) disruption to their business activities, (b) limiting compliance with regulatory requirements, (c) detriment to the continuity and quality of services provided to clients.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all",
+      "third_party"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "exit",
+      "third-party",
+      "continuity",
+      "portability"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554). Correction 2026-09-16: do not read a subcontracting-chain monitoring duty into this article. The ESAs' draft provision on monitoring the subcontracting chain was removed before Delegated Regulation (EU) 2025/532 was adopted, and the final RTS covers only the elements a financial entity determines and assesses when subcontracting."
+  },
+  {
+    "id": "DORA-RTS:2024/1774:Art6",
+    "regime": "DORA",
+    "doc": "Commission Delegated Regulation (EU) 2024/1774 (RTS on ICT risk management tools, methods, processes and policies)",
+    "ref": "Art. 6",
+    "title": "Encryption and cryptographic controls",
+    "summary": "Financial entities must develop, document and implement a policy on encryption and cryptographic controls, based on data classification and ICT risk assessment, covering encryption of data at rest, in transit and, where necessary, in use.",
+    "excerpt": "As part of their ICT security policies, procedures, protocols, and tools referred to in Article 9(2) of Regulation (EU) 2022/2554, financial entities shall develop, document, and implement a policy on encryption and cryptographic controls.",
+    "version": "2024-06-25",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj",
+    "tags": [
+      "encryption",
+      "cryptography",
+      "data-classification",
+      "keys"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Adopted 13 March 2024, published 25 June 2024, in force 20 days later; applies alongside Regulation (EU) 2022/2554 from 17 January 2025."
+  },
+  {
+    "id": "DORA-RTS:2024/1774:Art12",
+    "regime": "DORA",
+    "doc": "Commission Delegated Regulation (EU) 2024/1774 (RTS on ICT risk management tools, methods, processes and policies)",
+    "ref": "Art. 12",
+    "title": "Logging",
+    "summary": "Financial entities must develop, document and implement logging procedures, protocols and tools that define which events are logged, the retention period and how log data is secured, covering at least access control and identity management, capacity and change management and ICT operations.",
+    "excerpt": "Financial entities shall, as part of the safeguards against intrusions and data misuse, develop, document, and implement logging procedures, protocols and tools.",
+    "version": "2024-06-25",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj",
+    "tags": [
+      "logging",
+      "retention",
+      "identity",
+      "monitoring"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32024R1774)."
+  },
+  {
+    "id": "DORA:2022/2554:Art12(3)",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 12(3)",
+    "title": "Restoration from backup on segregated ICT systems",
+    "summary": "When restoring backup data with their own systems, financial entities must use ICT systems that are physically and logically segregated from the source system, protected from unauthorised access and corruption, and able to restore services in time.",
+    "excerpt": "When restoring backup data using own systems, financial entities shall use ICT systems that are physically and logically segregated from the source ICT system.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all",
+      "finma_supervised"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "backup",
+      "restoration",
+      "segregation",
+      "resilience"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2554). Split out of DORA:2022/2554:Art12 because segregation of the restore path is a drawable property."
+  },
+  {
+    "id": "DORA:2022/2554:Art12(4)",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 12(4)",
+    "title": "Redundant ICT capacities",
+    "summary": "Financial entities other than microenterprises must maintain redundant ICT capacities with resources, capabilities and functions adequate to business needs; microenterprises assess the need on their risk profile.",
+    "excerpt": "Financial entities, other than microenterprises, shall maintain redundant ICT capacities equipped with resources, capabilities and functions that are adequate to ensure business needs.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all",
+      "finma_supervised"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "redundancy",
+      "resilience",
+      "continuity",
+      "capacity"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2554)."
+  },
+  {
+    "id": "DORA:2022/2554:Art12(5)",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 12(5)",
+    "title": "Secondary processing site for central securities depositories",
+    "summary": "Central securities depositories must maintain at least one secondary processing site with adequate resources, capabilities, functions and staffing, located at a geographical distance from the primary site that gives it a distinct risk profile.",
+    "excerpt": "Central securities depositories shall maintain at least one secondary processing site endowed with adequate resources, capabilities, functions and staffing arrangements to ensure business needs.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "secondary-site",
+      "resilience",
+      "region",
+      "continuity"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2554). Applies to central securities depositories only; the drawing evidences the second region, not the staffing arrangements."
+  },
+  {
+    "id": "DORA:2022/2554:Art29",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 29",
+    "title": "Preliminary assessment of ICT concentration risk at entity level",
+    "summary": "Before contracting ICT services that support critical or important functions, a financial entity must consider whether the arrangement means contracting a provider that is not easily substitutable, or holding multiple such arrangements with the same or closely connected providers, and must weigh the benefits and costs of alternatives.",
+    "excerpt": "(a) contracting an ICT third-party service provider that is not easily substitutable; or (b) having in place multiple contractual arrangements in relation to the provision of ICT services supporting critical or important functions with the same ICT third-party service provider or with closely connected ICT third-party service providers.",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all",
+      "third_party",
+      "finma_supervised"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "concentration",
+      "third-party",
+      "substitutability",
+      "dependencies"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2554). Countable from the graph: how many distinct critical or important functions depend on one provider node. The substitutability judgement itself stays with the entity."
+  },
+  {
+    "id": "DORA:2022/2554:Art30(2)(b)",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 30(2)(b)",
+    "title": "Contractual arrangements — locations of provision, processing and storage",
+    "summary": "Every contractual arrangement for ICT services must state the regions or countries where the contracted or subcontracted functions and services are provided and where data is processed, including the storage location, and require advance notice of a change of location.",
+    "excerpt": "the locations, namely the regions or countries, where the contracted or subcontracted functions and ICT services are to be provided and where data is to be processed, including the storage location, and the requirement for the ICT third-party service provider to notify the financial entity in advance if it envisages changing such locations",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all",
+      "third_party"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "region",
+      "data-location",
+      "third-party",
+      "contract"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32022R2554). The only element of Art. 30(2) whose facts live in the drawing (region per node); the rest of the contract is not architecture."
+  },
+  {
+    "id": "DORA-RTS:2025/532:Art3",
+    "regime": "DORA",
+    "doc": "Commission Delegated Regulation (EU) 2025/532 (RTS on ICT subcontracting)",
+    "ref": "Art. 3",
+    "title": "Due diligence and risk assessment on the use of subcontractors",
+    "summary": "Before contracting, the financial entity decides whether the ICT third-party service provider may subcontract an ICT service supporting a critical or important function, and may only contract where the provider can select and assess its subcontractors and can identify all subcontractors that provide such services.",
+    "excerpt": "A financial entity shall, before entering into a contractual arrangement with an ICT third-party service provider, decide whether that ICT third-party service provider may subcontract an ICT service that supports critical or important functions or material parts thereof.",
+    "version": "2025-07-02",
+    "effective": "2025-07-22",
+    "applies_to": [
+      "all",
+      "third_party"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg_del/2025/532/oj",
+    "tags": [
+      "subcontracting",
+      "third-party",
+      "due-diligence",
+      "critical-function"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (Commission Delegated Regulation (EU) 2025/532, OJ L, 2025/532, 2.7.2025). In force on the twentieth day after publication (22 July 2025). The RTS covers the elements a financial entity determines and assesses when subcontracting; the draft provision on monitoring the whole subcontracting chain was removed before adoption, so no chain-mapping duty may be implied."
+  },
+  {
+    "id": "DORA-RTS:2025/532:Art4",
+    "regime": "DORA",
+    "doc": "Commission Delegated Regulation (EU) 2025/532 (RTS on ICT subcontracting)",
+    "ref": "Art. 4",
+    "title": "Conditions for subcontracting ICT services supporting critical or important functions",
+    "summary": "The contract must identify which ICT services supporting critical or important functions may be subcontracted and on what conditions, keep the provider responsible for subcontracted services, and require it to monitor and report on them.",
+    "excerpt": "The contractual arrangement concluded between the financial entity and the ICT third-party service provider shall identify which ICT services that support critical or important functions or material parts thereof are eligible for subcontracting and under which conditions.",
+    "version": "2025-07-02",
+    "effective": "2025-07-22",
+    "applies_to": [
+      "all",
+      "third_party"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg_del/2025/532/oj",
+    "tags": [
+      "subcontracting",
+      "third-party",
+      "contract",
+      "monitoring"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (Commission Delegated Regulation (EU) 2025/532, OJ L, 2025/532, 2.7.2025)."
+  }
+]

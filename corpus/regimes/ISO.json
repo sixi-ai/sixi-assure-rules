@@ -1,0 +1,555 @@
+[
+  {
+    "id": "ISO:27001:A.5.15",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.5.15",
+    "title": "Access control",
+    "summary": "Annex A control requiring rules to control physical and logical access to information and other associated assets, established and implemented based on business and information security requirements.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "access-control",
+      "identity",
+      "authorisation",
+      "isms"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "iso.org returned HTTP 403 from this environment on 2026-09-10, so the control title and the standard's publication date could not be verified against an official source. ISO/IEC text is copyright-protected and is never reproduced in this corpus; only the clause number and a paraphrase are stored. Checked 2026-09-16: the only amendment to ISO/IEC 27001:2022 is Amd 1:2024 (climate action changes, February 2024); there is no climate amendment to ISO/IEC 27002:2022.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.15",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.15",
+    "title": "Logging",
+    "summary": "Annex A control requiring logs that record activities, exceptions, faults and other relevant events to be produced, stored, protected and analysed.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "logging",
+      "monitoring",
+      "evidence",
+      "isms"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 on 2026-09-10. Clause number and paraphrase only; ISO/IEC text is not reproduced. Checked 2026-09-16: the only amendment to ISO/IEC 27001:2022 is Amd 1:2024 (climate action changes, February 2024); there is no climate amendment to ISO/IEC 27002:2022.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.16",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.16",
+    "title": "Monitoring activities",
+    "summary": "Annex A control requiring networks, systems and applications to be monitored for anomalous behaviour and appropriate action taken to evaluate potential incidents.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "monitoring",
+      "detection",
+      "anomaly",
+      "isms"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 on 2026-09-10. Clause number and paraphrase only; ISO/IEC text is not reproduced. Checked 2026-09-16: the only amendment to ISO/IEC 27001:2022 is Amd 1:2024 (climate action changes, February 2024); there is no climate amendment to ISO/IEC 27002:2022.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.24",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.24",
+    "title": "Use of cryptography",
+    "summary": "Annex A control requiring rules for the effective use of cryptography, including cryptographic key management, to be defined and implemented.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "encryption",
+      "cryptography",
+      "keys",
+      "isms"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 on 2026-09-10. Clause number and paraphrase only; ISO/IEC text is not reproduced. Checked 2026-09-16: the only amendment to ISO/IEC 27001:2022 is Amd 1:2024 (climate action changes, February 2024); there is no climate amendment to ISO/IEC 27002:2022.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.5.30",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.5.30",
+    "title": "ICT readiness for business continuity",
+    "summary": "Annex A control requiring ICT readiness to be planned, implemented, maintained and tested based on business continuity objectives and ICT continuity requirements.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "continuity",
+      "recovery",
+      "testing",
+      "isms"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 on 2026-09-10. Clause number and paraphrase only; ISO/IEC text is not reproduced. Checked 2026-09-16: the only amendment to ISO/IEC 27001:2022 is Amd 1:2024 (climate action changes, February 2024); there is no climate amendment to ISO/IEC 27002:2022.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:42001:A.3.2",
+    "regime": "ISO",
+    "doc": "ISO/IEC 42001:2023, Annex A",
+    "ref": "A.3.2",
+    "title": "AI roles and responsibilities",
+    "summary": "Annex A control on the internal organisation of an AI management system, requiring roles and responsibilities for AI to be defined and allocated within the organisation.",
+    "excerpt": "",
+    "version": "2023-12-18",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/81230.html",
+    "tags": [
+      "governance",
+      "roles",
+      "accountability",
+      "aims"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 on 2026-09-10; the control title and the standard's publication date could not be confirmed against an official source. ISO/IEC text is not reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:42001:A.6.2.4",
+    "regime": "ISO",
+    "doc": "ISO/IEC 42001:2023, Annex A",
+    "ref": "A.6.2.4",
+    "title": "AI system verification and validation",
+    "summary": "Annex A control in the AI system life cycle group requiring verification and validation measures for AI systems, with criteria and results documented.",
+    "excerpt": "",
+    "version": "2023-12-18",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/81230.html",
+    "tags": [
+      "testing",
+      "validation",
+      "evaluation",
+      "aims"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 on 2026-09-10. Clause number and paraphrase only; ISO/IEC text is not reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:42001:A.9.4",
+    "regime": "ISO",
+    "doc": "ISO/IEC 42001:2023, Annex A",
+    "ref": "A.9.4",
+    "title": "Intended use of the AI system",
+    "summary": "Annex A control in the group on use of AI systems, requiring the organisation to ensure that an AI system is used in accordance with its intended use and documented conditions of use.",
+    "excerpt": "",
+    "version": "2023-12-18",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/81230.html",
+    "tags": [
+      "intended-use",
+      "controls",
+      "operations",
+      "aims"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 on 2026-09-10. Clause number and paraphrase only; ISO/IEC text is not reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.22",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.22",
+    "title": "Segregation of networks",
+    "summary": "Groups of information services, users and information systems should be segregated in the organisation's networks. This is the strongest single design-time control: zones, trust boundaries and every flow that crosses one are drawn facts.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "segmentation",
+      "network",
+      "zones",
+      "boundary"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.27",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.27",
+    "title": "Secure system architecture and engineering principles",
+    "summary": "Principles for engineering secure systems should be established, documented, maintained and applied to information system development. A structured architecture assessment is direct evidence for this control.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "architecture",
+      "secure-design",
+      "engineering",
+      "principles"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.20",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.20",
+    "title": "Networks security",
+    "summary": "Networks and network devices should be secured, managed and controlled to protect information in systems and applications. The drawing evidences protocol and encryption per flow and the exposure of each application or API node.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "network",
+      "encryption",
+      "exposure",
+      "protocol"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.21",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.21",
+    "title": "Security of network services",
+    "summary": "Security mechanisms, service levels and requirements of network services should be identified, implemented and monitored. Gateway, WAF and egress-policy placement are the drawn evidence.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "network",
+      "gateway",
+      "egress",
+      "services"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.31",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.31",
+    "title": "Separation of development, test and production environments",
+    "summary": "Development, testing and production environments should be separated and secured. Environment boundaries drawn as zones are the evidence.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "environments",
+      "segmentation",
+      "zones",
+      "separation"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.2",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.2",
+    "title": "Privileged access rights",
+    "summary": "The allocation and use of privileged access rights should be restricted and managed. Administrative paths, bastion or jump nodes and the authentication declared on admin flows are the drawn evidence.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "privileged-access",
+      "identity",
+      "admin",
+      "access-control"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.11",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.11",
+    "title": "Data masking",
+    "summary": "Data masking should be used in accordance with the topic-specific policy on access control and business requirements, taking applicable legislation into account. A redaction or masking component on a data path is the drawn evidence.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "masking",
+      "redaction",
+      "privacy",
+      "data"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.8.12",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.8.12",
+    "title": "Data leakage prevention",
+    "summary": "Data leakage prevention measures should be applied to systems, networks and devices that process, store or transmit sensitive information. Egress paths, egress policy and the reach of an agent's tools are the drawn evidence.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "dlp",
+      "egress",
+      "exfiltration",
+      "data"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.5.23",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.5.23",
+    "title": "Information security for use of cloud services",
+    "summary": "Processes for acquisition, use, management and exit from cloud services should be established in line with the organisation's information security requirements. SaaS, model-endpoint and cloud nodes with a declared region are the drawn evidence.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "cloud",
+      "third-party",
+      "region",
+      "exit"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.5.19",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.5.19",
+    "title": "Information security in supplier relationships",
+    "summary": "Processes and procedures should be defined and implemented to manage the information security risks associated with the use of suppliers' products or services. Third-party nodes with declared origin and vetting status are the drawn evidence.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "supplier",
+      "third-party",
+      "vendor",
+      "risk"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.5.21",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.5.21",
+    "title": "Managing information security in the ICT supply chain",
+    "summary": "Processes and procedures should be defined and implemented to manage the information security risks associated with the ICT products and services supply chain. Component provenance, pinning or signing and an SBOM reference are the drawn evidence.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "supply-chain",
+      "provenance",
+      "sbom",
+      "integrity"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Control number and title recorded from the Annex A control list reproduced in docs/research/03 §7.4 [7] (secondary); the summary is ours and ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:42005:2025",
+    "regime": "ISO",
+    "doc": "ISO/IEC 42005:2025",
+    "ref": "ISO/IEC 42005:2025",
+    "title": "Information technology — Artificial intelligence (AI) — AI system impact assessment",
+    "summary": "Gives the AI system impact assessment a standard shape and is the natural companion to the fundamental rights impact assessment of AI Act Art. 27. A drawing pre-fills the structural inputs; the assessment's findings are never a tool output.",
+    "excerpt": "",
+    "version": "2025-01-01",
+    "effective": "",
+    "applies_to": [
+      "all",
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://www.iso.org/search.html?q=42005",
+    "tags": [
+      "impact-assessment",
+      "ai",
+      "governance",
+      "fria"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Designation and title from the ISO search index (this record's source_url) as recorded in docs/research/03 §7.1 [1]; the publication month could not be sourced, so version records the year only as 2025-01-01. ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:42006:2025",
+    "regime": "ISO",
+    "doc": "ISO/IEC 42006:2025",
+    "ref": "ISO/IEC 42006:2025",
+    "title": "Information technology — Artificial intelligence — Requirements for bodies providing audit and certification of artificial intelligence management systems",
+    "summary": "Adds requirements to ISO/IEC 17021-1 for the bodies that audit an AI management system under ISO/IEC 42001. Relevant as context for a buyer's assurance programme; Sixi Assure never claims or replaces such an audit.",
+    "excerpt": "",
+    "version": "2025-01-01",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/search.html?q=42006",
+    "tags": [
+      "audit",
+      "accreditation",
+      "aims",
+      "governance"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. Designation and title from the ISO search index (this record's source_url) as recorded in docs/research/03 §7.1 [1][2]; the publication month could not be sourced, so version records the year only as 2025-01-01. Note also that the International Accreditation Forum ceased operations on 1 January 2026 and was replaced by Global ACI, so IAF MD documents and the IAF MLA must no longer be cited.",
+    "redacted": "licence"
+  },
+  {
+    "id": "ISO:27017:2026",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27017:2026",
+    "ref": "ISO/IEC 27017:2026",
+    "title": "Information security controls for cloud services",
+    "summary": "The revised cloud-services control set, giving cloud-specific guidance alongside ISO/IEC 27002. Useful beside a finding about a SaaS, model-endpoint or cloud node.",
+    "excerpt": "",
+    "version": "2026-01-01",
+    "effective": "",
+    "applies_to": [
+      "all",
+      "third_party"
+    ],
+    "source_url": "https://www.iso.org/search.html?q=27017",
+    "tags": [
+      "cloud",
+      "controls",
+      "third-party",
+      "security"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. The 2026 revision was seen in ISO's search index (docs/research/03 §7.3 [1]); the exact title, publication month and stage code could not be read, so the short title is ours and version records the year only. ISO/IEC text is never reproduced.",
+    "redacted": "licence"
+  }
+]

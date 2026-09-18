@@ -1,0 +1,470 @@
+[
+  {
+    "id": "MR:2023/1230:Art3(16)",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Art. 3(16)",
+    "title": "Definition of substantial modification",
+    "summary": "A modification after placing on the market or putting into service, by physical or digital means, that the manufacturer did not foresee and that affects safety by creating a new hazard or increasing a risk so that new guards, protective devices in the safety control system or stability measures are needed.",
+    "excerpt": "‘substantial modification’ means a modification of machinery or a related product, by physical or digital means after that machinery or related product has been placed on the market or put into service, which is not foreseen or planned by the manufacturer, and which affects the safety of that machinery or related product, by creating a new hazard, or by increasing an existing risk, which requires:",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "substantial-modification",
+      "definitions",
+      "lifecycle",
+      "safety"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:Art8",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation), as amended by Regulation (EU) 2026/1744",
+    "ref": "Art. 8",
+    "title": "Essential health and safety requirements",
+    "summary": "Machinery and related products may only be made available or put into service if they meet the essential health and safety requirements of Annex III. Regulation (EU) 2026/1744 obliges the Commission to add requirements for high-risk AI systems that are safety components of machinery to Annex III by delegated acts applying by 2 August 2028.",
+    "excerpt": "Machinery or related products shall only be made available on the market or put into service if, where properly installed and maintained and used for their intended use or under conditions which can reasonably be foreseen, they meet the essential health and safety requirements set out in Annex III.",
+    "version": "2026-07-24",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "essential-requirements",
+      "ai-systems",
+      "high-risk",
+      "safety"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 including the text inserted by Regulation (EU) 2026/1744 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:Art10",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Art. 10",
+    "title": "Obligations of manufacturers of machinery and related products",
+    "summary": "Manufacturers design and construct to Annex III, draw up the Annex IV technical documentation, run the Article 25 conformity assessment, issue the EU declaration of conformity and CE marking, keep the documentation for 10 years and, on reasoned request, give authorities the source code or programming logic needed to check the requirements.",
+    "excerpt": "Where relevant, the source code or the programming logic included in the technical documentation shall, upon a reasoned request, be made available to the competent national authorities, if that source code or programming logic is necessary in order for them to be able to check compliance with the essential health and safety requirements set out in Annex III.",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "manufacturer",
+      "technical-documentation",
+      "conformity-assessment",
+      "source-code"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:Art18",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Art. 18",
+    "title": "Other cases in which obligations of manufacturers apply",
+    "summary": "Whoever carries out a substantial modification of machinery is treated as its manufacturer for the affected machinery, takes on the Article 10 obligations, declares conformity on its own responsibility and applies the Article 25 conformity assessment; a non-professional user modifying for own use is exempt.",
+    "excerpt": "A natural or legal person that carries out a substantial modification of machinery or a related product shall be considered to be a manufacturer for the purposes of this Regulation and shall be subject to the obligations of the manufacturer set out in Article 10 for that machinery or related product",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "substantial-modification",
+      "manufacturer",
+      "integrator",
+      "lifecycle"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:Art20(9)",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Art. 20(9)",
+    "title": "Presumption of conformity through cybersecurity schemes",
+    "summary": "Machinery assessed under a European cybersecurity scheme adopted under Regulation (EU) 2019/881, with the scheme's statement of conformity or its higher-assurance equivalent, is presumed to meet Annex III sections 1.1.9 (protection against corruption) and 1.2.1 (safety and reliability of control systems) as far as the scheme covers them.",
+    "excerpt": "shall be presumed to be in conformity with the essential health and safety requirements set out in Annex III, sections 1.1.9 and 1.2.1, as regards protection against corruption and safety and reliability of control systems insofar as those requirements are covered by the cybersecurity certificate or statement of conformity or parts thereof.",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "cybersecurity",
+      "presumption",
+      "control-systems",
+      "corruption"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:Art20(10)",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation), as amended by Regulation (EU) 2026/1744",
+    "ref": "Art. 20(10)",
+    "title": "Presumption of conformity for high-risk AI systems",
+    "summary": "Until harmonised standards or common specifications exist under this Regulation for high-risk AI systems, such systems that follow the harmonised standards or common specifications of the AI Act (Articles 40 and 41) are presumed to meet the Annex III requirements for high-risk AI systems. Inserted by Regulation (EU) 2026/1744.",
+    "excerpt": "high-risk AI systems within the scope of this Regulation which comply with the relevant harmonised standards referenced, or common specifications adopted pursuant to Articles 40 and, respectively, 41 of Regulation (EU) 2024/1689 shall be presumed to be in conformity with the essential health and safety requirements set out in Annex III to this Regulation as regards high-risk AI systems.",
+    "version": "2026-07-24",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "ai-systems",
+      "presumption",
+      "standards",
+      "high-risk"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 including the text inserted by Regulation (EU) 2026/1744 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:Art25(2)",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Art. 25(2)",
+    "title": "Conformity assessment for Annex I Part A machinery",
+    "summary": "Machinery in Annex I Part A needs a notified body: EU type-examination (module B) followed by conformity to type (module C), full quality assurance (module H) or unit verification (module G). Internal production control alone is not available.",
+    "excerpt": "Where the category of machinery or related product is listed in Annex I, Part A, the manufacturer or the natural or legal person referred to in Article 18 shall apply one of the following procedures: (a) EU type-examination (module B) set out in Annex VII, followed by conformity to type based on internal production control (module C) set out in Annex VIII;",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "conformity-assessment",
+      "notified-body",
+      "annex-i",
+      "modules"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:Art25(4)",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Art. 25(4)",
+    "title": "Conformity assessment for machinery not listed in Annex I",
+    "summary": "Machinery not listed in Annex I is assessed by the manufacturer, or by whoever substantially modifies it, under internal production control (module A).",
+    "excerpt": "Where the category of machinery or related product is not listed in Annex I, the manufacturer, including a natural or legal person referred to in Article 18, shall apply the internal production control procedure (module A) set out in Annex VI.",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "conformity-assessment",
+      "internal-control",
+      "module-a",
+      "manufacturer"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:Art54",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Art. 54",
+    "title": "Entry into force and application",
+    "summary": "In force since 19 July 2023 and applicable from 20 January 2027 (dates as corrected by the corrigendum of 4 July 2023); the notified-body provisions (Articles 26 to 42) apply from 20 January 2024 and Article 50(1) from 20 October 2026.",
+    "excerpt": "It shall apply from 20 January 2027. However, the following Articles shall apply from the following dates: (a) Articles 26 to 42 from 20 January 2024; (b) Article 50(1) from 20 October 2026;",
+    "version": "2023-06-29",
+    "effective": "2023-07-19",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "application",
+      "dates",
+      "transition",
+      "entry-into-force"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexI-A5",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex I, Part A, point 5",
+    "title": "Safety components with self-evolving behaviour using machine learning",
+    "summary": "Safety components that ensure safety functions with fully or partially self-evolving behaviour based on machine learning are Part A categories and need a notified-body conformity assessment under Article 25(2).",
+    "excerpt": "Safety components with fully or partially self-evolving behaviour using machine learning approaches ensuring safety functions.",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "machine-learning",
+      "self-evolving",
+      "safety-component",
+      "annex-i",
+      "notified-body"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexI-A6",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex I, Part A, point 6",
+    "title": "Machinery with embedded self-evolving machine-learning systems ensuring safety functions",
+    "summary": "Machinery whose embedded systems ensure safety functions with fully or partially self-evolving machine-learning behaviour, and are not placed on the market separately, is a Part A category in respect of those systems.",
+    "excerpt": "Machinery that has embedded systems with fully or partially self-evolving behaviour using machine learning approaches ensuring safety functions that have not been placed independently on the market, in respect only of those systems.",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider",
+      "deployer"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "machine-learning",
+      "self-evolving",
+      "embedded-systems",
+      "annex-i",
+      "notified-body"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexIII-B1",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex III, Part B, point 1",
+    "title": "General principles: risk assessment and risk reduction",
+    "summary": "The manufacturer runs an iterative risk assessment to set the machine's limits, identify hazards, estimate, evaluate and reduce risks. It covers hazards foreseeable from the intended evolution of self-evolving behaviour and from interactions between machines that work as an integral whole.",
+    "excerpt": "The risk assessment and risk reduction shall include hazards that might arise during the lifecycle of the machinery or related product that are foreseeable at the time of placing the machinery or related product on the market as an intended evolution of its fully or partially self-evolving behaviour or logic",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "risk-assessment",
+      "self-evolving",
+      "autonomy",
+      "lifecycle"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexIII-1.1.6",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex III, section 1.1.6",
+    "title": "Ergonomics",
+    "summary": "Operator stress is reduced by ergonomic design, including a human-machine interface adapted to the operators of machinery with self-evolving behaviour or varying autonomy, which responds to people appropriately and communicates its planned actions, what and why, comprehensibly.",
+    "excerpt": "to respond to people adequately and appropriately (such as verbally through words and non-verbally through gestures, facial expressions or body movement) and to communicate its planned actions (such as what it is going to do and why) to operators in a comprehensible manner.",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "ergonomics",
+      "human-machine-interface",
+      "autonomy",
+      "transparency"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexIII-1.1.9",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex III, section 1.1.9",
+    "title": "Protection against corruption",
+    "summary": "Connecting another device, directly or remotely, must not lead to a hazardous situation. Hardware and software critical to safety are protected against accidental or intentional corruption, the machine identifies its safety software, and it collects evidence of legitimate or illegitimate interventions in that software or its configuration.",
+    "excerpt": "The machinery or related product shall be designed and constructed so that the connection to it of another device, via any feature of the connected device itself or via any remote device that communicates with the machinery or related product does not lead to a hazardous situation.",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "cybersecurity",
+      "corruption",
+      "remote-access",
+      "intervention-log",
+      "software"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexIII-1.2.1",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex III, section 1.2.1",
+    "title": "Safety and reliability of control systems",
+    "summary": "Control systems prevent hazardous situations: they withstand foreseeable malicious attempts by third parties, faults and logic errors, and human error; the limits of safety functions come from the risk assessment and settings or rules must not change where that could be hazardous, including during learning; parameters do not change in an uncontrolled way; a lost wireless connection is not hazardous.",
+    "excerpt": "they can withstand, where appropriate to the circumstances and the risks, the intended operating stresses and intended and unintended external influences, including reasonably foreseeable malicious attempts from third parties leading to a hazardous situation; (b) a fault in the hardware or the logic of the control system shall not lead to hazardous situations;",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "control-systems",
+      "cybersecurity",
+      "safety-functions",
+      "wireless",
+      "parameters"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexIII-1.2.1(f)",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex III, section 1.2.1, first paragraph, point (f)",
+    "title": "Tracing log of interventions and safety software versions",
+    "summary": "The control system keeps a tracing log of the data generated by an intervention and of safety software versions uploaded after placing on the market, for five years after upload, used only to demonstrate conformity on a reasoned request from a national authority.",
+    "excerpt": "the tracing log of the data generated in relation to an intervention and of the versions of safety software uploaded after the machinery or related product has been placed on the market or put into service is enabled for five years after such upload",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "intervention-log",
+      "traceability",
+      "retention",
+      "software-versions"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexIII-1.2.1-SE",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex III, section 1.2.1, second paragraph",
+    "title": "Control systems with self-evolving behaviour or varying autonomy",
+    "summary": "Control systems with self-evolving behaviour or varying autonomy do not act beyond their defined task and movement space, record the data of the safety-related decision-making process for one year after collection for authorities on reasoned request, and can be corrected at all times to keep the machine safe.",
+    "excerpt": "recording of data on the safety related decision-making process for software based safety systems ensuring safety function including safety components, after the machinery or related product has been placed on the market or put into service, is enabled and that such data is retained for one year after its collection",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "self-evolving",
+      "decision-log",
+      "autonomy",
+      "retention",
+      "human-oversight"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexIII-3.2.4",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex III, section 3.2.4",
+    "title": "Supervisory function for autonomous mobile machinery",
+    "summary": "Autonomous mobile machinery has, where relevant, a supervisory function for the autonomous mode: the supervisor receives complete information remotely and may only stop, start or move the machine to a safe state, only when the working area is visible; without the active function the machine does not operate.",
+    "excerpt": "Where relevant, autonomous mobile machinery or related products shall have a supervisory function specific to the autonomous mode. This function shall allow the supervisor to remotely receive information from the machinery.",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "autonomy",
+      "mobile-machinery",
+      "supervision",
+      "remote-control",
+      "human-oversight"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  },
+  {
+    "id": "MR:2023/1230:AnnexIV-A",
+    "regime": "MR",
+    "doc": "Regulation (EU) 2023/1230 (Machinery Regulation)",
+    "ref": "Annex IV, Part A",
+    "title": "Technical documentation for machinery and related products",
+    "summary": "The technical documentation shows how the design meets Annex III: a description and intended use, the risk assessment with applicable requirements and protective measures, drawings and schemes, standards or other specifications applied, test reports, and the instructions for use.",
+    "excerpt": "The technical documentation shall specify the means used by the manufacturer to ensure the conformity of the machinery or related product with the applicable essential health and safety requirements set out in Annex III. The technical documentation shall include at least the following elements: (a) a complete description of the machinery or related product and of its intended use;",
+    "version": "2023-06-29",
+    "effective": "2027-01-20",
+    "applies_to": [
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2023/1230/oj",
+    "tags": [
+      "technical-documentation",
+      "risk-assessment",
+      "design",
+      "evidence"
+    ],
+    "licence": "eu-law",
+    "verified": true,
+    "note": "Verified 2026-09-15 against the EUR-Lex consolidated text of 27.7.2026 (CELEX 02023R1230-20260727: corrigendum OJ L 169, 4.7.2023; amended by Regulations (EU) 2024/2748 and 2026/1744) and the original OJ text (CELEX 32023R1230). Proposal COM(2025) 504 (digitalisation and common specifications) would amend it and is not loaded."
+  }
+]
