@@ -24,8 +24,8 @@ projections of the same typed model, and the assistant may only *propose* patche
 This repository is a synced snapshot of the engine and its data; the product repository is the
 source of truth.
 
-**Today: 85 rules in 15 packs, grouped into 18 causes · 383 clause records across 23 regimes ·
-12 golden models with expected findings · 174 rule fixtures.**
+**Today: 88 rules in 16 packs, grouped into 19 causes · 383 clause records across 23 regimes ·
+14 golden models with expected findings · 180 rule fixtures.**
 
 ## Quick start
 
@@ -60,24 +60,90 @@ make test    # go vet + go test ./...
 make eval    # the golden set: precision and recall per rule and per pack
 ```
 
+## In CI: SARIF for code scanning and a job summary
+
+`assure-check` writes its findings as **SARIF 2.1.0** (`-sarif <file>`) and as a Markdown summary
+(`-summary-md <file>`, `-` for stdout; `-step-summary` appends it to `$GITHUB_STEP_SUMMARY`). Each
+result points at the model file and the line that declares the first element it names, lists the
+element ids as logical locations, cites the rule's clause ids (an id the corpus does not know is
+marked "no clause found") and carries a fingerprint built from the rule id and the sorted element
+ids, so re-ordering a model never re-opens an alert. Critical and high map to `error`, medium to
+`warning`, low and info to `note`. Both files are written before the exit status is decided, so a
+failing `-fail-on` still leaves them behind. No account and no network are needed.
+
+```bash
+go run ./cmd/assure-check -fail-on high -sarif sixi-assure.sarif -summary-md - examples/*.json
+```
+
+The repository is also a **GitHub Action** (`action.yml`, composite): it sets up Go, builds
+`assure-check` from the action's own checkout, assesses the models your glob matches against the
+packs of the ref you pinned, appends the summary to the job summary and outputs the SARIF path.
+It runs on **Linux runners** (`ubuntu-latest`; it needs bash 4 or later, which macOS runners do not
+ship). Symlinked model files are skipped, and workflow commands are switched off while the report
+is printed, so text inside a model cannot become one.
+
+| Input | Default | Meaning |
+|---|---|---|
+| `models` | `**/*.sixi.json` | space-separated globs, relative to the repository root (hidden directories are skipped) |
+| `fail-on` | `high` | fail the step at this severity or above: `critical`, `high`, `medium`, `low`, `info`, or `none` |
+| `sarif` | `sixi-assure.sarif` | where the SARIF file is written; also the `sarif` output |
+
+```yaml
+name: architecture
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  assess:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # upload-sarif
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false   # the check needs no token in .git/config
+      - id: assure
+        # Pin the action by a commit SHA of this repository (tags can move).
+        uses: sixi-ai/sixi-assure-rules@<commit-sha>
+        with:
+          models: "architecture/**/*.sixi.json"
+          fail-on: high
+      - name: Upload findings to code scanning
+        if: ${{ !cancelled() }}           # also when the gate failed the previous step
+        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          sarif_file: ${{ steps.assure.outputs.sarif }}
+          category: sixi-assure
+```
+
+Findings then appear under *Security → Code scanning* and as annotations on the model file in the
+pull request. A reviewer who dismisses an alert there dismisses the alert, not the rule: the
+finding stays in the SARIF until the design changes. The summary and the alerts assess and
+evidence a design; they never certify anything.
+
 ## Layout
 
 | Path | What it is |
 |---|---|
-| `packs/*.yaml` | the 15 rule packs — ai, agt, zt, net, data, log, res, gov, tpr, ot, mr, gxp, c4, imp, drift |
+| `packs/*.yaml` | the 16 rule packs — ai, agt, a2a, zt, net, data, log, res, gov, tpr, ot, mr, gxp, c4, imp, drift |
 | `packs/fixtures/` | one positive and one negative model per rule; the eval asserts both behave |
-| `causes.yaml` | the 18 design invariants; every rule belongs to exactly one |
+| `causes.yaml` | the 19 design invariants; every rule belongs to exactly one |
 | `policy.yaml` | which regimes raise or lower a severity |
 | `lenses/` | rule id → MITRE ATLAS technique / STRIDE category; re-labels findings, never creates one |
 | `corpus/regimes/*.json` | the clause records every citation resolves to (`corpus/` is also a Go package) |
 | `corpus/disclaimers.json` | the one-sentence disclaimer shown with any statement about a regime |
-| `golden-set/` | 12 architectures with their expected findings — the precision/recall gate |
+| `golden-set/` | 14 architectures with their expected findings — the precision/recall gate |
 | `examples/` | four demo architectures: two Azure agentic-AI twins, two OT edge-to-cloud twins |
 | `schema/model.schema.json` | the typed graph model as JSON Schema 2020-12 |
 | `model/` | Go: the model types, validation, invariants, JSON Patch, the C4 projection |
-| `rules/` | Go: the pack loader, the CEL environment, the engine, causes, policy |
+| `rules/` | Go: the pack loader, the CEL environment, the engine, causes, policy; `rules/sarif` renders findings as SARIF 2.1.0 and a Markdown summary |
 | `secretguard/` | Go: the detector that refuses a model carrying a credential |
 | `cmd/assure-check`, `cmd/assure-eval` | the two commands |
+| `action.yml` | the GitHub Action: `assure-check` over your models, SARIF for code scanning, a job summary |
 
 ## How a pack is written
 
