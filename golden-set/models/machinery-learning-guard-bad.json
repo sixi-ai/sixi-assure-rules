@@ -1,0 +1,149 @@
+{
+  "id": "arch_gs_machinery_learning_guard_bad",
+  "tenant_id": "tenant_templates",
+  "name": "Learning safety guard on a press line (machinery) - gaps",
+  "version": 1,
+  "schema_version": "1.2",
+  "attrs": {
+    "owner": "Head of Machine Safety",
+    "regimes": [
+      "MR",
+      "AIACT"
+    ],
+    "ai_act_tier": "limited",
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "substantial_modification": "not_substantial",
+    "incident_reporting": "Machine safety officer to the provider and the market surveillance authority within 15 days (AI Act Art. 73).",
+    "description": "Golden pair of swarm team 09 (agents/swarm/09-sector-packs/machinery-conformity.md): a press line whose light-curtain guard model learns on site and receives model uploads from a training service. The bad twin takes uploads straight from the training service, keeps a mutable decision log, routes the guard through module A and declares the limited AI Act tier."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_train",
+      "type": "app",
+      "name": "Guard training service",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 120,
+        "y": 80
+      },
+      "attrs": {
+        "owner": "Head of Machine Safety",
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "edge_gateway",
+      "name": "Press line gateway",
+      "layer": "edge",
+      "source": "design",
+      "position": {
+        "x": 520,
+        "y": 320
+      },
+      "attrs": {
+        "owner": "Head of Machine Safety",
+        "site": "Example Machines AG - Winterthur",
+        "attestation": "tpm",
+        "command_validation": true,
+        "intervention_log": true
+      }
+    },
+    {
+      "id": "n_guard",
+      "type": "edge_model",
+      "name": "Light-curtain guard model",
+      "layer": "edge",
+      "source": "design",
+      "position": {
+        "x": 720,
+        "y": 320
+      },
+      "attrs": {
+        "owner": "Head of Machine Safety",
+        "hosted_on": "n_gw",
+        "safety_function": true,
+        "self_evolving": true,
+        "conformity_route": "module_a",
+        "version": "2.3"
+      }
+    },
+    {
+      "id": "n_plc",
+      "type": "edge_device",
+      "name": "Press PLC",
+      "layer": "edge",
+      "source": "design",
+      "position": {
+        "x": 520,
+        "y": 520
+      },
+      "attrs": {
+        "owner": "Head of Machine Safety",
+        "site": "Example Machines AG - Winterthur",
+        "attestation": "tpm"
+      }
+    },
+    {
+      "id": "n_decision_log",
+      "type": "log_sink",
+      "name": "Safety decision log",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 920,
+        "y": 320
+      },
+      "attrs": {
+        "retention_days": 400
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_gw_guard",
+      "from": "n_gw",
+      "to": "n_guard",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_gw_plc",
+      "from": "n_gw",
+      "to": "n_plc",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e_guard_log",
+      "from": "n_guard",
+      "to": "n_decision_log",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_train_guard",
+      "from": "n_train",
+      "to": "n_guard",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

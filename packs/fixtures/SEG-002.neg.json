@@ -1,0 +1,93 @@
+{
+  "id": "arch_fx_seg_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SEG-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_egw",
+      "type": "edge_gateway",
+      "name": "Edge gateway",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": true,
+        "sbom": true
+      }
+    },
+    {
+      "id": "n_dmz",
+      "type": "dmz",
+      "name": "Plant DMZ",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_broker",
+      "type": "broker",
+      "name": "IoT Hub",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "network_exposure": "private"
+      }
+    },
+    {
+      "id": "n_queue",
+      "type": "queue",
+      "name": "Event queue",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_egw",
+      "to": "n_dmz",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_dmz",
+      "to": "n_broker",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_broker",
+      "to": "n_queue",
+      "kind": "publishes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

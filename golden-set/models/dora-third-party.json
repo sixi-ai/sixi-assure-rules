@@ -1,0 +1,287 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_gs_dora_third_party",
+  "tenant_id": "tenant_templates",
+  "name": "Payments platform with outsourced ICT services",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Payments IT",
+    "criticality": "high",
+    "materiality": "high",
+    "ai_act_tier": "minimal",
+    "regimes": [
+      "DORA",
+      "FINMA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "dr_tested_at": "2026-06-15",
+    "incident_reporting": "Major ICT incidents are classified by the CISO office and reported to the competent authority on the DORA timeline; FINMA is notified within 24 h.",
+    "description": "A payments platform that leans on outsourced ICT services: a hosted model for payment-dispute summaries, a core payments SaaS with its card-network subcontractor, a KYC service and a CRM."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Payments core",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 120
+      },
+      "attrs": {
+        "criticality": "critical",
+        "geo_redundant": true,
+        "rto_min": 60,
+        "rpo_min": 15,
+        "exposure": "internal",
+        "owner": "Head of Payments IT"
+      }
+    },
+    {
+      "id": "n_aigw",
+      "type": "gateway",
+      "name": "AI gateway (APIM GenAI policies)",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 0
+      },
+      "attrs": {
+        "kind": "ai",
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "logging": true,
+        "content_safety": true,
+        "token_limits": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI (dispute summaries)",
+      "layer": "ai",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 0
+      },
+      "attrs": {
+        "criticality": "critical",
+        "geo_redundant": true,
+        "rto_min": 60,
+        "rpo_min": 15,
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "model": "gpt-4.1",
+        "model_card": true,
+        "outsourcing_registered": true,
+        "exit_strategy": true,
+        "materiality": "high",
+        "owner": "Head of Payments IT",
+        "purpose": "Summarises payment disputes for the back office; no decision is taken by the model."
+      }
+    },
+    {
+      "id": "n_saas_core",
+      "type": "saas",
+      "name": "Core payments SaaS",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 120
+      },
+      "attrs": {
+        "criticality": "critical",
+        "geo_redundant": true,
+        "rto_min": 60,
+        "rpo_min": 15,
+        "provider": "aws",
+        "outsourcing_registered": true,
+        "exit_strategy": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_saas_sub",
+      "type": "saas",
+      "name": "Card network processor (subcontractor)",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 120
+      },
+      "attrs": {
+        "provider": "other",
+        "outsourcing_registered": true,
+        "exit_strategy": true,
+        "criticality": "high",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_saas_kyc",
+      "type": "saas",
+      "name": "KYC screening service",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 240
+      },
+      "attrs": {
+        "provider": "other",
+        "outsourcing_registered": true,
+        "exit_strategy": true,
+        "region": "switzerlandnorth",
+        "materiality": "medium",
+        "criticality": "high"
+      }
+    },
+    {
+      "id": "n_saas_crm",
+      "type": "saas",
+      "name": "Client CRM",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 360
+      },
+      "attrs": {
+        "provider": "other",
+        "outsourcing_registered": true,
+        "region": "switzerlandnorth",
+        "materiality": "high",
+        "criticality": "high",
+        "exit_strategy": true
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Log Analytics (immutable archive)",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 360
+      },
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true,
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_app_aigw",
+      "from": "n_app",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_aigw_llm",
+      "from": "n_aigw",
+      "to": "n_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_app_core",
+      "from": "n_app",
+      "to": "n_saas_core",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    },
+    {
+      "id": "e_core_sub",
+      "from": "n_saas_core",
+      "to": "n_saas_sub",
+      "kind": "calls",
+      "label": "card authorisation",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    },
+    {
+      "id": "e_app_kyc",
+      "from": "n_app",
+      "to": "n_saas_kyc",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    },
+    {
+      "id": "e_app_crm",
+      "from": "n_app",
+      "to": "n_saas_crm",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    },
+    {
+      "id": "e_app_logs",
+      "from": "n_app",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_aigw_logs",
+      "from": "n_aigw",
+      "to": "n_logs",
+      "kind": "writes",
+      "label": "prompt/response log",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

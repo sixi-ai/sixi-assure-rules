@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_fw_005_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture FW-005 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Research loop agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "semi",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "max_iterations": 10
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

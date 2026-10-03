@@ -272,5 +272,53 @@
     "licence": "eu-law",
     "verified": true,
     "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (Commission Implementing Regulation (EU) 2024/2690, OJ L, 2024/2690, 18.10.2024). A drawing evidences that a log sink exists and which paths reach it, never what the logs contain."
+  },
+  {
+    "id": "NIS2:2022/2555:Art23(4)",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS 2 Directive)",
+    "ref": "Art. 23(4)",
+    "title": "Reporting obligations — early warning, notification and final report timelines",
+    "summary": "For a significant incident the entity submits an early warning without undue delay and in any event within 24 hours of becoming aware of it, an incident notification within 72 hours (24 hours for trust service providers) with an initial assessment, intermediate reports on request, and a final report no later than one month after the notification; the Member State's transposing act names the CSIRT or competent authority.",
+    "excerpt": "",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "incident",
+      "reporting",
+      "timelines",
+      "csirt"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Event-driven duty under the national transposition (name the act per organisation, NIS2:2022/2555:Art41); evidence is the declared reporting path and SLA; no cadence entry. Added 2026-10-01, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
+  },
+  {
+    "id": "NIS2:2022/2555:Art4",
+    "regime": "NIS2",
+    "doc": "Directive (EU) 2022/2555 (NIS 2 Directive)",
+    "ref": "Art. 4",
+    "title": "Sector-specific Union legal acts",
+    "summary": "Where a sector-specific Union legal act requires essential or important entities to adopt cybersecurity risk-management measures or to notify significant incidents, and those requirements are at least equivalent in effect to the obligations of the Directive, the corresponding provisions of the Directive, including its supervision and enforcement provisions, do not apply to those entities; the recitals name Regulation (EU) 2022/2554 (DORA) as such an act for financial entities.",
+    "excerpt": "",
+    "version": "2022-12-27",
+    "effective": "2024-10-18",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+    "tags": [
+      "scope",
+      "lex-specialis",
+      "applicability"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Cited by corpus/applicability.json for the NIS2 exclusion where DORA applies (lex specialis). Applies through national transposition. Added 2026-10-01, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
   }
 ]

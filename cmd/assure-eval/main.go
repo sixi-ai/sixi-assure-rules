@@ -11,6 +11,21 @@
 // Matching: a prediction matches an expectation when rule_id and the element id are equal. The
 // engine reports one finding per element, so an expected entry listing several ids
 // (`{"rule_id":"AI-005","ids":["n_agent","n_llm"]}`) is shorthand for one expected finding per id.
+//
+// Authorship (docs/18 B4): an entry may carry `author` (who wrote the expectation) and `authored_at`
+// (YYYY-MM-DD); golden-set/AUTHORS.md lists them. The report counts the entries per author, and an entry
+// without one is counted as authored by the rule authors. An expected file that names an authored_at without an
+// author, a date that is not YYYY-MM-DD, or an author longer than 200 characters or carrying a control character
+// (a line break, an ANSI escape) is refused: the model fails the run (`assure eval` applies the same checks; the
+// shared cases in testdata/conformance pin both).
+//
+// Unexercised rules (docs/18 B4): a rule no expected entry names is listed under unexercised_rules, overall and per
+// pack. Its pack's precision and recall say nothing about it: they measure only the rules the golden set expects.
+//
+// Published result (docs/18 B4): a passing run writes -results (default <expected>/../results/latest.json when
+// that results directory exists, "off" disables): per pack its version, content hash, TP/FP/FN, precision and recall, the combined hash
+// of the packs and the run date. The file keeps its run date while the packs and the numbers are
+// unchanged, so a re-run does not dirty the tree. LIMITATIONS.md in a bundle states it when present.
 package main
 
 import (
@@ -28,6 +43,8 @@ import (
 	"strings"
 	"text/tabwriter"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/sixi-ai/sixi-assure-rules/model"
 	"github.com/sixi-ai/sixi-assure-rules/rules"
@@ -42,7 +59,14 @@ const (
 type expectedFinding struct {
 	RuleID string   `json:"rule_id"`
 	IDs    []string `json:"ids"`
+	// Author and AuthoredAt record who wrote the expectation and when (docs/18 B4, golden-set/AUTHORS.md).
+	Author     string `json:"author,omitempty"`
+	AuthoredAt string `json:"authored_at,omitempty"`
 }
+
+// ruleAuthors is the author an expectation entry without one is counted under: the rule authors themselves
+// (golden-set/AUTHORS.md), not an independent reader.
+const ruleAuthors = "rule-authors"
 
 type fixtureResult struct {
 	RuleID string `json:"rule_id"`
@@ -67,6 +91,16 @@ type counter struct {
 	Recall    float64  `json:"recall"`
 	FPKeys    []string `json:"fp_keys,omitempty"`
 	FNKeys    []string `json:"fn_keys,omitempty"`
+	// UnexercisedRules (pack rows only) lists the pack's rules that no expected entry names.
+	UnexercisedRules []string `json:"unexercised_rules,omitempty"`
+}
+
+// packMeta identifies a loaded pack: what a published precision and recall is a statement about.
+type packMeta struct {
+	Pack    string `json:"pack"`
+	Version string `json:"version"`
+	Hash    string `json:"hash"`
+	Rules   int    `json:"rules"`
 }
 
 type report struct {
@@ -78,6 +112,14 @@ type report struct {
 	ByPack   []counter       `json:"by_pack"`
 	Failures []string        `json:"failures"`
 	Pass     bool            `json:"pass"`
+	// PackMeta lists every loaded pack with its version and content hash; CatalogHash is their combined hash.
+	PackMeta    []packMeta `json:"pack_meta"`
+	CatalogHash string     `json:"catalog_hash"`
+	// Authors counts the expected findings (one per element id) per author (docs/18 B4).
+	Authors map[string]int `json:"authors"`
+	// UnexercisedRules lists, sorted, the loaded rules that no expected entry names: precision and recall do not
+	// measure them.
+	UnexercisedRules []string `json:"unexercised_rules"`
 }
 
 func main() {
@@ -87,6 +129,7 @@ func main() {
 	expectedDir := flag.String("expected", "golden-set/expected", "expected findings per model")
 	asJSON := flag.Bool("json", false, "machine-readable output")
 	verbose := flag.Bool("verbose", false, "list FP/FN keys per rule")
+	resultsFlag := flag.String("results", "auto", `where a passing run writes the published result ("auto": <expected>/../results/latest.json, "off": nowhere)`)
 	flag.Parse()
 
 	rep, err := run(*packsDir, *policyPath, *modelsDir, *expectedDir)
@@ -100,6 +143,19 @@ func main() {
 		_ = enc.Encode(rep)
 	} else {
 		printReport(os.Stdout, rep, *verbose)
+	}
+	if path := resultsPath(*resultsFlag, *expectedDir); path != "" && rep.Pass {
+		written, err := writeResults(path, rep, time.Now().UTC())
+		switch {
+		case err != nil:
+			fmt.Fprintln(os.Stderr, "eval: results:", err)
+			os.Exit(1)
+		case *asJSON:
+		case written:
+			fmt.Printf("results: wrote %s\n", path)
+		default:
+			fmt.Printf("results: %s unchanged\n", path)
+		}
 	}
 	if !rep.Pass {
 		os.Exit(1)
@@ -118,7 +174,12 @@ func run(packsDir, policyPath, modelsDir, expectedDir string) (*report, error) {
 		return nil, err
 	}
 	eng := rules.New(catalog, table, rules.WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
-	rep := &report{Packs: len(catalog.Packs()), Rules: len(catalog.Rules()), Fixtures: []fixtureResult{}, Models: []modelResult{}, Failures: []string{}}
+	rep := &report{Packs: len(catalog.Packs()), Rules: len(catalog.Rules()), Fixtures: []fixtureResult{}, Models: []modelResult{}, Failures: []string{},
+		PackMeta: []packMeta{}, CatalogHash: catalog.Hash(), Authors: map[string]int{}, UnexercisedRules: []string{}}
+	for _, p := range catalog.Packs() {
+		rep.PackMeta = append(rep.PackMeta, packMeta{Pack: p.Pack, Version: p.Version, Hash: p.Hash(), Rules: len(p.Rules)})
+	}
+	sort.Slice(rep.PackMeta, func(i, j int) bool { return rep.PackMeta[i].Pack < rep.PackMeta[j].Pack })
 	known := map[string]string{} // rule id → pack
 	for _, r := range catalog.Rules() {
 		known[r.ID] = r.Pack
@@ -190,8 +251,13 @@ func run(packsDir, policyPath, modelsDir, expectedDir string) (*report, error) {
 		rep.Models = append(rep.Models, modelResult{Name: name, Status: "evaluated"})
 		expectedKeys := map[string]bool{}
 		for _, x := range exp {
+			author := x.Author
+			if author == "" {
+				author = ruleAuthors
+			}
 			for _, k := range keys(x.RuleID, x.IDs) {
 				expectedKeys[k] = true
+				rep.Authors[author]++
 			}
 		}
 		predicted := map[string]bool{}
@@ -223,6 +289,15 @@ func run(packsDir, policyPath, modelsDir, expectedDir string) (*report, error) {
 	for id := range known {
 		get(id)
 	}
+	// A loaded rule without an expected finding (TP+FN = 0) is unexercised: its pack's numbers do not measure it.
+	unexercised := map[string][]string{}
+	for id, c := range byRule {
+		if _, loaded := known[id]; loaded && c.TP+c.FN == 0 {
+			rep.UnexercisedRules = append(rep.UnexercisedRules, id)
+			unexercised[c.Pack] = append(unexercised[c.Pack], id)
+		}
+	}
+	sort.Strings(rep.UnexercisedRules)
 
 	byPack := map[string]*counter{}
 	for _, c := range byRule {
@@ -242,6 +317,8 @@ func run(packsDir, policyPath, modelsDir, expectedDir string) (*report, error) {
 	sort.Slice(rep.ByRule, func(i, j int) bool { return rep.ByRule[i].Rule < rep.ByRule[j].Rule })
 	for _, p := range byPack {
 		p.Precision, p.Recall = ratios(p.TP, p.FP, p.FN)
+		p.UnexercisedRules = unexercised[p.Pack]
+		sort.Strings(p.UnexercisedRules)
 		rep.ByPack = append(rep.ByPack, *p)
 		if p.TP+p.FN+p.FP == 0 {
 			continue // the pack neither expects nor raises a finding → thresholds do not apply
@@ -317,8 +394,34 @@ func readExpected(path string) ([]expectedFinding, error) {
 		if x.RuleID == "" || len(x.IDs) == 0 {
 			return nil, fmt.Errorf("expected file %s: entry %d needs rule_id and ids", filepath.Base(path), i)
 		}
+		if err := checkAuthorship(x.Author, x.AuthoredAt); err != nil {
+			return nil, fmt.Errorf("expected file %s: entry %d: %w", filepath.Base(path), i, err)
+		}
 	}
 	return out, nil
+}
+
+// maxAuthorLen bounds an expectation's author (characters).
+const maxAuthorLen = 200
+
+// checkAuthorship validates an entry's author and authored_at (docs/18 B4). The author is printed by both commands,
+// so it is one line of printable text: a control character (a line break, a tab, an ANSI escape from an untrusted
+// checkout) is refused rather than echoed to a terminal. `assure eval` applies the same checks
+// (server/cmd/assure/eval.go evalCheckAuthorship; the shared cases in testdata/conformance pin both).
+func checkAuthorship(author, authoredAt string) error {
+	if authoredAt != "" {
+		if _, err := time.Parse(time.DateOnly, authoredAt); err != nil {
+			return fmt.Errorf("authored_at %q is not a YYYY-MM-DD date", authoredAt)
+		}
+		if author == "" {
+			return errors.New("authored_at without an author")
+		}
+	}
+	if !utf8.ValidString(author) || utf8.RuneCountInString(author) > maxAuthorLen ||
+		strings.IndexFunc(author, unicode.IsControl) >= 0 {
+		return fmt.Errorf("author must be one line of at most %d printable characters", maxAuthorLen)
+	}
+	return nil
 }
 
 // policyFor derives the policy from the model attrs (regimes, allowed_regions), as the API does
@@ -410,12 +513,36 @@ func printReport(w io.Writer, rep *report, verbose bool) {
 		}
 	}
 	_, _ = fmt.Fprintln(tw, "\t\t\t\t\t\t")
-	_, _ = fmt.Fprintln(tw, "pack\t\tTP\tFP\tFN\tprecision\trecall")
+	_, _ = fmt.Fprintln(tw, "pack\tversion\tTP\tFP\tFN\tprecision\trecall\thash")
+	meta := map[string]packMeta{}
+	for _, m := range rep.PackMeta {
+		meta[m.Pack] = m
+	}
 	for _, p := range rep.ByPack {
-		_, _ = fmt.Fprintf(tw, "%s\t\t%d\t%d\t%d\t%.3f\t%.3f\n", p.Pack, p.TP, p.FP, p.FN, p.Precision, p.Recall)
+		m := meta[p.Pack]
+		_, _ = fmt.Fprintf(tw, "%s\t%s\t%d\t%d\t%d\t%.3f\t%.3f\t%s\n", p.Pack, m.Version, p.TP, p.FP, p.FN, p.Precision, p.Recall, shortHash(m.Hash))
 	}
 	_ = tw.Flush()
 	_, _ = fmt.Fprintln(w)
+	if len(rep.Authors) > 0 {
+		names := make([]string, 0, len(rep.Authors))
+		for a := range rep.Authors {
+			names = append(names, a)
+		}
+		sort.Strings(names)
+		parts := make([]string, 0, len(names))
+		for _, a := range names {
+			parts = append(parts, fmt.Sprintf("%s %d", a, rep.Authors[a]))
+		}
+		_, _ = fmt.Fprintf(w, "expectations by author (golden-set/AUTHORS.md): %s\n", strings.Join(parts, ", "))
+	}
+	if len(rep.UnexercisedRules) > 0 {
+		_, _ = fmt.Fprintf(w, "rules no golden expectation exercises (%d; the pack numbers above do not measure them): %s\n",
+			len(rep.UnexercisedRules), strings.Join(rep.UnexercisedRules, ", "))
+	}
+	if rep.CatalogHash != "" {
+		_, _ = fmt.Fprintf(w, "packs hash: %s\n", rep.CatalogHash)
+	}
 	for _, f := range rep.Failures {
 		_, _ = fmt.Fprintln(w, "FAIL:", f)
 	}

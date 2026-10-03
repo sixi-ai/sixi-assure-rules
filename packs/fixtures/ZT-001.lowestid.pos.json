@@ -1,0 +1,96 @@
+{
+  "id": "arch_fx_zt_001_lowestid_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ZT-001 (lowest edge id, positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "SQL DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      }
+    },
+    {
+      "id": "n_idx",
+      "type": "vector_index",
+      "name": "pgvector index",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "data_class": "internal",
+        "acl_trimming": true,
+        "redaction": true,
+        "region": "switzerlandnorth",
+        "hosted_on": "n_db"
+      }
+    },
+    {
+      "id": "n_audit",
+      "type": "log_sink",
+      "name": "Audit table",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true,
+        "hosted_on": "n_db"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e2",
+      "from": "n_app",
+      "to": "n_idx",
+      "kind": "reads",
+      "auth": "connection_string",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_audit",
+      "kind": "writes",
+      "auth": "connection_string",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

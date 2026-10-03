@@ -551,5 +551,30 @@
     "verified": false,
     "note": "Not verified: iso.org returned HTTP 403 from this environment on 2026-09-16. The 2026 revision was seen in ISO's search index (docs/research/03 §7.3 [1]); the exact title, publication month and stage code could not be read, so the short title is ours and version records the year only. ISO/IEC text is never reproduced.",
     "redacted": "licence"
+  },
+  {
+    "id": "ISO:27001:A.5.33",
+    "regime": "ISO",
+    "doc": "ISO/IEC 27001:2022, Annex A",
+    "ref": "A.5.33",
+    "title": "Protection of records",
+    "summary": "Annex A organisational control on keeping records safe from loss, destruction, falsification and unauthorised access or release, in line with the legal, regulatory, contractual and business requirements that apply to them.",
+    "excerpt": "",
+    "version": "2022-10-25",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://www.iso.org/standard/27001.html",
+    "tags": [
+      "records",
+      "evidence",
+      "integrity",
+      "isms"
+    ],
+    "licence": "iso",
+    "verified": false,
+    "note": "Cited by EVD-004 and by the evidence-chain-integrity agent for the chain export (integrity, authenticity, retrievability). Not verified: iso.org returned HTTP 403 from the authoring environment. Clause number and paraphrase only; ISO/IEC text is not reproduced. Added 2026-10-02, awaiting review by a named reviewer (corpus/README.md §Governance).",
+    "redacted": "licence"
   }
 ]

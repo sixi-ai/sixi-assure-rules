@@ -1,0 +1,20 @@
+[
+  {
+    "rule_id": "NIS-001",
+    "ids": [
+      "arch_gs_nis2_ledger_bad"
+    ]
+  },
+  {
+    "rule_id": "NIS-003",
+    "ids": [
+      "arch_gs_nis2_ledger_bad"
+    ]
+  },
+  {
+    "rule_id": "NIS-004",
+    "ids": [
+      "n_partner"
+    ]
+  }
+]

@@ -75,8 +75,7 @@
   {
     "rule_id": "ZT-001",
     "ids": [
-      "e_api_sql_r",
-      "e_api_sql_w"
+      "e_api_sql_r"
     ]
   },
   {
@@ -90,6 +89,12 @@
     "rule_id": "ZT-009",
     "ids": [
       "e_user_web"
+    ]
+  },
+  {
+    "rule_id": "SCP-005",
+    "ids": [
+      "arch_demo_webapp_sql_bad"
     ]
   }
 ]

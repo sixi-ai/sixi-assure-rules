@@ -1,0 +1,51 @@
+[
+  {
+    "rule_id": "DOR-001",
+    "ids": [
+      "n_saas_core"
+    ]
+  },
+  {
+    "rule_id": "DOR-002",
+    "ids": [
+      "n_llm",
+      "n_saas_core"
+    ]
+  },
+  {
+    "rule_id": "DOR-003",
+    "ids": [
+      "n_saas_core"
+    ]
+  },
+  {
+    "rule_id": "DOR-004",
+    "ids": [
+      "e_app_kyc"
+    ]
+  },
+  {
+    "rule_id": "FIN-001",
+    "ids": [
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "FIN-003",
+    "ids": [
+      "n_saas_crm"
+    ]
+  },
+  {
+    "rule_id": "TPR-001",
+    "ids": [
+      "n_saas_sub"
+    ]
+  },
+  {
+    "rule_id": "CMP-005",
+    "ids": [
+      "n_aigw"
+    ]
+  }
+]

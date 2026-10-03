@@ -1,0 +1,57 @@
+{
+  "id": "arch_fx_dor_001_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DOR-001 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "DORA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Core app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "criticality": "critical"
+      }
+    },
+    {
+      "id": "n_saas",
+      "type": "saas",
+      "name": "Payments SaaS",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "provider": "other",
+        "criticality": "critical",
+        "outsourcing_registered": true,
+        "exit_strategy": true,
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_saas",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

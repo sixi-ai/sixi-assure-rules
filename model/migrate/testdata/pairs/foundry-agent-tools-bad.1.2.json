@@ -1,0 +1,506 @@
+{
+  "attrs": {
+    "ai_act_tier": "limited",
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "criticality": "high",
+    "description": "Bad twin of foundry-agent-tools: the agent became autonomous without kill switch/rate limit, holds a standing subscription contributor role, releases payments to the ledger without human approval, calls an unvetted third-party MCP server directly with no authentication and wildcard scopes, and tool calls are not logged. Ledger uses platform-managed keys and a connection string; the critical LLM dependency has no exit strategy.",
+    "dr_tested_at": "2026-05-15",
+    "incident_reporting": "ICT-related incidents are classified by the SOC within 2 h; major incidents reported to FINMA within 24 h and per DORA Art. 19 timelines.",
+    "materiality": "high",
+    "owner": "Head of Operations",
+    "regimes": [
+      "FINMA",
+      "AIACT",
+      "DORA"
+    ]
+  },
+  "edges": [
+    {
+      "attrs": {},
+      "auth": "oauth_client",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_user",
+      "id": "e_user_app",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_app"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_app",
+      "id": "e_app_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_aigw"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "managed_identity",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_aigw",
+      "id": "e_aigw_agent",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_agent"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "agent_id",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_aigw",
+      "kind": "calls",
+      "label": "LLM completions via gateway",
+      "protocol": "https",
+      "to": "n_aigw"
+    },
+    {
+      "attrs": {
+        "logged": true,
+        "prompt_contains": "cid"
+      },
+      "auth": "managed_identity",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_aigw",
+      "id": "e_aigw_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_llm"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_tool_cust",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_tool_cust"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "internal",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_tool_ticket",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_tool_ticket"
+    },
+    {
+      "attrs": {
+        "x_migrated_from": "protocol=tds"
+      },
+      "auth": "connection_string",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_tool_cust",
+      "id": "e_tool_cust_ledger",
+      "kind": "reads",
+      "protocol": "sql",
+      "to": "n_ledger"
+    },
+    {
+      "attrs": {},
+      "auth": "none",
+      "data_class": "internal",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_mcp_fx",
+      "kind": "calls",
+      "label": "direct MCP call (no gateway)",
+      "protocol": "https",
+      "to": "n_mcp_fx"
+    },
+    {
+      "attrs": {
+        "consequence": "high",
+        "logged": true,
+        "x_migrated_from": "protocol=tds"
+      },
+      "auth": "agent_id",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_ledger",
+      "kind": "writes",
+      "label": "payment release (no approval)",
+      "protocol": "sql",
+      "to": "n_ledger"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "secret",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_kv",
+      "kind": "reads",
+      "protocol": "https",
+      "to": "n_kv"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "internal",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "to": "n_logs"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_aigw",
+      "id": "e_aigw_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "to": "n_logs"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "cid",
+      "encryption": "tls",
+      "from": "n_eval",
+      "id": "e_eval_logs",
+      "kind": "reads",
+      "protocol": "https",
+      "to": "n_logs"
+    }
+  ],
+  "evidence": [],
+  "findings": [],
+  "groups": [
+    {
+      "id": "g_users",
+      "kind": "zone",
+      "name": "Employees & operations",
+      "node_ids": [
+        "n_user"
+      ]
+    },
+    {
+      "attrs": {
+        "region": "switzerlandnorth"
+      },
+      "id": "g_cloud",
+      "kind": "zone",
+      "name": "Azure – Switzerland North",
+      "node_ids": [
+        "n_app",
+        "n_aigw",
+        "n_agent",
+        "n_llm",
+        "n_tool_cust",
+        "n_tool_ticket",
+        "n_ledger",
+        "n_kv",
+        "n_logs",
+        "n_eval"
+      ]
+    },
+    {
+      "id": "g_ext",
+      "kind": "zone",
+      "name": "External – FX data provider",
+      "node_ids": [
+        "n_mcp_fx"
+      ]
+    },
+    {
+      "id": "g_agent_tb",
+      "kind": "trust_boundary",
+      "name": "Agent runtime",
+      "node_ids": [
+        "n_aigw",
+        "n_agent"
+      ]
+    }
+  ],
+  "id": "arch_demo_foundry_agent_bad",
+  "identities": [
+    {
+      "attrs": {
+        "x_migrated_from": "agent.identity=agent_id"
+      },
+      "id": "ident_agent_id",
+      "kind": "agent_identity",
+      "name": "Agent identity (agent_id)"
+    }
+  ],
+  "name": "Foundry agent with tools and human approval (bad twin)",
+  "nodes": [
+    {
+      "attrs": {
+        "mfa": true,
+        "population": "employee"
+      },
+      "id": "n_user",
+      "layer": "human",
+      "name": "Operations analyst",
+      "position": {
+        "x": 40,
+        "y": 200
+      },
+      "source": "design",
+      "type": "user",
+      "zone": "g_users"
+    },
+    {
+      "attrs": {
+        "authn": [
+          "oidc"
+        ],
+        "exposure": "internal",
+        "region": "switzerlandnorth",
+        "secrets_in": "secret_store",
+        "waf": true
+      },
+      "id": "n_app",
+      "layer": "app",
+      "name": "Ops assistant web app",
+      "position": {
+        "x": 260,
+        "y": 200
+      },
+      "source": "design",
+      "type": "app",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "content_safety": true,
+        "criticality": "critical",
+        "exit_strategy": false,
+        "geo_redundant": true,
+        "materiality": "high",
+        "model": "gpt-4.1",
+        "network": "private",
+        "outsourcing_registered": true,
+        "owner": "Head of Operations",
+        "provider": "azure",
+        "purpose": "Reasoning and tool-planning model for the operations agent.",
+        "region": "switzerlandnorth",
+        "rpo_min": 5,
+        "rto_min": 30
+      },
+      "id": "n_llm",
+      "layer": "ai",
+      "name": "Azure OpenAI (Foundry)",
+      "position": {
+        "x": 480,
+        "y": 80
+      },
+      "source": "design",
+      "type": "llm_endpoint",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "content_safety": true,
+        "kind": "ai",
+        "logging": true,
+        "region": "switzerlandnorth",
+        "token_limits": true
+      },
+      "id": "n_aigw",
+      "layer": "platform",
+      "name": "AI gateway (APIM GenAI policies)",
+      "position": {
+        "x": 480,
+        "y": 200
+      },
+      "source": "design",
+      "type": "gateway",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "ai_disclosure": true,
+        "autonomy": "autonomous",
+        "content_safety": true,
+        "criticality": "high",
+        "identity": "agent_id",
+        "identity_id": "ident_agent_id",
+        "kill_switch": false,
+        "materiality": "high",
+        "owner": "Head of Operations",
+        "purpose": "Triages customer payment exceptions, looks up customer context, drafts tickets and releases payments.",
+        "rbac_scope": "subscription_contributor",
+        "region": "switzerlandnorth",
+        "tool_scopes": "*"
+      },
+      "id": "n_agent",
+      "layer": "ai",
+      "name": "Operations agent (Foundry Agent Service)",
+      "position": {
+        "x": 700,
+        "y": 200
+      },
+      "source": "design",
+      "type": "agent",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "region": "switzerlandnorth"
+      },
+      "id": "n_kv",
+      "layer": "identity",
+      "name": "Key Vault",
+      "position": {
+        "x": 700,
+        "y": 440
+      },
+      "source": "design",
+      "type": "secret_store",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "logged": false,
+        "origin": "first_party",
+        "owner": "Head of Operations",
+        "scopes": [
+          "customer.read"
+        ],
+        "vetted": true,
+        "write_capable": false
+      },
+      "id": "n_tool_cust",
+      "layer": "app",
+      "name": "Customer lookup tool",
+      "position": {
+        "x": 920,
+        "y": 80
+      },
+      "source": "design",
+      "type": "tool",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "logged": false,
+        "origin": "first_party",
+        "owner": "Head of Operations",
+        "scopes": [
+          "tickets.create"
+        ],
+        "vetted": true,
+        "write_capable": true
+      },
+      "id": "n_tool_ticket",
+      "layer": "app",
+      "name": "Ticketing tool",
+      "position": {
+        "x": 920,
+        "y": 200
+      },
+      "source": "design",
+      "type": "tool",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "logged": false,
+        "origin": "third_party",
+        "region": "eu",
+        "scopes": "*",
+        "vetted": false,
+        "write_capable": false
+      },
+      "id": "n_mcp_fx",
+      "layer": "app",
+      "name": "FX rates MCP server (third party)",
+      "position": {
+        "x": 1140,
+        "y": 320
+      },
+      "source": "design",
+      "type": "mcp_server",
+      "zone": "g_ext"
+    },
+    {
+      "attrs": {
+        "backup": true,
+        "criticality": "critical",
+        "data_class": "cid",
+        "encryption_key": "pmk",
+        "engine": "azure_sql",
+        "geo_redundant": true,
+        "network_exposure": "private",
+        "region": "switzerlandnorth",
+        "retention_days": 3650,
+        "rpo_min": 5,
+        "rto_min": 30
+      },
+      "id": "n_ledger",
+      "layer": "data",
+      "name": "Core ledger SQL",
+      "position": {
+        "x": 1140,
+        "y": 200
+      },
+      "source": "design",
+      "type": "datastore",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "immutable": true,
+        "region": "switzerlandnorth",
+        "retention_days": 3650
+      },
+      "id": "n_logs",
+      "layer": "platform",
+      "name": "Log Analytics (immutable archive)",
+      "position": {
+        "x": 1360,
+        "y": 320
+      },
+      "source": "design",
+      "type": "log_sink",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "owner": "Head of Operations",
+        "purpose": "Tool-call accuracy and approval-rate drift evaluated weekly from logs."
+      },
+      "id": "n_eval",
+      "layer": "ai",
+      "name": "Evaluation & drift monitoring",
+      "position": {
+        "x": 1360,
+        "y": 440
+      },
+      "source": "design",
+      "type": "evaluation",
+      "zone": "g_cloud"
+    }
+  ],
+  "schema_version": "1.2",
+  "tenant_id": "tenant_demo",
+  "version": 1
+}

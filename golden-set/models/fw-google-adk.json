@@ -1,0 +1,1189 @@
+{
+  "schema_version": "1.2",
+  "identities": [
+    {
+      "id": "id_web",
+      "name": "Web app workload identity",
+      "kind": "workload_identity",
+      "issuer": "https://login.microsoftonline.com/11111111-2222-3333-4444-555555555555/v2.0",
+      "credential_type": "managed_identity",
+      "credential_ttl": 3600,
+      "sponsor": "Head of Digital Operations",
+      "owner": "Head of Agent Platform",
+      "registry": "n_registry"
+    },
+    {
+      "id": "id_server",
+      "name": "ADK deployment identity",
+      "kind": "shared",
+      "issuer": "https://login.microsoftonline.com/11111111-2222-3333-4444-555555555555/v2.0",
+      "credential_type": "managed_identity",
+      "credential_ttl": 3600,
+      "sponsor": "Head of Digital Operations",
+      "owner": "Head of Agent Platform",
+      "registry": "n_registry"
+    },
+    {
+      "id": "id_action",
+      "name": "Privileged specialist identity",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/11111111-2222-3333-4444-555555555555/v2.0",
+      "credential_type": "federated",
+      "credential_ttl": 3600,
+      "sponsor": "Head of Digital Operations",
+      "owner": "Head of Agent Platform",
+      "registry": "n_registry",
+      "federation": "entra_agent_id",
+      "blueprint": "Agent blueprint"
+    }
+  ],
+  "id": "arch_tpl_fw_google_adk",
+  "tenant_id": "tenant_templates",
+  "name": "Google ADK: a loop orchestrator with config-declared specialists",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Agent Platform",
+    "description": "Blueprint B4 (ADR-093 M5, docs/research/07-agentic-frameworks/00-synthesis.md §6): a LoopAgent orchestrator with max_iterations and YAML-declared LlmAgent specialists in one ADK API server deployment (one principal, ADR-093 SD-2) behind authentication, the privileged specialist in its own deployment reached as a RemoteA2aAgent under on-behalf-of, no transfer to peers or parent, Model Armor and runner plugins, the container code executor with networking off, Postgres sessions and per-user state, credentials from a broker.",
+    "ai_act_tier": "limited",
+    "regimes": [
+      "OWASP",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_cloud",
+      "kind": "zone",
+      "name": "Azure – switzerlandnorth",
+      "node_ids": [
+        "n_system",
+        "n_web",
+        "n_aigw",
+        "n_llm",
+        "n_mcpgw",
+        "n_mcp_docs",
+        "n_registry",
+        "n_secrets",
+        "n_approval",
+        "n_tool_write",
+        "n_records",
+        "n_logs",
+        "n_eval",
+        "n_server",
+        "n_remote",
+        "n_loop",
+        "n_research",
+        "n_action",
+        "n_exec",
+        "n_exec_approval",
+        "n_pg",
+        "n_sessions",
+        "n_user_state",
+        "n_broker"
+      ],
+      "attrs": {
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "g_users",
+      "kind": "zone",
+      "name": "Users",
+      "node_ids": [
+        "n_user"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_system",
+      "type": "app",
+      "name": "Case assistant (Google ADK)",
+      "layer": "app",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 220,
+        "y": -160
+      },
+      "attrs": {
+        "c4_level": "context",
+        "c4_kind": "SoftwareSystem",
+        "exposure": "internal",
+        "owner": "Head of Agent Platform",
+        "criticality": "high"
+      }
+    },
+    {
+      "id": "n_user",
+      "type": "user",
+      "name": "Employee",
+      "layer": "human",
+      "source": "design",
+      "zone": "g_users",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "attrs": {
+        "population": "employee",
+        "mfa": true,
+        "c4_level": "context",
+        "c4_kind": "Person"
+      }
+    },
+    {
+      "id": "n_web",
+      "type": "app",
+      "name": "Assistant web app",
+      "layer": "app",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 220,
+        "y": 0
+      },
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "owner": "Head of Agent Platform",
+        "secrets_in": "secret_store",
+        "identity_id": "id_web",
+        "c4_level": "container",
+        "c4_kind": "Container",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_aigw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 660,
+        "y": 360
+      },
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "content_safety": true,
+        "token_limits": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth",
+        "c4_level": "container",
+        "c4_kind": "Gateway",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Model endpoint",
+      "layer": "ai",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 880,
+        "y": 360
+      },
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "content_safety": true,
+        "model": "gpt-4.1",
+        "network": "private",
+        "owner": "Head of Agent Platform",
+        "purpose": "Generation model for the agents.",
+        "materiality": "medium",
+        "model_card": true,
+        "outsourcing_registered": true,
+        "exit_strategy": true,
+        "c4_level": "container",
+        "c4_kind": "Container",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_mcpgw",
+      "type": "gateway",
+      "name": "MCP gateway",
+      "layer": "platform",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 660,
+        "y": 480
+      },
+      "attrs": {
+        "kind": "mcp",
+        "logging": true,
+        "identity": "managed_identity",
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth",
+        "c4_level": "container",
+        "c4_kind": "Gateway",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_mcp_docs",
+      "type": "mcp_server",
+      "name": "Market data MCP server",
+      "layer": "app",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 880,
+        "y": 480
+      },
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "quotes.read"
+        ],
+        "vetted": true,
+        "integrity": "pinned",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "queries_database"
+        ],
+        "transport": "streamable_http",
+        "auth_mode": "oauth21",
+        "resource_metadata": true,
+        "client_registration": "pre_registered",
+        "exposure": "private_network",
+        "sandbox": "container",
+        "owner": "Head of Agent Platform",
+        "sampling": "denied",
+        "c4_level": "container",
+        "c4_kind": "MCPServer",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_registry",
+      "type": "agent_registry",
+      "name": "Agent registry",
+      "layer": "identity",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 0,
+        "y": 600
+      },
+      "attrs": {
+        "kind": "custom",
+        "verification": "signed",
+        "owner": "Head of Agent Platform",
+        "c4_level": "container",
+        "c4_kind": "Container",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_secrets",
+      "type": "secret_store",
+      "name": "Key vault",
+      "layer": "identity",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 220,
+        "y": 600
+      },
+      "attrs": {
+        "network_exposure": "private",
+        "region": "switzerlandnorth",
+        "owner": "Head of Agent Platform",
+        "c4_level": "container",
+        "c4_kind": "DataStore",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_approval",
+      "type": "human_step",
+      "name": "Action approval",
+      "layer": "human",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 660,
+        "y": 600
+      },
+      "attrs": {
+        "role": "operations",
+        "approval_identity": "separate",
+        "approval_for": [
+          "record_update"
+        ],
+        "c4_level": "container",
+        "c4_kind": "Container",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_tool_write",
+      "type": "tool",
+      "name": "Record update tool",
+      "layer": "app",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 880,
+        "y": 600
+      },
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "records.write"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": true,
+        "capabilities": [
+          "modifies_state"
+        ],
+        "c4_level": "container",
+        "c4_kind": "Tool",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_records",
+      "type": "datastore",
+      "name": "Case records",
+      "layer": "data",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1100,
+        "y": 600
+      },
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "owner": "Head of Agent Platform",
+        "c4_level": "container",
+        "c4_kind": "DataStore",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Agent log archive",
+      "layer": "platform",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 440,
+        "y": 720
+      },
+      "attrs": {
+        "immutable": true,
+        "retention_days": 3650,
+        "region": "switzerlandnorth",
+        "purpose": "evidence",
+        "owner": "Head of Agent Platform",
+        "backup": true,
+        "geo_redundant": true,
+        "c4_level": "container",
+        "c4_kind": "DataStore",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_eval",
+      "type": "evaluation",
+      "name": "Agent evaluation",
+      "layer": "platform",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 660,
+        "y": 720
+      },
+      "attrs": {
+        "owner": "Head of Agent Platform",
+        "evaluates": [
+          "prompt_injection",
+          "robustness",
+          "accuracy",
+          "drift"
+        ],
+        "purpose": "Evaluates the agents from their logged runs, adversarial prompts included",
+        "c4_level": "container",
+        "c4_kind": "Container",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_server",
+      "type": "api",
+      "name": "ADK API server",
+      "layer": "app",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 440,
+        "y": 0
+      },
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "protocols": [
+          "http_api"
+        ],
+        "integrity": "pinned",
+        "secrets_in": "secret_store",
+        "owner": "Head of Agent Platform",
+        "identity_id": "id_server",
+        "c4_level": "container",
+        "c4_kind": "Container",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_remote",
+      "type": "api",
+      "name": "Remote A2A deployment (privileged specialist)",
+      "layer": "app",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 880,
+        "y": 0
+      },
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "protocols": [
+          "a2a"
+        ],
+        "integrity": "pinned",
+        "secrets_in": "secret_store",
+        "owner": "Head of Agent Platform",
+        "c4_level": "container",
+        "c4_kind": "Container",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_loop",
+      "type": "agent",
+      "name": "Loop orchestrator",
+      "layer": "ai",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 440,
+        "y": 120
+      },
+      "attrs": {
+        "identity": "shared",
+        "purpose": "Runs the specialists in a bounded loop until the case is complete; it changes nothing itself.",
+        "owner": "Head of Agent Platform",
+        "sponsor": "Head of Digital Operations",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "content_safety": true,
+        "autonomy": "semi",
+        "framework": "google_adk",
+        "kind": "orchestrator",
+        "max_iterations": 5,
+        "max_duration_s": 300,
+        "guardrails": [
+          {
+            "stage": "input",
+            "kind": "code",
+            "blocking": true,
+            "scope": "agent"
+          },
+          {
+            "stage": "tool_output",
+            "kind": "code",
+            "blocking": true,
+            "scope": "agent"
+          },
+          {
+            "stage": "model",
+            "kind": "platform_policy",
+            "blocking": true,
+            "scope": "runner"
+          }
+        ],
+        "identity_id": "id_server",
+        "hosted_on": "n_server",
+        "orchestration": "loop",
+        "definition_source": "local",
+        "config_imports_code": false,
+        "config_env_access": false,
+        "framework_version": "1.0",
+        "c4_level": "container",
+        "c4_kind": "Agent",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_research",
+      "type": "agent",
+      "name": "Research specialist",
+      "layer": "ai",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 660,
+        "y": 120
+      },
+      "attrs": {
+        "identity": "shared",
+        "purpose": "Reads market data through the MCP gateway; it changes nothing.",
+        "owner": "Head of Agent Platform",
+        "sponsor": "Head of Digital Operations",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "content_safety": true,
+        "autonomy": "semi",
+        "framework": "google_adk",
+        "kind": "llm",
+        "max_iterations": 10,
+        "max_duration_s": 300,
+        "guardrails": [
+          {
+            "stage": "input",
+            "kind": "code",
+            "blocking": true,
+            "scope": "agent"
+          },
+          {
+            "stage": "tool_output",
+            "kind": "code",
+            "blocking": true,
+            "scope": "agent"
+          },
+          {
+            "stage": "model",
+            "kind": "platform_policy",
+            "blocking": true,
+            "scope": "runner"
+          }
+        ],
+        "identity_id": "id_server",
+        "hosted_on": "n_server",
+        "definition_source": "local",
+        "config_imports_code": false,
+        "config_env_access": false,
+        "framework_version": "1.0",
+        "c4_level": "container",
+        "c4_kind": "Agent",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_action",
+      "type": "agent",
+      "name": "Privileged action specialist",
+      "layer": "ai",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 880,
+        "y": 120
+      },
+      "attrs": {
+        "identity": "agent_id",
+        "purpose": "Proposes case record updates that an operator approves, and runs calculations in a container after approval.",
+        "owner": "Head of Agent Platform",
+        "sponsor": "Head of Digital Operations",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "content_safety": true,
+        "autonomy": "semi",
+        "framework": "google_adk",
+        "kind": "llm",
+        "max_iterations": 10,
+        "max_duration_s": 300,
+        "guardrails": [
+          {
+            "stage": "input",
+            "kind": "code",
+            "blocking": true,
+            "scope": "agent"
+          },
+          {
+            "stage": "tool_output",
+            "kind": "code",
+            "blocking": true,
+            "scope": "agent"
+          },
+          {
+            "stage": "model",
+            "kind": "platform_policy",
+            "blocking": true,
+            "scope": "runner"
+          }
+        ],
+        "identity_id": "id_action",
+        "hosted_on": "n_remote",
+        "definition_source": "local",
+        "config_imports_code": false,
+        "config_env_access": false,
+        "framework_version": "1.0",
+        "c4_level": "container",
+        "c4_kind": "Agent",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_exec",
+      "type": "tool",
+      "name": "Container code executor",
+      "layer": "app",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1100,
+        "y": 240
+      },
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "code.run"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "executes_code"
+        ],
+        "sandbox": "container",
+        "egress_policy": "disabled",
+        "c4_level": "container",
+        "c4_kind": "Tool",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_exec_approval",
+      "type": "human_step",
+      "name": "Code run approval",
+      "layer": "human",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 880,
+        "y": 240
+      },
+      "attrs": {
+        "role": "analyst",
+        "approval_identity": "separate",
+        "approval_for": [
+          "code_run"
+        ],
+        "c4_level": "container",
+        "c4_kind": "Container",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_pg",
+      "type": "datastore",
+      "name": "Session database (Postgres)",
+      "layer": "data",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1320,
+        "y": 0
+      },
+      "attrs": {
+        "engine": "postgresql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "owner": "Head of Agent Platform",
+        "c4_level": "container",
+        "c4_kind": "DataStore",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_sessions",
+      "type": "agent_memory",
+      "name": "Sessions",
+      "layer": "data",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1100,
+        "y": 0
+      },
+      "attrs": {
+        "scope": "session",
+        "validated": true,
+        "write_path": "broker",
+        "deserialization": "json_only",
+        "encryption": "store",
+        "retention_days": 30,
+        "hosted_on": "n_pg",
+        "c4_level": "container",
+        "c4_kind": "DataStore",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_user_state",
+      "type": "agent_memory",
+      "name": "Per-user state (user: keys)",
+      "layer": "data",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1100,
+        "y": 120
+      },
+      "attrs": {
+        "scope": "user",
+        "validated": true,
+        "write_path": "broker",
+        "deserialization": "json_only",
+        "encryption": "store",
+        "retention_days": 90,
+        "hosted_on": "n_pg",
+        "c4_level": "container",
+        "c4_kind": "DataStore",
+        "c4_parent": "n_system"
+      }
+    },
+    {
+      "id": "n_broker",
+      "type": "credential_broker",
+      "name": "Credential service",
+      "layer": "identity",
+      "source": "design",
+      "zone": "g_cloud",
+      "position": {
+        "x": 440,
+        "y": 600
+      },
+      "attrs": {
+        "issues": "short_lived_token",
+        "max_lifetime": 3600,
+        "owner": "Head of Agent Platform",
+        "region": "switzerlandnorth",
+        "c4_level": "container",
+        "c4_kind": "Container",
+        "c4_parent": "n_system"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_user_system",
+      "from": "n_user",
+      "to": "n_system",
+      "kind": "calls",
+      "label": "uses (C4 context)",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_aigw_llm",
+      "from": "n_aigw",
+      "to": "n_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_mcpgw_docs",
+      "from": "n_mcpgw",
+      "to": "n_mcp_docs",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "token_exchange",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consent": "per_client"
+      }
+    },
+    {
+      "id": "e_approval_tool",
+      "from": "n_approval",
+      "to": "n_tool_write",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_tool_records",
+      "from": "n_tool_write",
+      "to": "n_records",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_eval_logs",
+      "from": "n_eval",
+      "to": "n_logs",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_user_web",
+      "from": "n_user",
+      "to": "n_web",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_web_server",
+      "from": "n_web",
+      "to": "n_server",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_server_loop",
+      "from": "n_server",
+      "to": "n_loop",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_loop_research",
+      "from": "n_loop",
+      "to": "n_research",
+      "kind": "delegates",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "mode": "as_tool",
+        "routing": "deterministic",
+        "bidirectional": false,
+        "context_forwarded": "last_message"
+      }
+    },
+    {
+      "id": "e_loop_action",
+      "from": "n_loop",
+      "to": "n_action",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "mode": "as_tool",
+        "routing": "deterministic",
+        "bidirectional": false,
+        "context_forwarded": "last_message"
+      }
+    },
+    {
+      "id": "e_loop_aigw",
+      "from": "n_loop",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_loop_logs",
+      "from": "n_loop",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_aigw",
+      "from": "n_research",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_logs",
+      "from": "n_research",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_mcpgw",
+      "from": "n_research",
+      "to": "n_mcpgw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_action_aigw",
+      "from": "n_action",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_action_logs",
+      "from": "n_action",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_action_approval",
+      "from": "n_action",
+      "to": "n_approval",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_action_exec_approval",
+      "from": "n_action",
+      "to": "n_exec_approval",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_exec_approval_exec",
+      "from": "n_exec_approval",
+      "to": "n_exec",
+      "kind": "executes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_loop_sessions",
+      "from": "n_loop",
+      "to": "n_sessions",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "guarded": true
+      }
+    },
+    {
+      "id": "e_loop_sessions_read",
+      "from": "n_loop",
+      "to": "n_sessions",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_user_state",
+      "from": "n_research",
+      "to": "n_user_state",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_web_secrets",
+      "from": "n_web",
+      "to": "n_secrets",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_server_secrets",
+      "from": "n_server",
+      "to": "n_secrets",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_remote_secrets",
+      "from": "n_remote",
+      "to": "n_secrets",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

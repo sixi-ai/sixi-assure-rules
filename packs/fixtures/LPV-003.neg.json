@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_lpv_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture LPV-003 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Treasury agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 02 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "tool_scopes": [
+          "fx.rates.read"
+        ]
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "FX rates server",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "fx.rates.read"
+        ],
+        "vetted": true,
+        "logged": true,
+        "write_capable": false,
+        "owner": "Fixture owner"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_mcp",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "scopes": [
+          "fx.rates.read"
+        ]
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

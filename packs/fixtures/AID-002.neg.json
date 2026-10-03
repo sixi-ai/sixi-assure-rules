@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_aid_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture AID-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "identities": [
+    {
+      "id": "id_fleet",
+      "name": "Identity id_fleet",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0",
+      "federation": "entra_agent_id",
+      "owner": "Fixture owner",
+      "sponsor": "Head of Fixtures"
+    },
+    {
+      "id": "id_fleet_2",
+      "name": "Identity id_fleet_2",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0",
+      "federation": "entra_agent_id",
+      "owner": "Fixture owner",
+      "sponsor": "Head of Fixtures"
+    }
+  ],
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent_a",
+      "type": "agent",
+      "name": "Research agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity_id": "id_fleet"
+      }
+    },
+    {
+      "id": "n_agent_b",
+      "type": "agent",
+      "name": "Drafting agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity_id": "id_fleet_2"
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Orders API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oauth"
+        ],
+        "secrets_in": "secret_store"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent_a",
+      "to": "n_api",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_agent_b",
+      "to": "n_api",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,162 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_mem_003_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture MEM-003 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_reader",
+      "type": "agent",
+      "name": "Research agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 03 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true
+      }
+    },
+    {
+      "id": "n_writer",
+      "type": "agent",
+      "name": "Drafting agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 03 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true
+      }
+    },
+    {
+      "id": "n_mcp_tp",
+      "type": "mcp_server",
+      "name": "Web search MCP server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": false,
+        "integrity": "pinned",
+        "logged": true,
+        "capabilities": [
+          "queries_database"
+        ]
+      }
+    },
+    {
+      "id": "n_tool_w",
+      "type": "tool",
+      "name": "Ticket writer",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "write"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "capabilities": [
+          "modifies_state"
+        ],
+        "write_capable": true
+      }
+    },
+    {
+      "id": "n_state",
+      "type": "datastore",
+      "name": "Shared notes",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "cosmos",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_reader",
+      "to": "n_mcp_tp",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_reader",
+      "to": "n_state",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e3",
+      "from": "n_writer",
+      "to": "n_state",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e4",
+      "from": "n_writer",
+      "to": "n_tool_w",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

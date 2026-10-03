@@ -1,0 +1,305 @@
+[
+  {
+    "name": "expectation met, authored",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "author": "Independent Reader",
+        "authored_at": "2026-10-01"
+      }
+    ],
+    "pass": true,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "failure": "",
+    "authors": {
+      "Independent Reader": 1
+    },
+    "unexercised_rules": [
+      "TST-002"
+    ]
+  },
+  {
+    "name": "expectation met, no author",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ]
+      }
+    ],
+    "pass": true,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "failure": "",
+    "authors": {
+      "rule-authors": 1
+    },
+    "unexercised_rules": [
+      "TST-002"
+    ]
+  },
+  {
+    "name": "author without a date",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "author": "rule-authors"
+      }
+    ],
+    "pass": true,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "failure": "",
+    "authors": {
+      "rule-authors": 1
+    },
+    "unexercised_rules": [
+      "TST-002"
+    ]
+  },
+  {
+    "name": "200-character author (not bytes)",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "author": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+      }
+    ],
+    "pass": true,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "failure": "",
+    "authors": {
+      "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé": 1
+    },
+    "unexercised_rules": [
+      "TST-002"
+    ]
+  },
+  {
+    "name": "finding nobody expected",
+    "expected": [],
+    "pass": false,
+    "tp": 0,
+    "fp": 1,
+    "fn": 0,
+    "failure": "pack tst: precision 0.000 < 0.90",
+    "authors": {},
+    "unexercised_rules": [
+      "TST-001",
+      "TST-002"
+    ]
+  },
+  {
+    "name": "expected finding not raised",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent",
+          "n_gone"
+        ]
+      }
+    ],
+    "pass": false,
+    "tp": 1,
+    "fp": 0,
+    "fn": 1,
+    "failure": "pack tst: recall 0.500 < 0.85",
+    "authors": {
+      "rule-authors": 2
+    },
+    "unexercised_rules": [
+      "TST-002"
+    ]
+  },
+  {
+    "name": "bad date",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "author": "x",
+        "authored_at": "01.10.2026"
+      }
+    ],
+    "pass": false,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "failure": "authored_at \"01.10.2026\" is not a YYYY-MM-DD date",
+    "authors": {},
+    "unexercised_rules": [
+      "TST-001",
+      "TST-002"
+    ]
+  },
+  {
+    "name": "date without author",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "authored_at": "2026-10-01"
+      }
+    ],
+    "pass": false,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "failure": "authored_at without an author",
+    "authors": {},
+    "unexercised_rules": [
+      "TST-001",
+      "TST-002"
+    ]
+  },
+  {
+    "name": "multi-line author",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "author": "a\nb"
+      }
+    ],
+    "pass": false,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "failure": "one line of at most 200 printable characters",
+    "authors": {},
+    "unexercised_rules": [
+      "TST-001",
+      "TST-002"
+    ]
+  },
+  {
+    "name": "carriage return in author",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "author": "a\rb"
+      }
+    ],
+    "pass": false,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "failure": "one line of at most 200 printable characters",
+    "authors": {},
+    "unexercised_rules": [
+      "TST-001",
+      "TST-002"
+    ]
+  },
+  {
+    "name": "ANSI escape in author",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "author": "\u001b[31mred"
+      }
+    ],
+    "pass": false,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "failure": "one line of at most 200 printable characters",
+    "authors": {},
+    "unexercised_rules": [
+      "TST-001",
+      "TST-002"
+    ]
+  },
+  {
+    "name": "tab in author",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "author": "a\tb"
+      }
+    ],
+    "pass": false,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "failure": "one line of at most 200 printable characters",
+    "authors": {},
+    "unexercised_rules": [
+      "TST-001",
+      "TST-002"
+    ]
+  },
+  {
+    "name": "201-character author",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": [
+          "n_agent"
+        ],
+        "author": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "pass": false,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "failure": "one line of at most 200 printable characters",
+    "authors": {},
+    "unexercised_rules": [
+      "TST-001",
+      "TST-002"
+    ]
+  },
+  {
+    "name": "entry without ids",
+    "expected": [
+      {
+        "rule_id": "TST-001",
+        "ids": []
+      }
+    ],
+    "pass": false,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "failure": "entry 0 needs rule_id and ids",
+    "authors": {},
+    "unexercised_rules": [
+      "TST-001",
+      "TST-002"
+    ]
+  }
+]

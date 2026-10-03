@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_mem_005_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture MEM-005 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 03 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true
+      }
+    },
+    {
+      "id": "n_mem",
+      "type": "agent_memory",
+      "name": "Agent memory",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "write_path": "broker",
+        "validated": true,
+        "scope": "agent"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_mem",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "guarded": false
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

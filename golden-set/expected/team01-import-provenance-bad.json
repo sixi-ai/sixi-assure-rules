@@ -1,0 +1,158 @@
+[
+  {
+    "rule_id": "CMP-001",
+    "ids": [
+      "n_db"
+    ]
+  },
+  {
+    "rule_id": "CMP-003",
+    "ids": [
+      "n_tool"
+    ]
+  },
+  {
+    "rule_id": "CMP-004",
+    "ids": [
+      "n_api"
+    ]
+  },
+  {
+    "rule_id": "IMP-001",
+    "ids": [
+      "n_legacy"
+    ]
+  },
+  {
+    "rule_id": "IMP-002",
+    "ids": [
+      "n_db2"
+    ]
+  },
+  {
+    "rule_id": "IMP-003",
+    "ids": [
+      "n_db"
+    ]
+  },
+  {
+    "rule_id": "IMP-004",
+    "ids": [
+      "n_core"
+    ]
+  },
+  {
+    "rule_id": "IMP-005",
+    "ids": [
+      "n_pe"
+    ]
+  },
+  {
+    "rule_id": "IMP-006",
+    "ids": [
+      "arch_gs_team01_import_provenance_bad"
+    ]
+  },
+  {
+    "rule_id": "PRV-001",
+    "ids": [
+      "n_approver"
+    ]
+  },
+  {
+    "rule_id": "PRV-001",
+    "ids": [
+      "n_gw"
+    ]
+  },
+  {
+    "rule_id": "PRV-002",
+    "ids": [
+      "arch_gs_team01_import_provenance_bad"
+    ]
+  },
+  {
+    "rule_id": "PRV-004",
+    "ids": [
+      "n_web"
+    ]
+  },
+  {
+    "rule_id": "PRV-005",
+    "ids": [
+      "n_db"
+    ]
+  },
+  {
+    "rule_id": "PRV-006",
+    "ids": [
+      "n_web"
+    ]
+  },
+  {
+    "rule_id": "SCP-002",
+    "ids": [
+      "arch_gs_team01_import_provenance_bad"
+    ]
+  },
+  {
+    "rule_id": "SCP-003",
+    "ids": [
+      "arch_gs_team01_import_provenance_bad"
+    ]
+  },
+  {
+    "rule_id": "SCP-004",
+    "ids": [
+      "arch_gs_team01_import_provenance_bad"
+    ]
+  },
+  {
+    "rule_id": "SCP-005",
+    "ids": [
+      "arch_gs_team01_import_provenance_bad"
+    ]
+  },
+  {
+    "rule_id": "STR-001",
+    "ids": [
+      "n_comp2"
+    ]
+  },
+  {
+    "rule_id": "STR-007",
+    "ids": [
+      "n_approver"
+    ]
+  },
+  {
+    "rule_id": "STR-009",
+    "ids": [
+      "n_tool"
+    ]
+  },
+  {
+    "rule_id": "STR-010",
+    "ids": [
+      "e_comp_db"
+    ]
+  },
+  {
+    "rule_id": "STR-011",
+    "ids": [
+      "arch_gs_team01_import_provenance_bad"
+    ]
+  },
+  {
+    "rule_id": "STR-012",
+    "ids": [
+      "n_db"
+    ]
+  },
+  {
+    "rule_id": "STR-012",
+    "ids": [
+      "n_db2"
+    ]
+  }
+]

@@ -1,0 +1,61 @@
+{
+  "id": "arch_fx_dor_003_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DOR-003 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "DORA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Major ICT incidents reported to the competent authority by the CISO office.",
+    "dr_tested_at": "2026-06-01"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_saas",
+      "type": "saas",
+      "name": "Payments SaaS",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "provider": "other",
+        "criticality": "critical",
+        "region": "switzerlandnorth",
+        "outsourcing_registered": true,
+        "exit_strategy": true
+      }
+    },
+    {
+      "id": "n_sub",
+      "type": "saas",
+      "name": "Card processor",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "provider": "other",
+        "outsourcing_registered": false,
+        "criticality": "high",
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_saas",
+      "to": "n_sub",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

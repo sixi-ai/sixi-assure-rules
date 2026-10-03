@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_dlg_002_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DLG-002 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "identities": [
+    {
+      "id": "id_worker",
+      "name": "Worker identity",
+      "kind": "agent_identity",
+      "federation": "entra_agent_id",
+      "issuer": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0",
+      "owner": "Fixture owner",
+      "sponsor": "Head of Fixtures"
+    }
+  ],
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Orchestrator",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 02 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true
+      }
+    },
+    {
+      "id": "n_worker",
+      "type": "agent",
+      "name": "Worker",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 02 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity_id": "id_worker"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_orch",
+      "to": "n_worker",
+      "kind": "delegates",
+      "protocol": "https",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "audience": "api://market-data",
+        "delegation_depth": 1
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

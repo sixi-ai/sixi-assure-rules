@@ -1,0 +1,41 @@
+{
+  "id": "arch_fx_cmp_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CMP-003 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_tool",
+      "type": "tool",
+      "name": "Lookup tool",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "scopes": [
+          "read"
+        ],
+        "capabilities": [
+          "queries_database"
+        ],
+        "integrity": "pinned",
+        "vetted": true,
+        "origin": "first_party"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

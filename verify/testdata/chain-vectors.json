@@ -1,0 +1,107 @@
+{
+  "notes": [
+    "Hash-chain test vectors of the Sixi Assure evidence chain (ADR-012, docs/18 A4). Check them with standard tools:",
+    "payload_hash = sha256 of payload_canonical: printf '%s' \"$(jq -r '.events[0].payload_canonical' chain-vectors.json)\" | sha256sum",
+    "(canonical: object keys sorted byte-wise, no insignificant whitespace, strings in UTF-8 with no HTML escaping, numbers as written)",
+    "hash = sha256 of the pre-image: printf '%s' \"$(jq -r '.events[0].preimage' chain-vectors.json)\" | sha256sum",
+    "preimage = prev_hash|payload_hash|type|actor|version|ts, joined by '|', ts in RFC 3339 UTC with the fraction truncated to microseconds and trailing zeros dropped (Go's time.RFC3339Nano)",
+    "the first prev_hash is 64 zeros (genesis); each prev_hash is the hash before it; head_hash is the last hash",
+    "assure verify chain-vectors.json recomputes them too (the file is a chain export; no anchor, so every event reads as unanchored)"
+  ],
+  "arch_id": "arch_vectors",
+  "events": [
+    {
+      "id": "ev_001",
+      "arch_id": "arch_vectors",
+      "version": 1,
+      "type": "model_created",
+      "payload": {
+        "hash": "6e0a0d0f8c4b2f7d6d0a5e3c1b9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a19",
+        "name_sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+        "nodes": 7
+      },
+      "payload_hash": "5f5e84a1c6e29d3f476a4287cc31a4957d134a90d3d4ebd5cf518bf75c0ab09b",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "1e4eb21be655644307f15aa507ca67ce9471dc11ed76a9bb72ea84a98b3ed50b",
+      "actor": "user:usr_vectors",
+      "ts": "2026-10-01T09:00:00Z",
+      "seq": 1,
+      "anchored_by": null,
+      "payload_canonical": "{\"hash\":\"6e0a0d0f8c4b2f7d6d0a5e3c1b9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a19\",\"name_sha256\":\"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08\",\"nodes\":7}",
+      "preimage": "0000000000000000000000000000000000000000000000000000000000000000|5f5e84a1c6e29d3f476a4287cc31a4957d134a90d3d4ebd5cf518bf75c0ab09b|model_created|user:usr_vectors|1|2026-10-01T09:00:00Z"
+    },
+    {
+      "id": "ev_002",
+      "arch_id": "arch_vectors",
+      "version": 2,
+      "type": "patch_accepted",
+      "payload": {
+        "after": "b1",
+        "before": "a0",
+        "ops": 3,
+        "rationale_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "payload_hash": "e8fbc68a4f137579011c34073b716e928b3b3d09dd346da2e1409643f9e2b698",
+      "prev_hash": "1e4eb21be655644307f15aa507ca67ce9471dc11ed76a9bb72ea84a98b3ed50b",
+      "hash": "95f669bf1ba62282e365bd50387fd6e93e5d2109c8b135408120af02f1a319f4",
+      "actor": "user:usr_vectors",
+      "ts": "2026-10-01T09:30:15.123456Z",
+      "seq": 2,
+      "anchored_by": null,
+      "payload_canonical": "{\"after\":\"b1\",\"before\":\"a0\",\"ops\":3,\"rationale_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}",
+      "preimage": "1e4eb21be655644307f15aa507ca67ce9471dc11ed76a9bb72ea84a98b3ed50b|e8fbc68a4f137579011c34073b716e928b3b3d09dd346da2e1409643f9e2b698|patch_accepted|user:usr_vectors|2|2026-10-01T09:30:15.123456Z"
+    },
+    {
+      "id": "ev_003",
+      "arch_id": "arch_vectors",
+      "version": 2,
+      "type": "finding_status",
+      "payload": {
+        "finding": "f_1",
+        "note": "Zürich – «größer» <&>",
+        "rule_id": "NET-003",
+        "status": "accepted"
+      },
+      "payload_hash": "4789a70b525c6d09809dab9ba21b04d1bf234aa7610a4993b6ede480a8cb8a0d",
+      "prev_hash": "95f669bf1ba62282e365bd50387fd6e93e5d2109c8b135408120af02f1a319f4",
+      "hash": "341c4a846f821c3d368f2acfa0bb4899bce84bbeaf57a48942e54aa96f3e0f49",
+      "actor": "agent_key:ak_vectors",
+      "ts": "2026-10-01T10:00:00.5Z",
+      "seq": 3,
+      "anchored_by": null,
+      "payload_canonical": "{\"finding\":\"f_1\",\"note\":\"Zürich – «größer» <&>\",\"rule_id\":\"NET-003\",\"status\":\"accepted\"}",
+      "preimage": "95f669bf1ba62282e365bd50387fd6e93e5d2109c8b135408120af02f1a319f4|4789a70b525c6d09809dab9ba21b04d1bf234aa7610a4993b6ede480a8cb8a0d|finding_status|agent_key:ak_vectors|2|2026-10-01T10:00:00.5Z"
+    },
+    {
+      "id": "ev_004",
+      "arch_id": "arch_vectors",
+      "version": 2,
+      "type": "export_generated",
+      "payload": {
+        "format": "json",
+        "kind": "assurance_report",
+        "nested": {
+          "a": 1.50,
+          "b": [
+            3,
+            1,
+            2
+          ]
+        },
+        "sha256": "5d41402abc4b2a76b9719d911017c592"
+      },
+      "payload_hash": "e6779aebbd9020a6081c9fe9c15ae944cbc218966a640223fd41c07b1fded9c6",
+      "prev_hash": "341c4a846f821c3d368f2acfa0bb4899bce84bbeaf57a48942e54aa96f3e0f49",
+      "hash": "57b38402603aefd43082d2d21efc126816daa331bd6adafed51e4d4cdf819005",
+      "actor": "user:usr_vectors",
+      "ts": "2026-10-01T10:15:00.000001Z",
+      "seq": 4,
+      "anchored_by": null,
+      "payload_canonical": "{\"format\":\"json\",\"kind\":\"assurance_report\",\"nested\":{\"a\":1.50,\"b\":[3,1,2]},\"sha256\":\"5d41402abc4b2a76b9719d911017c592\"}",
+      "preimage": "341c4a846f821c3d368f2acfa0bb4899bce84bbeaf57a48942e54aa96f3e0f49|e6779aebbd9020a6081c9fe9c15ae944cbc218966a640223fd41c07b1fded9c6|export_generated|user:usr_vectors|2|2026-10-01T10:15:00.000001Z"
+    }
+  ],
+  "head_hash": "57b38402603aefd43082d2d21efc126816daa331bd6adafed51e4d4cdf819005",
+  "count": 4,
+  "anchors": []
+}

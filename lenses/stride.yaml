@@ -3,12 +3,13 @@
 # a finding (CLAUDE.md §1.2); it re-labels a finding a deterministic rule already made, so a security
 # reviewer can read the assessment in the vocabulary of their own threat model.
 lens: stride
-version: 2026-09-16
+version: 2026-10-01
 source: https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats
 licence: none (our own classification; STRIDE itself is a taxonomy, not a licensed artefact)
 accessed: 2026-09-16
 notes: |
-  Covers all 85 rules in packs/*.yaml as of 2026-09-16. The classification is ours: it says which
+  Covers all 96 rules in packs/*.yaml (2026-10-01: LOG-004 retired into AI-001 by docs/18 B1; ATA, AIA, CHE,
+  CRA-004, DOR-001, FIN and NIS-004 added). The classification is ours: it says which
   property of the system the drawn weakness puts at risk, not which attack will happen. Several rules
   carry more than one letter; the order follows the acronym. Repudiation (R) is used for the evidence
   and accountability gaps — missing logs, missing owner, missing inventory entry — because that is the
@@ -21,6 +22,10 @@ categories:
   D: Denial of service — the function cannot be delivered or recovered
   E: Elevation of privilege — a component acts with more authority than its task needs
 map:
+  # ---- a2a
+  ATA-001:  [S]            # A2A peer across a boundary declares no verified agent card
+  ATA-002:  [S, E]         # A2A hop across a boundary authenticated with an API key or HTTP Basic
+  ATA-003:  [I, E]         # Credential carried inside the A2A message payload
   # ---- agt
   AGT-001:  [S, T]         # Third-party tool shadows the name of another tool
   AGT-002:  [T, E]         # Declared behaviour hides a secondary action
@@ -30,7 +35,7 @@ map:
   AGT-006:  [T, E]         # Autonomous agent reaches a code-executing tool with no approval step
   AGT-007:  [T]            # Third-party component declares no capabilities and cannot be assessed
   # ---- ai
-  AI-001:   [I, D]         # LLM called without an AI gateway
+  AI-001:   [R, I, D]      # LLM called without a gateway on every path
   AI-002:   [T, I]         # User-facing agent without content safety
   AI-003:   [E]            # Consequential agent action without human approval
   AI-004:   [T]            # Agents without an evaluation / drift-monitoring node
@@ -45,6 +50,9 @@ map:
   AI-013:   [R]            # LLM endpoint without model documentation
   AI-014:   [R]            # Evaluation declares no scope
   AI-015:   [T]            # High-risk system evaluated without robustness and bias coverage
+  # ---- aia
+  AIA-001:  [S]            # Agent reached by people through an app or gateway declares no AI disclosure
+  AIA-002:  [R, E]         # Non-high-risk tier declared while a high-consequence action has no human step
   # ---- c4
   STR-001:  [R]            # Component declared without a containing element
   STR-002:  [S, E]         # Relationship crosses a boundary without authentication
@@ -61,16 +69,23 @@ map:
   DATA-004: [I]            # Sensitive datastore without customer-managed keys
   DATA-005: [D]            # Critical datastore without backups
   DATA-006: [I]            # PII or secrets sent to an LLM endpoint
+  CHE-002:  [E]            # Autonomous agent decides on customers with a write path that avoids a human step
   # ---- drift
   DRF-001:  [T, D]         # Element uses a service or feature the knowledge base records as deprecated
   DRF-002:  [R]            # Accepted decision rests on a document that has moved on
   DRF-003:  [R]            # Element documentation link is stale, superseded or unreachable
   DRF-004:  [T, D]         # Relationship names a deprecated feature or protocol
+  # ---- fin
+  FIN-002:  [I]            # Client-identifying or personal data store without a criticality categorisation
+  FIN-003:  [D]            # Material external model or service without an exit arrangement
   # ---- gov
   GOV-001:  [R]            # Architecture without an owner
   GOV-002:  [R]            # Incident reporting path not defined (ISG / DORA / NIS2 / CRA)
   CRA-001:  [T, R]         # CRA product without SBOM
   CRA-002:  [T, E]         # CRA product without secure boot or signed updates
+  CRA-004:  [S, E]         # External interface of a CRA product accepts unauthenticated access
+  CHE-004:  [R]            # Public IT resource under the ISG reporting duty whose events reach no log sink
+  NIS-004:  [I, E]         # Third-party system drawn inside a zone that holds data
   # ---- gxp
   GXP-001:  [T, R]         # No immutable audit trail for GxP records
   GXP-002:  [S, R]         # Electronic approval not bound to the signer's own identity
@@ -82,7 +97,6 @@ map:
   LOG-001:  [R]            # AI components without a log sink
   LOG-002:  [R]            # Log retention below the regime minimum
   LOG-003:  [T, R]         # Log sink not immutable (FINMA)
-  LOG-004:  [R]            # LLM traffic not logged through a gateway
   LOG-005:  [R]            # Agent tool calls not logged
   # ---- mr
   MR-001:   [R]            # Self-evolving ML safety function without third-party conformity assessment
@@ -111,6 +125,7 @@ map:
   # ---- tpr
   TPR-001:  [R]            # External service not in the outsourcing register
   TPR-002:  [D]            # Critical external service without exit strategy
+  DOR-001:  [R]            # Location of a critical ICT service undeclared
   # ---- zt
   ZT-001:   [S, E]         # Shared secret on service-to-data edge
   ZT-002:   [S, R]         # Agent without dedicated identity

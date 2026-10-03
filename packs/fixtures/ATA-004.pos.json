@@ -1,0 +1,83 @@
+{
+  "id": "arch_fx_ata_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ATA-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_home",
+      "kind": "zone",
+      "name": "Our agent runtime",
+      "node_ids": [
+        "n_agent"
+      ]
+    },
+    {
+      "id": "g_partner",
+      "kind": "trust_boundary",
+      "name": "Partner agent (other organisation)",
+      "node_ids": [
+        "n_partner"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Our agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 02 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "output_marking": true,
+        "integrity": "signed"
+      }
+    },
+    {
+      "id": "n_partner",
+      "type": "saas",
+      "name": "Partner agent service",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "provider": "other"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_partner",
+      "to": "n_agent",
+      "kind": "calls",
+      "protocol": "a2a",
+      "auth": "none",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,37 @@
+{
+  "id": "arch_fx_cra_006_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CRA-006 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "CRA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Actively exploited vulnerabilities reported through the PSIRT."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_prod",
+      "type": "product",
+      "name": "Agent appliance",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "cra_scope": true,
+        "sbom": true,
+        "secure_boot": true,
+        "ota_signed": true,
+        "owner": "Fixture owner"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

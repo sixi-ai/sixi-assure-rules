@@ -60,9 +60,27 @@
     ]
   },
   {
+    "rule_id": "AIA-002",
+    "ids": [
+      "arch_demo_foundry_agent_bad"
+    ]
+  },
+  {
+    "rule_id": "BLR-003",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
     "rule_id": "DATA-004",
     "ids": [
       "n_ledger"
+    ]
+  },
+  {
+    "rule_id": "HOV-004",
+    "ids": [
+      "n_agent"
     ]
   },
   {
@@ -71,6 +89,12 @@
       "e_agent_mcp_fx",
       "e_agent_tool_cust",
       "e_agent_tool_ticket"
+    ]
+  },
+  {
+    "rule_id": "LPV-001",
+    "ids": [
+      "n_agent"
     ]
   },
   {
@@ -95,6 +119,12 @@
     "rule_id": "ZT-008",
     "ids": [
       "e_agent_mcp_fx"
+    ]
+  },
+  {
+    "rule_id": "CMP-005",
+    "ids": [
+      "n_aigw"
     ]
   }
 ]

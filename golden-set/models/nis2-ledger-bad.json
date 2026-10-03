@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_gs_nis2_ledger_bad",
+  "tenant_id": "tenant_templates",
+  "name": "Dispatch system under NIS2 (bad twin)",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Operations IT",
+    "regimes": [
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Significant incidents go to the national CSIRT through the security office: early warning, notification and final report.",
+    "description": "Bad twin of nis2-ledger: A logistics operator's dispatch system with an order database and a partner's tracking SaaS."
+  },
+  "groups": [
+    {
+      "id": "g_data",
+      "kind": "zone",
+      "name": "Data zone",
+      "node_ids": [
+        "n_app",
+        "n_db",
+        "n_partner"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Dispatch app",
+      "layer": "app",
+      "zone": "g_data",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "attrs": {
+        "exposure": "internal",
+        "owner": "Head of Operations IT"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Order database",
+      "layer": "data",
+      "zone": "g_data",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 0
+      },
+      "attrs": {
+        "engine": "sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_partner",
+      "type": "saas",
+      "name": "Partner tracking SaaS",
+      "layer": "platform",
+      "zone": "g_data",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 0
+      },
+      "attrs": {
+        "provider": "other",
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_app_db",
+      "from": "n_app",
+      "to": "n_db",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_app_partner",
+      "from": "n_app",
+      "to": "n_partner",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

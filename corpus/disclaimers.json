@@ -21,5 +21,6 @@
   "OWASP": "Sixi Assure assesses your architecture against the cited OWASP guidance and evidences the design decisions you record; it does not provide legal advice, a security test or certification.",
   "MAESTRO": "Sixi Assure uses the cited CSA MAESTRO layers to frame agentic threat modelling and evidences the design decisions you record; it does not provide legal advice, a security test or certification.",
   "MSFT": "Sixi Assure assesses your architecture against the cited Microsoft product guidance and evidences the design decisions you record; this guidance is not law, and Sixi Assure does not provide legal advice or certification.",
-  "CIS": "Sixi Assure assesses your architecture against the cited CIS Benchmark sections and evidences the design decisions you record; benchmark text is not reproduced, and this is not legal advice, an audit or certification."
+  "CIS": "Sixi Assure assesses your architecture against the cited CIS Benchmark sections and evidences the design decisions you record; benchmark text is not reproduced, and this is not legal advice, an audit or certification.",
+  "EIDAS": "Sixi Assure cites Regulation (EU) No 910/2014 (eIDAS) for reference beside its evidence chain; an Assure bundle is not a qualified electronic signature, seal or time stamp, and this is not legal advice or certification."
 }

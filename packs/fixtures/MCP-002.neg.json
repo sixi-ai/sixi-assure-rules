@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_mcp_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture MCP-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "OWASP",
+      "MCSB"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Team MCP server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "capabilities": [
+          "queries_database"
+        ],
+        "transport": "streamable_http",
+        "exposure": "private_network",
+        "auth_mode": "oauth21",
+        "resource_metadata": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_mcp",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

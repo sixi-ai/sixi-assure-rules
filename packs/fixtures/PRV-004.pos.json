@@ -1,0 +1,35 @@
+{
+  "id": "arch_fx_prv_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture PRV-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Public API",
+      "layer": "app",
+      "source": "design",
+      "description": "Public API behind the WAF",
+      "attrs": {
+        "exposure": "public",
+        "authn": "oidc"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

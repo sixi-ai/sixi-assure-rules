@@ -1,0 +1,294 @@
+{
+  "schema_version": "1.2",
+  "identities": [
+    {
+      "id": "ident_agent_id",
+      "name": "Agent identity (agent_id)",
+      "kind": "agent_identity",
+      "attrs": {
+        "x_migrated_from": "agent.identity=agent_id"
+      }
+    }
+  ],
+  "id": "arch_gs_cra_agent_product_bad",
+  "tenant_id": "tenant_templates",
+  "name": "Support appliance with an embedded agent (bad twin)",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Product Security",
+    "criticality": "high",
+    "materiality": "medium",
+    "ai_act_tier": "gpai",
+    "regimes": [
+      "CRA",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Actively exploited vulnerabilities and severe incidents are reported by the PSIRT through the single reporting platform within 24 h.",
+    "description": "Bad twin of cra-agent-product: An on-premises support appliance sold to customers: an embedded agent with a partner MCP server, an API partners call, and the appliance log."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_partner",
+      "type": "external_party",
+      "name": "Partner service desk",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 120
+      },
+      "attrs": {}
+    },
+    {
+      "id": "n_prod",
+      "type": "product",
+      "name": "Support appliance",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 0
+      },
+      "attrs": {
+        "cra_scope": true,
+        "owner": "Head of Product Security",
+        "secure_boot": true,
+        "ota_signed": false
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Appliance API",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 120
+      },
+      "attrs": {
+        "exposure": "internal",
+        "c4_parent": "n_prod"
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Appliance support agent",
+      "layer": "ai",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 120
+      },
+      "attrs": {
+        "identity": "agent_id",
+        "identity_id": "ident_agent_id",
+        "autonomy": "assisted",
+        "purpose": "Drafts answers to support tickets; a person sends them.",
+        "owner": "Head of Product Security",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "content_safety": true,
+        "c4_parent": "n_prod"
+      }
+    },
+    {
+      "id": "n_mcp_tp",
+      "type": "mcp_server",
+      "name": "Partner ticketing MCP server",
+      "layer": "ai",
+      "source": "design",
+      "position": {
+        "x": 720,
+        "y": 240
+      },
+      "attrs": {
+        "origin": "third_party",
+        "vetted": true,
+        "c4_parent": "n_prod",
+        "capabilities": [
+          "network_egress"
+        ],
+        "scopes": [
+          "tickets.read"
+        ],
+        "owner": "Head of Product Security",
+        "purpose": "Partner ticketing connector."
+      }
+    },
+    {
+      "id": "n_aigw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 720,
+        "y": 0
+      },
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "content_safety": true,
+        "token_limits": true,
+        "c4_parent": "n_prod"
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI",
+      "layer": "ai",
+      "source": "design",
+      "position": {
+        "x": 960,
+        "y": 0
+      },
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "model": "gpt-4.1",
+        "model_card": true,
+        "owner": "Head of Product Security",
+        "materiality": "medium",
+        "purpose": "Generation model of the support agent."
+      }
+    },
+    {
+      "id": "n_sink",
+      "type": "log_sink",
+      "name": "Appliance log",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 360
+      },
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true,
+        "c4_parent": "n_prod"
+      }
+    },
+    {
+      "id": "n_eval",
+      "type": "evaluation",
+      "name": "Agent evaluation",
+      "layer": "ai",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 360
+      },
+      "attrs": {
+        "evaluates": [
+          "accuracy",
+          "prompt_injection",
+          "drift"
+        ],
+        "owner": "Head of Product Security",
+        "purpose": "Golden-set evaluation of drafted answers before every release."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_in",
+      "from": "n_partner",
+      "to": "n_api",
+      "kind": "calls",
+      "label": "ticket intake",
+      "protocol": "https",
+      "auth": "none",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    },
+    {
+      "id": "e_api_agent",
+      "from": "n_api",
+      "to": "n_agent",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_agent_aigw",
+      "from": "n_agent",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_aigw_llm",
+      "from": "n_aigw",
+      "to": "n_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_agent_mcp",
+      "from": "n_agent",
+      "to": "n_mcp_tp",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_api_sink",
+      "from": "n_api",
+      "to": "n_sink",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_eval_sink",
+      "from": "n_eval",
+      "to": "n_sink",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

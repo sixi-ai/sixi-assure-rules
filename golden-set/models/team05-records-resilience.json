@@ -1,0 +1,559 @@
+{
+  "attrs": {
+    "ai_act_tier": "high_risk",
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "criticality": "critical",
+    "description": "Four agents prepare credit decisions for a case worker; every agent writes the evidence or security sink, an evaluation reads both, and a critical case app depends on a geo-redundant case store.",
+    "dr_tested_at": "2026-06-30",
+    "incident_reporting": "Security events from the security sink go to the SOC; the CISO informs FINMA (cyber attack) and, for a serious incident of the AI system, the provider and the market surveillance authority, per the cited clauses.",
+    "materiality": "high",
+    "owner": "Head of AI Operations",
+    "regimes": [
+      "FINMA",
+      "AIACT"
+    ]
+  },
+  "edges": [
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_app",
+      "id": "e_app_db",
+      "kind": "reads",
+      "protocol": "https",
+      "to": "n_db"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_app",
+      "id": "e_app_agent",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_agent"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_gw",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_gw"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_gw",
+      "id": "e_gw_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_llm"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "obo",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_b",
+      "kind": "delegates",
+      "protocol": "https",
+      "to": "n_agent_b"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "obo",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_c",
+      "kind": "delegates",
+      "protocol": "https",
+      "to": "n_agent_c"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent_b",
+      "id": "e_b_gw",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_gw"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "obo",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_d",
+      "kind": "delegates",
+      "protocol": "https",
+      "to": "n_agent_d"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent_d",
+      "id": "e_d_sec",
+      "kind": "writes",
+      "protocol": "https",
+      "to": "n_logs_sec"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "agent_id",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent_c",
+      "id": "e_c_tool",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_tool"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_ev",
+      "kind": "writes",
+      "protocol": "https",
+      "to": "n_logs_ev"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent_b",
+      "id": "e_b_sec",
+      "kind": "writes",
+      "protocol": "https",
+      "to": "n_logs_sec"
+    },
+    {
+      "attrs": {},
+      "auth": "agent_id",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_agent_c",
+      "id": "e_c_sec",
+      "kind": "writes",
+      "protocol": "https",
+      "to": "n_logs_sec"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_gw",
+      "id": "e_gw_sec",
+      "kind": "writes",
+      "protocol": "https",
+      "to": "n_logs_sec"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_eval",
+      "id": "e_eval_ev",
+      "kind": "reads",
+      "protocol": "https",
+      "to": "n_logs_ev"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_eval",
+      "id": "e_eval_sec",
+      "kind": "reads",
+      "protocol": "https",
+      "to": "n_logs_sec"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_eval_offline",
+      "id": "e_offline_gw",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_gw"
+    }
+  ],
+  "evidence": [],
+  "findings": [],
+  "groups": [
+    {
+      "attrs": {
+        "region": "switzerlandnorth"
+      },
+      "id": "g_cloud",
+      "kind": "zone",
+      "name": "Azure – switzerlandnorth",
+      "node_ids": [
+        "n_app",
+        "n_db",
+        "n_agent",
+        "n_agent_b",
+        "n_agent_c",
+        "n_agent_d",
+        "n_gw",
+        "n_llm",
+        "n_tool",
+        "n_logs_sec",
+        "n_logs_ev",
+        "n_eval",
+        "n_eval_offline"
+      ]
+    }
+  ],
+  "id": "arch_gs_team05_records_resilience",
+  "identities": [
+    {
+      "attrs": {
+        "x_migrated_from": "agent.identity=agent_id"
+      },
+      "id": "ident_agent_id",
+      "kind": "agent_identity",
+      "name": "Agent identity (agent_id)"
+    }
+  ],
+  "name": "Credit-decision assistant with evidence, evaluation and recovery declared",
+  "nodes": [
+    {
+      "attrs": {
+        "authn": [
+          "oidc"
+        ],
+        "backup": true,
+        "criticality": "critical",
+        "exposure": "internal",
+        "geo_redundant": true,
+        "owner": "Head of AI Operations",
+        "rpo_min": 15,
+        "rto_min": 30,
+        "secrets_in": "secret_store"
+      },
+      "id": "n_app",
+      "layer": "app",
+      "name": "Case app",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "source": "design",
+      "type": "app",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "backup": true,
+        "data_class": "confidential",
+        "encryption_key": "cmk",
+        "engine": "azure_sql",
+        "geo_redundant": true,
+        "network_exposure": "private",
+        "region": "switzerlandnorth",
+        "rpo_min": 15,
+        "rto_min": 30
+      },
+      "id": "n_db",
+      "layer": "data",
+      "name": "Case store",
+      "position": {
+        "x": 0,
+        "y": 200
+      },
+      "source": "design",
+      "type": "datastore",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "ai_disclosure": true,
+        "autonomy": "assisted",
+        "content_safety": true,
+        "identity": "agent_id",
+        "identity_id": "ident_agent_id",
+        "kill_switch": true,
+        "materiality": "high",
+        "output_marking": true,
+        "owner": "Head of AI Operations",
+        "purpose": "Drafts the credit assessment for the case worker",
+        "rate_limit": true
+      },
+      "id": "n_agent",
+      "layer": "ai",
+      "name": "Credit assistant",
+      "position": {
+        "x": 240,
+        "y": 0
+      },
+      "source": "design",
+      "type": "agent",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "ai_disclosure": true,
+        "autonomy": "assisted",
+        "content_safety": true,
+        "identity": "agent_id",
+        "identity_id": "ident_agent_id",
+        "kill_switch": true,
+        "materiality": "high",
+        "output_marking": true,
+        "owner": "Head of AI Operations",
+        "purpose": "Summarises the case documents for the credit assistant",
+        "rate_limit": true
+      },
+      "id": "n_agent_b",
+      "layer": "ai",
+      "name": "Document summariser",
+      "position": {
+        "x": 240,
+        "y": 200
+      },
+      "source": "design",
+      "type": "agent",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "ai_disclosure": true,
+        "autonomy": "assisted",
+        "content_safety": true,
+        "identity": "agent_id",
+        "identity_id": "ident_agent_id",
+        "kill_switch": true,
+        "materiality": "high",
+        "output_marking": true,
+        "owner": "Head of AI Operations",
+        "purpose": "Opens follow-up tickets for the case worker",
+        "rate_limit": true
+      },
+      "id": "n_agent_c",
+      "layer": "ai",
+      "name": "Ticket agent",
+      "position": {
+        "x": 240,
+        "y": 400
+      },
+      "source": "design",
+      "type": "agent",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "ai_disclosure": true,
+        "autonomy": "assisted",
+        "content_safety": true,
+        "identity": "agent_id",
+        "identity_id": "ident_agent_id",
+        "kill_switch": true,
+        "materiality": "high",
+        "output_marking": true,
+        "owner": "Head of AI Operations",
+        "purpose": "Files the decided case with its rationale",
+        "rate_limit": true
+      },
+      "id": "n_agent_d",
+      "layer": "ai",
+      "name": "Archive agent",
+      "position": {
+        "x": 240,
+        "y": 600
+      },
+      "source": "design",
+      "type": "agent",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "content_safety": true,
+        "kind": "ai",
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "logging": true,
+        "token_limits": true
+      },
+      "id": "n_gw",
+      "layer": "platform",
+      "name": "AI gateway",
+      "position": {
+        "x": 480,
+        "y": 0
+      },
+      "source": "design",
+      "type": "gateway",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "exit_strategy": true,
+        "materiality": "high",
+        "model_card": true,
+        "network": "private",
+        "outsourcing_registered": true,
+        "owner": "Head of AI Operations",
+        "provider": "azure",
+        "purpose": "Credit assessment model",
+        "region": "switzerlandnorth"
+      },
+      "id": "n_llm",
+      "layer": "ai",
+      "name": "Azure OpenAI",
+      "position": {
+        "x": 720,
+        "y": 0
+      },
+      "source": "design",
+      "type": "llm_endpoint",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "tickets.write"
+        ],
+        "vetted": true
+      },
+      "id": "n_tool",
+      "layer": "app",
+      "name": "Ticket tool",
+      "position": {
+        "x": 480,
+        "y": 400
+      },
+      "source": "design",
+      "type": "tool",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "backup": true,
+        "geo_redundant": true,
+        "immutable": true,
+        "purpose": "security",
+        "region": "switzerlandnorth",
+        "retention_days": 3650
+      },
+      "id": "n_logs_sec",
+      "layer": "platform",
+      "name": "Security log archive",
+      "position": {
+        "x": 480,
+        "y": 200
+      },
+      "source": "design",
+      "type": "log_sink",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "backup": true,
+        "geo_redundant": true,
+        "immutable": true,
+        "purpose": "evidence",
+        "region": "switzerlandnorth",
+        "retention_days": 3650
+      },
+      "id": "n_logs_ev",
+      "layer": "platform",
+      "name": "Evidence archive",
+      "position": {
+        "x": 720,
+        "y": 200
+      },
+      "source": "design",
+      "type": "log_sink",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "evaluates": [
+          "accuracy",
+          "robustness",
+          "bias",
+          "prompt_injection",
+          "drift"
+        ],
+        "owner": "Head of AI Operations",
+        "purpose": "Evaluates the agents against the high-risk scope and watches for drift"
+      },
+      "id": "n_eval",
+      "layer": "platform",
+      "name": "Evaluation and drift monitoring",
+      "position": {
+        "x": 720,
+        "y": 400
+      },
+      "source": "design",
+      "type": "evaluation",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "evaluates": [
+          "accuracy",
+          "robustness",
+          "bias",
+          "prompt_injection",
+          "drift"
+        ],
+        "owner": "Head of AI Operations",
+        "purpose": "Offline evaluation of the model path before a release"
+      },
+      "id": "n_eval_offline",
+      "layer": "platform",
+      "name": "Offline model evaluation",
+      "position": {
+        "x": 960,
+        "y": 0
+      },
+      "source": "design",
+      "type": "evaluation",
+      "zone": "g_cloud"
+    }
+  ],
+  "schema_version": "1.2",
+  "tenant_id": "tenant_templates",
+  "version": 1
+}

@@ -1,7 +1,8 @@
 # DATA — data protection & residency (docs/03 §DATA). Deterministic CEL; the LLM never creates findings.
 pack: data
-version: 0.2.0
-regimes: [FADP, FINMA, ISO, MCSB, DORA, OWASP]
+version: 0.4.0
+regimes: [FADP, GDPR, FINMA, ISO, MCSB, DORA, OWASP]
+offer: agentic
 rules:
   - id: DATA-001
     title: Sensitive data embedded without classification or redaction
@@ -10,6 +11,8 @@ rules:
     condition: |
       e.to.type == "vector_index" && attr(e.from, "data_class", "") in ["pii","cid","phi"] &&
       !(attr(e.to, "redaction", false) || attr(e.to, "classification", false))
+    requires: [e.from.attrs.data_class]
+    domain: 'e.to.type == "vector_index"'
     message: "{{e.from.name}} ({{attr(e.from,'data_class','')}}) is indexed into {{e.to.name}} without classification or redaction."
     clauses: [FADP:2023:Art7-8, GDPR:Art25, FINMA:2023/1:Rz-CriticalData]
     remediation: "Classify and redact/pseudonymise PII/CID before embedding; record it on the index (classification/redaction=true)."
@@ -25,6 +28,8 @@ rules:
        !attr(e.from, "acl_trimming", false)) ||
       (e.kind == "reads" && e.to.type == "vector_index" && attr(e.to, "data_class", "") in ["confidential","pii","cid"] &&
        !attr(e.to, "acl_trimming", false))
+    requires: [e.from.attrs.data_class, e.to.attrs.data_class]
+    domain: 'e.from.type == "vector_index" || (e.kind == "reads" && e.to.type == "vector_index")'
     message: "Retrieval {{e.from.name}} → {{e.to.name}} returns sensitive chunks without security-filtered (ACL-trimmed) search."
     clauses: [ISO:27001:A.5.15]
     remediation: "Enable security-filtered retrieval (document-level ACLs propagated to the index; acl_trimming=true)."
@@ -35,8 +40,17 @@ rules:
     title: Sensitive data outside allowed regions
     scope: node
     severity: high
-    condition: 'attr(n, "data_class", "") in ["pii","cid","phi"] && !(attr(n, "region", "") in tenant.allowed_regions)'
-    message: "{{n.name}} holds {{attr(n,'data_class','')}} data in region '{{attr(n,'region','')}}', outside the allowed regions."
+    # Schema 1.1 data_classes[] (every class the component holds, beside the single data_class) is read with it, so a
+    # store declaring data_class internal with data_classes [pii] is asked too (self-assessment limitation 6; Reconcile
+    # A, 2026-10-02). A sensitive data_classes[] entry decides the store on its own: it fires without data_class
+    # (DATA-003.classesonly.pos). data_class stays the required fact: a store that declares no data_class and lists no
+    # sensitive class is not_checked, since the single class could still be sensitive.
+    condition: |
+      (attr(n, "data_class", "") in ["pii","cid","phi"] || attr(n, "data_classes", []).exists(c, c in ["pii","cid","phi"])) &&
+      !(attr(n, "region", "") in tenant.allowed_regions)
+    requires: [n.attrs.data_class]
+    domain: 'n.type in ["datastore","vector_index","saas"]'
+    message: "{{n.name}} holds {{attr(n,'data_class','') in ['pii','cid','phi'] ? attr(n,'data_class','') : attr(n,'data_classes',[]).filter(c, c in ['pii','cid','phi']).join(', ')}} data in region '{{attr(n,'region','')}}', outside the allowed regions."
     clauses: [FADP:2023:Art16, FINMA:2018/3:Outsourcing]
     remediation: "Move the resource to an allowed region or document a cross-border transfer assessment."
     fixtures: { positive: fixtures/DATA-003.pos.json, negative: fixtures/DATA-003.neg.json }
@@ -46,10 +60,17 @@ rules:
     title: Sensitive datastore without customer-managed keys
     scope: node
     severity: low
+    # data_classes[] is read with data_class (schema 1.1, self-assessment limitation 6; Reconcile A, 2026-10-02). As
+    # DATA-003: a sensitive entry fires without data_class (DATA-004.classesonly.pos); no data_class and no sensitive
+    # entry is not_checked.
     condition: |
-      n.type == "datastore" && attr(n, "data_class", "") in ["confidential","pii","cid","secret"] &&
+      n.type == "datastore" &&
+      (attr(n, "data_class", "") in ["confidential","pii","cid","secret"] ||
+       attr(n, "data_classes", []).exists(c, c in ["confidential","pii","cid","secret"])) &&
       attr(n, "encryption_key", "pmk") != "cmk"
-    message: "{{n.name}} ({{attr(n,'data_class','')}}) is encrypted with platform-managed keys."
+    requires: [n.attrs.data_class]
+    domain: 'n.type == "datastore"'
+    message: "{{n.name}} ({{attr(n,'data_class','') in ['confidential','pii','cid','secret'] ? attr(n,'data_class','') : attr(n,'data_classes',[]).filter(c, c in ['confidential','pii','cid','secret']).join(', ')}}) is encrypted with platform-managed keys."
     clauses: [MCSB:v1:DP-5]
     remediation: "Use customer-managed keys in Key Vault (encryption_key=cmk) with rotation."
     patch_template:
@@ -62,6 +83,8 @@ rules:
     scope: node
     severity: high
     condition: 'n.type == "datastore" && attr(n, "criticality", "") == "critical" && !attr(n, "backup", false)'
+    requires: [n.attrs.criticality]
+    domain: 'n.type == "datastore"'
     message: "Critical datastore {{n.name}} has no backup declared."
     clauses: [DORA:2022/2554:Art12, FINMA:2023/1:Rz-BCM]
     remediation: "Enable backups with tested restore procedures (backup=true); document restore tests."
@@ -73,8 +96,113 @@ rules:
     scope: edge
     severity: high
     condition: 'e.to.type == "llm_endpoint" && attr(e, "prompt_contains", "") in ["pii","secrets"]'
+    requires: [e.attrs.prompt_contains]
+    domain: 'e.to.type == "llm_endpoint"'
     message: "{{e.from.name}} sends {{attr(e,'prompt_contains','')}} in prompts to {{e.to.name}}."
     clauses: [FADP:2023:Art7, OWASP:LLMTop10:LLM02]
     remediation: "Redact PII/secrets before the prompt; system-prompt hygiene; never place secrets in prompts."
     fixtures: { positive: fixtures/DATA-006.pos.json, negative: fixtures/DATA-006.neg.json }
     tags: [data, privacy, llm]
+
+  # CHE-002: a Swiss data-protection rule of the regulatory mappers (agents/swarm/06-regulatory-mappers/swiss-mapper.md);
+  # GDPR is cited beside FADP where the same duty exists. CHE-001 and CHE-003 stay specified until a golden pair
+  # (swiss-ledger) exercises them.
+  - id: CHE-002
+    title: Autonomous agent decides on customers with a write path that avoids a human step
+    scope: node
+    severity: high
+    condition: '(regime("FADP") || regime("GDPR")) && n.type == "agent" && attr(n, "autonomy", "") == "autonomous" && g.in(n.id, "calls").exists(x, x.from.type == "user" && attr(x.from, "population", "") == "customer") && g.out(n.id, "").exists(w, w.kind in ["writes", "executes"] && g.pathAvoiding(n.id, w.to.id, "human_step"))'
+    requires: [n.attrs.autonomy]
+    domain: '(regime("FADP") || regime("GDPR")) && n.type == "agent"'
+    message: "{{n.name}} acts autonomously for customers and writes state on a path no person reviews: an automated individual decision with no human review step."
+    clauses: [FADP:2023:Art21, GDPR:Art22, FADP:2023:Art7]
+    remediation: "Route the decision through a human step the customer can ask for, or declare the agent assisted."
+    fixtures: { positive: fixtures/CHE-002.pos.json, negative: fixtures/CHE-002.neg.json }
+    tags: [fadp, gdpr, automated-decision]
+
+  # CHE-001 (docs/18 WS-I I2, swiss-mapper): built with the golden pair swiss-ledger. Health data (phi) reaching an
+  # agent or a model is the "in particular" case of FADP Art. 22(2); an accepted decision citing FADP:2023:Art22 is the
+  # graph's only trace of the assessment. pii alone is not read as high risk (the swiss-mapper's not-checked row).
+  - id: CHE-001
+    title: Sensitive personal data reaches an AI component with no recorded impact-assessment decision
+    scope: node
+    severity: medium
+    condition: 'regime("FADP") && n.type in ["agent", "llm_endpoint"] && g.nodes("datastore").exists(s, attr(s, "data_class", "") == "phi" && s.id in g.dataSources(n.id, "data")) && !attr(g, "decisions", []).exists(d, d.status == "accepted" && "citations" in d && d.citations.exists(c, c.kind == "clause" && c.id == "FADP:2023:Art22"))'
+    requires: [g.attrs.decisions]
+    # The domain is the AI components every reaching datastore of which declares its data_class (review fix, I2): the
+    # outcome depends on the class of each store, a fact on another element that `requires:` cannot name, so a
+    # component reached by an unclassified store is not decided here (swiss-mapper lists the store, facts_missing).
+    # FADP:2023:Art22 is not cited: its disposition is the impact-assessment record a person makes, so a rule must not
+    # decide it; the remediation names it and swiss-mapper requests the record.
+    domain: 'regime("FADP") && n.type in ["agent", "llm_endpoint"] && g.nodes("datastore").exists(s, s.id in g.dataSources(n.id, "data")) && g.nodes("datastore").all(s, !(s.id in g.dataSources(n.id, "data")) || attr(s, "data_class", "") != "")'
+    message: "Health data reaches {{n.name}} and no accepted decision records the data protection impact assessment."
+    clauses: [FADP:2023:Art7]
+    remediation: "Carry out the impact assessment before processing and record it as an accepted decision citing FADP:2023:Art22."
+    fixtures: { positive: fixtures/CHE-001.pos.json, negative: fixtures/CHE-001.neg.json }
+    tags: [fadp, dpia, sensitive-data]
+
+  # ---- swarm team 04 (docs/18 WS-I I2, agents/swarm/04-gateways-network-and-data/data-classification-residency.md) --
+  # DCR-001 to DCR-003 follow the data along the drawn flows to the endpoints and keys that carry no class of their own.
+  # DCR-001: the endpoint or unclassed index has no class, so DATA-003 is silent; the data that reaches it along drawn
+  # flows (g.dataSources over the data layer) has one. The class guard keeps DATA-003 and DCR-001 from both firing on one
+  # classed index; an undeclared region is not_checked (ADR-047 §3b: allowed_regions for llm_endpoint and vector_index).
+  - id: DCR-001
+    title: Sensitive data reaches a model endpoint or unclassed index outside allowed regions
+    scope: node
+    severity: high
+    condition: |
+      n.type in ["llm_endpoint","vector_index"] && !(attr(n, "data_class", "") in ["pii","cid","phi"]) &&
+      attr(n, "region", "") != "" && !(attr(n, "region", "") in tenant.allowed_regions) &&
+      (g.nodes("datastore") + g.nodes("vector_index")).exists(s, s.id in g.dataSources(n.id, "data") &&
+        attr(s, "data_class", "") in ["pii","cid","phi"])
+    requires: [n.attrs.region]
+    domain: 'n.type in ["llm_endpoint","vector_index"]'
+    message: "{{n.name}} in region '{{attr(n,'region','')}}', outside the allowed regions, receives {{(g.nodes('datastore') + g.nodes('vector_index')).filter(s, s.id in g.dataSources(n.id, 'data') && attr(s, 'data_class', '') in ['pii','cid','phi']).map(s, s.name + ' (' + attr(s, 'data_class', '') + ')').join(', ')}} data along the drawn flows."
+    clauses: [FADP:2023:Art16, GDPR:Art44, FINMA:2018/3:Outsourcing, OWASP:LLMTop10-2026:LLM02]
+    remediation: "Deploy the endpoint or index in an allowed region, or document the cross-border transfer basis and keep the sensitive data from reaching it."
+    fixtures: { positive: fixtures/DCR-001.pos.json, negative: fixtures/DCR-001.neg.json }
+    tags: [data, residency, llm]
+
+  # DCR-002: a cmk claim moves the residency question to the vault: data-encryption keys outside the allowed regions leave
+  # the data readable from there. Fires only when the architect declared what the vault's keys are for; key_use is a
+  # single value in docs/02 §3, so a vault used for secrets and data keys cannot be declared (TODO(decision): key_use as
+  # a list).
+  - id: DCR-002
+    title: Data-encryption keys for a sensitive store held outside allowed regions
+    scope: node
+    severity: high
+    condition: |
+      n.type == "secret_store" && attr(n, "key_use", "") == "data_encryption" &&
+      attr(n, "region", "") != "" && !(attr(n, "region", "") in tenant.allowed_regions) &&
+      g.nodes("datastore").exists(d, attr(d, "encryption_key", "") == "cmk" &&
+        attr(d, "data_class", "") in ["confidential","pii","cid","phi","secret"])
+    requires: [n.attrs.key_use, n.attrs.region]
+    domain: 'n.type == "secret_store"'
+    message: "{{n.name}} holds the data-encryption keys in region '{{attr(n,'region','')}}', outside the allowed regions, while customer-managed-key stores hold sensitive data."
+    clauses: [FINMA:2023/1:Rz-CriticalData, FADP:2023:Art16, MCSB:v1:DP-8, ISO:27001:A.8.24]
+    remediation: "Keep the key vault for the customer-managed keys in an allowed region (with its paired region), or document the key-custody location and its basis."
+    fixtures: { positive: fixtures/DCR-002.pos.json, negative: fixtures/DCR-002.neg.json }
+    tags: [data, residency, keys]
+
+  # DCR-003: the hop or its source says the payload is sensitive, the target store says it is not, and nothing on the
+  # target says the class was reduced on purpose (redaction is a vector_index attribute; a datastore has no declared
+  # exemption). A hop into an index from a pii/cid/phi node is DATA-001's (excluded: one finding per hop). The template
+  # raises the target's class to the source's (else the hop's); raising a class never removes a control.
+  - id: DCR-003
+    title: Classification dropped along a write with no redaction declared
+    scope: edge
+    severity: medium
+    condition: |
+      e.kind in ["writes","flows","publishes"] && e.to.type in ["datastore","vector_index"] &&
+      (e.data_class in ["pii","cid","phi","secret"] || attr(e.from, "data_class", "") in ["pii","cid","phi","secret"]) &&
+      attr(e.to, "data_class", "") in ["public","internal"] && !attr(e.to, "redaction", false) &&
+      !(e.to.type == "vector_index" && attr(e.from, "data_class", "") in ["pii","cid","phi"])
+    requires: [e.to.attrs.data_class]
+    domain: 'e.kind in ["writes","flows","publishes"] && e.to.type in ["datastore","vector_index"]'
+    message: "{{e.from.name}} → {{e.to.name}} carries {{attr(e.from, 'data_class', '') in ['pii','cid','phi','secret'] ? attr(e.from, 'data_class', '') : e.data_class}} data into a store classified {{attr(e.to, 'data_class', '')}}, with no redaction declared."
+    clauses: [MCSB:v1:DP-1, ISO:27001:A.8.11, FADP:2023:Art7, GDPR:Art25, CSA:AICM:Data-Security-and-Privacy-Lifecycle-Management]
+    remediation: "Classify the target at the class of the data written into it, or redact the data before the write and declare it."
+    patch_template:
+      - { op: replace, path: "/nodes/{{e.to.id}}/attrs/data_class", value: "{{attr(e.from, 'data_class', '') in ['pii','cid','phi','secret'] ? attr(e.from, 'data_class', '') : e.data_class}}" }
+    fixtures: { positive: fixtures/DCR-003.pos.json, negative: fixtures/DCR-003.neg.json }
+    tags: [data, classification]

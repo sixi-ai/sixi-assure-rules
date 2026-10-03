@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "id": "arch_synthetic_narrowed_10",
+  "tenant_id": "tenant_migrate",
+  "name": "Synthetic 1.0 model with values 1.1 narrowed (purpose, egress_policy, exposure, plaintext protocols)",
+  "version": 2,
+  "attrs": { "owner": "Migration tests", "regimes": ["NIS2"] },
+  "groups": [],
+  "nodes": [
+    { "id": "n_app", "type": "app", "name": "Portal", "layer": "app", "attrs": { "exposure": "internal" } },
+    { "id": "n_siem", "type": "log_sink", "name": "SIEM", "layer": "platform",
+      "attrs": { "retention_days": 365, "purpose": "Audit trail for SIEM" } },
+    { "id": "n_soc", "type": "log_sink", "name": "SOC feed", "layer": "platform",
+      "attrs": { "retention_days": 90, "purpose": "Security" } },
+    { "id": "n_ops_logs", "type": "log_sink", "name": "Ops logs", "layer": "platform",
+      "attrs": { "retention_days": 30, "purpose": "operational" } },
+    { "id": "n_agent", "type": "agent", "name": "Helper", "layer": "ai",
+      "attrs": { "autonomy": "assisted", "purpose": "answers questions", "owner": "Ops", "egress_policy": true } },
+    { "id": "n_agent_open", "type": "agent", "name": "Crawler", "layer": "ai",
+      "attrs": { "autonomy": "assisted", "purpose": "crawls", "owner": "Ops", "egress_policy": false } },
+    { "id": "n_mcp_int", "type": "mcp_server", "name": "Docs MCP", "layer": "app",
+      "attrs": { "origin": "first_party", "scopes": ["read"], "exposure": "internal" } },
+    { "id": "n_mcp_unk", "type": "mcp_server", "name": "Vendor MCP", "layer": "app",
+      "attrs": { "origin": "third_party", "scopes": ["read"], "exposure": "unknown" } },
+    { "id": "n_mcp_pub", "type": "mcp_server", "name": "Public MCP", "layer": "app",
+      "attrs": { "origin": "third_party", "scopes": ["read"], "exposure": "public" } },
+    { "id": "n_plc", "type": "edge_device", "name": "PLC", "layer": "edge",
+      "attrs": { "site": "plant", "attestation": "tpm", "egress_policy": true } }
+  ],
+  "edges": [
+    { "id": "e_app_agent", "from": "n_app", "to": "n_agent", "kind": "calls", "protocol": "http", "auth": "none", "encryption": "none", "attrs": {} },
+    { "id": "e_agent_mcp", "from": "n_agent", "to": "n_mcp_int", "kind": "calls", "protocol": "SSE", "auth": "none", "encryption": "none", "attrs": {} },
+    { "id": "e_agent_pub", "from": "n_agent", "to": "n_mcp_pub", "kind": "calls", "protocol": "wss", "auth": "oauth_client", "encryption": "tls", "attrs": {} },
+    { "id": "e_crawler_unk", "from": "n_agent_open", "to": "n_mcp_unk", "kind": "calls", "protocol": "REST", "auth": "api_key", "encryption": "tls", "attrs": {} },
+    { "id": "e_app_siem", "from": "n_app", "to": "n_siem", "kind": "writes", "protocol": "ftp", "auth": "connection_string", "encryption": "none", "attrs": { "logged": true } },
+    { "id": "e_app_soc", "from": "n_app", "to": "n_soc", "kind": "writes", "protocol": "webhook", "auth": "api_key", "encryption": "tls", "attrs": {} },
+    { "id": "e_plc_ops", "from": "n_plc", "to": "n_ops_logs", "kind": "publishes", "protocol": "MQTTS", "auth": "mtls", "encryption": "mtls", "attrs": {} }
+  ],
+  "findings": [],
+  "evidence": []
+}

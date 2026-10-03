@@ -1,0 +1,50 @@
+[
+  {
+    "rule_id": "FW-001",
+    "ids": [
+      "n_ckpt"
+    ]
+  },
+  {
+    "rule_id": "FW-002",
+    "ids": [
+      "n_ckpt"
+    ]
+  },
+  {
+    "rule_id": "FW-003",
+    "ids": [
+      "n_ckpt"
+    ]
+  },
+  {
+    "rule_id": "FW-004",
+    "ids": [
+      "n_store"
+    ]
+  },
+  {
+    "rule_id": "FW-005",
+    "ids": [
+      "n_sup"
+    ]
+  },
+  {
+    "rule_id": "FW-006",
+    "ids": [
+      "e_sup_action"
+    ]
+  },
+  {
+    "rule_id": "FW-009",
+    "ids": [
+      "n_server"
+    ]
+  },
+  {
+    "rule_id": "FW-011",
+    "ids": [
+      "n_server"
+    ]
+  }
+]

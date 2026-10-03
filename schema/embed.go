@@ -9,3 +9,8 @@ import _ "embed"
 //
 //go:embed model.schema.json
 var ModelSchema []byte
+
+// ModelSchemaV10 is the published 1.0 schema, still served at its version (ADR-040 §2).
+//
+//go:embed model-1.0.schema.json
+var ModelSchemaV10 []byte

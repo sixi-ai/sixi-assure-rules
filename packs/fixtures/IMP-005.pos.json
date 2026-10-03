@@ -1,0 +1,37 @@
+{
+  "id": "arch_fx_imp_005_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture IMP-005 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "DORA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "x_import_source": "terraform_plan",
+    "x_import_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_pe",
+      "type": "network",
+      "name": "Private endpoint",
+      "layer": "network",
+      "source": "declared",
+      "attrs": {
+        "x_iac_address": "azurerm_private_endpoint.db",
+        "x_iac_type": "azurerm_private_endpoint",
+        "x_iac_target": "not in this file"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

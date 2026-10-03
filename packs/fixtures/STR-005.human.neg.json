@@ -1,0 +1,82 @@
+{
+  "id": "arch_fx_str_005_human_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture STR-005 (human, negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Research agent",
+      "layer": "ai",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Research summaries",
+        "owner": "Head of Research"
+      }
+    },
+    {
+      "id": "n_hs",
+      "type": "human_step",
+      "name": "Operator approval",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "operations"
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Docs MCP server",
+      "layer": "ai",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "docs.read"
+        ],
+        "vetted": true,
+        "logged": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_hs",
+      "kind": "executes",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_hs",
+      "to": "n_mcp",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

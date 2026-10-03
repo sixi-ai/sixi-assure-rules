@@ -1,0 +1,115 @@
+# PROV — import freshness and drift (docs/18 WS-C C5, ADR-086 §7, swarm spec provenance-auditor, ids PRV-*).
+# Deterministic CEL over the model and the provenance facts the engine exposes as `prov` (prov.available,
+# prov.as_of, prov.elements[id].{kind, stale, expired, drifted, fetched_at, identifier, cadence_days}), computed once
+# per evaluation from the model's provenance sidecar against a pinned clock (`assure verify` passes the bundle's
+# produced_at). Rules never read the sidecar itself. Without a sidecar (prov.available == false, no elements) every
+# rule here is silent and its domain is empty, so it decides nothing and moves no obligation: the golden set carries
+# no sidecar, so its precision and recall are unchanged, as drift is without kb. PRV-001 to PRV-004 are reserved for
+# the hand-declared-control rules of the provenance-auditor spec. `requires: [n.layer]` names a fact every node
+# declares: the rules' coverage is decided by the domain alone (imported elements while a sidecar is present).
+# The pack lists every regime because freshness is a property of where a fact came from, not of one regime.
+pack: prov
+version: 0.1.0
+regimes: [FINMA, CH-CO, FADP, CH-ISG, DORA, AIACT, CRA, NIS2, ISO, MCSB, NIST, IEC, OWASP, MAESTRO, MSFT]
+offer: agentic
+rules:
+  - id: PRV-005
+    title: Imported fact past its cadence on a critical path
+    scope: node
+    severity: medium
+    condition: |
+      prov.available && n.id in prov.elements &&
+      prov.elements[n.id].kind == "imported" && prov.elements[n.id].expired &&
+      (attr(n, "criticality", "") == "critical" ||
+       g.nodes.exists(c, c.id != n.id && attr(c, "criticality", "") == "critical" &&
+         (g.dataFlows(n.id, c.id) || g.dataFlows(c.id, n.id))))
+    requires: [n.layer]
+    domain: 'prov.available && n.id in prov.elements && prov.elements[n.id].kind == "imported"'
+    # The message never names prov.as_of: the evaluation clock would change the stored finding on every run.
+    message: "{{n.name}} was imported from {{prov.elements[n.id].identifier}}, fetched {{prov.elements[n.id].fetched_at}}; its cadence of {{prov.elements[n.id].cadence_days}} days has elapsed and it lies on a path to a critical component."
+    clauses: [DORA:2022/2554:Art8, NIST:AIRMF:MAP, NIST:AIRMF:MANAGE]
+    remediation: "Import the source again so the fact is read as it stands today (the import records a new fetch date), or declare the fact by hand and accept the change, which records it as declared with your name. The assessment evidences only what the model declares or imports at design time."
+    fixtures: { positive: fixtures/PRV-005.pos.json, negative: fixtures/PRV-005.neg.json }
+    tags: [provenance, freshness, import]
+
+  - id: PRV-006
+    title: Imported fact no longer carried by the latest import of its source
+    scope: node
+    severity: medium
+    condition: |
+      prov.available && n.id in prov.elements &&
+      prov.elements[n.id].kind == "imported" && prov.elements[n.id].drifted
+    requires: [n.layer]
+    domain: 'prov.available && n.id in prov.elements && prov.elements[n.id].kind == "imported"'
+    message: "{{n.name}} was imported from {{prov.elements[n.id].identifier}}, and a later import of that source no longer carries it."
+    clauses: [DORA:2022/2554:Art8, NIST:AIRMF:MAP]
+    remediation: "Review the proposal the later import raised (the import diff): accept it to remove what the source no longer carries, or reject it and declare the element by hand if it still exists. Nothing is removed until a person accepts the proposal."
+    fixtures: { positive: fixtures/PRV-006.pos.json, negative: fixtures/PRV-006.neg.json }
+    tags: [provenance, drift, import]
+
+  # PRV-001 to PRV-004 (docs/18 WS-I I2, swarm team 01, provenance-auditor): the hand-declared-control rules the
+  # header reserves, built in this pack (one prefix, one pack: README §3 extends the pack a prefix collides with)
+  # rather than a second prv.yaml. They read the model, not the sidecar: node `source` (design = drawn by hand,
+  # declared = imported) and the architecture's x_import_* attributes, so they decide on every model. `n.source` and
+  # `n.description` cannot be `requires:` paths (only zone and layer can), so the provenance-auditor reports an empty
+  # source or description as a not-checked row of its own. PRV-003 reads ADR-047 schema 1.1 attributes.
+  - id: PRV-001
+    title: Control added by hand to an imported architecture
+    scope: node
+    severity: medium
+    condition: |
+      attr(g, "x_import_source", "") in ["terraform_plan", "arm_template"] &&
+      n.type in ["gateway", "human_step", "data_diode", "dmz", "broker", "identity_provider", "secret_store", "log_sink", "evaluation"] &&
+      n.source == "design"
+    requires: [g.attrs.x_import_source]
+    domain: 'n.type in ["gateway", "human_step", "data_diode", "dmz", "broker", "identity_provider", "secret_store", "log_sink", "evaluation"]'
+    message: "{{n.name}} is a control drawn by hand into an architecture imported from {{attr(g, 'x_import_source', '')}}: the plan does not carry it, so the rules it satisfies rest on a declaration only."
+    clauses: [DORA:2022/2554:Art8, AIACT:2024/1689:Art11, NIST:AIRMF:MAP]
+    remediation: "Add the control to the infrastructure plan and import it again (it is then recorded as declared by the plan with the file hash), or keep it and attach the documentation it was taken from as evidence. The assistant never changes a source."
+    fixtures: { positive: fixtures/PRV-001.pos.json, negative: fixtures/PRV-001.neg.json }
+    tags: [provenance, hand-declared, import]
+
+  - id: PRV-002
+    title: Import without a file hash
+    scope: graph
+    severity: low
+    condition: 'attr(g, "x_import_source", "") != "" && attr(g, "x_import_sha256", "") == ""'
+    requires: [g.attrs.x_import_source]
+    message: "The architecture was imported from {{attr(g, 'x_import_source', '')}} but records no SHA-256 of the file: the model cannot be tied back to the file it was read from."
+    clauses: [AIACT:2024/1689:AnnexIV(6), DORA:2022/2554:Art8]
+    remediation: "Import the source file again through the import preview, which records its SHA-256 (x_import_sha256), or keep the file and its hash as the change-log entry for this version."
+    fixtures: { positive: fixtures/PRV-002.pos.json, negative: fixtures/PRV-002.neg.json }
+    tags: [provenance, import, hash]
+
+  - id: PRV-003
+    title: Registry or card claim declared by hand
+    scope: node
+    severity: medium
+    condition: |
+      n.source == "design" &&
+      ((n.type == "mcp_server" && attr(n, "registry_entry", "") != "") ||
+       (n.type == "external_agent" && attr(n, "card_signed", false)))
+    message: "{{n.name}} claims {{n.type == 'mcp_server' ? 'a registry entry' : 'a signed agent card'}}, but the claim was typed by hand, not read from the registry or the card."
+    clauses: [OWASP:AgenticTop10:ASI04, OWASP:LLMTop10-2026:LLM04, NIST:AIRMF:MAP]
+    remediation: "Import the MCP Registry server.json or the A2A agent card, so the claim is recorded as declared by the source with its hash; until then the claim is assessed as declared by hand."
+    fixtures: { positive: fixtures/PRV-003.pos.json, negative: fixtures/PRV-003.neg.json }
+    tags: [provenance, hand-declared, registry, a2a]
+
+  - id: PRV-004
+    title: Control claimed in free text only
+    scope: node
+    severity: low
+    # A description that denies or defers the control ("not behind a WAF", "no CMK yet", "WAF planned") claims nothing:
+    # the negation guards keep the rule, and the provenance-auditor's declaring candidate, off it (review fix 2026-10-02).
+    condition: |
+      (n.type in ["app", "api"] && n.description.matches("(?i)\\bwaf\\b") &&
+        !n.description.matches("(?i)\\b(no|not|without|lacks|lacking|missing|removed)\\b[^.]{0,20}\\bwaf\\b|\\bwaf\\b[^.]{0,20}\\b(disabled|planned|pending|removed|not)\\b") &&
+        !attr(n, "waf", false)) ||
+      (n.type == "datastore" && n.description.matches("(?i)customer[- ]managed key|\\bcmk\\b") &&
+        !n.description.matches("(?i)\\b(no|not|without|lacks|lacking|missing|removed)\\b[^.]{0,20}(customer[- ]managed key|\\bcmk\\b)|(customer[- ]managed key|\\bcmk\\b)[^.]{0,20}\\b(disabled|planned|pending|removed|not)\\b") &&
+        attr(n, "encryption_key", "") != "cmk")
+    message: "{{n.name}} claims {{n.type == 'datastore' ? 'a customer-managed key' : 'a WAF'}} in its description only: free text never satisfies a check, so the typed attribute decides and it says otherwise."
+    clauses: [NIST:AIRMF:MAP, ISO:42001:A.6.2.4, AIACT:2024/1689:Art11]
+    remediation: "Declare the control as a typed attribute (waf=true on the app or API, encryption_key=cmk on the store) if it exists, which records it as declared by hand, or correct the description."
+    fixtures: { positive: fixtures/PRV-004.pos.json, negative: fixtures/PRV-004.neg.json }
+    tags: [provenance, free-text]

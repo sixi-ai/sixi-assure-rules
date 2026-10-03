@@ -1,0 +1,40 @@
+{
+  "id": "arch_fx_imp_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture IMP-003 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "DORA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "x_import_source": "structurizr",
+    "x_import_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Core DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "pmk",
+        "backup": true,
+        "data_class": "cid"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

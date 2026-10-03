@@ -1,0 +1,134 @@
+[
+  {
+    "rule_id": "AGT-003",
+    "ids": [
+      "e_research_search"
+    ]
+  },
+  {
+    "rule_id": "AGT-005",
+    "ids": [
+      "n_research"
+    ]
+  },
+  {
+    "rule_id": "AI-009",
+    "ids": [
+      "n_tool_search"
+    ]
+  },
+  {
+    "rule_id": "ARH-003",
+    "ids": [
+      "n_reviewer"
+    ]
+  },
+  {
+    "rule_id": "BLR-002",
+    "ids": [
+      "n_research"
+    ]
+  },
+  {
+    "rule_id": "BLR-004",
+    "ids": [
+      "n_research"
+    ]
+  },
+  {
+    "rule_id": "CMP-002",
+    "ids": [
+      "n_triage"
+    ]
+  },
+  {
+    "rule_id": "FW-008",
+    "ids": [
+      "n_tool_exec"
+    ]
+  },
+  {
+    "rule_id": "HOV-001",
+    "ids": [
+      "n_approval"
+    ]
+  },
+  {
+    "rule_id": "HOV-002",
+    "ids": [
+      "n_notify"
+    ]
+  },
+  {
+    "rule_id": "ING-001",
+    "ids": [
+      "n_draft"
+    ]
+  },
+  {
+    "rule_id": "ING-001",
+    "ids": [
+      "n_research"
+    ]
+  },
+  {
+    "rule_id": "ING-001",
+    "ids": [
+      "n_reviewer"
+    ]
+  },
+  {
+    "rule_id": "ING-003",
+    "ids": [
+      "n_index"
+    ]
+  },
+  {
+    "rule_id": "ING-004",
+    "ids": [
+      "e_reviewer_queue"
+    ]
+  },
+  {
+    "rule_id": "MCP-004",
+    "ids": [
+      "n_mcp_kb"
+    ]
+  },
+  {
+    "rule_id": "MEM-002",
+    "ids": [
+      "n_mem_draft"
+    ]
+  },
+  {
+    "rule_id": "MEM-003",
+    "ids": [
+      "n_notes"
+    ]
+  },
+  {
+    "rule_id": "MEM-005",
+    "ids": [
+      "e_research_mem"
+    ]
+  },
+  {
+    "rule_id": "TSC-002",
+    "ids": [
+      "n_tool_docs_tp"
+    ]
+  },
+  {
+    "rule_id": "TSC-003",
+    "ids": [
+      "n_tool_exec"
+    ]
+  },
+  {
+    "rule_id": "TSC-004",
+    "ids": [
+      "n_registry"
+    ]
+  }
+]

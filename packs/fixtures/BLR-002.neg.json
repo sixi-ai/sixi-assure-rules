@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_blr_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture BLR-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "OWASP",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "autonomous",
+        "purpose": "Fixture agent for the team 03 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Client ledger",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "cid",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      }
+    },
+    {
+      "id": "n_tool_egress",
+      "type": "tool",
+      "name": "Market feed tool",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "capabilities": [
+          "network_egress"
+        ]
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "API gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "api",
+        "logging": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "egress"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_db",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_agent",
+      "to": "n_gw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e3",
+      "from": "n_gw",
+      "to": "n_tool_egress",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

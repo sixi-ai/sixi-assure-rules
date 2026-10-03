@@ -1,0 +1,95 @@
+{
+  "id": "arch_fx_prv_005_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture PRV-005 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "DORA",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "x_import_source": "terraform_plan",
+    "x_import_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Ledger store",
+      "layer": "data",
+      "source": "declared",
+      "external_ref": "azurerm_mssql_database.ledger",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "cid",
+        "region": "switzerlandnorth",
+        "criticality": "critical",
+        "x_iac_address": "azurerm_mssql_database.ledger"
+      }
+    },
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Ledger service",
+      "layer": "app",
+      "source": "declared",
+      "external_ref": "azurerm_linux_web_app.ledger",
+      "attrs": {
+        "exposure": "internal",
+        "x_iac_address": "azurerm_linux_web_app.ledger"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_app_db",
+      "from": "n_app",
+      "to": "n_db",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "cid",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": [],
+  "provenance": {
+    "/nodes/n_db": {
+      "kind": "imported",
+      "identifier": "terraform_plan:ledger",
+      "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "imported_by": "usr_fixture",
+      "imported_at": "2026-01-05T08:00:00Z",
+      "fetched_at": "2026-01-05T08:00:00Z",
+      "last_seen_import": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cadence_days": 30
+    },
+    "/nodes/n_app": {
+      "kind": "imported",
+      "identifier": "terraform_plan:ledger",
+      "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "imported_by": "usr_fixture",
+      "imported_at": "2026-01-05T08:00:00Z",
+      "fetched_at": "2026-01-05T08:00:00Z",
+      "last_seen_import": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cadence_days": 30
+    },
+    "/edges/e_app_db": {
+      "kind": "imported",
+      "identifier": "terraform_plan:ledger",
+      "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "imported_by": "usr_fixture",
+      "imported_at": "2026-01-05T08:00:00Z",
+      "fetched_at": "2026-01-05T08:00:00Z",
+      "last_seen_import": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cadence_days": 30
+    }
+  }
+}

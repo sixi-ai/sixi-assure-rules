@@ -1,4 +1,5 @@
 {
+  "schema_version": "1.1",
   "id": "arch_tpl_edge_iot",
   "tenant_id": "tenant_templates",
   "name": "OT / Edge-to-Cloud, glass-box (demo)",
@@ -49,7 +50,7 @@
       "attrs": { "retention_days": 3650, "immutable": true, "region": "switzerlandnorth" } }
   ],
   "edges": [
-    { "id": "e_plc1_egw",    "from": "n_plc1",   "to": "n_egw",    "kind": "publishes", "protocol": "opcua", "auth": "mtls",             "encryption": "mtls", "data_class": "internal",     "attrs": {} },
+    { "id": "e_plc1_egw",    "from": "n_plc1",   "to": "n_egw",    "kind": "publishes", "protocol": "opc_ua", "auth": "mtls",             "encryption": "mtls", "data_class": "internal",     "attrs": {} },
     { "id": "e_cam2_egw",    "from": "n_cam2",   "to": "n_egw",    "kind": "publishes", "protocol": "mqtt",  "auth": "mtls",             "encryption": "mtls", "data_class": "confidential", "attrs": {} },
     { "id": "e_vib3_egw",    "from": "n_vib3",   "to": "n_egw",    "kind": "publishes", "protocol": "mqtt",  "auth": "mtls",             "encryption": "mtls", "data_class": "internal",     "attrs": {} },
     { "id": "e_egw_emodel",  "from": "n_egw",    "to": "n_emodel", "kind": "calls",     "protocol": "grpc",  "auth": "mtls",             "encryption": "mtls", "data_class": "confidential", "label": "local inference", "attrs": {} },

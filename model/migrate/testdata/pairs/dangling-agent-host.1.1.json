@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_dangling_host",
+  "tenant_id": "tenant_migration",
+  "name": "Agents on an undrawn host (1.1 free-text hosted_on)",
+  "version": 1,
+  "attrs": {
+    "owner": "Migration tests",
+    "regimes": ["ISO"]
+  },
+  "provenance": {
+    "/nodes/n_planner/attrs/hosted_on": {"kind": "declared"},
+    "/nodes/n_planner/attrs/owner": {"kind": "declared"},
+    "/nodes/n_memory/attrs/hosted_on": {"kind": "imported"}
+  },
+  "groups": [],
+  "nodes": [
+    {"id": "n_planner", "type": "agent", "name": "Planner", "layer": "ai", "source": "design",
+     "attrs": {"autonomy": "semi", "purpose": "plans", "owner": "team", "hosted_on": "vm-7"}},
+    {"id": "n_writer", "type": "agent", "name": "Writer", "layer": "ai", "source": "design",
+     "attrs": {"autonomy": "semi", "purpose": "writes", "owner": "team", "hosted_on": "vm-7"}},
+    {"id": "n_self", "type": "agent", "name": "Self-hosted", "layer": "ai", "source": "design",
+     "attrs": {"autonomy": "assisted", "purpose": "checks", "owner": "team", "hosted_on": "n_self"}},
+    {"id": "n_noted", "type": "agent", "name": "On a note", "layer": "ai", "source": "design",
+     "attrs": {"autonomy": "assisted", "purpose": "reviews", "owner": "team", "hosted_on": "n_note"}},
+    {"id": "n_hosted", "type": "agent", "name": "On the app", "layer": "ai", "source": "design",
+     "attrs": {"autonomy": "assisted", "purpose": "answers", "owner": "team", "hosted_on": "n_app"}},
+    {"id": "n_memory", "type": "agent_memory", "name": "Memory", "layer": "data", "source": "design",
+     "attrs": {"write_path": "every_step", "validated": false, "scope": "session", "hosted_on": "redis"}},
+    {"id": "n_app", "type": "app", "name": "App", "layer": "app", "source": "design",
+     "attrs": {"exposure": "internal", "hosted_on": "vm-7"}},
+    {"id": "n_note", "type": "note", "name": "Note", "layer": "app", "source": "design",
+     "attrs": {"text": "the agents share vm-7"}}
+  ],
+  "findings": [],
+  "evidence": [],
+  "edges": [
+    {"id": "e_planner_writer", "from": "n_planner", "to": "n_writer", "kind": "delegates", "auth": "managed_identity", "encryption": "none", "attrs": {}},
+    {"id": "e_planner_app", "from": "n_planner", "to": "n_app", "kind": "calls", "auth": "managed_identity", "encryption": "none", "attrs": {}},
+    {"id": "e_planner_memory", "from": "n_planner", "to": "n_memory", "kind": "writes", "auth": "managed_identity", "encryption": "tls", "attrs": {}}
+  ]
+}

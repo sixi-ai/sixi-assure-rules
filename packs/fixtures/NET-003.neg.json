@@ -53,15 +53,6 @@
   ],
   "edges": [
     {
-      "id": "e1",
-      "from": "n_user",
-      "to": "n_app",
-      "kind": "calls",
-      "auth": "oauth_client",
-      "encryption": "tls",
-      "attrs": {}
-    },
-    {
       "id": "e2",
       "from": "n_user",
       "to": "n_gw",

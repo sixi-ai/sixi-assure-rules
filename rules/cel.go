@@ -1,11 +1,13 @@
 package rules
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math"
 	"reflect"
 	"regexp"
+	"slices"
 	"strings"
 
 	"cel.dev/cel-go/cel"
@@ -15,6 +17,7 @@ import (
 	"cel.dev/cel-go/common/types/ref"
 	"cel.dev/cel-go/common/types/traits"
 	"cel.dev/cel-go/ext"
+	"cel.dev/cel-go/interpreter"
 
 	"github.com/sixi-ai/sixi-assure-rules/model"
 )
@@ -74,9 +77,12 @@ func newEnvs() (*envSet, error) {
 		cel.Variable("g", dyn),
 		cel.Variable("tenant", cel.MapType(str, dyn)),
 		cel.Variable("kb", cel.MapType(str, dyn)),
-		ext.Strings(), // lowerAscii(), trim(), … for lookups into kb (ADR-035)
+		// prov: the computed provenance facts of ADR-086 §7 (ProvenanceVars), injected by provProgram from the graph.
+		cel.Variable("prov", cel.MapType(str, dyn)),
+		ext.Strings(),  // lowerAscii(), trim(), … for lookups into kb (ADR-035)
+		ext.Bindings(), // cel.bind(name, value, expr): names a value once, e.g. the host of a hosted_on target (B3)
 		cel.CrossTypeNumericComparisons(true),
-		cel.Macros(policyMacro("regime"), policyMacro("required")),
+		cel.Macros(policyMacro("regime"), policyMacro("required"), policyMacro("capped")),
 		cel.Function("attr", cel.Overload("attr_dyn_string_dyn", []*cel.Type{dyn, str, dyn}, dyn, cel.FunctionBinding(attrFn))),
 		member("has", "graph_has", []*cel.Type{dyn, str}, cel.BoolType, cel.BinaryBinding(graphBinary((*graphVal).has))),
 		member("nodes", "graph_nodes", []*cel.Type{dyn, str}, cel.ListType(dyn), cel.BinaryBinding(graphBinary((*graphVal).nodesOf))),
@@ -93,8 +99,19 @@ func newEnvs() (*envSet, error) {
 		member("dataZones", "graph_data_zones", []*cel.Type{dyn, str, str}, cel.ListType(dyn), cel.FunctionBinding(graphTernary((*graphVal).dataZonesVal))),
 		member("writersInto", "graph_writers_into", []*cel.Type{dyn, str}, cel.ListType(dyn), cel.BinaryBinding(graphBinary((*graphVal).writersIntoVal))),
 		member("upstreamAvoidingAttr", "graph_upstream_avoiding_attr", []*cel.Type{dyn, str, str}, cel.ListType(dyn), cel.FunctionBinding(graphTernary((*graphVal).upstreamAvoidingAttrVal))),
+		cel.Function("upstreamAvoiding",
+			cel.MemberOverload("graph_upstream_avoiding", []*cel.Type{dyn, str, cel.ListType(str), cel.ListType(str)}, cel.ListType(dyn), cel.FunctionBinding(graphUpstreamAvoiding)),
+			// The attr form also blocks every node of attrTypes whose boolean attribute is true (AGT-003: an agent with
+			// content_safety).
+			cel.MemberOverload("graph_upstream_avoiding_attr_block", []*cel.Type{dyn, str, cel.ListType(str), cel.ListType(str), cel.ListType(str), str}, cel.ListType(dyn), cel.FunctionBinding(graphUpstreamAvoiding)),
+			// The function-aware form (ADR-088 Amendments, B2b): a node of the types blocks when it credits the hop —
+			// it declares every one of needFunctions in functions[], or it declares no functions and its kind is in
+			// kinds (any kind when kinds is empty). A node of the types that does not credit is walked through, at
+			// any chain length (AI-001, NET-003, STR-005, AGW-003, APX-004).
+			cel.MemberOverload("graph_upstream_avoiding_functions", []*cel.Type{dyn, str, cel.ListType(str), cel.ListType(str), cel.ListType(str)}, cel.ListType(dyn), cel.FunctionBinding(graphUpstreamAvoiding))),
 		member("regime", "graph_regime", []*cel.Type{dyn, str}, cel.BoolType, cel.BinaryBinding(graphBinary((*graphVal).regimeVal))),
 		member("required", "graph_required", []*cel.Type{dyn, str}, cel.IntType, cel.BinaryBinding(graphBinary((*graphVal).requiredVal))),
+		member("capped", "graph_capped", []*cel.Type{dyn, str}, cel.IntType, cel.BinaryBinding(graphBinary((*graphVal).cappedVal))),
 		member("inZone", "node_in_zone", []*cel.Type{dyn, str}, cel.BoolType, cel.BinaryBinding(inZoneFn)),
 	)
 	if err != nil {
@@ -136,8 +153,52 @@ func (s *envSet) compile(scope, src string, costLimit uint64) (cel.Program, *cel
 	if err != nil {
 		return nil, nil, err
 	}
-	return prog, a.OutputType(), nil
+	return provProgram{prog}, a.OutputType(), nil
 }
+
+// provProgram resolves the `prov` variable (ADR-086 §7) from the graph of the activation, so every program the
+// engine evaluates sees the provenance facts computed once per evaluation in buildGraph, beside `kb`. An activation
+// without a graph (a program evaluated outside an evaluation) sees prov.available == false. Every other name
+// resolves from the activation map unchanged, CEL unknowns included.
+type provProgram struct{ cel.Program }
+
+func (p provProgram) Eval(input any) (ref.Val, *cel.EvalDetails, error) {
+	return p.Program.Eval(withProv(input))
+}
+
+func (p provProgram) ContextEval(ctx context.Context, input any) (ref.Val, *cel.EvalDetails, error) {
+	return p.Program.ContextEval(ctx, withProv(input))
+}
+
+func withProv(input any) any {
+	vars, ok := input.(map[string]any)
+	if !ok {
+		return input
+	}
+	if _, set := vars["prov"]; set {
+		return input
+	}
+	return provActivation{vars: vars}
+}
+
+// provActivation is the activation map plus `prov`.
+type provActivation struct{ vars map[string]any }
+
+func (a provActivation) ResolveName(name string) (any, bool) {
+	if name == "prov" {
+		if g, ok := a.vars["g"].(*graphVal); ok && g.prov != nil {
+			return g.prov, true
+		}
+		return noProv, true
+	}
+	v, ok := a.vars[name]
+	return v, ok
+}
+
+func (provActivation) Parent() interpreter.Activation { return nil }
+
+// noProv is `prov` without provenance facts: unavailable, no elements.
+var noProv = map[string]any{"available": false, "as_of": "", "elements": map[string]any{}}
 
 // ---- helper bindings --------------------------------------------------------------------------
 
@@ -254,7 +315,8 @@ func attrsOf(v ref.Val) (map[string]any, bool) {
 	return nil, false
 }
 
-// inZoneFn implements n.inZone(kind): the node belongs to a group of that kind.
+// inZoneFn implements n.inZone(kind): the node belongs to a group of that kind. A workflow group is
+// not in n.groups (it is no boundary, buildGraph); n.inZone("workflow") reads n.workflow_ids.
 func inZoneFn(lhs, rhs ref.Val) ref.Val {
 	kind, ok := rhs.(types.String)
 	if !ok {
@@ -267,6 +329,10 @@ func inZoneFn(lhs, rhs ref.Val) ref.Val {
 	nm, ok := m.Value().(map[string]any)
 	if !ok {
 		return types.NewErr("inZone receiver must be a node")
+	}
+	if string(kind) == model.GroupKindWorkflow {
+		workflows, _ := nm["workflow_ids"].([]string)
+		return types.Bool(len(workflows) > 0)
 	}
 	kinds, _ := nm["groups"].([]string)
 	for _, k := range kinds {
@@ -288,6 +354,8 @@ type graphVal struct {
 
 	nodes       []any
 	edges       []any
+	identities  []any // schema 1.1 identity entities (identityValue)
+	groups      []any // every group (groupValue), so a condition reads a workflow's bounds (schema 1.2)
 	nodeByID    map[string]map[string]any
 	edgeByID    map[string]map[string]any
 	nodesByType map[string][]any
@@ -306,6 +374,9 @@ type graphVal struct {
 	dataAdj map[string][]string
 	dataRev map[string][]string
 	avoid   map[[2]string]map[string]bool
+	// upAvoid caches upstreamAvoiding keyed by {id, blocked types, blocked kinds, attr types, blocking attr} (lists
+	// joined with NUL); the function-aware form keys {id, types, kinds, "\x01functions", needed functions}.
+	upAvoid map[[5]string][]any
 	dataFwd map[string]map[string]bool
 	dataBwd map[string]map[string]bool
 	writers map[string][]any
@@ -313,6 +384,8 @@ type graphVal struct {
 	regimes map[string]bool
 	policy  Policy
 	table   *PolicyTable
+	// prov is the `prov` variable of this evaluation (ProvenanceVars, ADR-086 §7).
+	prov map[string]any
 }
 
 // buildGraph projects the architecture into CEL values (docs/03 environment).
@@ -327,20 +400,50 @@ func buildGraph(a *model.Architecture, p Policy, table *PolicyTable) *graphVal {
 		outEdges: map[string][]any{}, inEdges: map[string][]any{}, outAdj: map[string][]string{}, inAdj: map[string][]string{},
 		fwd: map[string]map[string]bool{}, bwd: map[string]map[string]bool{}, pathCache: map[[3]string]bool{},
 		dataAdj: map[string][]string{}, dataRev: map[string][]string{}, avoid: map[[2]string]map[string]bool{},
+		upAvoid: map[[5]string][]any{},
 		dataFwd: map[string]map[string]bool{}, dataBwd: map[string]map[string]bool{}, writers: map[string][]any{},
 		regimes: regimeSet(p.Regimes), policy: p, table: table,
+		prov: ProvenanceVars(a, p.AsOf),
+	}
+	g.identities = make([]any, 0, len(a.Identities))
+	for i := range a.Identities {
+		g.identities = append(g.identities, identityValue(&a.Identities[i]))
 	}
 	groupKinds := map[string][]string{}
 	groupIDs := map[string][]string{}
+	notes := map[string]bool{}
+	for i := range a.Nodes {
+		if model.IsNote(a.Nodes[i].Type) {
+			notes[a.Nodes[i].ID] = true
+		}
+	}
+	g.groups = make([]any, 0, len(a.Groups))
+	for i := range a.Groups {
+		g.groups = append(g.groups, groupValue(&a.Groups[i], notes))
+	}
+	// A workflow group (schema 1.2, ADR-093 FS-06) lists the executors of one agent workflow; it is
+	// not a security boundary. About fifteen pack conditions read "the two ends share no group id"
+	// as crossing a boundary (DLG-003, WIS-011, ATA-*, STR-002, the C4 and NET checks), so a workflow
+	// group stays out of n.groups and n.group_ids: drawing one never adds or hides a boundary
+	// finding. Its membership is n.workflow_ids, g.groups[].node_ids and n.inZone("workflow").
+	workflowIDs := map[string][]string{}
 	for _, grp := range a.Groups {
 		for _, nid := range grp.NodeIDs {
+			if grp.Kind == model.GroupKindWorkflow {
+				workflowIDs[nid] = append(workflowIDs[nid], grp.ID)
+				continue
+			}
 			groupKinds[nid] = append(groupKinds[nid], grp.Kind)
 			groupIDs[nid] = append(groupIDs[nid], grp.ID)
 		}
 	}
-	g.nodes = make([]any, 0, len(a.Nodes))
-	for i := range a.Nodes {
-		n := &a.Nodes[i]
+	// ADR-081: notes are annotations outside assessment by construction. They never enter the node
+	// set, so no pack's `n`, `g.nodes`, `nodes(type)` or `has(type)` can see one (IMP-001 cannot fire on
+	// a text box). Validation already refuses an edge to or from a note.
+	nodes := model.AssessedNodes(a)
+	g.nodes = make([]any, 0, len(nodes))
+	for i := range nodes {
+		n := &nodes[i]
 		kinds := groupKinds[n.ID]
 		if kinds == nil {
 			kinds = []string{}
@@ -349,13 +452,22 @@ func buildGraph(a *model.Architecture, p Policy, table *PolicyTable) *graphVal {
 		if ids == nil {
 			ids = []string{}
 		}
+		workflows := workflowIDs[n.ID]
+		if workflows == nil {
+			workflows = []string{}
+		}
 		// description is model-authored free text. It is projected so rules can assess what the
 		// architect declared a component does (docs/03 AGT-002); conditions read it only through
 		// RE2 `matches`, which is linear-time and cannot be made to backtrack.
 		m := map[string]any{
 			"id": n.ID, "type": n.Type, "name": n.Name, "layer": n.Layer, "zone": n.Zone, "source": n.Source,
 			"description": n.Description, "external_ref": n.ExternalRef,
-			"attrs": normAttrs(n.Attrs), "groups": kinds, "group_ids": ids,
+			"attrs": derivedAttrs(normAttrs(n.Attrs)), "groups": kinds, "group_ids": ids,
+			"workflow_ids": workflows,
+			// Schema 1.1 (ADR-047 §1): the identity the node runs as (attrs.identity_id resolved), so a
+			// condition reads n.identity.issuer or attr(n.identity, "credential_ttl", -1). A node without one
+			// gets the empty identity (every field "", attrs empty), never a missing key.
+			"identity": identityValue(a.IdentityOf(n)),
 		}
 		g.nodes = append(g.nodes, m)
 		g.nodeByID[n.ID] = m
@@ -367,7 +479,11 @@ func buildGraph(a *model.Architecture, p Policy, table *PolicyTable) *graphVal {
 		m := map[string]any{
 			"id": e.ID, "from": g.endpoint(e.From), "to": g.endpoint(e.To), "kind": e.Kind, "label": e.Label,
 			"protocol": e.Protocol, "auth": e.Auth, "encryption": e.Encryption, "data_class": e.DataClass,
-			"attrs": normAttrs(e.Attrs),
+			// Schema 1.1: protocol is an enum; protocol_text is the spelling the author wrote (the 1.0
+			// free text the migration mapped, read back from x_migrated_from, else the enum value), so a
+			// name match such as DRF-004 still sees "ftp" where protocol says "other". Projection only.
+			"protocol_text": e.ProtocolText(),
+			"attrs":         normAttrs(e.Attrs),
 		}
 		g.edges = append(g.edges, m)
 		g.edgeByID[e.ID] = m
@@ -398,7 +514,69 @@ func (g *graphVal) endpoint(id string) map[string]any {
 		return m
 	}
 	return map[string]any{"id": id, "type": "", "name": "", "layer": "", "zone": "", "source": "",
-		"description": "", "external_ref": "", "attrs": map[string]any{}, "groups": []string{}, "group_ids": []string{}}
+		"description": "", "external_ref": "", "attrs": map[string]any{}, "groups": []string{}, "group_ids": []string{},
+		"workflow_ids": []string{}, "identity": identityValue(nil)}
+}
+
+// groupValue projects a group for CEL (schema 1.2, ADR-093 FS-06): id, kind, name, parent, the member
+// node ids and the attributes, so a condition reads a workflow's bounds with attr(w, "max_iterations",
+// -1) and its members with `n.id in w.node_ids`. A node's own memberships stay n.groups (kinds) and
+// n.group_ids, workflows excepted (n.workflow_ids, see buildGraph). Notes are outside assessment (ADR-081), so a note's id is left out of node_ids.
+func groupValue(grp *model.Group, notes map[string]bool) map[string]any {
+	ids := make([]any, 0, len(grp.NodeIDs))
+	for _, id := range grp.NodeIDs {
+		if !notes[id] {
+			ids = append(ids, id)
+		}
+	}
+	return map[string]any{"id": grp.ID, "kind": grp.Kind, "name": grp.Name, "parent": grp.Parent,
+		"node_ids": ids, "attrs": normAttrs(grp.Attrs)}
+}
+
+// identityValue projects an identity entity (schema 1.1) for CEL: every member at the top level
+// ("" or 0 when not declared, so a condition never hits a missing key) and the declared members
+// again under attrs, so attr(n.identity, "credential_ttl", -1) tells "not declared" from 0. x_
+// extension values are left out: rules never read them (ADR-040 §5). The one exception is the
+// boolean `migrated`: true when the 1.0 → 1.1 migration created the entity (attrs.x_migrated_from,
+// docs/02 §8), so a rule tells "the architect left this fact out" from "the 1.0 model could not
+// say it" without reading the id (an id prefix is not reserved by the schema).
+func identityValue(id *model.Identity) map[string]any {
+	declared := map[string]any{}
+	str := func(k, v string) string {
+		if v != "" {
+			declared[k] = v
+		}
+		return v
+	}
+	num := func(k string, v *int64) int64 {
+		if v == nil {
+			return 0
+		}
+		declared[k] = *v
+		return *v
+	}
+	if id == nil {
+		id = &model.Identity{}
+	}
+	return map[string]any{
+		"id": id.ID, "name": str("name", id.Name), "kind": str("kind", id.Kind), "ref": str("ref", id.Ref),
+		"issuer": str("issuer", id.Issuer), "credential_type": str("credential_type", id.CredentialType),
+		"credential_ttl": num("credential_ttl", id.CredentialTTL), "rotation_days": num("rotation_days", id.RotationDays),
+		"sponsor": str("sponsor", id.Sponsor), "owner": str("owner", id.Owner), "blueprint": str("blueprint", id.Blueprint),
+		"registry": str("registry", id.Registry), "federation": str("federation", id.Federation),
+		"trust_domain": str("trust_domain", id.TrustDomain), "attrs": declared,
+		"migrated": identityMigrated(id),
+	}
+}
+
+// identityMigrated reports whether the identity carries the migration's x_migrated_from note.
+func identityMigrated(id *model.Identity) bool {
+	v, ok := id.Attrs[model.MigratedFromAttr]
+	if !ok {
+		return false
+	}
+	s, isStr := v.(string)
+	return !isStr || strings.TrimSpace(s) != ""
 }
 
 func (g *graphVal) ConvertToNative(t reflect.Type) (any, error) {
@@ -423,7 +601,8 @@ func (g *graphVal) Equal(o ref.Val) ref.Val {
 func (g *graphVal) Type() ref.Type { return graphType }
 func (g *graphVal) Value() any     { return g }
 
-// Get implements traits.Indexer so `g.id`, `g.name`, `g.attrs`, `g.nodes`, `g.edges` resolve.
+// Get implements traits.Indexer so `g.id`, `g.name`, `g.attrs`, `g.nodes`, `g.edges`,
+// `g.identities` (schema 1.1) and `g.groups` (schema 1.2) resolve.
 func (g *graphVal) Get(index ref.Val) ref.Val {
 	key, ok := index.(types.String)
 	if !ok {
@@ -440,6 +619,10 @@ func (g *graphVal) Get(index ref.Val) ref.Val {
 		return types.NewDynamicList(types.DefaultTypeAdapter, g.nodes)
 	case "edges":
 		return types.NewDynamicList(types.DefaultTypeAdapter, g.edges)
+	case "identities":
+		return types.NewDynamicList(types.DefaultTypeAdapter, g.identities)
+	case "groups":
+		return types.NewDynamicList(types.DefaultTypeAdapter, g.groups)
 	}
 	return types.NewErr("no such graph field %q", string(key))
 }
@@ -639,6 +822,205 @@ func (g *graphVal) upstreamAvoidingAttrVal(nodeID, attr string) ref.Val {
 	return listVal(out)
 }
 
+// graphUpstreamAvoiding binds g.upstreamAvoiding(id, types, kinds), g.upstreamAvoiding(id, types, kinds,
+// needFunctions) and g.upstreamAvoiding(id, types, kinds, attrTypes, attr) (ADR-088 §1 and Amendments).
+func graphUpstreamAvoiding(args ...ref.Val) ref.Val {
+	if len(args) != 4 && len(args) != 5 && len(args) != 6 {
+		return types.NewErr("upstreamAvoiding expects 3, 4 or 5 arguments")
+	}
+	g, ok := args[0].(*graphVal)
+	if !ok {
+		return types.NewErr("receiver is not the graph (got %s)", args[0].Type().TypeName())
+	}
+	id, ok := args[1].(types.String)
+	if !ok {
+		return types.NewErr("upstreamAvoiding: the node id must be a string")
+	}
+	blockedTypes, err := stringList(args[2])
+	if err != nil {
+		return types.NewErr("upstreamAvoiding: types: %v", err)
+	}
+	blockedKinds, err := stringList(args[3])
+	if err != nil {
+		return types.NewErr("upstreamAvoiding: kinds: %v", err)
+	}
+	if len(args) == 5 {
+		needFunctions, err := stringList(args[4])
+		if err != nil || len(needFunctions) == 0 {
+			return types.NewErr("upstreamAvoiding: needFunctions must be a non-empty list of strings")
+		}
+		return listVal(g.upstreamAvoidingFunctions(string(id), blockedTypes, blockedKinds, needFunctions))
+	}
+	var attrTypes []string
+	blockAttr := ""
+	if len(args) == 6 {
+		if attrTypes, err = stringList(args[4]); err != nil || len(attrTypes) == 0 {
+			return types.NewErr("upstreamAvoiding: attrTypes must be a non-empty list of strings")
+		}
+		a, ok := args[5].(types.String)
+		if !ok || a == "" {
+			return types.NewErr("upstreamAvoiding: the blocking attribute must be a non-empty string")
+		}
+		blockAttr = string(a)
+	}
+	return listVal(g.upstreamAvoiding(string(id), blockedTypes, blockedKinds, attrTypes, blockAttr))
+}
+
+// stringList converts a CEL list of strings.
+func stringList(v ref.Val) ([]string, error) {
+	l, ok := v.(traits.Lister)
+	if !ok {
+		return nil, fmt.Errorf("expected a list of strings (got %s)", v.Type().TypeName())
+	}
+	n, ok := l.Size().(types.Int)
+	if !ok {
+		return nil, fmt.Errorf("list size unavailable")
+	}
+	out := make([]string, 0, int(n))
+	for i := types.Int(0); i < n; i++ {
+		s, ok := l.Get(i).(types.String)
+		if !ok {
+			return nil, fmt.Errorf("element %d is not a string", i)
+		}
+		out = append(out, string(s))
+	}
+	return out, nil
+}
+
+// upstreamAvoiding lists, in model order, the nodes c (as node values) from which nodeID is reachable by a directed
+// walk that never enters a blocked node: nodeID itself and every node with a walk to it whose later nodes (nodeID
+// included) are all unblocked. A node is blocked when its type is in blockedTypes and, when blockedKinds is not
+// empty, its attrs.kind is in blockedKinds (a gateway of no declared kind is then not blocked), or when its type is
+// in attrTypes and its boolean attrs[blockAttr] is true (blockAttr "" blocks nothing). c itself is not checked, so a control can be its own source (a rule
+// that reads the source's type or layer must exclude the controls itself, as NET-005 does); a blocked nodeID is only
+// its own source. It generalises upstreamAvoidingAttr: one reverse walk answers "does some walk from a source of the
+// rule's types reach this hop around every control", which is how the path rules of docs/03 read all paths (ADR-088 §1).
+func (g *graphVal) upstreamAvoiding(nodeID string, blockedTypes, blockedKinds, attrTypes []string, blockAttr string) []any {
+	key := [5]string{nodeID, strings.Join(blockedTypes, "\x00"), strings.Join(blockedKinds, "\x00"), strings.Join(attrTypes, "\x00"), blockAttr}
+	return g.upstreamWalk(nodeID, key, func(m map[string]any) bool {
+		t, _ := m["type"].(string)
+		if blockAttr != "" && slices.Contains(attrTypes, t) {
+			attrs, _ := m["attrs"].(map[string]any)
+			if v, _ := attrs[blockAttr].(bool); v {
+				return true
+			}
+		}
+		if !slices.Contains(blockedTypes, t) {
+			return false
+		}
+		if len(blockedKinds) == 0 {
+			return true
+		}
+		attrs, _ := m["attrs"].(map[string]any)
+		k, _ := attrs["kind"].(string)
+		return slices.Contains(blockedKinds, k)
+	})
+}
+
+// upstreamAvoidingFunctions is upstreamAvoiding where a node of blockedTypes blocks only when it credits the hop
+// (ADR-088 Amendments, B2b "functions decide when declared"): it declares every one of needFunctions in its
+// attrs.functions, or it declares none and its attrs.kind is in blockedKinds (any kind when blockedKinds is empty; a
+// node of no declared kind is then credited only by an empty blockedKinds). A node of blockedTypes that does not
+// credit the hop is walked through like any other, so the walk is exact at any chain length: the path rules no
+// longer unroll it to a fixed depth in CEL.
+func (g *graphVal) upstreamAvoidingFunctions(nodeID string, blockedTypes, blockedKinds, needFunctions []string) []any {
+	// The fourth key slot names the form, so a function-aware walk never shares a cache entry with an attr walk.
+	key := [5]string{nodeID, strings.Join(blockedTypes, "\x00"), strings.Join(blockedKinds, "\x00"), "\x01functions", strings.Join(needFunctions, "\x00")}
+	return g.upstreamWalk(nodeID, key, func(m map[string]any) bool {
+		t, _ := m["type"].(string)
+		if !slices.Contains(blockedTypes, t) {
+			return false
+		}
+		attrs, _ := m["attrs"].(map[string]any)
+		if declared := declaredFunctions(attrs["functions"]); len(declared) > 0 {
+			for _, f := range needFunctions {
+				if !slices.Contains(declared, f) {
+					return false
+				}
+			}
+			return true
+		}
+		if len(blockedKinds) == 0 {
+			return true
+		}
+		k, _ := attrs["kind"].(string)
+		return slices.Contains(blockedKinds, k)
+	})
+}
+
+// DerivedCredentialBrokerage is the boolean attribute the loader derives on a node whose functions[] (schema 1.1,
+// gateway.functions) declares credential_brokerage (ADR-088 D1, WIS-005's second branch): a gateway that injects the
+// secret per call is a broker on the path, so g.pathAvoidingAttr(from, to, "credential_brokerage") walks around it as
+// g.pathAvoidingType walks around a credential_broker node. The model schema has no such node attribute; a value
+// already present (an extension the schema does not reject) is kept.
+const DerivedCredentialBrokerage = "credential_brokerage" // #nosec G101 -- an attribute name, not a credential
+
+// derivedAttrs adds the attributes the loader derives from declared ones to a node's projected attrs (in place).
+func derivedAttrs(attrs map[string]any) map[string]any {
+	if _, declared := attrs[DerivedCredentialBrokerage]; !declared && slices.Contains(declaredFunctions(attrs["functions"]), "credential_brokerage") {
+		attrs[DerivedCredentialBrokerage] = true
+	}
+	return attrs
+}
+
+// declaredFunctions reads attrs.functions (a list of strings once normalised; anything else declares none).
+func declaredFunctions(v any) []string {
+	var out []string
+	switch l := v.(type) {
+	case []any:
+		for _, x := range l {
+			if s, ok := x.(string); ok && s != "" {
+				out = append(out, s)
+			}
+		}
+	case []string:
+		for _, s := range l {
+			if s != "" {
+				out = append(out, s)
+			}
+		}
+	}
+	return out
+}
+
+// upstreamWalk is the reverse walk behind both forms of upstreamAvoiding, cached under key: nodeID and every node
+// with a directed walk to it whose later nodes (nodeID included) are all unblocked; a blocked nodeID is only its own
+// source. The result lists node values in model order.
+func (g *graphVal) upstreamWalk(nodeID string, key [5]string, blocked func(map[string]any) bool) []any {
+	start, ok := g.nodeByID[nodeID]
+	if !ok {
+		return nil
+	}
+	if out, ok := g.upAvoid[key]; ok {
+		return out
+	}
+	sources := map[string]bool{nodeID: true}
+	if !blocked(start) {
+		open := map[string]bool{nodeID: true}
+		queue := []string{nodeID}
+		for len(queue) > 0 {
+			cur := queue[0]
+			queue = queue[1:]
+			for _, p := range g.inAdj[cur] {
+				sources[p] = true
+				if m, ok := g.nodeByID[p]; ok && !open[p] && !blocked(m) {
+					open[p] = true
+					queue = append(queue, p)
+				}
+			}
+		}
+	}
+	out := []any{}
+	for _, item := range g.nodes {
+		m, _ := item.(map[string]any)
+		if id, _ := m["id"].(string); sources[id] {
+			out = append(out, m)
+		}
+	}
+	g.upAvoid[key] = out
+	return out
+}
+
 func (g *graphVal) addData(from, to string) {
 	g.dataAdj[from] = append(g.dataAdj[from], to)
 	g.dataRev[to] = append(g.dataRev[to], from)
@@ -754,6 +1136,16 @@ func (g *graphVal) regimeVal(code string) ref.Val {
 
 func (g *graphVal) requiredVal(code string) ref.Val {
 	return types.Int(g.table.Required(code, g.policy))
+}
+
+// cappedVal is capped(code): the ceiling PolicyTable.Cap returns, -1 when neither the table nor the
+// tenant names the key (the rule supplies its own default).
+func (g *graphVal) cappedVal(code string) ref.Val {
+	limit, ok := g.table.Cap(code, g.policy)
+	if !ok {
+		return types.Int(-1)
+	}
+	return types.Int(limit)
 }
 
 // ---- value normalisation ------------------------------------------------------------------------

@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_ata_006_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ATA-006 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_home",
+      "kind": "zone",
+      "name": "Our agent runtime",
+      "node_ids": [
+        "n_orch"
+      ]
+    },
+    {
+      "id": "g_partner",
+      "kind": "trust_boundary",
+      "name": "Partner agent (other organisation)",
+      "node_ids": [
+        "n_peer"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Orchestrator agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    },
+    {
+      "id": "n_peer",
+      "type": "saas",
+      "name": "Partner research agent",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "provider": "other",
+        "integrity": "signed",
+        "owner": "Fixture owner",
+        "purpose": "Partner agent."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_orch",
+      "to": "n_peer",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "token_binding": "none",
+        "prompt_contains": "internal"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

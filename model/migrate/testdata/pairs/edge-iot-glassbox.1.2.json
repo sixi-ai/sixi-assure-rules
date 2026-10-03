@@ -1,0 +1,452 @@
+{
+  "attrs": {
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "criticality": "high",
+    "description": "Template: OT telemetry pipeline. Attested edge devices publish to an edge gateway running an on-device model; northbound traffic crosses a data diode and site DMZ conduit into IoT Operations/IoT Hub, then Event Hubs and a private Blob telemetry lake in Switzerland North.",
+    "dr_tested_at": "2026-03-31",
+    "incident_reporting": "Cyber attacks on critical infrastructure reported to the NCSC within 24 h of discovery (ISG Art. 74a-c); DORA Art. 19 major-incident reporting via the ICT risk function; plant SOC on-call escalates within 1 h.",
+    "owner": "Head of Plant Engineering",
+    "regimes": [
+      "CRA",
+      "CH-ISG",
+      "IEC",
+      "DORA"
+    ]
+  },
+  "edges": [
+    {
+      "attrs": {},
+      "auth": "mtls",
+      "data_class": "internal",
+      "encryption": "mtls",
+      "from": "n_plc1",
+      "id": "e_plc1_egw",
+      "kind": "publishes",
+      "protocol": "opc_ua",
+      "to": "n_egw"
+    },
+    {
+      "attrs": {},
+      "auth": "mtls",
+      "data_class": "confidential",
+      "encryption": "mtls",
+      "from": "n_cam2",
+      "id": "e_cam2_egw",
+      "kind": "publishes",
+      "protocol": "mqtt",
+      "to": "n_egw"
+    },
+    {
+      "attrs": {},
+      "auth": "mtls",
+      "data_class": "internal",
+      "encryption": "mtls",
+      "from": "n_vib3",
+      "id": "e_vib3_egw",
+      "kind": "publishes",
+      "protocol": "mqtt",
+      "to": "n_egw"
+    },
+    {
+      "attrs": {},
+      "auth": "mtls",
+      "data_class": "confidential",
+      "encryption": "mtls",
+      "from": "n_egw",
+      "id": "e_egw_emodel",
+      "kind": "calls",
+      "label": "local inference",
+      "protocol": "grpc",
+      "to": "n_emodel"
+    },
+    {
+      "attrs": {},
+      "auth": "mtls",
+      "data_class": "confidential",
+      "encryption": "mtls",
+      "from": "n_egw",
+      "id": "e_egw_diode",
+      "kind": "publishes",
+      "protocol": "mqtt",
+      "to": "n_diode"
+    },
+    {
+      "attrs": {},
+      "auth": "mtls",
+      "data_class": "confidential",
+      "encryption": "mtls",
+      "from": "n_diode",
+      "id": "e_diode_dmz",
+      "kind": "flows",
+      "protocol": "mqtt",
+      "to": "n_dmz"
+    },
+    {
+      "attrs": {},
+      "auth": "mtls",
+      "data_class": "confidential",
+      "encryption": "mtls",
+      "from": "n_dmz",
+      "id": "e_dmz_broker",
+      "kind": "publishes",
+      "label": "X.509 device identity",
+      "protocol": "mqtt",
+      "to": "n_broker"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_broker",
+      "id": "e_broker_eh",
+      "kind": "publishes",
+      "protocol": "amqp",
+      "to": "n_eh"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "confidential",
+      "encryption": "tls",
+      "from": "n_eh",
+      "id": "e_eh_blob",
+      "kind": "writes",
+      "label": "Event Hubs Capture",
+      "protocol": "https",
+      "to": "n_blob"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "internal",
+      "encryption": "tls",
+      "from": "n_broker",
+      "id": "e_broker_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "to": "n_logs"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "data_class": "internal",
+      "encryption": "tls",
+      "from": "n_eh",
+      "id": "e_eh_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "to": "n_logs"
+    }
+  ],
+  "evidence": [],
+  "findings": [],
+  "groups": [
+    {
+      "attrs": {
+        "description": "Production zone (IEC 62443 zone), Plant A, Switzerland.",
+        "region": "ch"
+      },
+      "id": "g_site",
+      "kind": "zone",
+      "name": "Site – Plant A",
+      "node_ids": [
+        "n_plc1",
+        "n_cam2",
+        "n_vib3",
+        "n_egw",
+        "n_emodel",
+        "n_product"
+      ]
+    },
+    {
+      "attrs": {
+        "description": "Unidirectional conduit between production zone and cloud.",
+        "region": "ch"
+      },
+      "id": "g_conduit",
+      "kind": "zone",
+      "name": "Conduit – Plant A DMZ",
+      "node_ids": [
+        "n_diode",
+        "n_dmz"
+      ]
+    },
+    {
+      "attrs": {
+        "region": "switzerlandnorth"
+      },
+      "id": "g_cloud",
+      "kind": "zone",
+      "name": "Cloud – Switzerland North",
+      "node_ids": [
+        "n_broker",
+        "n_eh",
+        "n_blob",
+        "n_logs"
+      ]
+    },
+    {
+      "id": "g_plant_a",
+      "kind": "site",
+      "name": "Plant A",
+      "node_ids": [
+        "n_plc1",
+        "n_cam2",
+        "n_vib3",
+        "n_egw",
+        "n_emodel",
+        "n_product",
+        "n_diode",
+        "n_dmz"
+      ]
+    },
+    {
+      "id": "g_ot_tb",
+      "kind": "trust_boundary",
+      "name": "OT / IT boundary",
+      "node_ids": [
+        "n_diode",
+        "n_dmz"
+      ]
+    }
+  ],
+  "id": "arch_tpl_edge_iot",
+  "name": "Edge → IoT Operations/IoT Hub → Event Hub → storage (plant telemetry)",
+  "nodes": [
+    {
+      "attrs": {
+        "attestation": "tpm",
+        "cra_scope": true,
+        "disk_encryption": true,
+        "egress_policy": true,
+        "ota_signed": true,
+        "sbom": true,
+        "secure_boot": true,
+        "site": "Plant A",
+        "version": "fw 4.2.1"
+      },
+      "id": "n_plc1",
+      "layer": "edge",
+      "name": "PLC – line 1",
+      "position": {
+        "x": 40,
+        "y": 80
+      },
+      "source": "design",
+      "type": "edge_device",
+      "zone": "g_site"
+    },
+    {
+      "attrs": {
+        "attestation": "tpm",
+        "cra_scope": true,
+        "disk_encryption": true,
+        "egress_policy": true,
+        "ota_signed": true,
+        "sbom": true,
+        "secure_boot": true,
+        "site": "Plant A",
+        "version": "fw 2.8.0"
+      },
+      "id": "n_cam2",
+      "layer": "edge",
+      "name": "Vision camera – line 2",
+      "position": {
+        "x": 40,
+        "y": 200
+      },
+      "source": "design",
+      "type": "edge_device",
+      "zone": "g_site"
+    },
+    {
+      "attrs": {
+        "attestation": "secure_element",
+        "cra_scope": true,
+        "disk_encryption": true,
+        "egress_policy": true,
+        "ota_signed": true,
+        "sbom": true,
+        "secure_boot": true,
+        "site": "Plant A",
+        "version": "fw 1.9.3"
+      },
+      "id": "n_vib3",
+      "layer": "edge",
+      "name": "Vibration sensor array – line 3",
+      "position": {
+        "x": 40,
+        "y": 320
+      },
+      "source": "design",
+      "type": "edge_device",
+      "zone": "g_site"
+    },
+    {
+      "attrs": {
+        "cra_scope": true,
+        "ota_signed": true,
+        "owner": "Head of Plant Engineering",
+        "sbom": true,
+        "secure_boot": true,
+        "version": "2.3.0"
+      },
+      "id": "n_product",
+      "layer": "edge",
+      "name": "Edge appliance (product)",
+      "position": {
+        "x": 40,
+        "y": 440
+      },
+      "source": "design",
+      "type": "product",
+      "zone": "g_site"
+    },
+    {
+      "attrs": {
+        "attestation": "tpm",
+        "cra_scope": true,
+        "disk_encryption": true,
+        "egress_policy": true,
+        "ota_signed": true,
+        "owner": "Head of Plant Engineering",
+        "sbom": true,
+        "secure_boot": true,
+        "site": "Plant A",
+        "version": "2.3.0"
+      },
+      "id": "n_egw",
+      "layer": "edge",
+      "name": "Plant edge gateway",
+      "position": {
+        "x": 260,
+        "y": 200
+      },
+      "source": "design",
+      "type": "edge_gateway",
+      "zone": "g_site"
+    },
+    {
+      "attrs": {
+        "owner": "Head of Plant Engineering",
+        "purpose": "Detects vibration and vision anomalies locally; only scores and aggregates leave the site.",
+        "version": "1.4.0"
+      },
+      "id": "n_emodel",
+      "layer": "edge",
+      "name": "Anomaly detection model (ONNX, on-device)",
+      "position": {
+        "x": 480,
+        "y": 80
+      },
+      "source": "design",
+      "type": "edge_model",
+      "zone": "g_site"
+    },
+    {
+      "attrs": {},
+      "id": "n_diode",
+      "layer": "network",
+      "name": "Data diode (unidirectional, site → cloud)",
+      "position": {
+        "x": 480,
+        "y": 200
+      },
+      "source": "design",
+      "type": "data_diode",
+      "zone": "g_conduit"
+    },
+    {
+      "attrs": {},
+      "id": "n_dmz",
+      "layer": "network",
+      "name": "Site DMZ (MQTT relay)",
+      "position": {
+        "x": 700,
+        "y": 200
+      },
+      "source": "design",
+      "type": "dmz",
+      "zone": "g_conduit"
+    },
+    {
+      "attrs": {
+        "network_exposure": "private",
+        "region": "switzerlandnorth"
+      },
+      "id": "n_broker",
+      "layer": "platform",
+      "name": "IoT Operations / IoT Hub (MQTT broker)",
+      "position": {
+        "x": 920,
+        "y": 200
+      },
+      "source": "design",
+      "type": "broker",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "network_exposure": "private",
+        "region": "switzerlandnorth"
+      },
+      "id": "n_eh",
+      "layer": "platform",
+      "name": "Event Hubs (telemetry)",
+      "position": {
+        "x": 1140,
+        "y": 200
+      },
+      "source": "design",
+      "type": "queue",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "backup": true,
+        "criticality": "high",
+        "data_class": "confidential",
+        "encryption_key": "cmk",
+        "engine": "blob",
+        "geo_redundant": true,
+        "network_exposure": "private",
+        "region": "switzerlandnorth",
+        "retention_days": 1825
+      },
+      "id": "n_blob",
+      "layer": "data",
+      "name": "Telemetry lake (Blob, Capture)",
+      "position": {
+        "x": 1360,
+        "y": 200
+      },
+      "source": "design",
+      "type": "datastore",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "immutable": true,
+        "region": "switzerlandnorth",
+        "retention_days": 3650
+      },
+      "id": "n_logs",
+      "layer": "platform",
+      "name": "Log Analytics (immutable archive)",
+      "position": {
+        "x": 1360,
+        "y": 320
+      },
+      "source": "design",
+      "type": "log_sink",
+      "zone": "g_cloud"
+    }
+  ],
+  "schema_version": "1.2",
+  "tenant_id": "tenant_templates",
+  "version": 1
+}

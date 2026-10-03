@@ -1,0 +1,116 @@
+{
+  "id": "arch_fx_ot_011_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-011 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited",
+    "incident_reporting": "Plant CSIRT within 24 h (NIS2 Art. 23); CRA Art. 14 via the PSIRT."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_hs",
+      "type": "human_step",
+      "name": "Command approval",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "approver",
+        "approval_for": [
+          "command"
+        ],
+        "approval_identity": "separate"
+      }
+    },
+    {
+      "id": "n_val",
+      "type": "app",
+      "name": "Command validator",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "command_validation": true,
+        "hosted_on": "n_gw"
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "edge_gateway",
+      "name": "Line gateway",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      }
+    },
+    {
+      "id": "n_plc",
+      "type": "edge_device",
+      "name": "PLC",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      }
+    },
+    {
+      "id": "n_audit",
+      "type": "log_sink",
+      "name": "Approval log",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 365,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_hs_val",
+      "from": "n_hs",
+      "to": "n_val",
+      "kind": "executes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_val_plc",
+      "from": "n_val",
+      "to": "n_plc",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e_val_audit",
+      "from": "n_val",
+      "to": "n_audit",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

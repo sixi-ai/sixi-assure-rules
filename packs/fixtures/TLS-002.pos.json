@@ -1,0 +1,63 @@
+{
+  "id": "arch_fx_tls_002_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture TLS-002 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "IEC"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store",
+        "hosted_on": "n_ghost"
+      }
+    },
+    {
+      "id": "n_tool",
+      "type": "tool",
+      "name": "Sidecar tool",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "docs.search"
+        ],
+        "vetted": true,
+        "logged": true,
+        "write_capable": false,
+        "hosted_on": "n_ghost"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_tool",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "none",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,419 @@
+# FW — framework-aware rules (docs/03 §FW, ADR-093 decision 8, docs/18 WS-M M3). Deterministic CEL over the schema 1.2
+# framework vocabulary (docs/02 §10) that the framework importers (WS-M M2) or a person write; the LLM never creates
+# findings. Each rule reads a fact no other shipped rule reads (SD-6) and is owned by an existing steward (SD-7, owners in
+# agents/swarm/README.md §3): agent-memory-state (FW-001 to FW-004), autonomy-blast-radius (FW-005), ingestion-security
+# (FW-006), inter-agent-trust (FW-007), agent-runtime-hardening (FW-008), api-gateway-exposure (FW-009),
+# tool-supply-chain (FW-010, FW-011), data-classification-residency (FW-012), network-segmentation (FW-013).
+#
+# The hazards and the conditions are docs/research/07-agentic-frameworks/00-synthesis.md §4.2, read from the frameworks'
+# source repositories at pinned commits (fetched 2026-10-01). A framework's documentation is not law, so it is never a
+# clause: the clauses are OWASP and AI Act ids from corpus/, and each framework fact travels as a framework-native
+# remediation sentence (`remediation_by_framework`, ADR-093 decision 9, docs/18 M4) whose `source` is the repository file
+# at its commit. A framework the research found no native control for has no sentence; the generic remediation applies.
+#
+# An absent schema 1.2 fact is a not_checked row through `requires:` (ADR-088 §4), never a finding, with two deliberate
+# exceptions the synthesis states: FW-008 reads an undeclared egress policy on a code-executing tool as the gap, and
+# FW-009 reads a hosted runtime that declares no inbound authentication method as the gap.
+pack: fw
+version: 0.1.0
+regimes: [OWASP, AIACT]
+offer: agentic
+rules:
+  - id: FW-001
+    title: Agent memory turns stored data back into code objects
+    scope: node
+    severity: high
+    # LangGraph H1, H2 (langgraph.md §5): msgpack is permissive unless strict, and the server's pickle_fallback defaults
+    # to true. Only an explicit pickle or permissive value reports; json_only and allowlist are the safe readings.
+    condition: 'n.type == "agent_memory" && attr(n, "deserialization", "") in ["pickle", "permissive"]'
+    requires: [n.attrs.deserialization]
+    domain: 'n.type == "agent_memory"'
+    message: "{{n.name}} turns stored state back into code objects when it is read (deserialization={{attr(n, 'deserialization', '')}}): whoever can write one checkpoint or memory row runs code in every agent that loads it."
+    clauses: [OWASP:AgenticTop10:ASI05]
+    remediation: "Store agent state as data only (deserialization=json_only), or rebuild only an allow-list of types (deserialization=allowlist), and keep write access to the store to the agent's own identity."
+    remediation_by_framework:
+      langgraph:
+        text: 'Set `checkpointer.serde.pickle_fallback: false` (the server default is true when a `serde` block omits it) and `allowed_msgpack_modules: null` for strict mode; library users set `LANGGRAPH_STRICT_MSGPACK=true`.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/cli/langgraph_cli/schemas.py#L185-L190'
+      ms_agent_framework:
+        text: 'Prefer `FileCheckpointStorage`, whose pickle deserialisation is limited to an allow-list of types, and keep write access to a `CosmosCheckpointStorage` container to the workflow''s own identity, since loading untrusted checkpoints "can execute arbitrary code".'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/core/agent_framework/_workflows/_checkpoint.py#L505-L527'
+      google_adk:
+        text: 'New `SqliteSessionService` rows are JSON events and legacy pickled rows load only through a restricted unpickler; migrate the legacy rows.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/sessions/sqlite_session_service.py#L173-L178'
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/deserialization", value: allowlist }
+    fixtures: { positive: fixtures/FW-001.pos.json, negative: fixtures/FW-001.neg.json }
+    tags: [agentic, memory, framework, deserialization]
+
+  - id: FW-002
+    title: Agent memory kept with no retention limit
+    scope: node
+    severity: medium
+    # LangGraph H9, Foundry H10: with no TTL configured nothing expires; Foundry's default_ttl_seconds 0 means never.
+    condition: 'n.type == "agent_memory" && attr(n, "retention_days", -1) == 0'
+    requires: [n.attrs.retention_days]
+    domain: 'n.type == "agent_memory"'
+    message: "{{n.name}} keeps what agents store with no retention limit (retention_days=0): conversations and remembered facts accumulate for as long as the store exists, beyond the purpose they were kept for."
+    clauses: [OWASP:LLMTop10:LLM02]
+    remediation: "Set a retention period on the memory that matches the purpose of what agents store (retention_days greater than 0), and let the store expire older state itself."
+    remediation_by_framework:
+      langgraph:
+        text: 'Set `checkpointer.ttl` (`strategy`, `default_ttl`) and `store.ttl.default_ttl`; with both omitted "no TTL behavior is configured".'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/cli/langgraph_cli/schemas.py#L109-L125'
+      ms_agent_framework:
+        text: 'Not covered natively: the core `SessionStore` is an in-memory dict with no eviction, so retention is declared on the backing store.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/core/agent_framework/_sessions.py#L1926-L1937'
+      foundry_agent_service:
+        text: 'Set the memory store''s `default_ttl_seconds` above 0; 0, the default, means memories never expire.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/memory-stores/models.tsp#L116-L118'
+      openai_agents:
+        text: 'Wrap the session in `EncryptedSession`, whose `ttl` (600 s by default) makes old records unreadable; expired records stay in the underlying store until compaction reclaims them.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/extensions/memory/encrypt_session.py#L116-L160'
+    fixtures: { positive: fixtures/FW-002.pos.json, negative: fixtures/FW-002.neg.json }
+    tags: [agentic, memory, framework, retention]
+
+  - id: FW-003
+    title: Agent memory stored unencrypted
+    scope: node
+    severity: medium
+    # LangGraph H8: savers default to a plain serializer; MAF file stores "do not encrypt file contents".
+    condition: 'n.type == "agent_memory" && attr(n, "encryption", "") == "none"'
+    requires: [n.attrs.encryption]
+    domain: 'n.type == "agent_memory"'
+    message: "{{n.name}} is stored unencrypted (encryption=none): whoever reads the store or its backups reads every conversation and fact the agents kept."
+    clauses: [OWASP:LLMTop10:LLM02]
+    remediation: "Encrypt the memory before it is written (encryption=app_layer, with the key from the secret store) or in the store at rest (encryption=store)."
+    remediation_by_framework:
+      langgraph:
+        text: 'Use `EncryptedSerializer.from_pycryptodome_aes` with `LANGGRAPH_AES_KEY` supplied from the secret store, or the server''s `encryption.path` handler (beta); it still reads unencrypted rows, so old rows stay readable until rewritten.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/checkpoint/langgraph/checkpoint/serde/encrypted.py#L40-L80'
+      ms_agent_framework:
+        text: 'Do not use `FileHistoryProvider` or `FileSessionStore` for production history: they "do not encrypt file contents"; encryption of the Cosmos and Redis stores was not found in the source files read.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/core/agent_framework/_sessions.py#L2312-L2320'
+      openai_agents:
+        text: 'Wrap the session in `EncryptedSession` (Fernet, per-session keys derived with HKDF).'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/extensions/memory/encrypt_session.py#L116-L160'
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/encryption", value: store }
+    fixtures: { positive: fixtures/FW-003.pos.json, negative: fixtures/FW-003.neg.json }
+    tags: [agentic, memory, framework, encryption]
+
+  - id: FW-004
+    title: Memory shared across users is written by an agent and read back into a user-facing agent
+    scope: node
+    severity: high
+    # LangGraph H10, Foundry H10, CrewAI H8. Complements MEM-002 (one owner's memory reached by two agents) and MEM-003 (a
+    # shared store joining an untrusted reader and a writer). A user-facing agent is one a user's calls reach, directly
+    # or through the apps, APIs and agents in front of it. An undeclared scope is not_checked (requires, as MEM-002).
+    condition: |
+      n.type == "agent_memory" && attr(n, "scope", "") in ["shared", "tenant"] &&
+      g.inEdges(n.id, "writes").exists(w, w.from.type == "agent") &&
+      g.inEdges(n.id, "reads").exists(r, r.from.type == "agent" &&
+        g.nodes("user").exists(u, g.reachable(u.id, r.from.id)))
+    requires: [n.attrs.scope]
+    domain: 'n.type == "agent_memory" && g.inEdges(n.id, "writes").exists(w, w.from.type == "agent")'
+    message: "{{n.name}} is shared across users (scope={{attr(n, 'scope', '')}}), written by {{g.inEdges(n.id, 'writes').filter(w, w.from.type == 'agent').map(w, w.from.name).join(', ')}} and read back by {{g.inEdges(n.id, 'reads').filter(r, r.from.type == 'agent').map(r, r.from.name).join(', ')}}, which serve users: what one user's conversation stores reaches every other user's answers."
+    clauses: [OWASP:AgenticTop10:ASI06, OWASP:LLMTop10:LLM02]
+    remediation: "Scope the memory per user (scope=user, items keyed by the user's id) or per session, and keep any store shared across users read-only to the agents that answer users."
+    remediation_by_framework:
+      langgraph:
+        text: 'Namespace store items per user; `BaseStore` is namespaced and shared across threads.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/checkpoint/langgraph/store/base/__init__.py#L708-L730'
+      ms_agent_framework:
+        text: 'Host on Foundry, which partitions stored sessions per user at `{root}/a-{agent}/u-{user}/c-{context}.json`.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/docs/decisions/0031-hosted-per-user-session-storage-isolation.md#L53-L83'
+      foundry_agent_service:
+        text: 'Set `memory_search_preview.scope` to `{{$userId}}`.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/tools/models.tsp#L1009-L1012'
+      google_adk:
+        text: 'Keep per-user facts under `user:` keys; `app:` state is merged into every session read.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/sessions/state.py#L72-L77'
+      crewai:
+        text: 'Give agents their own `memory`, since agent memory falls back to crew memory.'
+        source: 'https://raw.githubusercontent.com/crewAIInc/crewAI/ca1d55abb368cd24344de1ddad97bc493b21ffa0/lib/crewai/src/crewai/agents/agent_builder/base_agent.py#L383-L395'
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/scope", value: user }
+    fixtures: { positive: fixtures/FW-004.pos.json, negative: fixtures/FW-004.neg.json }
+    tags: [agentic, memory, framework, poisoning, tenancy]
+
+  - id: FW-005
+    title: Agent or workflow loop with no iteration bound
+    scope: node
+    severity: medium
+    # LangGraph H13, MAF H7, H12, Foundry H9, ADK H7, CrewAI H11, OpenAI H14. Complements AI-010 and ARH-003 (kill switch
+    # and rate limit, not a bound). Importers write max_iterations 0 only where the artefact shows an unbounded loop; an
+    # assisted agent, which a person steps through, is outside the domain. An OpenAI Agents SDK handoff cycle is not
+    # such a loop: the Runner stops at max_turns (10 by default), which the drawing does not carry, so the importer
+    # leaves max_iterations undeclared and the row stays not checked (adr/proposals/ADR-093-I9-handoff-cycle.md).
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") != "assisted" &&
+      attr(n, "max_iterations", -1) == 0 && attr(n, "max_duration_s", 0) == 0
+    requires: [n.attrs.max_iterations]
+    domain: 'n.type == "agent" && attr(n, "autonomy", "") != "assisted"'
+    message: "{{n.name}} runs a loop with no iteration bound (max_iterations=0) and no time bound: a run that never meets its exit condition keeps calling the model and its tools until someone stops it."
+    clauses: [OWASP:LLMTop10:LLM10, OWASP:AgenticTop10:ASI08, AIACT:2024/1689:Art15(4)]
+    remediation: "Bound every loop the agent runs (max_iterations greater than 0, or max_duration_s greater than 0) and set the same bound in the framework, so a run ends on its own."
+    remediation_by_framework:
+      langgraph:
+        text: 'Bound each node with `TimeoutPolicy` (and `RetryPolicy`) and declare the run''s recursion limit in the model, since no artefact carries it.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/langgraph/langgraph/types.py#L427-L540'
+      ms_agent_framework:
+        text: 'Set `FunctionInvocationConfiguration.max_function_calls` and `max_duration_seconds`, unlimited by default, and a workflow `max_iterations` below the default 100.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/core/agent_framework/_tools.py#L1765-L1780'
+      foundry_agent_service:
+        text: 'Give each `GotoAction` loop a counter with `SetVariable` and `ConditionGroup`, the action kinds the workflow sample uses, or move the loop to MAF before workflows retire.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-sdk-for-python/f37eac8d85484ca1f8374e37854fa8070a478464/sdk/ai/azure-ai-projects/samples/agents/sample_workflow_multi_agent.py#L69-L139'
+      google_adk:
+        text: 'Set `max_iterations` on every `LoopAgent`; unset, it runs "indefinitely until a sub-agent escalates".'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/agents/loop_agent.py#L84-L89'
+      openai_agents:
+        text: 'Pass `max_turns` to `as_tool` and break handoff cycles such as `"A" -> "B"` and `"B" -> "A"`.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/agent.py#L606-L629'
+      crewai:
+        text: 'Keep `max_iter` and set `max_execution_time` and `max_rpm`.'
+        source: 'https://raw.githubusercontent.com/crewAIInc/crewAI/ca1d55abb368cd24344de1ddad97bc493b21ffa0/lib/cli/src/crewai_cli/templates/json_crew/agent_settings.jsonc#L7-L17'
+    fixtures: { positive: fixtures/FW-005.pos.json, negative: fixtures/FW-005.neg.json }
+    tags: [agentic, autonomy, framework, bounds]
+
+  - id: FW-006
+    title: Delegated agent runs without the guardrails of the agent that delegates to it
+    scope: edge
+    severity: medium
+    # ADK H11 (AgentTool without the runner's plugins), OpenAI input guardrails that run only for the starting agent.
+    # Complements ING-001, which reports an acting agent with no screen at all.
+    condition: |
+      e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent" &&
+      size(attr(e.from, "guardrails", [])) > 0 && size(attr(e.to, "guardrails", [])) == 0 &&
+      !attr(e.to, "content_safety", false)
+    message: "{{e.from.name}} delegates to {{e.to.name}}, which runs none of the guardrails {{e.from.name}} declares ({{attr(e.from, 'guardrails', []).map(x, x.stage).join(', ')}}) and declares no content safety: input the delegating agent would screen reaches the delegated one unscreened."
+    clauses: [OWASP:LLMTop10:LLM01, AIACT:2024/1689:Art15(5)]
+    remediation: "Give every agent a delegation reaches its own guardrails at the same stages (guardrails[] on the delegated agent), or content safety on its model calls (content_safety=true)."
+    remediation_by_framework:
+      langgraph:
+        text: 'Give each worker its own `pre_model_hook`/`post_model_hook`, not only the supervisor.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/prebuilt/langgraph/prebuilt/chat_agent_executor.py#L296-L297'
+      ms_agent_framework:
+        text: 'Register the agent and function middleware on every agent passed to `as_tool` or a builder.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/core/agent_framework/_middleware.py#L838-L1010'
+      foundry_agent_service:
+        text: 'Set `rai_config` on every agent definition, including each child agent.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/agents/models.tsp#L398-L404'
+      google_adk:
+        text: 'Keep `AgentTool(include_plugins=True)`, the default, so runner-wide plugins also run for the wrapped agent.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/tools/agent_tool.py#L131-L150'
+      openai_agents:
+        text: 'Input guardrails run only for the starting agent on the first turn, so attach `ToolInputGuardrail`/`ToolOutputGuardrail` to the tools of handoff targets.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/run_internal/run_loop.py#L1222-L1228'
+    patch_template:
+      - { op: add, path: "/nodes/{{e.to.id}}/attrs/content_safety", value: true }
+    fixtures: { positive: fixtures/FW-006.pos.json, negative: fixtures/FW-006.neg.json }
+    tags: [agentic, delegation, framework, guardrails]
+
+  - id: FW-007
+    title: Full conversation history forwarded to an external agent or across a trust boundary
+    scope: edge
+    severity: medium
+    # LangGraph GAP-6 (swarm and supervisor handoffs pass the whole messages list), OpenAI GAP 1 (handoffs forward the
+    # full history unless filtered). A workflow group is not a boundary (it stays out of group_ids, docs/03 CEL).
+    condition: |
+      e.kind == "delegates" && e.from.type == "agent" &&
+      attr(e, "context_forwarded", "") == "full_history" &&
+      (e.to.type == "external_agent" ||
+       (size(e.from.group_ids) + size(e.to.group_ids) > 0 &&
+        !e.from.group_ids.exists(gid, gid in e.to.group_ids)))
+    requires: [e.attrs.context_forwarded]
+    domain: |
+      e.kind == "delegates" && e.from.type == "agent" &&
+      (e.to.type == "external_agent" ||
+       (size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids)))
+    message: "{{e.from.name}} hands its full conversation history to {{e.to.name}} (context_forwarded=full_history) {{e.to.type == 'external_agent' ? 'outside the organisation' : 'across a trust boundary'}}: everything the user and earlier agents said leaves the boundary with the task, including what the receiving side has no need for."
+    clauses: [OWASP:LLMTop10:LLM02, OWASP:AgenticTop10:ASI07]
+    remediation: "Forward only what the task needs across the boundary (context_forwarded=filtered or last_message), or keep the full-history hop inside one boundary and cross it with an explicit input."
+    remediation_by_framework:
+      langgraph:
+        text: 'Swarm and single supervisor handoffs pass the whole `messages` list and no filter appears in the handoff code read; keep handoffs inside one boundary and cross it through `RemoteGraph` with an explicit input.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph-swarm-py/5442a15cdd0ed210589148900c9960c24c489d04/langgraph_swarm/handoff.py#L86-L92'
+      ms_agent_framework:
+        text: 'Leave `propagate_session` off on `as_tool`, so the parent''s session is not forwarded.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/core/agent_framework/_agents.py#L641-L665'
+      google_adk:
+        text: 'Not covered; a `single_turn` sub-agent runs inline in the parent''s session, and no filter was found in the ADK source files read.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/tools/agent_tool.py#L116-L122'
+      openai_agents:
+        text: 'Set an `input_filter` on the handoff; nested history "is not a redaction mechanism".'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/handoffs/__init__.py#L157-L175'
+    patch_template:
+      - { op: add, path: "/edges/{{e.id}}/attrs/context_forwarded", value: filtered }
+    fixtures: { positive: fixtures/FW-007.pos.json, negative: fixtures/FW-007.neg.json }
+    tags: [agentic, delegation, framework, data-minimisation, boundary]
+
+  - id: FW-008
+    title: Code-executing tool with unrestricted network egress
+    scope: node
+    severity: high
+    # Foundry H5. Tool-level; the D2 egress rule asks the same of the agent. An absent policy reads undeclared and is
+    # reported, by design (the synthesis's reading: code that runs may reach the network unless a policy says otherwise).
+    condition: |
+      n.type in ["tool", "mcp_server"] && "executes_code" in attr(n, "capabilities", []) &&
+      !(attr(n, "egress_policy", "undeclared") in ["disabled", "default_deny_allowlist"])
+    message: "{{n.name}} executes code and {{attr(n, 'egress_policy', 'undeclared') == 'default_allow' ? 'lets it reach any network destination (egress_policy=default_allow)' : 'declares no egress policy for it'}}: code an agent writes, or is steered into writing, can send data anywhere and fetch its next stage."
+    clauses: [OWASP:AgenticTop10:ASI05]
+    remediation: "Turn network access off for executed code (egress_policy=disabled), or restrict it to named destinations (egress_policy=default_deny_allowlist with egress_allowlist)."
+    remediation_by_framework:
+      ms_agent_framework:
+        text: 'Configure Hyperlight `allowed_domains`, optionally per method; a configured domain "is itself the approval" for it.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/hyperlight/README.md#L100-L119'
+      foundry_agent_service:
+        text: 'Set the code interpreter''s `container.network_policy` to `disabled`, or `allowlist` with narrow `allowed_domains`.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-sdk-for-python/f37eac8d85484ca1f8374e37854fa8070a478464/sdk/ai/azure-ai-projects/azure/ai/projects/models/_models.py#L5768-L5845'
+      google_adk:
+        text: 'Keep `ContainerCodeExecutor`''s networking off (the default; `network_enabled` opts in).'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/code_executors/container_code_executor.py#L126-L148'
+      openai_agents:
+        text: 'Give a `container_auto` shell environment `network_policy` `disabled`, or `allowlist`.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/tool.py#L1327-L1370'
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/egress_policy", value: disabled }
+    fixtures: { positive: fixtures/FW-008.pos.json, negative: fixtures/FW-008.neg.json }
+    tags: [agentic, runtime, framework, egress, code-execution]
+
+  - id: FW-009
+    title: Hosted agent runtime with no declared inbound authentication
+    scope: node
+    severity: high
+    # LangGraph H4, H5, H6 (/mcp and /a2a on by default, no auth block), MAF H10 (the hosting adapters leave
+    # authentication to the application). Complements HAC-004 (a public agent entry) and MCP-002 (an MCP server); this
+    # one reads the hosting runtime. A runtime whose authn lists only none is as open as one that lists nothing.
+    condition: |
+      n.type in ["app", "api"] && size(attr(n, "protocols", [])) > 0 &&
+      attr(n, "authn", []).all(m, m == "none") &&
+      g.nodes("agent").exists(a, attr(a, "hosted_on", "") == n.id)
+    requires: [n.attrs.authn]
+    domain: 'n.type in ["app", "api"] && g.nodes("agent").exists(a, attr(a, "hosted_on", "") == n.id)'
+    message: "{{n.name}} hosts {{g.nodes('agent').filter(a, attr(a, 'hosted_on', '') == n.id).map(a, a.name).join(', ')}} and serves {{attr(n, 'protocols', []).join(', ')}} with no declared inbound authentication: whoever reaches it can run the agents, read their threads and use every route it serves."
+    clauses: [OWASP:AgenticTop10:ASI03, OWASP:AgenticTop10:ASI07]
+    remediation: "Authenticate every inbound call to the runtime (authn with the method in use, e.g. oidc), deny by default in its handler, and switch off the protocols the deployment does not use."
+    remediation_by_framework:
+      langgraph:
+        text: 'Add an `auth` block whose handler registers a default-deny `@auth.on`, and set `http.disable_mcp` and `http.disable_a2a` where those routes are not used.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/sdk-py/langgraph_sdk/auth/__init__.py#L61-L64'
+      ms_agent_framework:
+        text: 'The MCP and A2A hosting adapters leave authentication to the application; mount them behind the application''s own authentication.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/hosting-mcp/README.md#L18-L20'
+      foundry_agent_service:
+        text: 'Set the agent endpoint''s `authorization_schemes` (Entra) and enable only the protocols in use.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/agents/models.tsp#L795-L824'
+      google_adk:
+        text: 'The ADK API server''s endpoints "are unauthenticated"; put authentication in front and deploy to Cloud Run with `--no-allow-unauthenticated`.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/cli/api_server.py#L846-L855'
+      crewai:
+        text: 'Set `A2AServerConfig.auth` explicitly rather than relying on the token from `AUTH_TOKEN`.'
+        source: 'https://raw.githubusercontent.com/crewAIInc/crewAI/ca1d55abb368cd24344de1ddad97bc493b21ffa0/lib/crewai/src/crewai/a2a/config.py#L684-L687'
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/authn", value: [oidc] }
+    fixtures: { positive: fixtures/FW-009.pos.json, negative: fixtures/FW-009.neg.json }
+    tags: [agentic, runtime, framework, authentication, exposure]
+
+  - id: FW-010
+    title: Loading the agent definition runs code or reads the environment
+    scope: node
+    severity: medium
+    # MAF H4 (PowerFx with safe_mode off reads Env), ADK H1, H14 (YAML imports the modules it names; stdio commands at
+    # load), CrewAI H12 (from_repository). Only a declared true or repository reports.
+    condition: |
+      n.type == "agent" &&
+      (attr(n, "definition_source", "local") == "repository" ||
+       attr(n, "config_imports_code", false) == true || attr(n, "config_env_access", false) == true)
+    message: "Loading the definition of {{n.name}} {{[attr(n, 'definition_source', 'local') == 'repository' ? 'fetches it from a remote repository' : '', attr(n, 'config_imports_code', false) == true ? 'imports the code it names' : '', attr(n, 'config_env_access', false) == true ? 'lets its expressions read the environment' : ''].filter(s, s != '').join(' and ')}}: whoever can change the definition, or the repository it comes from, runs code or reads secrets in the agent's process before the agent does anything."
+    clauses: [OWASP:AgenticTop10:ASI04]
+    remediation: "Define the agent locally and declaratively (definition_source=local), name no module outside the agent's own package (config_imports_code=false), and keep the definition's expressions away from the environment (config_env_access=false)."
+    remediation_by_framework:
+      langgraph:
+        text: 'Not applicable; `graphs` entries point at the deployment''s own Python by design.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/cli/langgraph_cli/schemas.py#L560-L573'
+      ms_agent_framework:
+        text: 'Keep PowerFx `safe_mode` on (the default), so `=Env.` expressions cannot read the process environment.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/declarative/agent_framework_declarative/_models.py#L70-L74'
+      google_adk:
+        text: 'Name only the agent''s own package and `google.adk` in YAML, since the loader''s denylist "cannot cover third-party packages in general", and leave `ADK_ALLOW_CONFIG_STDIO_MCP_SERVERS` unset.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/agents/config_agent_utils.py#L1005-L1011'
+      openai_agents:
+        text: 'Not applicable; agents are Python objects.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/agent.py#L318-L320'
+      crewai:
+        text: 'Define the agent inline instead of loading it `from_repository`.'
+        source: 'https://raw.githubusercontent.com/crewAIInc/crewAI/ca1d55abb368cd24344de1ddad97bc493b21ffa0/lib/crewai/src/crewai/project/crew_definition.py#L99-L107'
+    fixtures: { positive: fixtures/FW-010.pos.json, negative: fixtures/FW-010.neg.json }
+    tags: [agentic, supply-chain, framework, definition]
+
+  - id: FW-011
+    title: Hosted runtime, server version or dependencies not pinned
+    scope: node
+    severity: medium
+    # LangGraph H15, H16 (the server version defaults to latest; unpinned dependencies), Foundry H6 (an image by tag,
+    # code with remote_build). Only an explicit integrity none reports; an undeclared integrity is not_checked.
+    condition: |
+      n.type in ["app", "api"] && attr(n, "integrity", "") == "none" &&
+      g.nodes("agent").exists(a, attr(a, "hosted_on", "") == n.id)
+    requires: [n.attrs.integrity]
+    domain: 'n.type in ["app", "api"] && g.nodes("agent").exists(a, attr(a, "hosted_on", "") == n.id)'
+    message: "{{n.name}} hosts {{g.nodes('agent').filter(a, attr(a, 'hosted_on', '') == n.id).map(a, a.name).join(', ')}} on a runtime whose server version, image or dependencies are not pinned (integrity=none): the next deploy can run code nobody reviewed, from a tag or a branch that moved."
+    clauses: [OWASP:AgenticTop10:ASI04, OWASP:LLMTop10:LLM03]
+    remediation: "Pin the runtime: the server version and base image, the image by digest rather than by tag, and every dependency to an exact version or commit (integrity=pinned, or signed where the images are signed)."
+    remediation_by_framework:
+      langgraph:
+        text: 'Set `api_version` and `base_image` (the server version otherwise defaults to latest) and pin `dependencies`, including a commit for `git+https` entries.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/cli/langgraph_cli/schemas.py#L628-L640'
+      ms_agent_framework:
+        text: 'The azd sample deploys code with `dependencyResolution: remote_build`; deploy a container image (`container_configuration.image`) instead of code with `dependency_resolution: remote_build`.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/dotnet/samples/04-hosting/FoundryHostedAgents/responses/Hosted-Workflow-Simple/azure.yaml#L3-L40'
+      foundry_agent_service:
+        text: 'Reference the hosted image by digest, not by a tag such as `:latest`.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/agents/models.tsp#L534-L545'
+      google_adk:
+        text: 'Not covered; Cloud Run deploys leave no file, and the generated Dockerfile is removed after deploy.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/cli/cli_deploy.py#L874-L876'
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/integrity", value: pinned }
+    fixtures: { positive: fixtures/FW-011.pos.json, negative: fixtures/FW-011.neg.json }
+    tags: [agentic, supply-chain, framework, pinning]
+
+  - id: FW-012
+    title: Prompt and tool content sent to a vendor's telemetry service
+    scope: edge
+    severity: medium
+    # OpenAI/CrewAI H9: tracing exports prompt and tool content to the vendor by default. The importers draw the
+    # exporter as a saas with a flows edge carrying the class of what it sends.
+    condition: |
+      e.kind == "flows" && e.from.type == "agent" && e.to.type == "saas" &&
+      e.data_class in ["confidential", "pii", "phi", "cid", "secret"]
+    message: "{{e.from.name}} sends {{e.data_class}} prompt and tool content to {{e.to.name}}, a vendor's telemetry service: its traces carry what users and tools said to the agent, outside the organisation and its retention rules."
+    clauses: [OWASP:LLMTop10:LLM02]
+    remediation: "Keep sensitive content out of vendor traces: switch off sensitive-data capture or vendor tracing, or export traces to the organisation's own log sink, so only the classes the vendor may hold flow to it."
+    remediation_by_framework:
+      openai_agents:
+        text: 'Tracing exports to `https://api.openai.com/v1/traces/ingest` with `trace_include_sensitive_data` true by default; set it false, disable tracing with `OPENAI_AGENTS_DISABLE_TRACING`, or replace the processors.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/tracing/processors.py#L45-L46'
+      crewai:
+        text: 'Set `CREWAI_DISABLE_TELEMETRY` and keep `share_crew` false, which otherwise adds roles, goals, backstories and task descriptions.'
+        source: 'https://raw.githubusercontent.com/crewAIInc/crewAI/ca1d55abb368cd24344de1ddad97bc493b21ffa0/lib/crewai-core/src/crewai_core/telemetry.py#L354-L359'
+    fixtures: { positive: fixtures/FW-012.pos.json, negative: fixtures/FW-012.neg.json }
+    tags: [agentic, data, framework, telemetry, third-party]
+
+  - id: FW-013
+    title: Call target computed from conversation or tool content
+    scope: edge
+    severity: high
+    # MAF H6: HttpRequestAction.url may be an expression, and the default handler performs no URL filtering. Complements
+    # SEG-004, which reads declared egress capability. A call into a gateway is the egress gateway the remediation asks for.
+    condition: 'e.kind == "calls" && attr(e, "target_from_content", false) == true && e.to.type != "gateway"'
+    message: "{{e.from.name}} calls {{e.to.name}} at a target computed from conversation or tool content (target_from_content=true) with no egress gateway between them: steered content chooses where the call goes, internal addresses included."
+    clauses: [OWASP:AgenticTop10:ASI02]
+    remediation: "Write a literal target for the call, or route it through an egress gateway (gateway kind egress) that allows only the destinations the workflow needs."
+    remediation_by_framework:
+      ms_agent_framework:
+        text: 'Write a literal `url` in `HttpRequestAction`, because `DefaultHttpRequestHandler` "performs no URL filtering or SSRF protection"; route the call through an egress gateway (Sixi Assure proposes).'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/declarative/agent_framework_declarative/_workflows/_http_handler.py#L15-L18'
+    fixtures: { positive: fixtures/FW-013.pos.json, negative: fixtures/FW-013.neg.json }
+    tags: [agentic, network, framework, ssrf]

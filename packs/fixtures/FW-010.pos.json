@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_fw_010_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture FW-010 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Config-declared agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "definition_source": "local",
+        "config_imports_code": true,
+        "config_env_access": false
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

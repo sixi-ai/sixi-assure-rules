@@ -1,0 +1,57 @@
+[
+  {
+    "rule_id": "AGT-004",
+    "ids": [
+      "n_mcp_tp"
+    ]
+  },
+  {
+    "rule_id": "AIA-003",
+    "ids": [
+      "arch_gs_cra_agent_product_bad"
+    ]
+  },
+  {
+    "rule_id": "CRA-001",
+    "ids": [
+      "n_prod"
+    ]
+  },
+  {
+    "rule_id": "CRA-002",
+    "ids": [
+      "n_prod"
+    ]
+  },
+  {
+    "rule_id": "CRA-003",
+    "ids": [
+      "n_prod"
+    ]
+  },
+  {
+    "rule_id": "CRA-004",
+    "ids": [
+      "e_in"
+    ]
+  },
+  {
+    "rule_id": "CRA-005",
+    "ids": [
+      "n_agent",
+      "n_mcp_tp"
+    ]
+  },
+  {
+    "rule_id": "CRA-006",
+    "ids": [
+      "n_prod"
+    ]
+  },
+  {
+    "rule_id": "CMP-005",
+    "ids": [
+      "n_aigw"
+    ]
+  }
+]

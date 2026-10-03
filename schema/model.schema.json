@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://sixi.ai/schemas/model.schema.json",
+  "$id": "https://schema.sixi.ai/model/1.2/model.schema.json",
   "title": "Sixi Assure architecture model",
   "description": "Typed graph model (docs/02). Single source of truth; Go validation and Zod schemas derive from this file. Invariants that JSON Schema cannot express are listed in $comment and enforced in the model package.",
-  "$comment": "Server-enforced invariants (docs/02 §4): (1) edge endpoints reference existing node ids; (2) no self-loops except agent→agent 'delegates' with auth=obo; (3) a node belongs to at most one zone group (node.zone must match the zone group listing it) and may belong to many trust boundaries; (4) source=observed nodes are read-only; (5) region attrs must be known Azure regions or a generic region code; (6) findings and evidence reference existing ids; (7) ids are unique across nodes, edges, groups and findings. 'x-required-attrs' lists attributes that must be completed for inventory purposes — their absence is reported by rules (e.g. AI-005), not rejected by validation.",
+  "$comment": "Server-enforced invariants (docs/02 §4): (1) edge endpoints reference existing node ids; (2) no self-loops except agent→agent 'delegates' with auth=obo; (3) a node belongs to at most one zone group (node.zone must match the zone group listing it) and may belong to many trust boundaries; (4) source=observed nodes are read-only; (5) region attrs must be known Azure regions or a generic region code; (6) findings and evidence reference existing ids; (7) ids are unique across nodes, edges, groups, findings and identities; (8) a node's attrs.identity_id names an entry of identities[] and an identity's registry names an agent_registry node (schema 1.1); (9) every provenance key resolves to a model element, member or attribute, and the sidecar is written by the server alone (ADR-086, schema 1.1); (10) an agent's or agent_memory's attrs.hosted_on names another existing node (schema 1.2, ADR-093 SD-2); (11) an edge attribute annotated 'x-edge-kinds' is set only on an edge of those kinds and a group attribute annotated 'x-group-kinds' only on a group of those kinds (schema 1.2: the delegation attributes on delegates, the flow-group attributes on flows, the workflow bounds on workflow groups). 'x-required-attrs' lists attributes that must be completed for inventory purposes — their absence is reported by rules (e.g. AI-005), not rejected by validation. 'x-required-unless' (schema 1.1) names a required attribute another declared attribute replaces: an agent that declares identity_id no longer needs the deprecated identity string. 'x-attr-values' (schema 1.1) narrows an attribute the flat nodeAttrs set shares between types to the values one type accepts (e.g. gateway.kind vs agent_registry.kind, edge_device egress_policy boolean vs agent egress_policy enum); enforced in Go.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -19,6 +19,12 @@
     "evidence"
   ],
   "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.2",
+      "description": "Schema version the model follows (ADR-040 §1, docs/02 §Versions), MAJOR.MINOR. Optional on input: a model without it is 0.9 and is upgraded on read; the server writes the current version whenever it saves or returns a model.",
+      "$comment": "MINOR adds optional attributes, enum values or node types; MAJOR renames or removes. Older versions are upgraded on read by the model package/migrate, never validated against this file."
+    },
     "id": {
       "$ref": "#/$defs/id"
     },
@@ -44,6 +50,17 @@
     },
     "attrs": {
       "$ref": "#/$defs/architectureAttrs"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "identities": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "$ref": "#/$defs/identity"
+      },
+      "$comment": "ADR-047 §1 (schema 1.1): identities as entities. Nodes reference one by attrs.identity_id; the model holds claims about an identity, never a credential (credential_ttl is a duration, ref an identifier; the secret guard scans every string)."
     },
     "groups": {
       "type": "array",
@@ -94,6 +111,16 @@
       "type": "string",
       "maxLength": 2000
     },
+    "noteTone": {
+      "type": "string",
+      "enum": [
+        "neutral",
+        "decision",
+        "question",
+        "warning"
+      ],
+      "$comment": "ADR-081: the colour of a note; absent means neutral"
+    },
     "regionCode": {
       "type": "string",
       "pattern": "^[a-z0-9-]{0,40}$",
@@ -127,7 +154,12 @@
         "human_step",
         "saas",
         "evaluation",
-        "product"
+        "product",
+        "agent_memory",
+        "agent_registry",
+        "credential_broker",
+        "external_agent",
+        "note"
       ]
     },
     "layer": {
@@ -176,6 +208,14 @@
         "api_key",
         "password",
         "connection_string",
+        "token_exchange",
+        "workload_identity",
+        "agent_user",
+        "jwt_assertion",
+        "federated_credential",
+        "token_passthrough",
+        "public_client_id",
+        "sas",
         "none",
         "unknown"
       ]
@@ -217,7 +257,8 @@
         "open",
         "fixed",
         "accepted",
-        "false_positive"
+        "false_positive",
+        "superseded"
       ]
     },
     "groupKind": {
@@ -227,7 +268,10 @@
         "trust_boundary",
         "region",
         "subscription",
-        "site"
+        "site",
+        "tenant",
+        "jurisdiction",
+        "workflow"
       ]
     },
     "regime": {
@@ -251,7 +295,11 @@
         "FDA",
         "EU-GMP",
         "MR",
-        "GAMP", "GDPR", "OSFI", "CSA"]
+        "GAMP",
+        "GDPR",
+        "OSFI",
+        "CSA"
+      ]
     },
     "criticality": {
       "type": "string",
@@ -349,6 +397,308 @@
         ]
       }
     },
+    "edgeProtocol": {
+      "type": "string",
+      "enum": [
+        "",
+        "https",
+        "grpc",
+        "mqtt",
+        "amqp",
+        "opc_ua",
+        "modbus",
+        "ssh",
+        "sql",
+        "a2a",
+        "mcp_stdio",
+        "mcp_http",
+        "other"
+      ],
+      "$comment": "ADR-047 §2 (schema 1.1): the protocol of an edge, an enum so rules can reason about it. Free text from 1.0 is mapped by the 1.0 → 1.1 migration (known spellings lowercased, anything else → other with attrs.x_migrated_from) and stays readable for two MINOR versions (docs/02 §Versions)."
+    },
+    "authnMethod": {
+      "type": "string",
+      "enum": [
+        "",
+        "oidc",
+        "oauth",
+        "saml",
+        "api_key",
+        "basic",
+        "mtls",
+        "none",
+        "unknown"
+      ]
+    },
+    "identityKind": {
+      "type": "string",
+      "enum": [
+        "",
+        "user_account",
+        "service_principal",
+        "workload_identity",
+        "agent_identity",
+        "agent_user_account",
+        "shared",
+        "none"
+      ]
+    },
+    "credentialType": {
+      "type": "string",
+      "enum": [
+        "",
+        "federated",
+        "managed_identity",
+        "certificate",
+        "client_secret",
+        "api_key",
+        "sidecar",
+        "none"
+      ]
+    },
+    "federation": {
+      "type": "string",
+      "enum": [
+        "",
+        "workload_identity_federation",
+        "spiffe",
+        "entra_agent_id",
+        "oidc_client",
+        "static_key",
+        "none"
+      ],
+      "$comment": "How the identity obtains its credential: a federated exchange (workload identity federation, SPIFFE, Entra Agent ID, an OIDC client) or a static key."
+    },
+    "sandbox": {
+      "type": "string",
+      "enum": [
+        "",
+        "none",
+        "process",
+        "container",
+        "os_sandbox",
+        "managed",
+        "wasm",
+        "vm",
+        "model_hosted"
+      ],
+      "$comment": "ADR-047 §3 for mcp_server (none/process/container/os_sandbox) amended by docs/18 D3 with managed for an agent on a managed platform and by ADR-093 FS-08 (schema 1.2) for a tool: wasm (a WebAssembly guest), vm (a micro-VM or gVisor), model_hosted (the model provider runs the code); the per-type values are in x-attr-values."
+    },
+    "securitySchemes": {
+      "type": "array",
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "api_key",
+          "http_basic",
+          "http_bearer",
+          "oauth2",
+          "openid_connect",
+          "mtls",
+          "none"
+        ]
+      },
+      "$comment": "A2A agent card securitySchemes, as declared on the card (docs/research/06 §27)."
+    },
+    "humanInTheLoop": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tool_class",
+          "disposition"
+        ],
+        "properties": {
+          "tool_class": {
+            "$ref": "#/$defs/shortText"
+          },
+          "disposition": {
+            "type": "string",
+            "enum": [
+              "ask",
+              "defer",
+              "deny"
+            ]
+          }
+        }
+      },
+      "$comment": "ADR-047 §3: per tool class, what the agent does before acting: ask a person, defer to a person, or never act."
+    },
+    "framework": {
+      "type": "string",
+      "enum": [
+        "",
+        "langgraph",
+        "ms_agent_framework",
+        "foundry_agent_service",
+        "google_adk",
+        "openai_agents",
+        "crewai",
+        "other"
+      ],
+      "$comment": "ADR-093 FS-01 (schema 1.2): the agent framework the agent is built with; M4 chooses the framework-native remediation sentence by it."
+    },
+    "orchestration": {
+      "type": "string",
+      "enum": [
+        "",
+        "supervisor",
+        "swarm",
+        "handoff",
+        "sequential",
+        "parallel",
+        "loop",
+        "graph",
+        "group_chat",
+        "magentic",
+        "hierarchical"
+      ],
+      "$comment": "ADR-093 FS-03 (schema 1.2): the multi-agent pattern an orchestrating agent runs (LangGraph supervisor and swarm, MAF builders, ADK shell agents, CrewAI processes)."
+    },
+    "guardrails": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stage",
+          "kind"
+        ],
+        "properties": {
+          "stage": {
+            "type": "string",
+            "enum": [
+              "input",
+              "output",
+              "model",
+              "tool_input",
+              "tool_output"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "code",
+              "llm",
+              "platform_policy",
+              "ifc_labels"
+            ]
+          },
+          "blocking": {
+            "$ref": "#/$defs/boolish"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "",
+              "agent",
+              "runner"
+            ]
+          }
+        }
+      },
+      "$comment": "ADR-093 FS-15 (schema 1.2): the checks around the agent's model and tool calls, per stage: written as code, judged by an LLM, a platform policy (e.g. Foundry rai_config) or information-flow labels; blocking stops the run; scope runner applies to every agent the runner hosts. content_safety stays the fact AI-002 and AGT-003 read."
+    },
+    "hostedProtocols": {
+      "type": "array",
+      "maxItems": 7,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "http_api",
+          "responses",
+          "invocations",
+          "invocations_ws",
+          "activity",
+          "mcp",
+          "a2a"
+        ]
+      },
+      "$comment": "ADR-093 FS-19 (schema 1.2): what a hosted agent runtime serves (LangGraph Server /mcp and /a2a, Foundry agent endpoint protocols, MAF hosted protocols, ADK api_server --a2a)."
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/shortText"
+        },
+        "kind": {
+          "$ref": "#/$defs/identityKind"
+        },
+        "ref": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "an identifier (object id, client id, SPIFFE ID), never a credential"
+        },
+        "issuer": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "who issues the credential: an issuer URL or the name of the identity provider"
+        },
+        "credential_type": {
+          "$ref": "#/$defs/credentialType"
+        },
+        "credential_ttl": {
+          "type": "integer",
+          "minimum": 0,
+          "$comment": "lifetime of one issued credential, in seconds"
+        },
+        "rotation_days": {
+          "type": "integer",
+          "minimum": 0,
+          "$comment": "ADR-047 §3b identity.rotation: days between rotations of a long-lived credential"
+        },
+        "sponsor": {
+          "$ref": "#/$defs/shortText"
+        },
+        "owner": {
+          "$ref": "#/$defs/shortText"
+        },
+        "blueprint": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "Entra Agent ID blueprint (or another platform's template) the identity is created from"
+        },
+        "registry": {
+          "$ref": "#/$defs/id",
+          "$comment": "id of the agent_registry node the identity is registered in (checked in Go)"
+        },
+        "federation": {
+          "$ref": "#/$defs/federation"
+        },
+        "trust_domain": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "SPIFFE trust domain or tenant the identity belongs to"
+        },
+        "description": {
+          "$ref": "#/$defs/longText"
+        },
+        "attrs": {
+          "type": "object",
+          "patternProperties": {
+            "^x_[A-Za-z0-9_]{1,60}$": {
+              "$ref": "#/$defs/extValue"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "$comment": "ADR-047 §1 (schema 1.1). Ids share the namespace of nodes, edges, groups and findings."
+    },
     "position": {
       "type": "object",
       "additionalProperties": false,
@@ -370,6 +720,10 @@
       "properties": {
         "owner": {
           "$ref": "#/$defs/shortText"
+        },
+        "sponsor": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "schema 1.1: the person accountable for the system on the business side (ADR-089)"
         },
         "description": {
           "$ref": "#/$defs/longText"
@@ -498,6 +852,28 @@
             },
             "description": {
               "$ref": "#/$defs/longText"
+            },
+            "max_iterations": {
+              "type": "integer",
+              "minimum": 0,
+              "x-group-kinds": [
+                "workflow"
+              ],
+              "$comment": "ADR-093 FS-06: superstep or loop bound of the workflow; absent = undeclared, 0 = unbounded"
+            },
+            "checkpointing": {
+              "type": "string",
+              "enum": [
+                "",
+                "none",
+                "memory",
+                "file",
+                "store"
+              ],
+              "x-group-kinds": [
+                "workflow"
+              ],
+              "$comment": "ADR-093 FS-06: where the workflow checkpoints its state between steps"
             }
           },
           "patternProperties": {
@@ -657,10 +1033,7 @@
           "if": {
             "properties": {
               "type": {
-                "enum": [
-                  "tool",
-                  "mcp_server"
-                ]
+                "const": "tool"
               }
             }
           },
@@ -668,6 +1041,22 @@
             "properties": {
               "attrs": {
                 "$ref": "#/$defs/attrs/tool"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mcp_server"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/mcp_server"
               }
             }
           }
@@ -821,6 +1210,86 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "agent_memory"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/agent_memory"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "agent_registry"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/agent_registry"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "credential_broker"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/credential_broker"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "external_agent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/external_agent"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "note"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/note"
+              }
+            }
+          }
         }
       ]
     },
@@ -879,13 +1348,15 @@
         },
         "retention_days": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "$comment": "days data is kept; on an agent_memory (schema 1.2, ADR-093 FS-11) 0 = never expires"
         },
         "external_ref": {
           "$ref": "#/$defs/shortText"
         },
         "purpose": {
-          "$ref": "#/$defs/longText"
+          "$ref": "#/$defs/longText",
+          "$comment": "free text on agents, llm endpoints, evaluations and SaaS; log_sink (schema 1.1): operational, security or evidence — per-type values in x-attr-values"
         },
         "cra_scope": {
           "$ref": "#/$defs/boolish"
@@ -937,6 +1408,7 @@
             "anthropic",
             "openai",
             "google",
+            "google_vertex",
             "aws",
             "mistral",
             "self_hosted",
@@ -967,8 +1439,19 @@
             "",
             "api",
             "ai",
-            "waf"
-          ]
+            "waf",
+            "mcp",
+            "a2a",
+            "egress",
+            "agent365",
+            "api_center",
+            "gemini_enterprise",
+            "custom",
+            "foundry",
+            "llm",
+            "orchestrator"
+          ],
+          "$comment": "gateway: api, ai, waf, mcp, a2a, egress; agent_registry (schema 1.1): mcp, agent365, api_center, gemini_enterprise, custom, and foundry (schema 1.2, ADR-093 FS-24); agent (schema 1.2, ADR-093 FS-02): llm (has a model of its own) or orchestrator (routes without one) — per-type values in x-attr-values"
         },
         "logging": {
           "$ref": "#/$defs/boolish"
@@ -986,9 +1469,11 @@
           "type": "string",
           "enum": [
             "",
+            "none",
             "pmk",
             "cmk"
-          ]
+          ],
+          "$comment": "platform- or customer-managed key; none (schema 1.2, ADR-093 FS-12) = the store does not encrypt at rest"
         },
         "acl_trimming": {
           "$ref": "#/$defs/boolish"
@@ -1105,7 +1590,22 @@
           "$ref": "#/$defs/boolish"
         },
         "egress_policy": {
-          "$ref": "#/$defs/boolish"
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "enum": [
+                "",
+                "default_deny_allowlist",
+                "default_allow",
+                "undeclared",
+                "disabled"
+              ]
+            }
+          ],
+          "$comment": "edge_device/edge_gateway: a fail-closed egress allow-list exists (boolean); agent (schema 1.1): default_deny_allowlist, default_allow or undeclared; tool (schema 1.2, ADR-093 FS-09): the same values plus disabled (executed code reaches no network) — per-type values in x-attr-values"
         },
         "command_validation": {
           "$ref": "#/$defs/boolish",
@@ -1138,25 +1638,23 @@
             "",
             "internal",
             "public",
-            "unknown"
-          ]
+            "unknown",
+            "loopback",
+            "private_network"
+          ],
+          "$comment": "app/api: internal, public, unknown; mcp_server (schema 1.1): loopback, private_network, public — per-type values in x-attr-values"
         },
         "waf": {
           "$ref": "#/$defs/boolish"
         },
         "authn": {
-          "type": "string",
-          "enum": [
-            "",
-            "oidc",
-            "oauth",
-            "saml",
-            "api_key",
-            "basic",
-            "mtls",
-            "none",
-            "unknown"
-          ]
+          "type": "array",
+          "maxItems": 9,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/authnMethod"
+          },
+          "$comment": "ADR-047 §3b (schema 1.1): every authentication method the app or API accepts. A single 1.0 value is migrated to a one-item list and stays readable for two MINOR versions."
         },
         "secrets_in": {
           "type": "string",
@@ -1213,11 +1711,380 @@
         "hosted_on": {
           "type": "string",
           "maxLength": 64,
-          "$comment": "docs/02 §3: id of the node this component runs on (same host or process); calls between co-located nodes need no transport encryption"
+          "$comment": "docs/02 §3: id of the node this component runs on (same host or process); calls between co-located nodes need no transport encryption. Schema 1.2 (ADR-093 FS-14, SD-2): also on an agent (the app or runtime it runs in) and an agent_memory (the store it lives in), where it must name another existing node (checked in Go)"
         },
         "provider_service": {
           "$ref": "#/$defs/shortText",
           "$comment": "ADR-032: provider service slug, e.g. azure/aks, azure/openai"
+        },
+        "text": {
+          "$ref": "#/$defs/longText",
+          "$comment": "ADR-081: the words of a note (required and non-empty on a note, checked in Go); the secret guard applies"
+        },
+        "tone": {
+          "$ref": "#/$defs/noteTone"
+        },
+        "identity_id": {
+          "$ref": "#/$defs/id",
+          "$comment": "ADR-047 §1: id of the identities[] entry this component runs as (checked in Go)"
+        },
+        "sponsor": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "ADR-047 §3: the person accountable for the agent (Entra Agent ID sponsor)"
+        },
+        "inbound_auth": {
+          "$ref": "#/$defs/authnMethod",
+          "$comment": "ADR-047 §3: the scheme the agent accepts from its callers"
+        },
+        "human_in_the_loop": {
+          "$ref": "#/$defs/humanInTheLoop"
+        },
+        "card_url": {
+          "type": "string",
+          "maxLength": 2000,
+          "$comment": "A2A agent card URL"
+        },
+        "card_signed": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "A2A: the agent card carries a signature"
+        },
+        "security_schemes": {
+          "$ref": "#/$defs/securitySchemes"
+        },
+        "egress_allowlist": {
+          "type": "array",
+          "maxItems": 200,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/shortText"
+          },
+          "$comment": "hosts or services the agent (or, schema 1.2, the code a tool executes) may reach when egress_policy is default_deny_allowlist"
+        },
+        "hosting": {
+          "type": "string",
+          "enum": [
+            "",
+            "self_hosted",
+            "managed_platform"
+          ],
+          "$comment": "docs/18 D3: the agent runs on infrastructure the organisation operates or on a managed agent platform"
+        },
+        "sandbox": {
+          "$ref": "#/$defs/sandbox"
+        },
+        "spec_version": {
+          "type": "string",
+          "maxLength": 40,
+          "$comment": "MCP specification revision the server implements, e.g. 2026-07-28"
+        },
+        "transport": {
+          "type": "string",
+          "enum": [
+            "",
+            "stdio",
+            "streamable_http",
+            "http_sse",
+            "websocket"
+          ],
+          "$comment": "MCP transport (http_sse is the deprecated HTTP+SSE transport; websocket, schema 1.2, ADR-093 FS-16)"
+        },
+        "auth_mode": {
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "api_key",
+            "oauth21"
+          ],
+          "$comment": "how the MCP server authenticates its clients"
+        },
+        "resource_metadata": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "the MCP server publishes OAuth protected resource metadata (RFC 9728)"
+        },
+        "client_registration": {
+          "type": "string",
+          "enum": [
+            "",
+            "cimd",
+            "pre_registered",
+            "dcr"
+          ],
+          "$comment": "how MCP clients register: client ID metadata document, pre-registration, or dynamic client registration"
+        },
+        "registry_entry": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "name of the server's entry in an MCP registry"
+        },
+        "discover_supported": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "the server implements server/discover (MCP 2026-07-28)"
+        },
+        "cache_scope": {
+          "type": "string",
+          "enum": [
+            "",
+            "private",
+            "public"
+          ],
+          "$comment": "CacheableResult scope: public means shared gateways may cache list/read results"
+        },
+        "functions": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "identity_termination",
+              "credential_brokerage",
+              "policy",
+              "observability",
+              "egress"
+            ]
+          },
+          "$comment": "ADR-047 §3: what the gateway enforces, so 'a gateway on the path' is answered per function"
+        },
+        "write_path": {
+          "$ref": "#/$defs/shortText",
+          "$comment": "agent_memory: what writes into the memory (free text from the framework, e.g. every_step, add_session_to_memory)"
+        },
+        "validated": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "agent_memory: content is validated before it is written"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "",
+            "session",
+            "thread",
+            "user",
+            "agent",
+            "app",
+            "shared",
+            "tenant",
+            "unknown"
+          ],
+          "$comment": "agent_memory: who shares the memory; tenant (schema 1.2, ADR-093 FS-10) = every user and agent of one tenant"
+        },
+        "verification": {
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "namespace",
+            "signed",
+            "reviewed",
+            "unknown"
+          ],
+          "$comment": "agent_registry: how entries are verified before listing"
+        },
+        "trust_anchor": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "key_id": {
+              "$ref": "#/$defs/shortText"
+            },
+            "fetched_at": {
+              "$ref": "#/$defs/dateTime"
+            }
+          },
+          "$comment": "agent_registry: the key entries and cards are verified against, and when it was fetched"
+        },
+        "issues": {
+          "type": "string",
+          "enum": [
+            "",
+            "short_lived_token",
+            "certificate"
+          ],
+          "$comment": "credential_broker: what the broker hands out"
+        },
+        "max_lifetime": {
+          "type": "integer",
+          "minimum": 0,
+          "$comment": "credential_broker: longest lifetime of an issued credential, in seconds"
+        },
+        "holds_credentials": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "datastore: the store also keeps a credential at rest"
+        },
+        "data_classes": {
+          "type": "array",
+          "maxItems": 7,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/dataClass"
+          },
+          "$comment": "every class of data the component holds, beside the single data_class"
+        },
+        "input_guard": {
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "detect",
+            "reject"
+          ],
+          "$comment": "app/api: an ingestion guard inspects inbound content (ADR-041)"
+        },
+        "retention_statement": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "asserted_by": {
+              "$ref": "#/$defs/shortText"
+            },
+            "asserted_at": {
+              "$ref": "#/$defs/dateTime"
+            },
+            "reference": {
+              "type": "string",
+              "maxLength": 2000
+            }
+          },
+          "$comment": "llm_endpoint: the provider's statement on prompt and output retention (ADR-043 §3): who asserted it, when, and where it is published"
+        },
+        "form": {
+          "type": "string",
+          "enum": [
+            "",
+            "device",
+            "image",
+            "binary",
+            "service"
+          ],
+          "$comment": "product: the form the product is placed on the market in"
+        },
+        "secrets_delivery": {
+          "type": "string",
+          "enum": [
+            "",
+            "mounted_file",
+            "env",
+            "api"
+          ],
+          "$comment": "how secrets reach the process (secrets_in says where they are stored)"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "",
+            "production",
+            "staging",
+            "test",
+            "development",
+            "shared",
+            "unknown"
+          ],
+          "$comment": "deployment environment of the component; shared = serves more than one"
+        },
+        "redundancy": {
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "zonal",
+            "regional",
+            "multi_region"
+          ],
+          "$comment": "how the component survives a zone or region loss (zonal = one zone)"
+        },
+        "region_name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]{1,15}/[a-z0-9][a-z0-9-]{0,62}$",
+          "$comment": "the provider-qualified region beside the validated region code, e.g. gcp/europe-west6"
+        },
+        "framework": {
+          "$ref": "#/$defs/framework"
+        },
+        "framework_version": {
+          "type": "string",
+          "maxLength": 40,
+          "$comment": "ADR-093 FS-01: the framework release the agent is built with, e.g. 1.0.3"
+        },
+        "orchestration": {
+          "$ref": "#/$defs/orchestration"
+        },
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 0,
+          "$comment": "ADR-093 FS-04/FS-06: loop bound of an agent (or, on a workflow group, of the workflow); absent = undeclared, 0 = unbounded"
+        },
+        "max_tool_calls": {
+          "type": "integer",
+          "minimum": 0,
+          "$comment": "ADR-093 FS-04: tool calls one run may make; absent = undeclared, 0 = unbounded"
+        },
+        "max_duration_s": {
+          "type": "integer",
+          "minimum": 0,
+          "$comment": "ADR-093 FS-04: longest run, in seconds; absent = undeclared, 0 = unbounded"
+        },
+        "guardrails": {
+          "$ref": "#/$defs/guardrails"
+        },
+        "definition_source": {
+          "type": "string",
+          "enum": [
+            "",
+            "local",
+            "repository"
+          ],
+          "$comment": "ADR-093 FS-21: where the agent definition is loaded from (repository = fetched from a remote repository at load time)"
+        },
+        "config_imports_code": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "ADR-093 FS-21: loading the declarative definition imports code it names (ADK YAML, stdio commands launched at load)"
+        },
+        "config_env_access": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "ADR-093 FS-21: expressions in the definition can read the environment (MAF PowerFx with safe_mode off)"
+        },
+        "encryption": {
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "app_layer",
+            "store"
+          ],
+          "$comment": "agent_memory (schema 1.2, ADR-093 FS-12): how stored state is encrypted: not at all, by the application before it is written, or by the store at rest"
+        },
+        "deserialization": {
+          "type": "string",
+          "enum": [
+            "",
+            "json_only",
+            "allowlist",
+            "permissive",
+            "pickle"
+          ],
+          "$comment": "agent_memory (schema 1.2, ADR-093 FS-13): whether stored state is turned back into code objects when it is read"
+        },
+        "invoked_from": {
+          "type": "string",
+          "enum": [
+            "",
+            "client",
+            "provider"
+          ],
+          "$comment": "mcp_server (schema 1.2, ADR-093 FS-17): who opens the MCP connection: the agent's process, or the model provider (a hosted MCP tool, so the server must be reachable from the provider)"
+        },
+        "sampling": {
+          "type": "string",
+          "enum": [
+            "",
+            "denied",
+            "gated",
+            "auto"
+          ],
+          "$comment": "mcp_server (schema 1.2, ADR-093 FS-18): whether the server may ask the agent's model for completions"
+        },
+        "protocols": {
+          "$ref": "#/$defs/hostedProtocols"
         }
       },
       "patternProperties": {
@@ -1235,6 +2102,11 @@
           "purpose",
           "owner"
         ],
+        "x-required-unless": {
+          "identity": [
+            "identity_id"
+          ]
+        },
         "x-optional-attrs": [
           "materiality",
           "kill_switch",
@@ -1246,8 +2118,54 @@
           "region",
           "output_marking",
           "gamp_category",
-          "supplier_assessed"
-        ]
+          "supplier_assessed",
+          "identity_id",
+          "sponsor",
+          "inbound_auth",
+          "human_in_the_loop",
+          "card_url",
+          "card_signed",
+          "security_schemes",
+          "egress_policy",
+          "egress_allowlist",
+          "hosting",
+          "sandbox",
+          "environment",
+          "region_name",
+          "framework",
+          "framework_version",
+          "kind",
+          "orchestration",
+          "max_iterations",
+          "max_tool_calls",
+          "max_duration_s",
+          "guardrails",
+          "definition_source",
+          "config_imports_code",
+          "config_env_access",
+          "hosted_on"
+        ],
+        "x-attr-values": {
+          "egress_policy": [
+            "",
+            "default_deny_allowlist",
+            "default_allow",
+            "undeclared"
+          ],
+          "sandbox": [
+            "",
+            "none",
+            "process",
+            "container",
+            "os_sandbox",
+            "managed"
+          ],
+          "kind": [
+            "",
+            "llm",
+            "orchestrator"
+          ]
+        }
       },
       "llm_endpoint": {
         "x-required-attrs": [
@@ -1267,7 +2185,11 @@
           "output_marking",
           "model_card",
           "gamp_category",
-          "supplier_assessed"
+          "supplier_assessed",
+          "retention_statement",
+          "region_name",
+          "environment",
+          "redundancy"
         ]
       },
       "gateway": {
@@ -1279,8 +2201,23 @@
           "token_limits",
           "content_safety",
           "semantic_cache",
-          "region"
-        ]
+          "region",
+          "functions",
+          "environment",
+          "redundancy",
+          "region_name"
+        ],
+        "x-attr-values": {
+          "kind": [
+            "",
+            "api",
+            "ai",
+            "waf",
+            "mcp",
+            "a2a",
+            "egress"
+          ]
+        }
       },
       "datastore": {
         "x-required-attrs": [
@@ -1299,7 +2236,12 @@
           "rpo_min",
           "row_level_security",
           "gamp_category",
-          "supplier_assessed"
+          "supplier_assessed",
+          "data_classes",
+          "holds_credentials",
+          "environment",
+          "redundancy",
+          "region_name"
         ]
       },
       "vector_index": {
@@ -1310,7 +2252,10 @@
           "acl_trimming",
           "redaction",
           "classification",
-          "region"
+          "region",
+          "data_classes",
+          "environment",
+          "region_name"
         ]
       },
       "tool": {
@@ -1327,8 +2272,79 @@
           "integrity",
           "hosted_on",
           "gamp_category",
-          "supplier_assessed"
-        ]
+          "supplier_assessed",
+          "identity_id",
+          "environment",
+          "sandbox",
+          "egress_policy",
+          "egress_allowlist"
+        ],
+        "x-attr-values": {
+          "sandbox": [
+            "",
+            "none",
+            "process",
+            "container",
+            "os_sandbox",
+            "managed",
+            "wasm",
+            "vm",
+            "model_hosted"
+          ],
+          "egress_policy": [
+            "",
+            "default_deny_allowlist",
+            "default_allow",
+            "undeclared",
+            "disabled"
+          ]
+        }
+      },
+      "mcp_server": {
+        "x-required-attrs": [
+          "origin",
+          "scopes"
+        ],
+        "x-optional-attrs": [
+          "vetted",
+          "logged",
+          "write_capable",
+          "owner",
+          "capabilities",
+          "integrity",
+          "hosted_on",
+          "gamp_category",
+          "supplier_assessed",
+          "identity_id",
+          "spec_version",
+          "transport",
+          "auth_mode",
+          "resource_metadata",
+          "client_registration",
+          "registry_entry",
+          "sandbox",
+          "discover_supported",
+          "cache_scope",
+          "exposure",
+          "environment",
+          "invoked_from",
+          "sampling"
+        ],
+        "x-attr-values": {
+          "exposure": [
+            "",
+            "loopback",
+            "private_network",
+            "public"
+          ],
+          "sandbox": [
+            "",
+            "none",
+            "process",
+            "container",
+            "os_sandbox"
+          ]
+        }
       },
       "log_sink": {
         "x-required-attrs": [
@@ -1336,8 +2352,19 @@
         ],
         "x-optional-attrs": [
           "immutable",
-          "region"
-        ]
+          "region",
+          "purpose",
+          "environment",
+          "region_name"
+        ],
+        "x-attr-values": {
+          "purpose": [
+            "",
+            "operational",
+            "security",
+            "evidence"
+          ]
+        }
       },
       "edge": {
         "x-required-attrs": [
@@ -1357,8 +2384,15 @@
           "intervention_log",
           "safety_function",
           "self_evolving",
-          "conformity_route"
-        ]
+          "conformity_route",
+          "identity_id"
+        ],
+        "x-attr-values": {
+          "egress_policy": [
+            true,
+            false
+          ]
+        }
       },
       "human_step": {
         "x-required-attrs": [
@@ -1384,8 +2418,24 @@
           "hosted_on",
           "intervention_log",
           "gamp_category",
-          "supplier_assessed"
-        ]
+          "supplier_assessed",
+          "input_guard",
+          "secrets_delivery",
+          "identity_id",
+          "environment",
+          "redundancy",
+          "region_name",
+          "protocols",
+          "integrity"
+        ],
+        "x-attr-values": {
+          "exposure": [
+            "",
+            "internal",
+            "public",
+            "unknown"
+          ]
+        }
       },
       "user": {
         "x-required-attrs": [
@@ -1405,7 +2455,8 @@
           "secure_boot",
           "ota_signed",
           "version",
-          "owner"
+          "owner",
+          "form"
         ]
       },
       "saas": {
@@ -1419,7 +2470,10 @@
           "region",
           "data_class",
           "gamp_category",
-          "supplier_assessed"
+          "supplier_assessed",
+          "data_classes",
+          "region_name",
+          "environment"
         ]
       },
       "evaluation": {
@@ -1450,7 +2504,93 @@
         "x-optional-attrs": [
           "key_use",
           "network_exposure",
-          "region"
+          "region",
+          "environment",
+          "redundancy",
+          "region_name"
+        ]
+      },
+      "note": {
+        "$comment": "ADR-081: an annotation outside assessment; no rule, inventory or C4 view reads it",
+        "x-required-attrs": [
+          "text"
+        ],
+        "x-optional-attrs": [
+          "tone"
+        ]
+      },
+      "agent_memory": {
+        "$comment": "ADR-047 §3 (schema 1.1): what an agent remembers across turns or sessions; schema 1.2 (ADR-093 FS-10 to FS-14) adds its encryption, deserialisation and the store it is hosted_on",
+        "x-required-attrs": [
+          "write_path",
+          "validated",
+          "scope"
+        ],
+        "x-optional-attrs": [
+          "owner",
+          "data_class",
+          "data_classes",
+          "retention_days",
+          "region",
+          "region_name",
+          "environment",
+          "encryption",
+          "deserialization",
+          "hosted_on"
+        ]
+      },
+      "agent_registry": {
+        "$comment": "ADR-047 §3 (schema 1.1): a registry agents, MCP servers or cards are listed in",
+        "x-required-attrs": [
+          "kind",
+          "verification"
+        ],
+        "x-optional-attrs": [
+          "trust_anchor",
+          "owner",
+          "region",
+          "region_name"
+        ],
+        "x-attr-values": {
+          "kind": [
+            "",
+            "mcp",
+            "agent365",
+            "api_center",
+            "gemini_enterprise",
+            "custom",
+            "foundry"
+          ]
+        }
+      },
+      "credential_broker": {
+        "$comment": "ADR-047 §3 (schema 1.1): a token vault or credential provider that holds credentials instead of the agent",
+        "x-required-attrs": [
+          "issues"
+        ],
+        "x-optional-attrs": [
+          "max_lifetime",
+          "identity_id",
+          "owner",
+          "region",
+          "region_name",
+          "environment"
+        ]
+      },
+      "external_agent": {
+        "$comment": "ADR-047 §3 (schema 1.1): an A2A peer outside the organisation's control, described by its card",
+        "x-required-attrs": [],
+        "x-optional-attrs": [
+          "card_url",
+          "card_signed",
+          "security_schemes",
+          "integrity",
+          "identity_id",
+          "owner",
+          "sponsor",
+          "inbound_auth",
+          "region",
+          "region_name"
         ]
       }
     },
@@ -1482,8 +2622,7 @@
           "$ref": "#/$defs/shortText"
         },
         "protocol": {
-          "type": "string",
-          "maxLength": 40
+          "$ref": "#/$defs/edgeProtocol"
         },
         "auth": {
           "$ref": "#/$defs/edgeAuth"
@@ -1522,6 +2661,125 @@
             },
             "description": {
               "$ref": "#/$defs/longText"
+            },
+            "audience": {
+              "$ref": "#/$defs/shortText",
+              "$comment": "ADR-047 §1: the audience (resource indicator) the token on this call is issued for"
+            },
+            "token_binding": {
+              "type": "string",
+              "enum": [
+                "",
+                "none",
+                "dpop",
+                "mtls"
+              ],
+              "$comment": "ADR-047 §1: sender constraint of the token (none = bearer)"
+            },
+            "token_lifetime": {
+              "type": "integer",
+              "minimum": 0,
+              "$comment": "ADR-047 §1: lifetime of the token on this call, in seconds"
+            },
+            "scopes": {
+              "type": "array",
+              "maxItems": 200,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/shortText"
+              },
+              "$comment": "ADR-047 §1: scopes the token on this call carries"
+            },
+            "delegation_depth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 64,
+              "$comment": "ADR-047 §1: how many delegations deep the call's authority is (0 = the caller's own)"
+            },
+            "consent": {
+              "type": "string",
+              "enum": [
+                "",
+                "per_client",
+                "blanket",
+                "none"
+              ],
+              "$comment": "ADR-047 §1: the consent the delegated token rests on"
+            },
+            "guarded": {
+              "$ref": "#/$defs/boolish",
+              "$comment": "ADR-047 §3b: the write path passes an ingestion guard (ADR-041 secret guard or equivalent)"
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "",
+                "as_tool",
+                "handoff"
+              ],
+              "x-edge-kinds": [
+                "delegates"
+              ],
+              "$comment": "ADR-093 FS-05 (SD-1): as_tool = the caller keeps control and gets a result; handoff = control transfers to the target"
+            },
+            "routing": {
+              "type": "string",
+              "enum": [
+                "",
+                "deterministic",
+                "llm_choice"
+              ],
+              "x-edge-kinds": [
+                "delegates"
+              ],
+              "$comment": "ADR-093 FS-05: whether code or the model chooses this hop"
+            },
+            "bidirectional": {
+              "$ref": "#/$defs/boolish",
+              "x-edge-kinds": [
+                "delegates"
+              ],
+              "$comment": "ADR-093 FS-05: the target may hand control back (or on) to the caller"
+            },
+            "context_forwarded": {
+              "type": "string",
+              "enum": [
+                "",
+                "full_history",
+                "last_message",
+                "filtered",
+                "none"
+              ],
+              "x-edge-kinds": [
+                "delegates"
+              ],
+              "$comment": "ADR-093 FS-05: what of the conversation the target sees"
+            },
+            "flow_group": {
+              "type": "string",
+              "enum": [
+                "",
+                "single",
+                "fan_out",
+                "fan_in",
+                "switch_case",
+                "multi_select"
+              ],
+              "x-edge-kinds": [
+                "flows"
+              ],
+              "$comment": "ADR-093 FS-07: edge-group semantics of a flows edge between the executors of a workflow"
+            },
+            "condition_name": {
+              "$ref": "#/$defs/shortText",
+              "x-edge-kinds": [
+                "flows"
+              ],
+              "$comment": "ADR-093 FS-07: the name of the condition that selects this flows edge (a name, never the expression)"
+            },
+            "target_from_content": {
+              "$ref": "#/$defs/boolish",
+              "$comment": "ADR-093 FS-22: the call's URL or target is computed from conversation or tool data"
             }
           },
           "patternProperties": {
@@ -1596,6 +2854,34 @@
           "maxLength": 40,
           "$comment": "cause id from rules/causes.yaml (docs/03 §Causes); decorated from the loaded catalog, empty when the rule is not mapped"
         },
+        "references": {
+          "type": "array",
+          "maxItems": 8,
+          "$comment": "the rule's documentation references (ADR-095): decorated on read from the loaded catalog like cause, never a regulatory statement",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "title", "url", "fetched_at"],
+            "properties": {
+              "kind": { "type": "string", "enum": ["document"] },
+              "title": { "type": "string", "maxLength": 200 },
+              "url": { "type": "string", "maxLength": 2048, "pattern": "^https://" },
+              "fetched_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" }
+            }
+          }
+        },
+        "remediation_framework": {
+          "type": "object",
+          "additionalProperties": false,
+          "$comment": "the rule's framework-native remediation for the finding's agent framework (ADR-093 decision 9): decorated on read against the architecture, never stored",
+          "required": ["framework", "label", "text", "source"],
+          "properties": {
+            "framework": { "$ref": "#/$defs/framework" },
+            "label": { "type": "string", "maxLength": 80 },
+            "text": { "$ref": "#/$defs/longText" },
+            "source": { "type": "string", "maxLength": 2048 }
+          }
+        },
         "first_seen_version": {
           "type": "integer",
           "minimum": 0
@@ -1636,10 +2922,25 @@
             "llm_call",
             "evidence_record",
             "spot_check",
+            "ci_gate",
             "assistant_architect_run",
             "secret_rejected",
             "draft_accepted",
-            "draft_rejected"
+            "draft_rejected",
+            "design_review_requested",
+            "design_review_decision",
+            "design_review_closed",
+            "signing_key_rotated",
+            "signing_key_ceremony",
+            "chain_anchored",
+            "trusted_key_registered",
+            "bundle_downloaded",
+            "pack_advisory_applied",
+            "management_assertion",
+            "independent_review",
+            "auditor_scope_granted",
+            "auditor_scope_changed",
+            "assistant_swarm_run"
           ]
         },
         "ts": {
@@ -1652,6 +2953,93 @@
         },
         "actor": {
           "$ref": "#/$defs/shortText"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Provenance sidecar (ADR-086, schema 1.1, docs/02 §Provenance): where each fact came from, keyed by an id-addressed JSON pointer as patches spell it (/nodes/<id>, /nodes/<id>/attrs/<key>, /edges/<id>/auth, /attrs/<key>; RFC 6901-escaped). The most specific key wins. Server-owned: a patch to /provenance is refused, an accepted import writes imported entries and an accepted patch resets each pointer it changes to declared with its actor. Rules never read it; they see the precomputed `prov` variable.",
+      "$comment": "A node without an element-level entry resolves by the upgrade mapping of its source (design → declared, declared → imported, observed → observed) and the next save materialises it. `source` is written from the sidecar for two MINOR versions (ADR-040 §4). Every key and value passes the secret guard.",
+      "maxProperties": 50000,
+      "propertyNames": {
+        "type": "string",
+        "maxLength": 1000,
+        "$comment": "Every key must resolve to a model element, member or attribute under /nodes, /edges, /groups, /identities or /attrs: enforced in Go (invariant 9), which names the key's pointer and never echoes it."
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/provenanceEntry"
+      }
+    },
+    "provenanceKind": {
+      "type": "string",
+      "enum": [
+        "declared",
+        "imported",
+        "observed"
+      ],
+      "description": "declared: typed by a person; imported: read from a source by an accepted import; observed: reserved, no ingestion path while OBSERVED_OVERLAY is off. Staleness is computed, never a kind."
+    },
+    "provenanceActor": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:-]{0,199}$",
+      "description": "An actor id (user, agent key, service), never an e-mail address."
+    },
+    "provenanceEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/provenanceKind"
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "description": "The source an imported fact was read from (file, export, registry), stable across re-imports; for a declared fact from a diagram import, the diagram."
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Hex SHA-256 of the source as read."
+        },
+        "imported_by": {
+          "$ref": "#/$defs/provenanceActor"
+        },
+        "imported_at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "fetched_at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "cadence_days": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3650,
+          "description": "How often the source is expected to be read again; an imported fact is stale when now − fetched_at exceeds it (0: no cadence)."
+        },
+        "signature_verified": {
+          "type": "boolean",
+          "description": "True only when the server verified a signature over the source; absent means false."
+        },
+        "last_seen_import": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Version or hash of the latest import of the identifier that still carried the fact; a later import that no longer carries it is drift."
+        },
+        "declared_by": {
+          "$ref": "#/$defs/provenanceActor"
+        },
+        "declared_at": {
+          "$ref": "#/$defs/dateTime"
         }
       }
     },

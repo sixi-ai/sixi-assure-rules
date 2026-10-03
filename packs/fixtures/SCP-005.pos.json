@@ -1,0 +1,32 @@
+{
+  "id": "arch_fx_scp_005_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SCP-005 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FINMA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Payments app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

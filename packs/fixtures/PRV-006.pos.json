@@ -1,0 +1,68 @@
+{
+  "id": "arch_fx_prv_006_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture PRV-006 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "DORA",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "x_import_source": "sixi_registry"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_new",
+      "type": "agent",
+      "name": "Claims triage agent",
+      "layer": "ai",
+      "source": "declared",
+      "external_ref": "agent-claims-triage",
+      "attrs": {
+        "owner": "Claims",
+        "autonomy": "assisted"
+      }
+    },
+    {
+      "id": "n_old",
+      "type": "agent",
+      "name": "Retired intake agent",
+      "layer": "ai",
+      "source": "declared",
+      "external_ref": "agent-intake",
+      "attrs": {
+        "owner": "Claims",
+        "autonomy": "assisted"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": [],
+  "provenance": {
+    "/nodes/n_new": {
+      "kind": "imported",
+      "identifier": "sixi_registry:claims",
+      "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "imported_by": "usr_fixture",
+      "imported_at": "2026-09-03T08:00:00Z",
+      "fetched_at": "2026-09-03T08:00:00Z",
+      "last_seen_import": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "/nodes/n_old": {
+      "kind": "imported",
+      "identifier": "sixi_registry:claims",
+      "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "imported_by": "usr_fixture",
+      "imported_at": "2026-09-01T08:00:00Z",
+      "fetched_at": "2026-09-01T08:00:00Z",
+      "last_seen_import": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "arch_fx_nis_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture NIS-003 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Significant incidents notified to the national CSIRT by the security office.",
+    "decisions": [
+      {
+        "id": "ADR-001",
+        "title": "NIS2 applies as transposed by the national act",
+        "status": "accepted",
+        "context": "The organisation operates in an EU Member State and is in scope of NIS2.",
+        "decision": "NIS2 applies through the national transposition act the organisation names in its register.",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "NIS2:2022/2555:Art41"
+          },
+          {
+            "kind": "clause",
+            "id": "NIS2:2022/2555:Art21"
+          }
+        ]
+      }
+    ],
+    "criticality": "high"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Operations app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

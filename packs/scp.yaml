@@ -1,0 +1,85 @@
+# SCP — scope declaration (swarm spec intake-scoper, agents/swarm/01-intake-and-model/intake-scoper.md; docs/18 WS-I I2).
+# Deterministic CEL over the architecture's own scope facts: the regimes, the AI Act tier, the allowed regions and the
+# FINMA materiality an architecture is assessed under are declared, not defaulted. No `regimes:` list: the pack applies to
+# every architecture (Pack.AppliesTo), because an undeclared scope silences rules under every regime. All rules are
+# graph scope and report the architecture id. SCP-003 reads the model's own `regimes` list, not regime("AIACT"), so a
+# tenant filter that drops AIACT does not turn a declared tier into a finding (the intake-scoper reports that case as a
+# not-checked row instead). SCP-004 leaves tenant.allowed_regions alone: DATA-003 still runs against the policy
+# default; the finding says the default was never declared on the model.
+pack: scp
+version: 0.1.0
+offer: agentic
+rules:
+  - id: SCP-001
+    title: No regime declared on an assessable architecture
+    scope: graph
+    severity: medium
+    condition: |
+      size(attr(g, "regimes", [])) == 0 &&
+      (g.has("agent") || g.has("llm_endpoint") || g.has("datastore") || g.has("edge_device"))
+    message: "The architecture runs agents, models, stores or devices and declares no regime: every regime-gated rule is silent and nothing is assessed against a law or a standard."
+    clauses: [NIST:AIRMF:MAP]
+    remediation: "Declare the regimes the architecture is assessed under (attrs.regimes), from the scoping decision: the regimes considered, the ones that apply and why the rest do not."
+    fixtures: { positive: fixtures/SCP-001.pos.json, negative: fixtures/SCP-001.neg.json }
+    tags: [scope, regimes]
+
+  - id: SCP-002
+    title: Prohibited AI Act tier declared
+    scope: graph
+    severity: critical
+    condition: 'attr(g, "ai_act_tier", "") == "prohibited"'
+    requires: [g.attrs.ai_act_tier]
+    message: "The architecture declares AI Act tier prohibited: the declared use falls under a prohibited practice."
+    # Art113 (application dates) is requested as a one-off record by the intake-scoper, not cited here: a
+    # classification rule would print its disposition checked or open by the tier (the AIA-003 review fix).
+    clauses: [AIACT:2024/1689:Art5]
+    remediation: "A person reviews the classification: either the use is redesigned out of the prohibited practice and the tier is declared again with its Art. 6 reasoning, or the system is not deployed. The assessment does not change the tier."
+    fixtures: { positive: fixtures/SCP-002.pos.json, negative: fixtures/SCP-002.neg.json }
+    tags: [scope, aiact, classification]
+
+  - id: SCP-003
+    title: AI Act tier declared while the AI Act is not a declared regime
+    scope: graph
+    severity: low
+    # Review fix 2026-10-02: only a tier that carries the material AI Act duties (high_risk, gpai, prohibited) reports.
+    # AI-006 asks every agentic architecture for a tier whatever its regimes, so a minimal or limited tier on a model
+    # assessed under other regimes is that rule's housekeeping, not a scoping gap; reporting it put every agentic model
+    # outside the AI Act between AI-006 and SCP-003 (adr/proposals/ADR-102-team01-golden-twin-gaps.md).
+    condition: |
+      attr(g, "ai_act_tier", "") in ["high_risk", "gpai", "prohibited"] && size(attr(g, "regimes", [])) > 0 &&
+      !("AIACT" in attr(g, "regimes", []))
+    requires: [g.attrs.ai_act_tier, g.attrs.regimes]
+    message: "The architecture declares AI Act tier {{attr(g, 'ai_act_tier', '')}} but not the AI Act among its regimes: the AI Act rules that read the tier do not run."
+    clauses: [AIACT:2024/1689:Art6]
+    remediation: "Add AIACT to attrs.regimes if the AI Act applies, or record why it does not and clear the tier."
+    fixtures: { positive: fixtures/SCP-003.pos.json, negative: fixtures/SCP-003.neg.json }
+    tags: [scope, aiact, regimes]
+
+  - id: SCP-004
+    title: Allowed regions undeclared while residency-relevant elements carry a region
+    scope: graph
+    severity: medium
+    condition: |
+      size(attr(g, "allowed_regions", [])) == 0 &&
+      (regime("FADP") || regime("GDPR") || regime("FINMA") || regime("DORA")) &&
+      (g.nodes("datastore").exists(x, attr(x, "region", "") != "") ||
+       g.nodes("llm_endpoint").exists(x, attr(x, "region", "") != "") ||
+       g.nodes("vector_index").exists(x, attr(x, "region", "") != ""))
+    requires: [g.attrs.regimes]
+    message: "Stores or model endpoints declare a region, but the architecture declares no allowed regions: residency is assessed against the policy default, which the model never declared."
+    clauses: [FADP:2023:Art16, GDPR:Art44, DORA:2022/2554:Art30(2)(b)]
+    remediation: "Declare the allowed regions (attrs.allowed_regions) from the transfer basis and the contractual locations of processing and storage."
+    fixtures: { positive: fixtures/SCP-004.pos.json, negative: fixtures/SCP-004.neg.json }
+    tags: [scope, residency, regions]
+
+  - id: SCP-005
+    title: FINMA in scope without a materiality classification on the architecture
+    scope: graph
+    severity: medium
+    condition: 'regime("FINMA") && attr(g, "materiality", "") == ""'
+    requires: [g.attrs.regimes]
+    message: "FINMA is in scope and the architecture declares no materiality: the AI inventory entry for this application has no classification to size its controls on."
+    clauses: [FINMA:08/2024:Inventory]
+    remediation: "Declare the application's materiality (attrs.materiality: low, medium or high) as recorded in the AI inventory."
+    fixtures: { positive: fixtures/SCP-005.pos.json, negative: fixtures/SCP-005.neg.json }
+    tags: [scope, finma, inventory]

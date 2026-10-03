@@ -1,0 +1,63 @@
+{
+  "id": "arch_fx_seg_005_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SEG-005 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "IEC"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Orders service",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store",
+        "environment": "staging"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Orders DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "postgres",
+        "data_class": "confidential",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "environment": "production"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

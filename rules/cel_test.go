@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/common/types/traits"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -305,6 +307,214 @@ func TestOTHelpers(t *testing.T) {
 			got, err := evalExpr(t, ScopeGraph, tc.expr, a, Policy{}, "")
 			require.NoError(t, err)
 			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+// gatewayPathModel is the shape the all-paths rules read (ADR-088 §1, docs/03 "path rules"):
+//
+//	ag(agent) ─calls→ l1(llm)           ag ─calls→ gai(gateway kind ai) ─calls→ l1      (a bypass beside a gated route)
+//	ap(app) ─calls→ gapi(gateway kind api) ─calls→ l2                                   (a gateway of another kind)
+//	u(user) ─calls→ gnone(gateway, no kind) ─calls→ tool ─calls→ l3; ag ─calls→ tool    (an undeclared kind, a chain)
+func gatewayPathModel() *model.Architecture {
+	a := model.Empty("arch_paths", "tenant_t", "path helpers")
+	n := func(id, typ, layer string, attrs model.Attrs) model.Node {
+		if attrs == nil {
+			attrs = model.Attrs{}
+		}
+		return model.Node{ID: id, Type: typ, Name: "N " + id, Layer: layer, Source: "design", Attrs: attrs}
+	}
+	a.Nodes = []model.Node{
+		n("u", "user", "human", nil),
+		n("ag", "agent", "ai", nil),
+		n("ap", "app", "app", nil),
+		n("gai", "gateway", "platform", model.Attrs{"kind": "ai"}),
+		n("gapi", "gateway", "platform", model.Attrs{"kind": "api"}),
+		n("gnone", "gateway", "platform", nil),
+		n("tool", "tool", "app", nil),
+		n("l1", "llm_endpoint", "ai", nil),
+		n("l2", "llm_endpoint", "ai", nil),
+		n("l3", "llm_endpoint", "ai", nil),
+	}
+	e := func(id, from, to string) model.Edge {
+		return model.Edge{ID: id, From: from, To: to, Kind: "calls", Auth: "managed_identity", Encryption: "tls", Attrs: model.Attrs{}}
+	}
+	a.Edges = []model.Edge{
+		e("p1", "ag", "l1"), e("p2", "ag", "gai"), e("p3", "gai", "l1"),
+		e("p4", "ap", "gapi"), e("p5", "gapi", "l2"),
+		e("p6", "u", "gnone"), e("p7", "gnone", "tool"), e("p8", "tool", "l3"), e("p9", "ag", "tool"),
+	}
+	return a
+}
+
+// functionPathModel: an agent reaches l1 through a gateway of kind api that declares observability and policy, and
+// l2 through four AI gateways in series whose declared functions each lack one of observability and policy, except g4
+// which declares observability only.
+func functionPathModel() *model.Architecture {
+	a := gatewayPathModel()
+	n := func(id, typ string, attrs model.Attrs) model.Node {
+		if attrs == nil {
+			attrs = model.Attrs{}
+		}
+		return model.Node{ID: id, Type: typ, Name: id, Layer: "platform", Source: "design", Attrs: attrs}
+	}
+	fns := func(f ...any) model.Attrs { return model.Attrs{"kind": "ai", "functions": f} }
+	a.Nodes = []model.Node{
+		n("ag", "agent", nil),
+		n("gfull", "gateway", model.Attrs{"kind": "api", "functions": []any{"observability", "policy"}}),
+		n("g1", "gateway", fns("egress")),
+		n("g2", "gateway", fns("identity_termination")),
+		n("g3", "gateway", fns("policy")),
+		n("g4", "gateway", fns("observability")),
+		n("l1", "llm_endpoint", nil),
+		n("l2", "llm_endpoint", nil),
+	}
+	e := func(id, from, to string) model.Edge {
+		return model.Edge{ID: id, From: from, To: to, Kind: "calls", Auth: "managed_identity", Encryption: "tls", Attrs: model.Attrs{}}
+	}
+	a.Edges = []model.Edge{
+		e("f1", "ag", "gfull"), e("f2", "gfull", "l1"),
+		e("f3", "ag", "g1"), e("f4", "g1", "g2"), e("f5", "g2", "g3"), e("f6", "g3", "g4"), e("f7", "g4", "l2"),
+	}
+	return a
+}
+
+func TestUpstreamAvoiding(t *testing.T) {
+	t.Parallel()
+	paths, ot, fnPaths := gatewayPathModel(), otModel(), functionPathModel()
+	tests := []struct {
+		name string
+		a    *model.Architecture
+		expr string
+		want bool
+	}{
+		{"a bypass beside a gated route: the agent reaches the model around the AI gateway",
+			paths, `g.upstreamAvoiding("l1", ["gateway"], ["ai"]).map(c, c.id) == ["ag", "gai", "l1"]`, true},
+		{"the gateway is a source but is not walked through",
+			paths, `!g.upstreamAvoiding("l1", ["gateway"], ["ai"]).exists(c, c.id == "u")`, true},
+		{"a blocked start is only its own source",
+			paths, `g.upstreamAvoiding("gai", ["gateway"], ["ai"]).map(c, c.id) == ["gai"]`, true},
+		{"a gateway of another kind does not block",
+			paths, `g.upstreamAvoiding("l2", ["gateway"], ["ai"]).map(c, c.id) == ["ap", "gapi", "l2"]`, true},
+		{"empty kinds: any gateway blocks",
+			paths, `g.upstreamAvoiding("l2", ["gateway"], []).map(c, c.id) == ["gapi", "l2"]`, true},
+		{"kinds as a list (the specs' \"api|waf\")",
+			paths, `g.upstreamAvoiding("l2", ["gateway"], ["api", "waf"]).map(c, c.id) == ["gapi", "l2"]`, true},
+		{"a gateway with no declared kind is not credited for a kind",
+			paths, `g.upstreamAvoiding("l3", ["gateway"], ["ai"]).map(c, c.id) == ["u", "ag", "gnone", "tool", "l3"]`, true},
+		{"the same gateway blocks when any kind will do",
+			paths, `g.upstreamAvoiding("l3", ["gateway"], []).map(c, c.id) == ["ag", "gnone", "tool", "l3"]`, true},
+		{"several blocked types",
+			paths, `g.upstreamAvoiding("l3", ["gateway", "tool"], []).map(c, c.id) == ["tool", "l3"] && g.upstreamAvoiding("tool", ["gateway", "tool"], []).map(c, c.id) == ["tool"]`, true},
+		{"no blocked type: every node with a walk to the target",
+			paths, `g.upstreamAvoiding("l3", [], []).map(c, c.id) == ["u", "ag", "gnone", "tool", "l3"]`, true},
+		{"unknown node", paths, `size(g.upstreamAvoiding("nope", ["gateway"], [])) == 0`, true},
+		{"cel.bind names a value once (ext.Bindings, used by ZT-001 and STR-006)",
+			paths, `cel.bind(blocked, ["gateway"], size(g.upstreamAvoiding("l2", blocked, [])) == 2)`, true},
+		{"cached walk answers the same", paths,
+			`g.upstreamAvoiding("l1", ["gateway"], ["ai"]) == g.upstreamAvoiding("l1", ["gateway"], ["ai"])`, true},
+		{"agrees with pathAvoiding when kinds are empty",
+			ot, `g.nodes.all(x, g.nodes.all(c, (c in g.upstreamAvoiding(x.id, ["human_step"], [])) == g.pathAvoiding(c.id, x.id, "human_step")))`, true},
+		{"agrees with pathAvoiding on the gateway model",
+			paths, `g.nodes.all(x, g.nodes.all(c, (c in g.upstreamAvoiding(x.id, ["gateway"], [])) == g.pathAvoiding(c.id, x.id, "gateway")))`, true},
+		// The function-aware form (ADR-088 Amendments, B2b): declared functions decide; no functions declared credits by kind.
+		{"functions: no functions declared credits by kind, as the kind form",
+			paths, `g.upstreamAvoiding("l1", ["gateway"], ["ai"], ["policy"]) == g.upstreamAvoiding("l1", ["gateway"], ["ai"])`, true},
+		{"functions: a gateway of another kind is walked through when it declares none",
+			paths, `g.upstreamAvoiding("l2", ["gateway"], ["ai"], ["policy"]).map(c, c.id) == ["ap", "gapi", "l2"]`, true},
+		{"functions: a gateway that declares every needed function blocks whatever its kind",
+			fnPaths, `g.upstreamAvoiding("l1", ["gateway"], ["ai"], ["observability", "policy"]).map(c, c.id) == ["gfull", "l1"]`, true},
+		{"functions: a gateway of the credited kind whose functions lack one is walked through",
+			fnPaths, `g.upstreamAvoiding("l2", ["gateway"], ["ai"], ["observability", "policy"]).map(c, c.id) == ["ag", "g1", "g2", "g3", "g4", "l2"]`, true},
+		{"functions: the walk is exact past three gateways in series",
+			fnPaths, `g.upstreamAvoiding("l2", ["gateway"], ["ai"], ["observability"]).map(c, c.id) == ["g4", "l2"]`, true},
+		{"functions: a crediting start is only its own source",
+			fnPaths, `g.upstreamAvoiding("gfull", ["gateway"], [], ["policy"]).map(c, c.id) == ["gfull"]`, true},
+		{"functions: empty kinds credit any gateway that declares none",
+			paths, `g.upstreamAvoiding("l3", ["gateway"], [], ["policy"]) == g.upstreamAvoiding("l3", ["gateway"], [])`, true},
+		{"functions: cached walk answers the same and differs from the attr form's cache",
+			fnPaths, `g.upstreamAvoiding("l2", ["gateway"], ["ai"], ["observability"]) == g.upstreamAvoiding("l2", ["gateway"], ["ai"], ["observability"]) && g.upstreamAvoiding("l2", ["gateway"], ["ai"]).size() == 2`, true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := evalExpr(t, ScopeGraph, tc.expr, tc.a, Policy{}, "")
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestUpstreamAvoidingArguments(t *testing.T) {
+	t.Parallel()
+	_, err := stringList(types.NewDynamicList(types.DefaultTypeAdapter, []any{"gateway", 1}))
+	require.Error(t, err, "a list with a non-string element")
+	_, err = stringList(types.String("api|waf"))
+	require.Error(t, err, "the specs' pipe notation is a list, not a string")
+	got, err := stringList(types.NewDynamicList(types.DefaultTypeAdapter, []any{"api", "waf"}))
+	require.NoError(t, err)
+	assert.Equal(t, []string{"api", "waf"}, got)
+
+	g := buildGraph(gatewayPathModel(), Policy{}, nil)
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"))), "arity")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(types.String("g"), types.String("l1"), types.NewStringList(types.DefaultTypeAdapter, nil), types.NewStringList(types.DefaultTypeAdapter, nil))), "receiver")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.Int(1), types.NewStringList(types.DefaultTypeAdapter, nil), types.NewStringList(types.DefaultTypeAdapter, nil))), "id")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), types.String("gateway"), types.NewStringList(types.DefaultTypeAdapter, nil))), "types")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), types.NewStringList(types.DefaultTypeAdapter, []string{"gateway"}), types.String("ai"))), "kinds")
+	ok := graphUpstreamAvoiding(g, types.String("l1"), types.NewStringList(types.DefaultTypeAdapter, []string{"gateway"}), types.NewStringList(types.DefaultTypeAdapter, []string{"ai"}))
+	require.False(t, types.IsError(ok))
+	assert.Equal(t, types.Int(3), ok.(traits.Lister).Size())
+	none := types.NewStringList(types.DefaultTypeAdapter, nil)
+	agents := types.NewStringList(types.DefaultTypeAdapter, []string{"agent"})
+	// Four arguments after the receiver are the function-aware form (Reconcile A, 2026-10-02): this call was an arity
+	// error before the overload existed; it is now valid, and the form's own argument errors are pinned instead.
+	assert.False(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), none, none, agents)), "the function-aware form")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), none, none, none)), "empty needFunctions")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), none, none, types.String("policy"))), "needFunctions not a list")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), none, none, agents, types.String("content_safety"), agents)), "arity 6")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), none, none, agents, types.String(""))), "an empty blocking attribute")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), none, none, agents, types.Int(1))), "a blocking attribute that is not a string")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), none, none, none, types.String("content_safety"))), "empty attrTypes")
+	assert.True(t, types.IsError(graphUpstreamAvoiding(g, types.String("l1"), none, none, types.String("agent"), types.String("content_safety"))), "attrTypes not a list")
+}
+
+// The attr form of upstreamAvoiding also blocks every node of the given types whose boolean attribute is true
+// (ADR-088 Amendments, AGT-003): A (no content safety) → B (content safety) → tool, and C (no content safety) → tool
+// beside it; a tool that carries the attribute is not of the given types and does not block.
+func TestUpstreamAvoidingBlockingAttr(t *testing.T) {
+	t.Parallel()
+	a := model.Empty("arch_attr_block", "tenant_t", "attr block")
+	n := func(id, typ string, attrs model.Attrs) model.Node {
+		return model.Node{ID: id, Type: typ, Name: "N " + id, Layer: "ai", Source: "design", Attrs: attrs}
+	}
+	a.Nodes = []model.Node{
+		n("a", "agent", model.Attrs{"content_safety": false}),
+		n("b", "agent", model.Attrs{"content_safety": true}),
+		n("c", "agent", model.Attrs{}),
+		n("gw", "gateway", model.Attrs{"kind": "ai"}),
+		n("t", "tool", model.Attrs{}),
+		n("t2", "tool", model.Attrs{"content_safety": true}),
+		n("t3", "tool", model.Attrs{}),
+	}
+	e := func(id, from, to string) model.Edge {
+		return model.Edge{ID: id, From: from, To: to, Kind: "calls", Auth: "managed_identity", Encryption: "tls", Attrs: model.Attrs{}}
+	}
+	a.Edges = []model.Edge{e("x1", "a", "b"), e("x2", "b", "t"), e("x3", "c", "gw"), e("x4", "gw", "t"), e("x5", "a", "t2"), e("x6", "t2", "t3")}
+	tests := []struct{ name, expr string }{
+		{"without the attr the walk passes the safe agent", `g.upstreamAvoiding("t", ["gateway"], []).map(x, x.id) == ["a", "b", "gw", "t"]`},
+		{"the attr blocks the safe agent; it is a source but not walked through", `g.upstreamAvoiding("t", ["gateway"], [], ["agent"], "content_safety").map(x, x.id) == ["b", "gw", "t"]`},
+		{"a blocked start is only its own source", `g.upstreamAvoiding("b", [], [], ["agent"], "content_safety").map(x, x.id) == ["b"]`},
+		{"a false or missing attribute does not block", `g.upstreamAvoiding("gw", [], [], ["agent"], "content_safety").map(x, x.id) == ["c", "gw"]`},
+		{"a node of another type with the attribute does not block", `g.upstreamAvoiding("t3", [], [], ["agent"], "content_safety").map(x, x.id) == ["a", "t2", "t3"]`},
+		{"the attr form is cached apart from the plain form",
+			`size(g.upstreamAvoiding("t", ["gateway"], [])) == 4 && size(g.upstreamAvoiding("t", ["gateway"], [], ["agent"], "content_safety")) == 3`},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := evalExpr(t, ScopeGraph, tc.expr, a, Policy{}, "")
+			require.NoError(t, err)
+			assert.Equal(t, true, got)
 		})
 	}
 }

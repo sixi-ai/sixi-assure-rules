@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_fw_009_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture FW-009 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Agent server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "protocols": [
+          "http_api",
+          "mcp",
+          "a2a"
+        ],
+        "integrity": "pinned",
+        "authn": [
+          "oidc"
+        ]
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Supervisor agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "hosted_on": "n_app"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

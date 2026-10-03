@@ -1,8 +1,9 @@
 # GOV — governance (GOV) and products (CRA) (docs/03 §TPR/GOV/CRA). The third-party rules (TPR) live in tpr.yaml:
 # they cite FINMA and DORA only, so they apply only where those regimes are enabled.
 pack: gov
-version: 0.2.0
+version: 0.3.0
 regimes: [FINMA, ISO, CH-ISG, DORA, CRA, IEC, NIS2]
+offer: agentic
 rules:
   - id: GOV-001
     title: Architecture without an owner
@@ -31,6 +32,8 @@ rules:
     scope: node
     severity: medium
     condition: 'n.type in ["product","edge_device","edge_gateway"] && attr(n, "cra_scope", false) && !attr(n, "sbom", false)'
+    requires: [n.attrs.cra_scope]
+    domain: 'n.type in ["product","edge_device","edge_gateway"]'
     message: "{{n.name}} is in CRA scope but has no SBOM."
     clauses: [CRA:2024/2847:AnnexI-II]
     remediation: "Produce an SBOM and a vulnerability-handling process for the product (sbom=true)."
@@ -42,8 +45,134 @@ rules:
     scope: node
     severity: high
     condition: 'n.type in ["product","edge_device","edge_gateway"] && attr(n, "cra_scope", false) && !(attr(n, "secure_boot", false) && attr(n, "ota_signed", false))'
+    requires: [n.attrs.cra_scope]
+    domain: 'n.type in ["product","edge_device","edge_gateway"]'
     message: "{{n.name}} is in CRA scope without secure boot and/or signed OTA updates."
     clauses: [CRA:2024/2847:AnnexI, IEC:62443-4-2:CR3.x]
     remediation: "Enable secure boot and signed OTA updates (secure_boot=true, ota_signed=true)."
     fixtures: { positive: fixtures/CRA-002.pos.json, negative: fixtures/CRA-002.neg.json }
     tags: [cra, product, firmware]
+
+  # CRA-004: a CRA ledger rule of the regulatory mappers (agents/swarm/06-regulatory-mappers/cra-mapper.md). CRA-003,
+  # CRA-005 and CRA-006 stay specified until a golden pair (cra-agent-product) exercises them.
+  - id: CRA-004
+    title: External interface of a CRA product accepts unauthenticated access
+    scope: edge
+    severity: high
+    condition: 'regime("CRA") && e.auth in ["none", "unknown"] && g.nodes("product").exists(p, attr(p, "cra_scope", false) && attr(e.to, "c4_parent", "") == p.id && attr(e.from, "c4_parent", "") != p.id)'
+    requires: [e.auth]
+    domain: 'regime("CRA") && g.nodes("product").exists(p, attr(p, "cra_scope", false) && attr(e.to, "c4_parent", "") == p.id && attr(e.from, "c4_parent", "") != p.id)'
+    message: "{{e.from.name}} → {{e.to.name}} crosses into a CRA product with no authentication ({{e.auth}})."
+    clauses: [CRA:2024/2847:AnnexI-PtI-2(d), CRA:2024/2847:AnnexI-PtI-2(j), OWASP:ASVS:V1]
+    remediation: "Authenticate every interface that crosses the product boundary inward."
+    fixtures: { positive: fixtures/CRA-004.pos.json, negative: fixtures/CRA-004.neg.json }
+    tags: [cra, product, access]
+
+  # NIS-004: a NIS2 ledger rule of the regulatory mappers (agents/swarm/06-regulatory-mappers/nis2-mapper.md). NIS-001
+  # needs the good golden twin to carry its transposition decision first and NIS-003 a golden pair (nis2-ledger); both
+  # stay specified. NIS-002 is retired by the applicability layer (corpus/applicability.json: NIS2 is off where DORA
+  # applies).
+  - id: NIS-004
+    title: Third-party system drawn inside a zone that holds data
+    scope: node
+    severity: medium
+    condition: 'regime("NIS2") && n.type in ["saas", "external_party"] && n.zone != "" && (g.nodes("datastore") + g.nodes("secret_store") + g.nodes("queue") + g.nodes("vector_index") + g.nodes("edge_device")).exists(x, x.zone == n.zone)'
+    message: "Third-party system {{n.name}} sits in zone {{n.zone}} beside the stores, queues or devices it holds."
+    clauses: [NIS2:2024/2690:Annex-6.8, NIS2:2022/2555:Art21(2)(d), ISO:27001:A.8.22]
+    remediation: "Place the third party's system outside the zone and reach it through a controlled boundary."
+    fixtures: { positive: fixtures/NIS-004.pos.json, negative: fixtures/NIS-004.neg.json }
+    tags: [nis2, segmentation, third-party]
+
+  # CHE-004: the Swiss ISG rule of the regulatory mappers (agents/swarm/06-regulatory-mappers/swiss-mapper.md).
+  - id: CHE-004
+    title: Public IT resource under the ISG reporting duty whose events reach no log sink
+    scope: node
+    severity: medium
+    condition: 'regime("ISG") && n.type in ["app", "api"] && attr(n, "exposure", "") == "public" && g.has("log_sink") && !g.nodes("log_sink").exists(s, g.dataFlows(n.id, s.id))'
+    requires: [n.attrs.exposure]
+    domain: 'regime("ISG") && n.type in ["app", "api"]'
+    message: "Public {{n.type}} {{n.name}} writes to no log sink of the organisation: the 24-hour reporting clock has no declared point of discovery for it."
+    clauses: [CH-ISG:Art74a, CH-ISG:Art74e, CH-ISG:128.51:Art16]
+    remediation: "Send the resource's security events to a log sink the organisation monitors."
+    fixtures: { positive: fixtures/CHE-004.pos.json, negative: fixtures/CHE-004.neg.json }
+    tags: [isg, logging, incident]
+
+  # CRA-003, CRA-005 and CRA-006 (docs/18 WS-I I2, cra-mapper): built with the golden pair cra-agent-product, which
+  # exercises them (this supersedes the note above CRA-004). Each opens with regime("CRA"), so the pack enabled for
+  # FINMA, ISO or another regime alone keeps CRA-001/002 and gains nothing here. Product membership is c4_parent.
+  - id: CRA-003
+    title: CRA product embeds a third-party component whose definition is not fixed
+    scope: node
+    severity: high
+    condition: 'regime("CRA") && n.type == "product" && attr(n, "cra_scope", false) && (g.nodes("tool") + g.nodes("mcp_server")).exists(c, attr(c, "c4_parent", "") == n.id && attr(c, "origin", "") == "third_party" && !(attr(c, "integrity", "") in ["pinned", "signed"]))'
+    requires: [n.attrs.cra_scope]
+    domain: 'regime("CRA") && n.type == "product"'
+    message: "CRA product {{n.name}} embeds a third-party tool or MCP server whose version or signature is not fixed: the SBOM and the vulnerability handling cannot name what ships."
+    # CRA:2024/2847:Art13 is not cited: its disposition is the manufacturer's record (SBOM, vulnerability handling,
+    # risk assessment) a person makes; cra-mapper requests it (review fix, I2).
+    clauses: [CRA:2024/2847:AnnexI-PtI-2(f), OWASP:AgenticTop10:ASI04]
+    remediation: "Pin or sign every third-party component the product embeds and keep the SBOM (CRA:2024/2847:Art13) in step with it."
+    fixtures: { positive: fixtures/CRA-003.pos.json, negative: fixtures/CRA-003.neg.json }
+    tags: [cra, product, supply-chain]
+
+  - id: CRA-005
+    title: Component of a CRA product records no security-relevant activity
+    scope: node
+    severity: medium
+    condition: 'regime("CRA") && n.type in ["agent", "tool", "mcp_server", "app", "api"] && g.nodes("product").exists(p, attr(p, "cra_scope", false) && attr(n, "c4_parent", "") == p.id) && !g.nodes("log_sink").exists(s, g.reachable(n.id, s.id))'
+    requires: [n.attrs.c4_parent]
+    domain: 'regime("CRA") && n.type in ["agent", "tool", "mcp_server", "app", "api"] && g.nodes("product").exists(p, attr(p, "cra_scope", false))'
+    message: "{{n.name}} is part of a CRA product and no path from it reaches a log sink: its security-relevant activity is not recorded."
+    clauses: [CRA:2024/2847:AnnexI-PtI-2(l), ISO:27001:A.8.15]
+    remediation: "Record the component's security-relevant activity in a log sink of the product."
+    fixtures: { positive: fixtures/CRA-005.pos.json, negative: fixtures/CRA-005.neg.json }
+    tags: [cra, product, logging]
+
+  - id: CRA-006
+    title: CRA product without a version
+    scope: node
+    severity: low
+    condition: 'regime("CRA") && n.type == "product" && attr(n, "cra_scope", false) && attr(n, "version", "") == ""'
+    requires: [n.attrs.cra_scope]
+    domain: 'regime("CRA") && n.type == "product"'
+    message: "CRA product {{n.name}} declares no version: the SBOM, the vulnerability handling record and the support period have nothing to attach to."
+    # Art13 and Annex II are records a person makes (the manufacturer's file, the user information shipped with the
+    # version): the rule cites the composite Annex I and II reference the packs decide on (review fix, I2).
+    clauses: [CRA:2024/2847:AnnexI-II]
+    remediation: "Declare the version of the product placed on the market (version); the user information of CRA:2024/2847:AnnexII names it."
+    fixtures: { positive: fixtures/CRA-006.pos.json, negative: fixtures/CRA-006.neg.json }
+    tags: [cra, product, versioning]
+
+  # NIS-001 and NIS-003 (docs/18 WS-I I2, nis2-mapper): built with the golden pair nis2-ledger and the transposition
+  # decision on the good glassbox-ot-agent twin (this supersedes the note above NIS-004). NIS-002 stays retired.
+  - id: NIS-001
+    title: NIS2 declared without the national transposition act named
+    scope: graph
+    severity: low
+    # The rule reads an accepted decision citing Art41, not the act it names (the schema has no field for the act):
+    # the message says only that. The nis2-mapper's stub title is the placeholder the owner replaces, so the stub
+    # accepted as proposed does not close it. NIS2:2022/2555:Art41 is not cited: it is tracked in the organisation's
+    # register (outside this tool); the remediation names it (review fix, I2).
+    condition: 'regime("NIS2") && !attr(g, "decisions", []).exists(d, d.status == "accepted" && !("title" in d && d.title == "NIS2 applies as transposed by: to be named by the owner") && "citations" in d && d.citations.exists(c, c.kind == "clause" && c.id == "NIS2:2022/2555:Art41"))'
+    requires: [g.attrs.decisions]
+    domain: 'regime("NIS2")'
+    message: "NIS2 is declared and no accepted decision citing NIS2:2022/2555:Art41 records the transposition: Art. 21 reads as the category, the act the organisation answers to is not recorded."
+    clauses: [NIS2:2022/2555:Art21]
+    remediation: "Record an accepted decision that cites NIS2:2022/2555:Art41 and names in its title the national act that transposes NIS2."
+    fixtures: { positive: fixtures/NIS-001.pos.json, negative: fixtures/NIS-001.neg.json }
+    tags: [nis2, transposition, governance]
+
+  - id: NIS-003
+    title: Reporting path declared but service impact undeclared
+    scope: graph
+    severity: low
+    condition: 'regime("NIS2") && attr(g, "incident_reporting", "") != "" && attr(g, "criticality", "") == ""'
+    requires: [g.attrs.incident_reporting]
+    domain: 'regime("NIS2")'
+    message: "A reporting path is declared and the architecture declares no criticality: the impact of an incident on its services, which triggers the reporting duty, is undeclared."
+    # NIS2:2024/2690:Art1 (which entities the implementing act covers) is not cited: it is decided in the
+    # organisation's register (outside this tool); nis2-mapper requests the statement (review fix, I2).
+    clauses: [NIS2:2022/2555:Art23]
+    remediation: "Declare the architecture's criticality, the impact an incident on it has on the services it supports."
+    fixtures: { positive: fixtures/NIS-003.pos.json, negative: fixtures/NIS-003.neg.json }
+    tags: [nis2, incident, classification]

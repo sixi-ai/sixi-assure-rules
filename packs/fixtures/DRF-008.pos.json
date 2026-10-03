@@ -1,0 +1,62 @@
+{
+  "id": "arch_fx_drf_008_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DRF-008 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true
+      },
+      "description": "Routes to Azure OpenAI on your data"
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "purpose": "Fixture model",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "outsourcing_registered": true,
+        "exit_strategy": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_gw",
+      "to": "n_llm",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

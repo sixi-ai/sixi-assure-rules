@@ -54,7 +54,8 @@ func TestGlassBoxMachineryControlsAreEvidenced(t *testing.T) {
 	t.Parallel()
 	base := loadModel(t, repoPath("golden-set", "models", "glassbox-ot-agent.json"))
 	require.Contains(t, base.Attrs["regimes"], "MR")
-	require.Empty(t, evaluateWith(t, base), "the template is silent")
+	// The template is silent but for NIS-001: it ships no accepted NIS2 transposition decision (team 06 review fix).
+	require.Equal(t, glassboxTemplateBaseline, evaluateWith(t, base), "the template is silent but for NIS-001")
 	tests := []struct {
 		name   string
 		mutate func(a *model.Architecture)

@@ -1,0 +1,141 @@
+{
+  "id": "arch_fx_evl_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture EVL-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "regimes": [
+      "AIACT",
+      "FINMA"
+    ],
+    "ai_act_tier": "limited"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent_a",
+      "type": "agent",
+      "name": "Agent A",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_agent_b",
+      "type": "agent",
+      "name": "Agent B",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "purpose": "Fixture model",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "outsourcing_registered": true,
+        "exit_strategy": true
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Log Analytics",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_eval",
+      "type": "evaluation",
+      "name": "Evaluation",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "owner": "Fixture owner",
+        "purpose": "Fixture evaluation",
+        "evaluates": [
+          "accuracy",
+          "drift"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent_a",
+      "to": "n_logs",
+      "kind": "writes",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_eval",
+      "to": "n_logs",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_agent_b",
+      "to": "n_llm",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e4",
+      "from": "n_agent_b",
+      "to": "n_logs",
+      "kind": "writes",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

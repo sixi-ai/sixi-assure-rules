@@ -1,0 +1,87 @@
+[
+  {
+    "rule_id": "GXP-001",
+    "ids": [
+      "arch_gs_team09_learning_guard_gmp_bad"
+    ]
+  },
+  {
+    "rule_id": "GXP-003",
+    "ids": [
+      "n_records"
+    ]
+  },
+  {
+    "rule_id": "GXP-005",
+    "ids": [
+      "n_records"
+    ]
+  },
+  {
+    "rule_id": "GXP-006",
+    "ids": [
+      "e_mcp_records",
+      "e_mes_records"
+    ]
+  },
+  {
+    "rule_id": "GXP-007",
+    "ids": [
+      "n_qa_release"
+    ]
+  },
+  {
+    "rule_id": "GXP-008",
+    "ids": [
+      "e_mcp_records"
+    ]
+  },
+  {
+    "rule_id": "MR-001",
+    "ids": [
+      "n_guard"
+    ]
+  },
+  {
+    "rule_id": "MR-003",
+    "ids": [
+      "n_guard"
+    ]
+  },
+  {
+    "rule_id": "MR-005",
+    "ids": [
+      "n_guard"
+    ]
+  },
+  {
+    "rule_id": "MR-006",
+    "ids": [
+      "n_guard"
+    ]
+  },
+  {
+    "rule_id": "MR-007",
+    "ids": [
+      "n_decision_log"
+    ]
+  },
+  {
+    "rule_id": "OT-008",
+    "ids": [
+      "n_cmd_approval"
+    ]
+  },
+  {
+    "rule_id": "OT-010",
+    "ids": [
+      "n_cmd_approval"
+    ]
+  },
+  {
+    "rule_id": "OT-011",
+    "ids": [
+      "e_validator_plc"
+    ]
+  }
+]

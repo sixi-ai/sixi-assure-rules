@@ -5,8 +5,9 @@
 # facts, so drift never changes its precision/recall. The pack lists every regime because drift is a
 # property of the model against the knowledge base, not of one regime.
 pack: drift
-version: 0.1.0
+version: 0.2.0
 regimes: [FINMA, CH-CO, FADP, CH-ISG, DORA, AIACT, CRA, NIS2, ISO, MCSB, NIST, IEC, OWASP, MAESTRO, MSFT]
+offer: agentic
 rules:
   - id: DRF-001
     title: Element uses a service or feature the knowledge base records as deprecated
@@ -16,6 +17,8 @@ rules:
       kb.available &&
       (attr(n, "provider_service", "") != "" || attr(n, "model", "") != "") &&
       string(attr(n, "provider_service", "") != "" ? attr(n, "provider_service", "") : attr(n, "model", "")).lowerAscii() in kb.deprecated
+    requires: [kb, n.attrs.model]
+    domain: 'n.type == "llm_endpoint"'
     message: "{{n.name}} uses {{attr(n,'provider_service','') != '' ? attr(n,'provider_service','') : attr(n,'model','')}}, which the knowledge base records as deprecated (replaced by {{kb.deprecated[string(attr(n,'provider_service','') != '' ? attr(n,'provider_service','') : attr(n,'model','')).lowerAscii()]}})."
     clauses: [NIST:AIRMF:MANAGE, NIST:AIRMF:MAP]
     remediation: "Review the recorded replacement against the element's purpose and record the decision (adopt the replacement, or keep the deprecated service with its end-of-support date and exit path as an accepted decision with a citation)."
@@ -31,6 +34,7 @@ rules:
       attr(g, "decisions", []).exists(d, d.status == "accepted" && "citations" in d &&
         d.citations.exists(c, c.kind == "document" && "url" in c &&
           c.url in kb.freshness && kb.freshness[c.url] in ["superseded", "unreachable"]))
+    requires: [kb]
     message: "Accepted decision(s) {{attr(g,'decisions',[]).filter(d, d.status == 'accepted' && 'citations' in d && d.citations.exists(c, c.kind == 'document' && 'url' in c && c.url in kb.freshness && kb.freshness[c.url] in ['superseded','unreachable'])).map(d, string(d.id)).join(', ')}} cite a document the knowledge base now records as superseded or unreachable."
     clauses: [NIST:AIRMF:GOVERN, ISO:42001:A.3.2]
     remediation: "Re-read the decision against the current document: re-cite the successor document and keep the decision, or mark it superseded by a new decision. A decision whose evidence moved on is recorded as drift, not as still-valid."
@@ -45,6 +49,8 @@ rules:
       kb.available &&
       (n.external_ref != "" ? n.external_ref : string(attr(n, "external_ref", ""))) in kb.freshness &&
       kb.freshness[n.external_ref != "" ? n.external_ref : string(attr(n, "external_ref", ""))] in ["stale", "superseded", "unreachable"]
+    requires: [kb]
+    domain: 'n.external_ref != "" || attr(n, "external_ref", "") != ""'
     message: "{{n.name}} points to {{n.external_ref != '' ? n.external_ref : attr(n,'external_ref','')}}, which the knowledge base records as {{kb.freshness[n.external_ref != '' ? n.external_ref : string(attr(n,'external_ref',''))]}} since the last sync."
     clauses: [NIST:AIRMF:MAP]
     remediation: "Point external_ref at the current document (the successor page for a superseded one, a re-verified URL for an unreachable one) and re-check the attributes the element declares against it."
@@ -59,8 +65,80 @@ rules:
       kb.available &&
       ((e.label != "" && e.label.lowerAscii() in kb.deprecated) ||
        (e.protocol != "" && e.protocol.lowerAscii() in kb.deprecated))
+    requires: [kb]
+    domain: 'e.label != "" || e.protocol != ""'
     message: "{{e.from.name}} → {{e.to.name}} is declared over {{e.label != '' && e.label.lowerAscii() in kb.deprecated ? e.label : e.protocol}}, which the knowledge base records as deprecated (replaced by {{kb.deprecated[(e.label != '' && e.label.lowerAscii() in kb.deprecated ? e.label : e.protocol).lowerAscii()]}})."
     clauses: [NIST:AIRMF:MANAGE, NIST:AIRMF:MAP]
     remediation: "Review the recorded replacement for the relationship (API, feature or protocol) and record the decision; relabel the edge once the replacement is adopted."
     fixtures: { positive: fixtures/DRF-004.pos.json, negative: fixtures/DRF-004.neg.json, kb: fixtures/DRF-004.kb.json }
     tags: [drift, knowledge, deprecation, relationships]
+
+  # DRF-005 … DRF-008 (docs/18 WS-I I2, agents/swarm/05-logging-evidence-and-resilience/knowledge-drift.md). Every
+  # condition starts with kb.available; both fixtures of a rule run with the same kb file and differ in the model.
+  # The curator records each MCP revision as an entity with the alias "mcp <date>" (schema 1.1 spec_version).
+  - id: DRF-005
+    title: MCP server declares a specification revision the knowledge base records as deprecated
+    scope: node
+    severity: medium
+    condition: |
+      kb.available && n.type == "mcp_server" && attr(n, "spec_version", "") != "" &&
+      ("mcp " + string(attr(n, "spec_version", ""))).lowerAscii() in kb.deprecated
+    requires: [kb, n.attrs.spec_version]
+    domain: 'n.type == "mcp_server"'
+    message: "{{n.name}} declares MCP revision {{attr(n, 'spec_version', '')}}, which the knowledge base records as deprecated (replaced by {{kb.deprecated[('mcp ' + string(attr(n, 'spec_version', ''))).lowerAscii()]}})."
+    clauses: [NIST:AIRMF:MANAGE, OWASP:AgenticTop10:ASI04]
+    remediation: "Review the recorded successor revision with the server's supplier and record the decision (move to the successor, or keep the revision with its end-of-support date); the supplier's notice is the evidence."
+    fixtures: { positive: fixtures/DRF-005.pos.json, negative: fixtures/DRF-005.neg.json, kb: fixtures/DRF-005.kb.json }
+    tags: [drift, knowledge, mcp]
+
+  - id: DRF-006
+    title: Provider retention statement rests on a superseded or unreachable document
+    scope: node
+    severity: medium
+    condition: |
+      kb.available && n.type == "llm_endpoint" && has(n.attrs.retention_statement) &&
+      "reference" in n.attrs.retention_statement &&
+      string(n.attrs.retention_statement.reference) in kb.freshness &&
+      kb.freshness[string(n.attrs.retention_statement.reference)] in ["superseded", "unreachable"]
+    requires: [kb, n.attrs.retention_statement]
+    domain: 'n.type == "llm_endpoint"'
+    message: "{{n.name}}'s provider retention statement points at {{string(n.attrs.retention_statement.reference)}}, which the knowledge base records as {{kb.freshness[string(n.attrs.retention_statement.reference)]}}."
+    clauses: [ISO:27001:A.5.23, DORA:2022/2554:Art28, NIST:AIRMF:MANAGE]
+    remediation: "Re-read the provider's current retention terms and have a person re-assert the statement against the current document."
+    fixtures: { positive: fixtures/DRF-006.pos.json, negative: fixtures/DRF-006.neg.json, kb: fixtures/DRF-006.kb.json }
+    tags: [drift, knowledge, retention]
+
+  # DRF-002 reads accepted decisions; a proposed one would be accepted on evidence that is already gone.
+  - id: DRF-007
+    title: Proposed decision rests on a document that has moved on
+    scope: graph
+    severity: low
+    condition: |
+      kb.available &&
+      attr(g, "decisions", []).exists(d, d.status == "proposed" && "citations" in d &&
+        d.citations.exists(c, c.kind == "document" && "url" in c &&
+          c.url in kb.freshness && kb.freshness[c.url] in ["superseded", "unreachable"]))
+    requires: [kb]
+    message: "Proposed decision(s) {{attr(g,'decisions',[]).filter(d, d.status == 'proposed' && 'citations' in d && d.citations.exists(c, c.kind == 'document' && 'url' in c && c.url in kb.freshness && kb.freshness[c.url] in ['superseded','unreachable'])).map(d, string(d.id)).join(', ')}} cite a document the knowledge base now records as superseded or unreachable."
+    clauses: [NIST:AIRMF:GOVERN, ISO:42001:A.3.2]
+    remediation: "Before accepting the decision, re-cite the successor document or rewrite the decision against it."
+    fixtures: { positive: fixtures/DRF-007.pos.json, negative: fixtures/DRF-007.neg.json, kb: fixtures/DRF-007.kb.json }
+    tags: [drift, knowledge, decisions, citations]
+
+  # The description is model-authored free text read only through `matches` (RE2, linear time; docs/02 §3), the cost
+  # bounded by the deprecated keys times the 2 000-character description limit and DefaultCostLimit. A key matches
+  # whole tokens only: a non-alphanumeric character or the text's edge on both sides, so "ftp" never matches "SFTP"
+  # and "gpt-4" never matches "gpt-4o-mini". The key is quoted literally (\Q…\E; keys are lowercase, so they cannot
+  # hold the \E that would end the quote) and never read as a pattern.
+  - id: DRF-008
+    title: Element description names a deprecated service or feature
+    scope: node
+    severity: low
+    condition: 'kb.available && n.description != "" && kb.deprecated.exists(k, k != "" && n.description.lowerAscii().matches("(^|[^a-z0-9])\\Q" + k.lowerAscii() + "\\E([^a-z0-9]|$)"))'
+    requires: [kb]
+    domain: 'n.description != ""'
+    message: "{{n.name}}'s description names a service or feature the knowledge base records as deprecated: the drawing may contradict its own provider_service."
+    clauses: [NIST:AIRMF:MAP]
+    remediation: "Decide whether the description or the declared service is the stale one, and correct it."
+    fixtures: { positive: fixtures/DRF-008.pos.json, negative: fixtures/DRF-008.neg.json, kb: fixtures/DRF-008.kb.json }
+    tags: [drift, knowledge, description]

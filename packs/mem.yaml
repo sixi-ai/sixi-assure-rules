@@ -1,0 +1,87 @@
+# MEM — agent memory and state (docs/03 §MEM; docs/18 WS-I I2, agents/swarm/03-agentic-runtime-and-supply-chain/
+# agent-memory-state.md). Deterministic CEL over the memories and state stores agents write and read, and the
+# declarations about them (validated, scope, write_path, guarded). The LLM never creates findings and no rule reads
+# what a memory holds. MEM-001 (memory written with no validation) ships in mcp.yaml (docs/18 D2) and is not repeated
+# here; AGT-005 stays in agt.yaml.
+#
+# Schema 1.1 attributes (agent_memory, edge guarded): only an explicit weak value reports, an absent one is not_checked
+# (requires). MEM-003 reads schema 1.0 stores. None is a pathThrough rule: each keys on the state node or the hop itself.
+pack: mem
+version: 0.1.0
+regimes: [OWASP, AIACT, FINMA, MAESTRO, ISO]
+offer: agentic
+rules:
+  # A memory the design says belongs to one agent or one user is read or written by a second agent. A declared shared,
+  # app, session or thread scope is the architect's choice and is assessed by MEM-003 and the blast-radius rules.
+  - id: MEM-002
+    title: Memory scoped to one agent or user is reached by two or more agents
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent_memory" && attr(n, "scope", "") in ["agent","user"] &&
+      (g.inEdges(n.id, "reads") + g.inEdges(n.id, "writes")).exists(a, a.from.type == "agent" &&
+        (g.inEdges(n.id, "reads") + g.inEdges(n.id, "writes")).exists(b, b.from.type == "agent" && b.from.id != a.from.id))
+    requires: [n.attrs.scope]
+    domain: 'n.type == "agent_memory"'
+    message: "{{n.name}} is declared scoped to one {{attr(n, 'scope', '')}}, yet {{(g.inEdges(n.id, 'reads') + g.inEdges(n.id, 'writes')).filter(x, x.from.type == 'agent').map(x, x.from.name).join(', ')}} reach it: one poisoned write crosses agents, and one context leaks into another."
+    clauses: [OWASP:AgenticTop10:ASI06, OWASP:AgenticTop10:ASI08, ISO:27001:A.5.15, MAESTRO:L2]
+    remediation: "Give each agent its own memory (split the node and point the second agent's reads and writes at its own), and bind the runtime so that one agent's memory is not reachable from another; the access rule per memory is the evidence."
+    fixtures: { positive: fixtures/MEM-002.pos.json, negative: fixtures/MEM-002.neg.json }
+    tags: [agentic, memory, scope]
+
+  # The split AGT-005 asks for (one agent reads untrusted content, another writes) is undone when the reader's notes land
+  # in a store the writer reads: the store is the instruction channel. The writer must not itself write this store
+  # (then it is one context and AGT-005 reports the agent). A write into a log sink, a human step or an agent memory is
+  # not a write reach. vetted absent reads unvetted, as AGT-005 reads it.
+  - id: MEM-003
+    title: Shared state joins a reader of unvetted third-party content with an agent that writes
+    scope: node
+    severity: high
+    condition: |
+      n.type in ["datastore","vector_index","queue","agent_memory"] &&
+      g.inEdges(n.id, "").exists(w, w.kind in ["writes","publishes"] && w.from.type == "agent" &&
+        g.outEdges(w.from.id, "").exists(t, t.to.type in ["tool","mcp_server"] &&
+          attr(t.to, "origin", "") == "third_party" && !attr(t.to, "vetted", false))) &&
+      g.inEdges(n.id, "").exists(r, r.kind in ["reads","subscribes"] && r.from.type == "agent" &&
+        !g.inEdges(n.id, "").exists(w2, w2.kind in ["writes","publishes"] && w2.from.id == r.from.id) &&
+        g.outEdges(r.from.id, "").exists(b,
+          (b.to.type in ["tool","mcp_server"] && attr(b.to, "write_capable", false)) ||
+          (b.kind in ["writes","executes"] && b.to.id != n.id && !(b.to.type in ["log_sink","human_step","agent_memory"]))))
+    message: "{{n.name}} carries what an agent that reads unvetted third-party content writes into the context of {{g.inEdges(n.id, '').filter(r, r.kind in ['reads','subscribes'] && r.from.type == 'agent' && !g.inEdges(n.id, '').exists(w2, w2.kind in ['writes','publishes'] && w2.from.id == r.from.id)).map(r, r.from.name).join(', ')}}, which can write: the store undoes the split between reading untrusted content and acting."
+    clauses: [OWASP:AgenticTop10:ASI06, OWASP:AgenticTop10:ASI02, OWASP:AgenticTop10:ASI03, OWASP:LLMTop10-2026:LLM01]
+    remediation: "Vet the third-party component the reading agent calls, or keep the reader's output out of the writer's context (a separate store the writing agent never reads, or a validation step between them)."
+    fixtures: { positive: fixtures/MEM-003.pos.json, negative: fixtures/MEM-003.neg.json }
+    tags: [agentic, memory, shared-state, poisoning]
+
+  # The design declares the agent itself as the write path (write_path is free text from the framework; this rule
+  # reads the value agent) and the agent runs with no person in the loop. MEM-001 reports the validation half.
+  - id: MEM-004
+    title: Autonomous agent writes its memory directly
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent_memory" && attr(n, "write_path", "") == "agent" &&
+      g.inEdges(n.id, "writes").exists(w, w.from.type == "agent" && attr(w.from, "autonomy", "") == "autonomous")
+    requires: [n.attrs.write_path]
+    domain: 'n.type == "agent_memory" && g.inEdges(n.id, "writes").exists(w, w.from.type == "agent")'
+    message: "Autonomous {{g.inEdges(n.id, 'writes').filter(w, w.from.type == 'agent' && attr(w.from, 'autonomy', '') == 'autonomous').map(w, w.from.name).join(', ')}} write{{size(g.inEdges(n.id, 'writes').filter(w, w.from.type == 'agent' && attr(w.from, 'autonomy', '') == 'autonomous')) == 1 ? 's' : ''}} {{n.name}} directly (write_path=agent): no component or person outside the agent decides what is remembered."
+    clauses: [OWASP:AgenticTop10:ASI06, AIACT:2024/1689:Art15(4), MAESTRO:L3]
+    remediation: "Route memory updates of the autonomous agent through a component that validates them, or a person, before they are stored (write_path=broker or human), and record what that component checks."
+    fixtures: { positive: fixtures/MEM-004.pos.json, negative: fixtures/MEM-004.neg.json }
+    tags: [agentic, memory, autonomy]
+
+  # ADR-047 §3b: the hop into memory declares no credential detector (the ADR-041 guard as a graph fact).
+  - id: MEM-005
+    title: Memory write hop carries no secret guard
+    scope: edge
+    severity: medium
+    condition: 'e.kind == "writes" && e.from.type == "agent" && e.to.type == "agent_memory" && attr(e, "guarded", true) == false'
+    requires: [e.attrs.guarded]
+    domain: 'e.kind == "writes" && e.from.type == "agent" && e.to.type == "agent_memory"'
+    message: "{{e.from.name}} writes {{e.to.name}} on a hop declared without a secret guard (guarded=false): a token a tool returned or a user pasted is persisted and read back into every later context."
+    clauses: [OWASP:LLMTop10-2026:LLM08, OWASP:LLMTop10:LLM02, ISO:27001:A.8.12]
+    remediation: "Pass every write into memory through a credential detector that drops or masks secrets (guarded=true), and keep its configuration as evidence."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/attrs/guarded", value: true }
+    fixtures: { positive: fixtures/MEM-005.pos.json, negative: fixtures/MEM-005.neg.json }
+    tags: [agentic, memory, secrets]

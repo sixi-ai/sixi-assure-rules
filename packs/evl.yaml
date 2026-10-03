@@ -1,0 +1,60 @@
+# EVL — evaluation and monitoring (docs/03 §EVL; docs/18 WS-I I2, agents/swarm/05-logging-evidence-and-resilience/
+# evaluation-monitoring.md). Deterministic CEL; the LLM never creates findings. AI-004, AI-014 and AI-015 (ai.yaml)
+# ask whether an evaluation exists and what its scope names; these ask whether it is fed, whether every agent reaches
+# it, and whether a declared scope covers adversarial inputs and drift where the tier or a material agent asks for
+# them. dataFlows follows writes/publishes/flows/delegates/executes, runs against reads and both ways along calls. A
+# declared scope is a plan, never a result: the evaluation-monitoring agent asks for the report behind it.
+pack: evl
+version: 0.1.0
+regimes: [AIACT, FINMA, ISO, MAESTRO, NIST, OWASP]
+offer: agentic
+rules:
+  - id: EVL-001
+    title: Evaluation fed by nothing
+    scope: node
+    severity: medium
+    condition: 'n.type == "evaluation" && !g.nodes("log_sink").exists(s, g.dataFlows(s.id, n.id)) && !g.nodes("agent").exists(a, g.dataFlows(a.id, n.id)) && !g.nodes("llm_endpoint").exists(l, g.reachable(n.id, l.id))'
+    message: "{{n.name}} reads no log sink, receives no agent's records and calls no model path: it evaluates nothing that is drawn."
+    clauses: [FINMA:08/2024:Monitoring, AIACT:2024/1689:Art72, ISO:42001:A.6.2.4, MAESTRO:L5]
+    remediation: "Connect the evaluation to what it evaluates: a reads edge to the log sink the agents write, or a calls edge to the model path it tests offline."
+    fixtures: { positive: fixtures/EVL-001.pos.json, negative: fixtures/EVL-001.neg.json }
+    tags: [evaluation, monitoring]
+
+  # AI-004 is a graph rule: one evaluation anywhere silences it for every agent. This names the agent no evaluation sees.
+  - id: EVL-002
+    title: Agent no evaluation sees
+    scope: node
+    severity: medium
+    condition: 'n.type == "agent" && g.has("evaluation") && !g.nodes("evaluation").exists(v, g.dataFlows(n.id, v.id))'
+    message: "An evaluation is drawn, but nothing {{n.name}} emits reaches any evaluation, directly or through a sink or a gateway."
+    clauses: [FINMA:08/2024:Monitoring, AIACT:2024/1689:Art72, AIACT:2024/1689:Art26(5), NIST:AIRMF:MEASURE]
+    remediation: "Route the agent's records to a sink the evaluation reads, or extend the evaluation to read the sink the agent writes."
+    fixtures: { positive: fixtures/EVL-002.pos.json, negative: fixtures/EVL-002.neg.json }
+    tags: [evaluation, monitoring, agent]
+
+  # The size guard leaves an empty scope to AI-014 (and AI-015 under high_risk).
+  - id: EVL-003
+    title: High-risk scope without adversarial coverage
+    scope: node
+    severity: high
+    condition: 'n.type == "evaluation" && attr(g, "ai_act_tier", "") == "high_risk" && size(attr(n, "evaluates", [])) > 0 && !("prompt_injection" in attr(n, "evaluates", []))'
+    requires: [g.attrs.ai_act_tier, n.attrs.evaluates]
+    domain: 'n.type == "evaluation"'
+    message: "{{n.name}} declares a scope for a high-risk system without prompt_injection: resistance to adversarial inputs is not in the evaluation plan."
+    clauses: [AIACT:2024/1689:Art15(5), OWASP:LLMTop10-2026:LLM01, OWASP:AgenticTop10:ASI01]
+    remediation: "Add prompt_injection to the evaluation scope and keep the adversarial test report as evidence."
+    fixtures: { positive: fixtures/EVL-003.pos.json, negative: fixtures/EVL-003.neg.json }
+    tags: [evaluation, adversarial, aiact]
+
+  - id: EVL-004
+    title: Material system watched for no drift
+    scope: node
+    severity: medium
+    condition: 'n.type == "evaluation" && size(attr(n, "evaluates", [])) > 0 && !("drift" in attr(n, "evaluates", [])) && ((regime("AIACT") && attr(g, "ai_act_tier", "") == "high_risk") || (regime("FINMA") && g.nodes("agent").exists(a, attr(a, "materiality", "") == "high" && g.dataFlows(a.id, n.id))))'
+    requires: [n.attrs.evaluates, g.attrs.ai_act_tier]
+    domain: 'n.type == "evaluation"'
+    message: "{{n.name}} declares a scope without drift although the tier or a material agent whose records reach it asks for performance over time."
+    clauses: [AIACT:2024/1689:Art72, FINMA:08/2024:Monitoring, MAESTRO:L5]
+    remediation: "Add drift to the evaluation scope and keep the monitoring report for the period as evidence."
+    fixtures: { positive: fixtures/EVL-004.pos.json, negative: fixtures/EVL-004.neg.json }
+    tags: [evaluation, monitoring, drift]

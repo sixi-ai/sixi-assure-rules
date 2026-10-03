@@ -2,14 +2,31 @@
 # clauses only, so the pack applies only where one of those regimes is enabled — an OT plant under CRA and IEC 62443
 # is not told about an outsourcing register it has no clause for.
 pack: tpr
-version: 0.1.0
+version: 0.3.0
 regimes: [FINMA, DORA]
+offer: agentic
 rules:
   - id: TPR-001
     title: External service not in the outsourcing register
     scope: node
     severity: high
-    condition: 'n.type in ["llm_endpoint","saas"] && !attr(n, "outsourcing_registered", false)'
+    # By function, not type (docs/18 E6, self-assessment limitation 22). An llm_endpoint or saas is an external service
+    # by its type, so silence reads "not registered". A managed cloud service typed by what it does (gateway,
+    # datastore, secret_store, queue, identity_provider, log_sink) is external when it names a provider service
+    # (`provider_service`, ADR-032) or a provider other than self_hosted; the schema has no `managed` flag, and the
+    # provider declaration is the fact a model already carries. For those the rule fires only on a declared
+    # `outsourcing_registered: false` and reports an undeclared register status not_checked (facts_missing), so a
+    # design that never spoke about the register is asked, not accused.
+    condition: |
+      (n.type in ["llm_endpoint","saas"] && !attr(n, "outsourcing_registered", false)) ||
+      (n.type in ["gateway","datastore","secret_store","queue","identity_provider","log_sink"] &&
+       (attr(n, "provider_service", "") != "" || !(attr(n, "provider", "") in ["", "self_hosted"])) &&
+       attr(n, "outsourcing_registered", true) == false)
+    requires: [n.attrs.outsourcing_registered]
+    domain: |
+      n.type in ["llm_endpoint","saas"] ||
+      (n.type in ["gateway","datastore","secret_store","queue","identity_provider","log_sink"] &&
+       (attr(n, "provider_service", "") != "" || !(attr(n, "provider", "") in ["", "self_hosted"])))
     message: "{{n.name}} is not recorded in the outsourcing register."
     clauses: [FINMA:2018/3:Register, DORA:2022/2554:Art28(3)]
     remediation: "Add a register entry with audit and access rights (outsourcing_registered=true)."
@@ -21,8 +38,78 @@ rules:
     scope: node
     severity: medium
     condition: 'n.type in ["llm_endpoint","saas"] && attr(n, "criticality", "") == "critical" && !attr(n, "exit_strategy", false)'
+    requires: [n.attrs.criticality]
+    domain: 'n.type in ["llm_endpoint","saas"]'
     message: "Critical external service {{n.name}} has no exit strategy."
     clauses: [DORA:2022/2554:Art28(8), FINMA:2018/3:Exit]
     remediation: "Document an exit plan (alternative provider, data portability, transition time) (exit_strategy=true)."
     fixtures: { positive: fixtures/TPR-002.pos.json, negative: fixtures/TPR-002.neg.json }
     tags: [third-party, exit]
+
+  # DOR-001: a DORA ledger rule of the regulatory mappers (agents/swarm/06-regulatory-mappers/dora-mapper.md). It lives in
+  # this pack (the spec names a dor pack) because tpr already applies to DORA and is exercised by the golden set; the
+  # condition opens with regime("DORA"), so an architecture under FINMA alone gains nothing. DOR-002 to DOR-004 stay
+  # specified until a golden pair (dora-third-party) exercises them.
+  - id: DOR-001
+    title: Location of a critical ICT service undeclared
+    scope: node
+    severity: medium
+    condition: 'regime("DORA") && n.type in ["llm_endpoint", "saas"] && attr(n, "criticality", "") == "critical" && attr(n, "region", "") == ""'
+    requires: [n.attrs.criticality]
+    domain: 'regime("DORA") && n.type in ["llm_endpoint", "saas"]'
+    message: "Critical ICT service {{n.name}} declares no region: where the service is provided and its data processed and stored cannot be compared with the contract."
+    clauses: [DORA:2022/2554:Art30(2)(b), DORA:2022/2554:Art28(3)]
+    remediation: "Declare the region the service runs and stores data in, as the contract states it (region)."
+    fixtures: { positive: fixtures/DOR-001.pos.json, negative: fixtures/DOR-001.neg.json }
+    tags: [dora, third-party, location]
+
+  # DOR-002 to DOR-004 (docs/18 WS-I I2, dora-mapper): built beside DOR-001 with the golden pair dora-third-party, which
+  # exercises them (this supersedes the note above DOR-001). Each opens with regime("DORA"); none is a path rule: each
+  # reads one external service and its direct edges.
+  - id: DOR-002
+    title: Critical ICT services concentrated on one provider
+    scope: node
+    severity: low
+    condition: 'regime("DORA") && n.type in ["llm_endpoint", "saas"] && attr(n, "criticality", "") == "critical" && !(attr(n, "provider", "") in ["", "other", "self_hosted"]) && (g.nodes("llm_endpoint") + g.nodes("saas")).exists(o, o.id != n.id && attr(o, "criticality", "") == "critical" && attr(o, "provider", "") == attr(n, "provider", ""))'
+    requires: [n.attrs.criticality, n.attrs.provider]
+    domain: 'regime("DORA") && n.type in ["llm_endpoint", "saas"]'
+    message: "Critical ICT service {{n.name}} shares provider {{attr(n, 'provider', '')}} with another critical ICT service: the concentration the preliminary assessment weighs before contracting."
+    # DORA:2022/2554:Art29 is not cited: its disposition is the concentration-risk assessment record a person makes, so
+    # a rule must not decide it; the remediation names it and dora-mapper requests the record (review fix, I2).
+    clauses: [DORA:2022/2554:Art28]
+    remediation: "Record the concentration-risk assessment for the provider (DORA:2022/2554:Art29: substitutability, alternatives weighed) and set the finding status with that reason."
+    fixtures: { positive: fixtures/DOR-002.pos.json, negative: fixtures/DOR-002.neg.json }
+    tags: [dora, third-party, concentration]
+
+  - id: DOR-003
+    title: Subcontracting chain behind a critical ICT service not in the register
+    scope: node
+    severity: medium
+    condition: 'regime("DORA") && n.type in ["llm_endpoint", "saas"] && attr(n, "criticality", "") == "critical" && g.out(n.id, "").exists(x, x.kind in ["calls", "writes", "publishes", "delegates", "flows"] && x.to.type in ["llm_endpoint", "saas"] && !attr(x.to, "outsourcing_registered", false))'
+    requires: [n.attrs.criticality]
+    domain: 'regime("DORA") && n.type in ["llm_endpoint", "saas"]'
+    message: "Critical ICT service {{n.name}} relies on an external service that is not in the register of information: its subcontracting chain cannot be named."
+    # DORA-RTS:2025/532:Art3 and Art4 are not cited: their dispositions are the due-diligence and contract records a
+    # person makes; the remediation names them and dora-mapper requests the records (review fix, I2).
+    clauses: [DORA:2022/2554:Art28(3)]
+    remediation: "Identify the subcontractor behind the critical service, record it in the register of information (DORA-RTS:2025/532:Art3) and state the subcontracting conditions in the contract (DORA-RTS:2025/532:Art4)."
+    fixtures: { positive: fixtures/DOR-003.pos.json, negative: fixtures/DOR-003.neg.json }
+    tags: [dora, third-party, subcontracting]
+
+  # DOR-004 reads the dependency edge, not the service (review fix, I2): the outcome depends on the consumer's
+  # criticality, a fact on the edge's source, so the edge is the element that can require it. An unclassified service
+  # whose consumer declares no criticality is not checked (facts_missing), never decided; a service no component
+  # depends on is outside the domain. DORA:2022/2554:Art8 is not cited: its disposition is the classification record a
+  # person makes; dora-mapper requests it for every DOR-004 element.
+  - id: DOR-004
+    title: ICT service supporting a critical function not classified
+    scope: edge
+    severity: medium
+    condition: 'regime("DORA") && e.kind in ["calls", "reads", "writes", "publishes", "subscribes", "delegates"] && e.to.type in ["llm_endpoint", "saas"] && attr(e.to, "criticality", "") == "" && attr(e.from, "criticality", "") == "critical"'
+    requires: [e.from.attrs.criticality]
+    domain: 'regime("DORA") && e.kind in ["calls", "reads", "writes", "publishes", "subscribes", "delegates"] && e.to.type in ["llm_endpoint", "saas"] && attr(e.to, "criticality", "") == ""'
+    message: "{{e.to.name}} supports the critical component {{e.from.name}} and carries no criticality classification: the third-party checks that read it stay silent."
+    clauses: [DORA:2022/2554:Art28(8)]
+    remediation: "Classify the service in the ICT asset and function register (criticality; DORA:2022/2554:Art8), as the function it supports requires."
+    fixtures: { positive: fixtures/DOR-004.pos.json, negative: fixtures/DOR-004.neg.json }
+    tags: [dora, third-party, classification]

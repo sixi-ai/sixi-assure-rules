@@ -1,0 +1,55 @@
+{
+  "id": "arch_fx_ot_009_nomachine_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-009 (command-signing key read by an app, but no machine write in the model: silent)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "ISO"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_brk",
+      "type": "app",
+      "name": "Command broker",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "command_validation": true
+      }
+    },
+    {
+      "id": "n_kv",
+      "type": "secret_store",
+      "name": "Signing keys",
+      "layer": "identity",
+      "source": "design",
+      "attrs": {
+        "key_use": "command_signing",
+        "network_exposure": "public"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_brk_kv",
+      "from": "n_brk",
+      "to": "n_kv",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

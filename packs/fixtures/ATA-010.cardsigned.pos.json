@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_ata_010_cardsigned_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ATA-010 (card_signed true but integrity none: a present signature is not a verified one, positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Orchestrator agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    },
+    {
+      "id": "n_peer",
+      "type": "external_agent",
+      "name": "Partner agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "card_url": "https://partner.example/.well-known/agent-card.json",
+        "card_signed": true,
+        "integrity": "none"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_orch",
+      "to": "n_peer",
+      "kind": "calls",
+      "protocol": "a2a",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "prompt_contains": "internal"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

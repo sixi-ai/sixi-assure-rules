@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_ata_005_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ATA-005 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_home",
+      "kind": "zone",
+      "name": "Our agent runtime",
+      "node_ids": [
+        "n_orch"
+      ]
+    },
+    {
+      "id": "g_partner",
+      "kind": "trust_boundary",
+      "name": "Partner agent (other organisation)",
+      "node_ids": [
+        "n_peer"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Our orchestrator",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 02 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "output_marking": true,
+        "inbound_auth": "oauth",
+        "security_schemes": [
+          "oauth2"
+        ],
+        "integrity": "signed"
+      }
+    },
+    {
+      "id": "n_peer",
+      "type": "external_agent",
+      "name": "Partner agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "card_url": "https://partner.example/.well-known/agent-card.json",
+        "card_signed": false,
+        "integrity": "pinned",
+        "owner": "Partner AG"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_peer",
+      "to": "n_orch",
+      "kind": "calls",
+      "protocol": "a2a",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "token_binding": "dpop"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

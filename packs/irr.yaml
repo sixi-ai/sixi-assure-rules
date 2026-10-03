@@ -1,0 +1,74 @@
+# IRR — incident reporting readiness (docs/03 §IRR; docs/18 WS-I I2, agents/swarm/05-logging-evidence-and-resilience/
+# incident-reporting-readiness.md). GOV-002 (gov.yaml) asks for a declared path under ISG, DORA, NIS2 and CRA; these
+# ask it under the regimes GOV-002 does not gate on, and (schema 1.1) for a security sink the clock can start from.
+# incident_reporting is free text: its presence is the only fact a rule reads, never its content. IRR-002 excludes
+# GOV-002's regimes so one architecture never carries two findings for the same absent path. The personal-data breach
+# duty is one rule per regime, so each finding cites only the duty of the regime it is raised under: IRR-001 runs
+# under FADP and cites the Swiss duty alone (FADP:2023:Art24, the FDPIC), IRR-005 under GDPR and cites the EU duty
+# alone (GDPR:Art33, the supervisory authority, where feasible within 72 hours). A GDPR-only architecture is never cited a Swiss
+# clause, a FADP-only one never the EU clause; an architecture under both carries both findings, one per authority.
+pack: irr
+version: 0.1.0
+regimes: [FADP, GDPR, AIACT, FINMA, CH-ISG, DORA, NIS2, CRA]
+offer: agentic
+rules:
+  - id: IRR-001
+    title: Personal-data breach notification path undeclared (FDPIC)
+    scope: graph
+    severity: medium
+    # FADP only: its one clause is the Swiss duty. The GDPR duty is IRR-005's (Reconcile A, 2026-10-02: one rule per
+    # regime, so a finding's clauses never name a regime the architecture does not declare).
+    condition: 'attr(g, "incident_reporting", "") == "" && regime("FADP") && (g.nodes("datastore") + g.nodes("vector_index")).exists(s, attr(s, "data_class", "") in ["pii", "phi"])'
+    message: "Personal data is drawn in a store or index, but no path for notifying a breach to the FDPIC is declared."
+    clauses: [FADP:2023:Art24]
+    remediation: "Declare the breach notification path (roles and channels, never names) on the architecture (incident_reporting) and keep the procedure as evidence."
+    fixtures: { positive: fixtures/IRR-001.pos.json, negative: fixtures/IRR-001.neg.json }
+    tags: [governance, incident, privacy]
+
+  - id: IRR-002
+    title: FINMA cyber-attack reporting path undeclared
+    scope: graph
+    severity: medium
+    condition: 'attr(g, "incident_reporting", "") == "" && regime("FINMA") && !(regime("ISG") || regime("DORA") || regime("NIS2") || regime("CRA"))'
+    message: "The architecture sits under FINMA, but no path for reporting a successful cyber attack to FINMA is declared."
+    clauses: [FINMA:2023/1:Rz-Cyber, FINMA:05/2020:CyberReporting]
+    remediation: "Declare the reporting path to FINMA (roles and channels) on the architecture (incident_reporting) and keep the procedure as evidence."
+    fixtures: { positive: fixtures/IRR-002.pos.json, negative: fixtures/IRR-002.neg.json }
+    tags: [governance, incident, finma]
+
+  - id: IRR-003
+    title: Serious-incident path undeclared for a high-risk AI system
+    scope: graph
+    severity: medium
+    condition: 'attr(g, "incident_reporting", "") == "" && regime("AIACT") && attr(g, "ai_act_tier", "") == "high_risk"'
+    requires: [g.attrs.ai_act_tier]
+    message: "The architecture is a high-risk AI system, but no path for informing the provider and the market surveillance authority of a serious incident is declared."
+    clauses: [AIACT:2024/1689:Art26, AIACT:2024/1689:Art73]
+    remediation: "Declare the serious-incident path (deployer to provider and authority, roles and channels) on the architecture (incident_reporting)."
+    fixtures: { positive: fixtures/IRR-003.pos.json, negative: fixtures/IRR-003.neg.json }
+    tags: [governance, incident, aiact]
+
+  # Schema 1.1 (ADR-047 §3b): the purpose guard keeps every model that declares no sink purpose silent.
+  - id: IRR-004
+    title: No security sink feeds the reporting path
+    scope: graph
+    severity: low
+    condition: '(regime("ISG") || regime("DORA") || regime("NIS2") || regime("CRA") || regime("FINMA")) && g.nodes("log_sink").exists(s, attr(s, "purpose", "") != "") && !g.nodes("log_sink").exists(s, attr(s, "purpose", "") == "security")'
+    message: "Log sinks declare purposes, but none is the security sink an incident is detected from: the reporting clock has no declared start."
+    clauses: [DORA:2022/2554:Art17, NIS2:2022/2555:Art21, ISO:27001:A.8.16]
+    remediation: "Declare the sink that security events land in (purpose=security), so detection and the reporting path start from one place."
+    fixtures: { positive: fixtures/IRR-004.pos.json, negative: fixtures/IRR-004.neg.json }
+    tags: [governance, incident, logging]
+
+  # The GDPR branch of the incident-reporting-readiness spec's IRR-001 row, built as its own rule once the corpus
+  # carried GDPR:Art33 (Reconcile A, 2026-10-02), so it cites the EU duty alone.
+  - id: IRR-005
+    title: Personal-data breach notification path undeclared (GDPR supervisory authority)
+    scope: graph
+    severity: medium
+    condition: 'attr(g, "incident_reporting", "") == "" && regime("GDPR") && (g.nodes("datastore") + g.nodes("vector_index")).exists(s, attr(s, "data_class", "") in ["pii", "phi"])'
+    message: "Personal data is drawn in a store or index under the GDPR, but no path for notifying a personal-data breach to the supervisory authority (without undue delay and, where feasible, within 72 hours) is declared."
+    clauses: [GDPR:Art33]
+    remediation: "Declare the breach notification path to the competent supervisory authority (roles and channels, never names; the controller's clock and the processor-to-controller step) on the architecture (incident_reporting) and keep the procedure as evidence."
+    fixtures: { positive: fixtures/IRR-005.pos.json, negative: fixtures/IRR-005.neg.json }
+    tags: [governance, incident, privacy, gdpr]

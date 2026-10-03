@@ -68,6 +68,24 @@
       "auth": "mtls",
       "encryption": "mtls",
       "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_dev",
+      "to": "n_broker",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_broker",
+      "to": "n_lake",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
     }
   ],
   "findings": [],

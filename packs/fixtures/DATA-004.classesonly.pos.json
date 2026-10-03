@@ -1,0 +1,63 @@
+{
+  "id": "arch_fx_data_004_classesonly_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DATA-004 (no data_class, a sensitive class listed in data_classes[] only, positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FADP",
+      "FINMA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "SQL DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "pmk",
+        "backup": true,
+        "geo_redundant": true,
+        "data_classes": [
+          "secret"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

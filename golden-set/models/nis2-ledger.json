@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_gs_nis2_ledger",
+  "tenant_id": "tenant_templates",
+  "name": "Dispatch system under NIS2",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Operations IT",
+    "regimes": [
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Significant incidents go to the national CSIRT through the security office: early warning, notification and final report.",
+    "description": "A logistics operator's dispatch system with an order database and a partner's tracking SaaS.",
+    "criticality": "high",
+    "decisions": [
+      {
+        "id": "ADR-001",
+        "title": "NIS2 applies as transposed by the national act named in the register",
+        "status": "accepted",
+        "context": "The operator runs an important service in an EU Member State; the Directive binds through the national transposition.",
+        "decision": "Art. 21 and Art. 23 are read as transposed by the national act the organisation names in its compliance register, with the registration with the national authority recorded there.",
+        "consequences": "Every NIS2 row names the act from the register; a change of the act reopens this decision.",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "NIS2:2022/2555:Art41"
+          },
+          {
+            "kind": "clause",
+            "id": "NIS2:2022/2555:Art21"
+          }
+        ],
+        "proposed_by": "Head of Operations IT",
+        "decided_by": "Head of Operations IT",
+        "decided_at": "2026-09-20T08:00:00Z"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_data",
+      "kind": "zone",
+      "name": "Data zone",
+      "node_ids": [
+        "n_app",
+        "n_db"
+      ]
+    },
+    {
+      "id": "g_partner",
+      "kind": "zone",
+      "name": "Partner zone",
+      "node_ids": [
+        "n_partner"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Dispatch app",
+      "layer": "app",
+      "zone": "g_data",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "attrs": {
+        "exposure": "internal",
+        "owner": "Head of Operations IT"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Order database",
+      "layer": "data",
+      "zone": "g_data",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 0
+      },
+      "attrs": {
+        "engine": "sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_partner",
+      "type": "saas",
+      "name": "Partner tracking SaaS",
+      "layer": "platform",
+      "zone": "g_partner",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 0
+      },
+      "attrs": {
+        "provider": "other",
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_app_db",
+      "from": "n_app",
+      "to": "n_db",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_app_partner",
+      "from": "n_app",
+      "to": "n_partner",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}
