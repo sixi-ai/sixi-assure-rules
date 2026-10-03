@@ -1,16 +1,32 @@
 # ZT — identity & zero trust (docs/03 §ZT). Deterministic CEL; the LLM never creates findings.
 pack: zt
-version: 0.1.0
+version: 0.4.0
 regimes: [MCSB, NIST, FINMA, OWASP, MAESTRO, ISO]
+offer: agentic
 rules:
   - id: ZT-001
     title: Shared secret on service-to-data edge
     scope: edge
     severity: high
+    # B3 (docs/18): a node hosted_on a datastore (an index or a sink inside the same database) is reached over the same
+    # connection, so it is in scope. A hop between co-located components (one hosted_on the other, or both on one
+    # host) is exempt as in NET-006. One credential, one finding: of the reads and writes from one node with one secret
+    # into one datastore and the nodes hosted_on it, only the hop into the datastore itself, else the lowest edge id,
+    # reports.
     condition: |
-      e.kind in ["reads","writes"] && e.to.type == "datastore" &&
-      e.auth in ["password","connection_string","api_key"]
-    message: "{{e.from.name}} accesses {{e.to.name}} with a shared secret ({{e.auth}})."
+      e.kind in ["reads","writes"] && e.auth in ["password","connection_string","api_key","sas"] &&
+      (e.to.type == "datastore" || g.nodes("datastore").exists(d, d.id == attr(e.to, "hosted_on", ""))) &&
+      !(attr(e.from, "hosted_on", "") == e.to.id || attr(e.to, "hosted_on", "") == e.from.id ||
+        (attr(e.from, "hosted_on", "") != "" && attr(e.from, "hosted_on", "") == attr(e.to, "hosted_on", ""))) &&
+      cel.bind(store, e.to.type == "datastore" ? e.to.id : attr(e.to, "hosted_on", ""),
+        !g.out(e.from.id, "").exists(x, x.id != e.id && x.kind in ["reads","writes"] && x.auth == e.auth &&
+          (x.to.id == store || attr(x.to, "hosted_on", "") == store) &&
+          ((x.to.id == store && e.to.id != store) || ((x.to.id == store) == (e.to.id == store) && x.id < e.id))))
+    requires: [e.auth]
+    domain: 'e.kind in ["reads","writes"] && (e.to.type == "datastore" || g.nodes("datastore").exists(d, d.id == attr(e.to, "hosted_on", "")))'
+    # The message names the other hops that use the same secret into the same datastore: the finding stands for them,
+    # and the patch replaces auth on the reported hop only, so each sibling reports in turn (docs/03 §ZT).
+    message: "{{e.from.name}} accesses {{e.to.name}} with a shared secret ({{e.auth}}).{{cel.bind(store, e.to.type == 'datastore' ? e.to.id : attr(e.to, 'hosted_on', ''), cel.bind(sib, g.out(e.from.id, '').filter(x, x.id != e.id && x.kind in ['reads','writes'] && x.auth == e.auth && (x.to.id == store || attr(x.to, 'hosted_on', '') == store)), size(sib) == 0 ? '' : ' The same secret also reaches ' + sib.map(x, x.to.name + ' (' + x.id + ')').join(', ') + ': this finding stands for those hops too, and each needs the same change.'))}}"
     clauses: [MCSB:v1:IM-1, MCSB:v1:IM-3, NIST:800-207:S2, FINMA:2023/1:Rz-AccessMgmt]
     remediation: "Set auth=managed_identity (agent_id for agents); keep only unavoidable secrets in a secret store; add a private endpoint."
     patch_template:
@@ -22,10 +38,39 @@ rules:
     title: Agent without dedicated identity
     scope: node
     severity: high
-    condition: 'n.type == "agent" && attr(n, "identity", "none") in ["none","shared","user_impersonation"]'
-    message: "Agent {{n.name}} has no dedicated identity ({{attr(n,'identity','none')}})."
+    # ADR-093 SD-2 (docs/18 WS-M M3, amendment A-1 of 00-synthesis.md §4.3): agents hosted_on the same app or API and
+    # running as that host's identity_id are one principal, the deployment. ZT-002 then reads the host's identity once:
+    # it reports when that identity is a user account or none (the deployment runs as a person, or as nobody), and only
+    # on the lowest agent id of the host, so one principal is one finding. Agents hosted apart keep the 1.0 reading.
+    condition: |
+      n.type == "agent" &&
+      cel.bind(hid, attr(n, "identity_id", ""), cel.bind(host, attr(n, "hosted_on", ""),
+        (hid != "" && host != "" &&
+         g.nodes.exists(h, h.id == host && h.type in ["app", "api"] && attr(h, "identity_id", "") == hid))
+          ? (n.identity.kind in ["user_account", "none"] &&
+             !g.nodes("agent").exists(o, o.id < n.id && attr(o, "hosted_on", "") == host && attr(o, "identity_id", "") == hid))
+          : attr(n, "identity", "none") in ["none","shared","user_impersonation"]))
+    requires: [n.attrs.identity]
+    domain: 'n.type == "agent"'
+    message: "{{cel.bind(hid, attr(n, 'identity_id', ''), cel.bind(host, attr(n, 'hosted_on', ''), (hid != '' && host != '' && g.nodes.exists(h, h.id == host && h.type in ['app', 'api'] && attr(h, 'identity_id', '') == hid)) ? 'Agent ' + n.name + ' and the agents hosted with it on ' + g.nodes.filter(h, h.id == host).map(h, h.name).join('') + ' (' + g.nodes('agent').filter(o, attr(o, 'hosted_on', '') == host && attr(o, 'identity_id', '') == hid).map(o, o.name).join(', ') + ') run as the host identity ' + (n.identity.name != '' ? n.identity.name : hid) + ', which is ' + (n.identity.kind == 'none' ? 'no identity' : 'a user account') + ': the deployment is their one principal, and it has no dedicated identity (assessed once for the host, ADR-093 SD-2).' : 'Agent ' + n.name + ' has no dedicated identity (' + string(attr(n, 'identity', 'none')) + ').'))}}"
     clauses: [MSFT:EntraAgentID, FINMA:08/2024:Governance]
     remediation: "Assign an Entra agent identity (identity=agent_id); record an owner attestation; enable access reviews."
+    remediation_by_framework:
+      langgraph:
+        text: 'The libraries read have no per-agent identity; the deployment is the principal, and a worker that needs its own identity moves to its own deployment, reached with `RemoteGraph` and checked by that server''s `@auth.authenticate` handler.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/langgraph/langgraph/pregel/remote.py#L118-L180'
+      ms_agent_framework:
+        text: 'No agent-identity object was found in the MAF source files read; run each privileged agent as its own Foundry hosted agent, whose v2 agent object carries an `instance_identity`, rather than in one process on `AzureCliCredential`.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/agents/models.tsp#L205-L211'
+      foundry_agent_service:
+        text: 'Use the v2 agent''s read-only `instance_identity` (`principal_id`, `client_id`) and `blueprint` as the agent''s `identity_id`; the agent''s state can follow that identity (`state_source`).'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/agents/models.tsp#L970-L990'
+      google_adk:
+        text: 'No per-agent identity field was found in the ADK source files read; give each tool its own `auth_credential` and move privileged agents behind a `RemoteA2aAgent` in their own deployment.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/auth/auth_credential.py#L232-L254'
+      openai_agents:
+        text: 'No agent-level identity attribute was found in the source files read; the only per-agent principal is the sandbox `run_as` user, so the privileged action goes behind its own MCP server with an OAuth `auth` handler.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/agent.py#L186-L418'
     patch_template:
       - { op: add, path: "/nodes/{{n.id}}/attrs/identity", value: agent_id }
     fixtures: { positive: fixtures/ZT-002.pos.json, negative: fixtures/ZT-002.neg.json }
@@ -35,10 +80,38 @@ rules:
     title: Agent-to-agent delegation without OBO
     scope: edge
     severity: high
-    condition: 'e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent" && e.auth != "obo"'
+    # ADR-093 SD-2 (amendment A-1, 00-synthesis.md §4.3): a hop between two agents hosted_on the same app or API and
+    # running as that host's identity_id stays inside one process, so no token crosses it and it is not a delegation
+    # ZT-003 asks OBO of. The co-location claim holds only inside one boundary: two co-hosted agents the design puts in
+    # different groups are assessed as before (the TLS-001 guard), and agents hosted apart are unaffected.
+    condition: |
+      e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent" && e.auth != "obo" &&
+      !(cel.bind(host, attr(e.from, "hosted_on", ""), cel.bind(hid, attr(e.from, "identity_id", ""),
+        host != "" && hid != "" && attr(e.to, "hosted_on", "") == host && attr(e.to, "identity_id", "") == hid &&
+        g.nodes.exists(h, h.id == host && h.type in ["app", "api"] && attr(h, "identity_id", "") == hid) &&
+        !(size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids)))))
     message: "{{e.from.name}} delegates to {{e.to.name}} without on-behalf-of token exchange (auth={{e.auth}})."
     clauses: [NIST:800-207:S3, MSFT:EntraAgentID]
     remediation: "Use OBO token exchange on every hop (auth=obo); audit each hop."
+    remediation_by_framework:
+      langgraph:
+        text: 'In-process handoffs carry no token (`Command(graph=PARENT)`) and are not token hops (agents in one process are one principal); across deployments `RemoteGraph` sends `x-api-key` from `LANGGRAPH_API_KEY` or `LANGSMITH_API_KEY`, so pass an exchanged token in its headers and validate it in the remote `Auth` handler; an OBO helper is not in the source.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph-supervisor-py/88859b34017ac3569bbd4a3092c7e77593a0a960/langgraph_supervisor/handoff.py#L105-L125'
+      ms_agent_framework:
+        text: '`A2AAgent` authenticates through an optional `auth_interceptor`; perform the token exchange there (no OBO helper appears in the files read).'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/a2a/agent_framework_a2a/_agent.py#L251-L256'
+      foundry_agent_service:
+        text: 'Give the `a2a` tool a `project_connection_id` whose connection uses `AgenticIdentityToken_Preview` credentials; whether that is an on-behalf-of exchange, and which identity a `connected_agent` child acts under, was not found in the source files read.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/tools/models.tsp#L861-L915'
+      google_adk:
+        text: 'Configure `RemoteA2aAgent` with `auth_scheme` and an `oauth2` `auth_credential`; in-process `sub_agents` are not token hops (agents in one process are one principal).'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/a2a/agent/_remote_a2a_agent.py#L629-L700'
+      openai_agents:
+        text: 'Handoffs run in-process under the application''s credentials and are not token hops (agents in one process are one principal); the SDK has no cross-process agent hop.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/handoffs/__init__.py#L124-L153'
+      crewai:
+        text: 'A2A clients support OAuth2 client-credentials and authorization-code schemes.'
+        source: 'https://raw.githubusercontent.com/crewAIInc/crewAI/ca1d55abb368cd24344de1ddad97bc493b21ffa0/lib/crewai/src/crewai/a2a/auth/client_schemes.py#L125-L402'
     patch_template:
       - { op: replace, path: "/edges/{{e.id}}/auth", value: obo }
     fixtures: { positive: fixtures/ZT-003.pos.json, negative: fixtures/ZT-003.neg.json }
@@ -49,6 +122,8 @@ rules:
     scope: node
     severity: high
     condition: 'attr(n, "rbac_scope", "") in ["subscription_contributor","owner"]'
+    requires: [n.attrs.rbac_scope]
+    domain: 'n.type in ["app","api"]'
     message: "{{n.name}} holds a standing {{attr(n,'rbac_scope','')}} role."
     clauses: [MCSB:v1:PA-7, CIS:Azure:1.x]
     remediation: "Replace with a scoped custom role; no standing privilege for non-human identities; use PIM for humans."
@@ -60,6 +135,8 @@ rules:
     scope: edge
     severity: medium
     condition: 'e.from.type == "user" && attr(e.from, "population", "") == "admin" && !attr(e.from, "pim", false)'
+    requires: [e.from.attrs.population]
+    domain: 'e.from.type == "user"'
     message: "Admin population {{e.from.name}} reaches {{e.to.name}} without PIM/JIT elevation."
     clauses: [MCSB:v1:PA-2]
     remediation: "Require Privileged Identity Management with just-in-time activation and approval for admin access."
@@ -72,8 +149,10 @@ rules:
     severity: medium
     condition: |
       e.from.type in ["user","external_party"] && e.to.type in ["app","api"] &&
-      e.auth == "api_key" && attr(e.to, "exposure", "") == "public"
-    message: "{{e.from.name}} authenticates to public {{e.to.name}} with a static API key."
+      e.auth in ["api_key","sas"] && attr(e.to, "exposure", "") == "public"
+    requires: [e.auth, e.to.attrs.exposure]
+    domain: 'e.from.type in ["user","external_party"] && e.to.type in ["app","api"]'
+    message: "{{e.from.name}} authenticates to public {{e.to.name}} with {{e.auth == 'sas' ? 'a shared access signature (a static bearer key)' : 'a static API key'}}."
     clauses: [MCSB:v1:IM-2]
     remediation: "Use OIDC/OAuth 2.0 with short-lived tokens; front the API with a gateway that validates tokens."
     fixtures: { positive: fixtures/ZT-006.pos.json, negative: fixtures/ZT-006.neg.json }
@@ -84,6 +163,8 @@ rules:
     scope: node
     severity: high
     condition: 'attr(n, "secrets_in", "secret_store") in ["config","code","env_plain"]'
+    requires: [n.attrs.secrets_in]
+    domain: 'n.type in ["app","api"]'
     message: "{{n.name}} keeps secrets in {{attr(n,'secrets_in','secret_store')}} instead of a secret store."
     clauses: [MCSB:v1:IM-8, ISO:27001:A.8.24]
     remediation: "Move secrets to Key Vault (secrets_in=secret_store); rotate exposed secrets; reference by managed identity."
@@ -110,8 +191,457 @@ rules:
     condition: |
       e.from.type == "user" && e.to.type in ["app","api","agent"] &&
       !attr(e.from, "mfa", false) && attr(e.to, "exposure", "") == "public"
+    requires: [e.to.attrs.exposure]
+    domain: 'e.from.type == "user" && e.to.type in ["app","api","agent"]'
     message: "{{e.from.name}} reaches public {{e.to.name}} without multi-factor authentication."
     clauses: [FINMA:2023/1:Rz-Cyber, MCSB:v1:IM-6]
     remediation: "Enforce MFA or passwordless (FIDO2) sign-in for this population; conditional access policies."
     fixtures: { positive: fixtures/ZT-009.pos.json, negative: fixtures/ZT-009.neg.json }
     tags: [identity, mfa]
+
+  # WIS-006 (swarm agent workload-identity-secrets; docs/18 E6, self-assessment limitation 23). Schema 1.1's
+  # `secrets_delivery` says how a secret reaches the process (secrets_in says where it is stored). Delivered as an
+  # environment variable, a secret held in a secret store is copied into the process environment: child processes
+  # inherit it, and crash dumps, diagnostics endpoints and the platform's revision configuration can show it. Where
+  # the secret is not in a store at all (secrets_in config, code or env_plain) ZT-007 reports the storage and this
+  # rule stays quiet, one finding per fact.
+  - id: WIS-006
+    title: Secrets delivered to the process as environment variables
+    scope: node
+    severity: medium
+    condition: |
+      n.type in ["app","api"] && attr(n, "secrets_delivery", "") == "env" &&
+      !(attr(n, "secrets_in", "") in ["config", "code", "env_plain"])
+    requires: [n.attrs.secrets_delivery]
+    domain: 'n.type in ["app","api"] && (attr(n, "secrets_in", "") != "" || attr(n, "secrets_delivery", "") != "") && !(attr(n, "secrets_in", "") in ["config", "code", "env_plain"])'
+    message: "{{n.name}} receives its secrets as environment variables: child processes inherit them, and crash dumps, diagnostics and the platform's configuration views can expose them."
+    clauses: [MCSB:v1:IM-8]
+    remediation: "Mount secrets as files the platform refreshes from the secret store, or fetch them at runtime with the workload identity (secrets_delivery=mounted_file or api); keep them out of the process environment."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/secrets_delivery", value: mounted_file }
+    fixtures: { positive: fixtures/WIS-006.pos.json, negative: fixtures/WIS-006.neg.json }
+    tags: [secrets, workload-identity]
+
+  # ---- docs/18 D2 (ADR-047 §4): agent identity, workload credentials and delegation on schema 1.1 ----------------------
+  # Identity facts are read through n.identity / e.from.identity (the identities[] entry attrs.identity_id names,
+  # docs/03 CEL environment) and required as n.identity.<member> / e.from.identity.<member>, so an element whose
+  # identity does not declare the fact (or that names no identity) is not_checked, never decided (ADR-088 §4).
+  # An identity the 1.0 → 1.1 migration created (n.identity.migrated, projected from x_migrated_from; docs/02 §8) only
+  # records which 1.0 string the agents carried: one entity stands for every agent that said `agent_id`, with no
+  # issuer, sponsor or registry. While the architect has declared none of those three on it, the AID rules raise
+  # nothing on it: the exclusion is written on the facts themselves (`untouched`, below), so the coverage pass, which
+  # sets an undeclared fact unknown, reads a migrated agent as not_checked rather than decided. Once one of the three is
+  # declared the identity is assessed like a native one. AID-002 still reads a migrated identity of kind `shared`.
+  #   untouched := n.identity.migrated && n.identity.issuer == "" && n.identity.sponsor == "" && n.identity.registry == ""
+  # Owners: agent-identity (AID-*), workload-identity-secrets (WIS-*), delegation-chain (DLG-*). AID-010, AID-011,
+  # WIS-010 and WIS-011 take numbers above the specs' reserved ranges so parallel increments never collide.
+  - id: AID-001
+    title: Agent identity without a sponsor
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(n, "identity_id", "") != "" && attr(n, "sponsor", "") == "" && n.identity.sponsor == "" &&
+      !(n.identity.migrated && n.identity.issuer == "" && n.identity.sponsor == "" && n.identity.registry == "")
+    requires: [n.attrs.identity_id, n.identity.sponsor]
+    domain: 'n.type == "agent"'
+    message: "Agent {{n.name}} runs as identity {{n.identity.name != '' ? n.identity.name : n.identity.id}} and neither the agent nor the identity names a sponsor: nobody is accountable for what the identity may do or for switching it off."
+    clauses: [MSFT:EntraAgentID, ISO:42001:A.3.2]
+    remediation: "Name the person who sponsors the agent's identity (agent sponsor or identities[].sponsor) and record the approval in which they accept it; the sponsor is a person, so no value is proposed."
+    fixtures: { positive: fixtures/AID-001.pos.json, negative: fixtures/AID-001.neg.json }
+    tags: [identity, agent, sponsor]
+
+  - id: AID-002
+    title: One identity shared by two or more agents
+    scope: node
+    severity: high
+    # A migrated identity of another kind stands for every agent that carried the 1.0 value, so whether they share one
+    # is unknown until the architect declares it (not_checked through the three identity facts).
+    # ADR-093 SD-2 (amendment A-1, 00-synthesis.md §4.3): agents hosted_on the same app or API that run as the host's
+    # own identity_id are one principal (the deployment), assessed once for identity by ZT-002; sharing that identity
+    # with each other is not a finding. Any agent hosted elsewhere (or nowhere) on the same identity still is.
+    condition: |
+      n.type == "agent" && attr(n, "identity_id", "") != "" &&
+      cel.bind(hid, attr(n, "identity_id", ""), cel.bind(host, attr(n, "hosted_on", ""),
+        cel.bind(inproc, host != "" && g.nodes.exists(h, h.id == host && h.type in ["app", "api"] && attr(h, "identity_id", "") == hid),
+          g.nodes("agent").exists(o, o.id != n.id && attr(o, "identity_id", "") == hid &&
+            !(inproc && attr(o, "hosted_on", "") == host))))) &&
+      (n.identity.kind == "shared" ||
+       !(n.identity.migrated && n.identity.issuer == "" && n.identity.sponsor == "" && n.identity.registry == ""))
+    requires: [n.attrs.identity_id, n.identity.issuer, n.identity.sponsor, n.identity.registry]
+    domain: 'n.type == "agent"'
+    message: "Agent {{n.name}} shares identity {{n.identity.name != '' ? n.identity.name : n.identity.id}} with {{cel.bind(hid, attr(n, 'identity_id', ''), cel.bind(host, attr(n, 'hosted_on', ''), cel.bind(inproc, host != '' && g.nodes.exists(h, h.id == host && h.type in ['app', 'api'] && attr(h, 'identity_id', '') == hid), g.nodes('agent').filter(o, o.id != n.id && attr(o, 'identity_id', '') == hid && !(inproc && attr(o, 'hosted_on', '') == host)).map(o, o.name).join(', '))))}}: their actions land in the audit trail under one name and cannot be scoped, reviewed or switched off one by one."
+    clauses: [OWASP:AgenticTop10:ASI03, MSFT:EntraAgentID, MCSB:v1:IM-3]
+    remediation: "Give each agent an identity entity of its own (an Entra agent identity per agent, or one workload identity each) and point identity_id at it; which agent keeps the existing identity is a question for the architect."
+    fixtures: { positive: fixtures/AID-002.pos.json, negative: fixtures/AID-002.neg.json }
+    tags: [identity, agent, shared]
+
+  - id: AID-010
+    title: Agent identity in no registry the design declares
+    scope: node
+    severity: high
+    # ADR-047 §4 "agent in no registry" (the Agent 365 "shadow agent"): the design draws an agent_registry, yet the
+    # agent's identity names none. Without a registry drawn the rule is silent (its domain).
+    condition: |
+      n.type == "agent" && attr(n, "identity_id", "") != "" && n.identity.registry == "" && g.has("agent_registry") &&
+      !(n.identity.migrated && n.identity.issuer == "" && n.identity.sponsor == "" && n.identity.registry == "")
+    requires: [n.attrs.identity_id, n.identity.registry]
+    domain: 'n.type == "agent" && g.has("agent_registry")'
+    message: "Agent {{n.name}} runs as identity {{n.identity.name != '' ? n.identity.name : n.identity.id}}, which is listed in none of the design's registries ({{g.nodes('agent_registry').map(r, r.name).join(', ')}}): an agent nobody inventoried is not reviewed, not discovered by the other agents' checks and not switched off with the rest."
+    clauses: [MSFT:EntraAgentID, OWASP:AgenticTop10:ASI03, ISO:42001:A.3.2]
+    remediation: "Register the agent's identity in the agent registry and name it on the identity (identities[].registry); keep the registry's owner and the agent's sponsor on record."
+    fixtures: { positive: fixtures/AID-010.pos.json, negative: fixtures/AID-010.neg.json }
+    tags: [identity, agent, registry, inventory]
+
+  - id: AID-011
+    title: Agent identity with no declared issuer
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(n, "identity_id", "") != "" && n.identity.issuer == "" &&
+      !(n.identity.migrated && n.identity.issuer == "" && n.identity.sponsor == "" && n.identity.registry == "")
+    requires: [n.attrs.identity_id, n.identity.issuer]
+    domain: 'n.type == "agent"'
+    message: "Agent {{n.name}} runs as identity {{n.identity.name != '' ? n.identity.name : n.identity.id}}, which names no issuer: no callee can be told which authority to trust for its tokens, and nobody can say where the credential is revoked."
+    clauses: [MCSB:v1:IM-1, NIST:800-207A:Model, MSFT:EntraAgentID]
+    remediation: "Declare the issuer of the identity (identities[].issuer: the issuer URL or the identity provider) and how it is federated (federation), so every callee validates tokens against that issuer only."
+    fixtures: { positive: fixtures/AID-011.pos.json, negative: fixtures/AID-011.neg.json }
+    tags: [identity, agent, issuer]
+
+  - id: WIS-004
+    title: Long-lived credential on a platform that offers federation
+    scope: node
+    severity: high
+    # ADR-047 §4 "long-lived credential where federation exists", read as the workload-identity-secrets spec reads it:
+    # the node runs on a provider service (provider_service), which offers a managed or federated identity, yet its
+    # identity holds a client secret or an API key. n.identity is the entity attrs.identity_id names; an identity that
+    # declares no credential_type (or a node that names none) is not_checked.
+    condition: |
+      n.type in ["app","api","agent","tool","mcp_server"] &&
+      n.identity.credential_type in ["client_secret","api_key"] && attr(n, "provider_service", "") != ""
+    requires: [n.attrs.provider_service, n.attrs.identity_id, n.identity.credential_type]
+    domain: 'n.type in ["app","api","agent","tool","mcp_server"]'
+    message: "{{n.name}} runs on {{attr(n,'provider_service','')}} and its identity {{n.identity.name != '' ? n.identity.name : n.identity.id}} authenticates with a long-lived {{n.identity.credential_type}}, although the platform issues managed or federated credentials that need no stored secret."
+    clauses: [MCSB:v1:IM-3, NIST:800-207A:Model, MSFT:EntraAgentID]
+    remediation: "Switch the identity to the platform's managed identity or to workload identity federation (credential_type managed_identity or federated) and retire the secret; until then record its rotation period (rotation_days)."
+    fixtures: { positive: fixtures/WIS-004.pos.json, negative: fixtures/WIS-004.neg.json }
+    tags: [identity, secrets, federation]
+
+  - id: WIS-010
+    title: Agent reaches an Entra-protected resource with an API key
+    scope: edge
+    severity: high
+    # ADR-047 §4: in a design whose identity provider is Entra ID, an agent that calls an Azure resource with an API key
+    # bypasses Conditional Access and the agent's own identity. STR-006 reports the shared secret on the same hop as a
+    # service-hop fact; this row names the Entra consequence (the two rows name each other in docs/03).
+    condition: |
+      e.from.type == "agent" && e.kind in ["calls","reads","writes","executes"] && e.auth in ["api_key","sas"] &&
+      attr(e.to, "provider_service", "").startsWith("azure/") &&
+      g.nodes("identity_provider").exists(i, attr(i, "provider_service", "") == "azure/entra-id")
+    requires: [e.to.attrs.provider_service]
+    domain: 'e.from.type == "agent" && e.kind in ["calls","reads","writes","executes"] && g.nodes("identity_provider").exists(i, attr(i, "provider_service", "") == "azure/entra-id")'
+    message: "Agent {{e.from.name}} reaches {{e.to.name}} ({{attr(e.to,'provider_service','')}}) with {{e.auth == 'sas' ? 'a shared access signature' : 'an API key'}} in a design whose identity provider is Entra ID: Conditional Access, the agent's own identity and its sign-in logs never see the call."
+    clauses: [MSFT:EntraAgentID, MCSB:v1:IM-1, MCSB:v1:IM-3]
+    remediation: "Call the resource with the agent's Entra identity (auth=agent_id) and disable key-based access on the resource."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/auth", value: agent_id }
+    fixtures: { positive: fixtures/WIS-010.pos.json, negative: fixtures/WIS-010.neg.json }
+    tags: [identity, agent, secrets, entra]
+
+  - id: WIS-011
+    title: Identity issued by a static key on a boundary-crossing hop
+    scope: edge
+    severity: high
+    # An identity that declares no federation (or a caller that names none) is not_checked.
+    condition: |
+      e.kind in ["calls","reads","writes","executes","delegates"] && e.from.identity.federation == "static_key" &&
+      size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids)
+    requires: [e.from.attrs.identity_id, e.from.identity.federation]
+    domain: 'e.kind in ["calls","reads","writes","executes","delegates"] && size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids)'
+    message: "{{e.from.name}} → {{e.to.name}} crosses a boundary as identity {{e.from.identity.name != '' ? e.from.identity.name : e.from.identity.id}}, whose credential is a static key (federation=static_key): whoever copies the key outside the boundary is that identity, and nothing short-lived limits the damage."
+    clauses: [NIST:800-207A:Model, MCSB:v1:IM-3, NIST:800-207:S2]
+    remediation: "Federate the identity (workload identity federation, SPIFFE or an Entra agent identity) so the hop carries a short-lived token the issuer mints per call; retire the static key."
+    fixtures: { positive: fixtures/WIS-011.pos.json, negative: fixtures/WIS-011.neg.json }
+    tags: [identity, secrets, federation, boundary]
+
+  - id: DLG-001
+    title: Delegation depth beyond policy
+    scope: edge
+    severity: medium
+    # The delegation-chain spec's DLG-001: the token minted for an agent → agent delegates hop may be re-delegated
+    # further than the tenant's policy allows (default 1: the callee may not delegate it again). required() answers 0
+    # while rules/policy.yaml has no delegation_depth row, so the limit falls back to ADR-047's constant 1 until it does.
+    # TODO(decision): add `delegation_depth: {default: 1}` to rules/policy.yaml (outside D2's files) and drop the
+    # fallback; the tenant's own requirement already raises the limit through required().
+    condition: |
+      e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent" &&
+      cel.bind(limit, required("delegation_depth"), attr(e, "delegation_depth", 0) > (limit > 0 ? limit : 1))
+    requires: [e.attrs.delegation_depth]
+    domain: 'e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent"'
+    message: "{{e.from.name}} delegates to {{e.to.name}} a token that may be re-delegated {{attr(e,'delegation_depth',0)}} hops deep, beyond the {{required('delegation_depth') > 0 ? required('delegation_depth') : 1}} the policy allows: every further hop acts with the user's authority, and the last callee is one nobody approved."
+    clauses: [OWASP:AgenticTop10:ASI03, NIST:800-207:S2.1, MCSB:v1:PA-7]
+    remediation: "Mint the delegated token so the callee may not delegate it further than the policy allows (delegation_depth=1 by default); a worker that needs to call on is given a token exchanged for that hop."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/attrs/delegation_depth", value: 1 }
+    fixtures: { positive: fixtures/DLG-001.pos.json, negative: fixtures/DLG-001.neg.json }
+    tags: [identity, delegation, agentic]
+
+  - id: DLG-010
+    title: Delegated authority more than one hop deep without token exchange
+    scope: edge
+    severity: high
+    # ADR-047 §4 "delegation depth > 1 without token exchange", on every hop but the agent → agent delegates ones
+    # (DLG-001 bounds their depth and ZT-003 asks for the on-behalf-of exchange there), so no hop is reported twice.
+    # DLG-010 takes a number above the spec's reserved DLG-001 … DLG-004.
+    condition: |
+      e.kind in ["calls","reads","writes","executes","delegates"] && attr(e, "delegation_depth", 0) > 1 &&
+      !(e.auth in ["obo","token_exchange"]) &&
+      !(e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent")
+    requires: [e.attrs.delegation_depth]
+    domain: 'e.kind in ["calls","reads","writes","executes","delegates"] && !(e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent")'
+    message: "{{e.from.name}} → {{e.to.name}} carries authority delegated {{attr(e,'delegation_depth',0)}} hops deep with auth={{e.auth}}: without an exchange at each hop the token is not narrowed or re-addressed, so the last callee holds whatever the first caller held."
+    clauses: [OWASP:AgenticTop10:ASI03, NIST:800-207:S3, MCSB:v1:PA-7]
+    remediation: "Exchange the token at every hop (auth=token_exchange, RFC 8693, or on-behalf-of), narrowing scopes and addressing it to the next callee; keep the depth the issuer allows at one where the design permits."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/auth", value: token_exchange }
+    fixtures: { positive: fixtures/DLG-010.pos.json, negative: fixtures/DLG-010.neg.json }
+    tags: [identity, delegation, agentic]
+
+  - id: DLG-003
+    title: Bearer delegation across a boundary without sender constraint
+    scope: edge
+    severity: high
+    condition: |
+      e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent" &&
+      e.auth in ["obo","token_exchange","jwt_assertion","oauth_client"] &&
+      size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids) &&
+      attr(e, "token_binding", "") == "none"
+    requires: [e.attrs.token_binding]
+    domain: 'e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent" && size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids)'
+    message: "{{e.from.name}} delegates to {{e.to.name}} across a boundary with a bearer token (auth={{e.auth}}, token_binding=none): whoever reads the token on the way can replay it as the delegating agent."
+    clauses: [OWASP:AgenticTop10:ASI07, OWASP:AgenticTop10:ASI03, NIST:800-207A:Model, MCSB:v1:IM-8]
+    remediation: "Bind the delegated token to its sender (token_binding=dpop, or mtls where the hop already runs mutual TLS), so a copied token is useless without the caller's key."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/attrs/token_binding", value: dpop }
+    fixtures: { positive: fixtures/DLG-003.pos.json, negative: fixtures/DLG-003.neg.json }
+    tags: [identity, delegation, token, boundary]
+
+  # ---- docs/18 WS-I I2, swarm team 02 (agents/swarm/02-identity-and-zero-trust): the rules the team's specs propose -----
+  # Owners by prefix: agent-identity (AID-003, AID-004), workload-identity-secrets (WIS-001 … WIS-003), delegation-chain
+  # (DLG-002, DLG-004), human-access (HAC-001 … HAC-004). WIS-005 stays specified (its spec: not shipped until its scope
+  # is decided, TODO(decision)). Rule numbers follow the specs; D2's numbers above them are untouched.
+  - id: AID-003
+    title: Agent identity not anchored to the drawn identity provider
+    scope: node
+    severity: medium
+    # The registry half of the spec's AID-003 is AID-010 (built by D2): this rule reads the identity_provider anchor only,
+    # so no fact is reported twice. An agent reached over an OBO or token-exchange hop from an agent that authenticates
+    # against the provider is anchored through that hop.
+    condition: |
+      n.type == "agent" && (attr(n, "identity", "") == "agent_id" || n.identity.kind == "agent_identity") &&
+      g.has("identity_provider") &&
+      !g.out(n.id, "authenticates").exists(x, x.to.type == "identity_provider") &&
+      !g.in(n.id, "delegates").exists(d, d.auth in ["obo","token_exchange"] &&
+        g.out(d.from.id, "authenticates").exists(y, y.to.type == "identity_provider"))
+    requires: [n.attrs.identity]
+    domain: 'n.type == "agent" && g.has("identity_provider")'
+    message: "Agent {{n.name}} declares an identity of its own, but it neither authenticates against {{g.nodes('identity_provider').map(i, i.name).join(', ')}} nor is reached over an on-behalf-of or token-exchange hop from an agent that does: nothing in the design says which authority issues and revokes its tokens."
+    clauses: [MCSB:v1:IM-1, MSFT:EntraAgentID, NIST:800-207A:Model]
+    remediation: "Draw the agent's authenticates edge to the identity provider that issues its identity (auth=agent_id), or reach it only over an on-behalf-of or token-exchange hop from an agent that does."
+    fixtures: { positive: fixtures/AID-003.pos.json, negative: fixtures/AID-003.neg.json }
+    tags: [identity, agent, anchor]
+
+  - id: AID-004
+    title: Declared agent identity not used on any hop
+    scope: node
+    severity: medium
+    # Only workload identities that are not the agent's are listed: a hop on a secret (api_key, password,
+    # connection_string, none) is ZT-001's, STR-006's or ZT-008's, so this rule never double-reports a secret.
+    condition: |
+      n.type == "agent" && (attr(n, "identity", "") == "agent_id" || n.identity.kind == "agent_identity") &&
+      g.out(n.id, "").exists(x, x.kind in ["calls","reads","writes","executes","delegates"] &&
+        x.auth in ["managed_identity","oauth_client","mtls","agent_user"]) &&
+      !g.out(n.id, "").exists(x, x.auth in ["agent_id","obo","token_exchange","workload_identity","federated_credential"])
+    requires: [n.attrs.identity]
+    domain: 'n.type == "agent"'
+    message: "Agent {{n.name}} declares an identity of its own, but every authenticated hop it makes uses another workload's identity ({{g.out(n.id, '').filter(x, x.auth in ['managed_identity','oauth_client','mtls','agent_user']).map(x, x.to.name + ' (' + x.auth + ')').join(', ')}}): its actions are attributed to that workload, not to the agent."
+    clauses: [OWASP:AgenticTop10:ASI03, NIST:800-207:S2.1, MSFT:EntraAgentID]
+    remediation: "Authenticate the agent's hops with its own identity (auth=agent_id, or on-behalf-of where it acts for a user), so the callee and the audit trail see the agent itself."
+    fixtures: { positive: fixtures/AID-004.pos.json, negative: fixtures/AID-004.neg.json }
+    tags: [identity, agent, attribution]
+
+  - id: WIS-001
+    title: Secret store reached with a shared secret or exposed publicly
+    scope: node
+    severity: high
+    # The spec's sketch reports every inbound read or write that is not a workload identity; only an explicit shared
+    # secret or none reports here, and an undeclared auth (unknown, "") is the workload-identity-secrets agent's
+    # not_checked row (one finding per declared fact).
+    condition: |
+      n.type == "secret_store" && (attr(n, "network_exposure", "") == "public" ||
+        g.in(n.id, "").exists(x, x.kind in ["reads","writes"] && x.auth in ["api_key","sas","password","connection_string","none"]))
+    requires: [n.attrs.network_exposure]
+    domain: 'n.type == "secret_store"'
+    message: "Secret store {{n.name}} {{attr(n, 'network_exposure', '') == 'public' ? 'is exposed to the public network' : 'is reached with a shared secret or none (' + g.in(n.id, '').filter(x, x.kind in ['reads','writes'] && x.auth in ['api_key','sas','password','connection_string','none']).map(x, x.from.name + ': ' + x.auth).join(', ') + ')'}}: the store that guards every other credential is then guarded by less than the credentials it holds."
+    clauses: [MCSB:v1:DP-8, MCSB:v1:IM-8, ISO:27001:A.5.15]
+    remediation: "Keep the secret store on a private endpoint (network_exposure=private) and reach it only with a workload identity (auth=managed_identity, agent_id for agents); disable key-based access to the store."
+    fixtures: { positive: fixtures/WIS-001.pos.json, negative: fixtures/WIS-001.neg.json }
+    tags: [secrets, secret-store, exposure]
+
+  - id: WIS-002
+    title: Declared secret store not reached
+    scope: node
+    severity: low
+    # The spec's sketch fires on an app that declares secrets_in=secret_store while no secret store is drawn at all; a
+    # drawing that leaves the secret store out is a completeness question (model-completeness), and the golden A2A
+    # pair draws none. Narrowed (TODO(decision), reported in the team 02 build report): a store is drawn and the
+    # component that says it keeps its secrets there reaches none.
+    condition: |
+      n.type in ["app","api"] && attr(n, "secrets_in", "") == "secret_store" && g.has("secret_store") &&
+      !g.nodes("secret_store").exists(s, g.reachable(n.id, s.id))
+    requires: [n.attrs.secrets_in]
+    domain: 'n.type in ["app","api"] && g.has("secret_store")'
+    message: "{{n.name}} declares that it keeps its secrets in a secret store, but reaches none of the drawn stores ({{g.nodes('secret_store').map(s, s.name).join(', ')}}): either the hop is missing from the design or the declaration is."
+    clauses: [MCSB:v1:IM-8, CSA:AICM:Identity-and-Access-Management]
+    remediation: "Draw the hop from the component to the secret store it uses (reads, auth=managed_identity), or correct secrets_in."
+    fixtures: { positive: fixtures/WIS-002.pos.json, negative: fixtures/WIS-002.neg.json }
+    tags: [secrets, secret-store, completeness]
+
+  - id: WIS-003
+    title: Static credential without a rotation period
+    scope: graph
+    severity: medium
+    # Schema 1.1 identities[]: a client secret, an API key or a certificate whose rotation period is undeclared or longer
+    # than the policy allows. required("credential_rotation_days") answers 0 while rules/policy.yaml has no such row, so
+    # the limit falls back to the spec's default of 90 days (TODO(decision): add `credential_rotation_days: {default: 90}`
+    # to rules/policy.yaml, outside team 02's files). An absent rotation is the finding: a rotation nobody declared is
+    # not one.
+    condition: |
+      g.identities.exists(i, i.credential_type in ["client_secret","api_key","certificate"] &&
+        cel.bind(limit, required("credential_rotation_days"), i.rotation_days == 0 || i.rotation_days > (limit > 0 ? limit : 90)))
+    message: "{{size(g.identities.filter(i, i.credential_type in ['client_secret','api_key','certificate']))}} static credential(s) declare no rotation within the policy's {{required('credential_rotation_days') > 0 ? required('credential_rotation_days') : 90}} days: {{g.identities.filter(i, i.credential_type in ['client_secret','api_key','certificate'] && (i.rotation_days == 0 || i.rotation_days > (required('credential_rotation_days') > 0 ? required('credential_rotation_days') : 90))).map(i, (i.name != '' ? i.name : i.id) + ' (' + i.credential_type + ')').join(', ')}}."
+    clauses: [MCSB:v1:IM-3, MCSB:v1:DP-6]
+    remediation: "Declare the rotation period of each static credential (identities[].rotation_days, at most the policy's limit) and record the rotation configuration as evidence; better, replace the credential with a managed or federated identity."
+    fixtures: { positive: fixtures/WIS-003.pos.json, negative: fixtures/WIS-003.neg.json }
+    tags: [secrets, rotation, identity]
+
+  - id: DLG-002
+    title: Delegation token not addressed to the callee
+    scope: edge
+    severity: high
+    # An exchanged token whose declared audience is neither the callee node, nor the identity entity it runs as, nor
+    # that identity's identifier (ref: the client id an audience usually names) is usable at a third party.
+    condition: |
+      e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent" &&
+      e.auth in ["obo","token_exchange","jwt_assertion"] &&
+      attr(e, "audience", "") != "" && attr(e, "audience", "") != e.to.id &&
+      attr(e, "audience", "") != attr(e.to, "identity_id", "") &&
+      (e.to.identity.ref == "" || attr(e, "audience", "") != e.to.identity.ref)
+    requires: [e.attrs.audience, e.to.attrs.identity_id]
+    domain: 'e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent" && e.auth in ["obo","token_exchange","jwt_assertion"]'
+    message: "{{e.from.name}} delegates to {{e.to.name}} with a token issued for {{attr(e,'audience','')}}, which is neither {{e.to.name}} nor the identity it runs as: the token is accepted wherever that audience is, so a worker that leaks it hands the user's authority to a third party."
+    clauses: [OWASP:AgenticTop10:ASI03, MCSB:v1:IM-4, NIST:800-207:S3]
+    remediation: "Exchange the token for the callee's own audience (its identity or node) at each hop and have the callee reject any other audience; which audience the callee validates is the architect's to declare."
+    fixtures: { positive: fixtures/DLG-002.pos.json, negative: fixtures/DLG-002.neg.json }
+    tags: [identity, delegation, audience]
+
+  - id: DLG-004
+    title: Delegated user context reaches a state-changing tool over an unexchanged hop
+    scope: node
+    severity: high
+    # One chain from a user to a tool that changes state through an agent → agent delegation that dropped the user's
+    # context suffices (zero trust); a second chain that keeps on-behalf-of does not clear it. ZT-003 names the hop, this
+    # rule the tool the dropped context reaches; the two rows name each other.
+    condition: |
+      n.type in ["tool","mcp_server"] &&
+      (attr(n, "write_capable", false) == true ||
+        (type(attr(n, "capabilities", [])) == list && "modifies_state" in attr(n, "capabilities", []))) &&
+      g.edges("delegates").exists(d, d.from.type == "agent" && d.to.type == "agent" &&
+        !(d.auth in ["obo","token_exchange"]) && g.reachable(d.to.id, n.id) &&
+        g.nodes("user").exists(u, g.reachable(u.id, d.from.id)))
+    requires: [n.attrs.write_capable, n.attrs.capabilities]
+    domain: 'n.type in ["tool","mcp_server"]'
+    message: "{{n.name}} changes state and is reached on behalf of a user through a delegation that dropped the user's context ({{g.edges('delegates').filter(d, d.from.type == 'agent' && d.to.type == 'agent' && !(d.auth in ['obo','token_exchange']) && g.reachable(d.to.id, n.id)).map(d, d.from.name + ' → ' + d.to.name + ' (' + d.auth + ')').join(', ')}}): the write happens under the worker's own identity, not the user's."
+    clauses: [OWASP:AgenticTop10:ASI03, OWASP:AgenticTop10:ASI02, NIST:800-207:S2.1, ISO:27001:A.5.15]
+    remediation: "Carry the user's context on every delegation hop that leads to the tool (auth=obo or token_exchange), so the tool authorises the write against the user's entitlements."
+    fixtures: { positive: fixtures/DLG-004.pos.json, negative: fixtures/DLG-004.neg.json }
+    tags: [identity, delegation, agentic, write]
+
+  - id: HAC-001
+    title: Public surface declares a static sign-in method
+    scope: node
+    severity: medium
+    # authn is a list from schema 1.1 (a single 1.0 value is migrated to a one-item list): an app or API that accepts
+    # OIDC and also keys reports. ZT-006 reads the hop's auth; this rule reads what the surface itself accepts.
+    condition: |
+      n.type in ["app","api"] && attr(n, "exposure", "") == "public" &&
+      (type(attr(n, "authn", [])) == list ? attr(n, "authn", []).exists(a, a in ["api_key","basic","none"]) :
+        attr(n, "authn", "") in ["api_key","basic","none"])
+    requires: [n.attrs.exposure, n.attrs.authn]
+    domain: 'n.type in ["app","api"]'
+    message: "Public {{n.name}} accepts a static sign-in method ({{type(attr(n, 'authn', [])) == list ? attr(n, 'authn', []).filter(a, a in ['api_key','basic','none']).join(', ') : attr(n, 'authn', '')}}): a copied key or password signs anyone in, whatever the drawn hops use."
+    clauses: [MCSB:v1:IM-6, OWASP:ASVS:V6, NIS2:2022/2555:Art21(2)(j)]
+    remediation: "Sign people in with OIDC or OAuth 2.0 and short-lived tokens; remove API keys, HTTP Basic and anonymous access from the methods the surface accepts."
+    fixtures: { positive: fixtures/HAC-001.pos.json, negative: fixtures/HAC-001.neg.json }
+    tags: [identity, authentication, public]
+
+  - id: HAC-002
+    title: Long-lived token on a human entry
+    scope: edge
+    severity: medium
+    # token_lifetime is in seconds (docs/02 §3, schema 1.1). required("human_token_lifetime_s") answers 0 while
+    # rules/policy.yaml has no such row, so the limit falls back to the spec's 3600 s (TODO(decision): add
+    # `human_token_lifetime_s: {default: 3600}`, a maximum the tenant may lower, to rules/policy.yaml).
+    condition: |
+      e.from.type in ["user","external_party"] && e.to.type in ["app","api","agent"] &&
+      attr(e.to, "exposure", "") == "public" && e.auth in ["oauth_client","jwt_assertion"] &&
+      cel.bind(limit, required("human_token_lifetime_s"), attr(e, "token_lifetime", 0) > (limit > 0 ? limit : 3600))
+    requires: [e.to.attrs.exposure, e.attrs.token_lifetime]
+    domain: 'e.from.type in ["user","external_party"] && e.to.type in ["app","api","agent"] && e.auth in ["oauth_client","jwt_assertion"]'
+    message: "{{e.from.name}} signs in to public {{e.to.name}} with a token that lives {{attr(e,'token_lifetime',0)}} s, beyond the {{required('human_token_lifetime_s') > 0 ? required('human_token_lifetime_s') : 3600}} s the policy allows: a stolen session stays usable long after the person has gone."
+    clauses: [MCSB:v1:IM-7, NIST:800-207:S2.1]
+    remediation: "Issue tokens for the human entry that live no longer than the policy allows (token_lifetime at most the policy value) and refresh them under conditional access."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/attrs/token_lifetime", value: 3600 }
+    fixtures: { positive: fixtures/HAC-002.pos.json, negative: fixtures/HAC-002.neg.json }
+    tags: [identity, token, session, public]
+
+  - id: HAC-003
+    title: Public surface signs users in outside the drawn identity provider
+    scope: node
+    severity: medium
+    # The one path rule of human-access: node scope on the surface, it fires when any user walk avoids every gateway
+    # (g.pathAvoiding, the OT-001 form) or when no gateway in front of it terminates identity (authenticates against the
+    # provider, or declares functions ∋ identity_termination, schema 1.1). Never pathThrough.
+    condition: |
+      n.type in ["app","api","agent"] && attr(n, "exposure", "") == "public" && g.has("identity_provider") &&
+      !g.out(n.id, "authenticates").exists(x, x.to.type == "identity_provider") &&
+      g.nodes("user").exists(u, g.reachable(u.id, n.id) &&
+        (g.pathAvoiding(u.id, n.id, "gateway") ||
+         !g.in(n.id, "calls").exists(c, c.from.type == "gateway" &&
+           (g.out(c.from.id, "authenticates").exists(y, y.to.type == "identity_provider") ||
+            "identity_termination" in attr(c.from, "functions", [])))))
+    requires: [n.attrs.exposure]
+    domain: 'n.type in ["app","api"] && g.has("identity_provider")'
+    message: "Public {{n.name}} signs people in without the drawn identity provider ({{g.nodes('identity_provider').map(i, i.name).join(', ')}}): it neither authenticates against it nor sits behind a gateway that does on every user path, so its accounts live outside the identity system that enforces MFA and revocation."
+    clauses: [MCSB:v1:IM-1, MCSB:v1:IM-5, ISO:27001:A.5.15, NIST:800-207:S3]
+    remediation: "Federate the surface's sign-in to the identity provider (an authenticates edge, auth=oauth_client), or terminate identity at a gateway on every user path."
+    fixtures: { positive: fixtures/HAC-003.pos.json, negative: fixtures/HAC-003.neg.json }
+    tags: [identity, authentication, public, federation]
+
+  - id: HAC-004
+    title: Public agent entry with a static or absent inbound method
+    scope: edge
+    severity: medium
+    # inbound_auth (schema 1.1, docs/02 §3) is the scheme an agent accepts from its callers, in the authn vocabulary.
+    condition: |
+      e.from.type in ["user","external_party"] && e.to.type == "agent" &&
+      attr(e.to, "inbound_auth", "") in ["api_key","basic","none","unknown"]
+    requires: [e.to.attrs.inbound_auth]
+    domain: 'e.from.type in ["user","external_party"] && e.to.type == "agent"'
+    message: "{{e.from.name}} reaches agent {{e.to.name}}, which accepts its callers with {{attr(e.to,'inbound_auth','')}}: a static or absent method signs anyone in as whoever holds the key."
+    clauses: [MCSB:v1:IM-2, MCSB:v1:IM-6, NIST:800-207A:Model]
+    remediation: "Accept people at the agent only with OIDC or OAuth 2.0 tokens (inbound_auth=oauth) validated against the identity provider."
+    patch_template:
+      - { op: replace, path: "/nodes/{{e.to.id}}/attrs/inbound_auth", value: oauth }
+    fixtures: { positive: fixtures/HAC-004.pos.json, negative: fixtures/HAC-004.neg.json }
+    tags: [identity, agent, authentication]

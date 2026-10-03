@@ -53,6 +53,16 @@
           "executes_code"
         ]
       }
+    },
+    {
+      "id": "n_hs",
+      "type": "human_step",
+      "name": "Approval (four-eyes)",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "operations"
+      }
     }
   ],
   "edges": [
@@ -62,6 +72,28 @@
       "to": "n_tool_x",
       "kind": "calls",
       "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_agent",
+      "to": "n_hs",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e3",
+      "from": "n_hs",
+      "to": "n_tool_x",
+      "kind": "calls",
+      "auth": "managed_identity",
       "encryption": "tls",
       "attrs": {
         "logged": true

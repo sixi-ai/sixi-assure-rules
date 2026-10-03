@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "rule_id": "NIS-001",
+    "ids": [
+      "arch_tpl_glassbox_ot_agent"
+    ]
+  }
+]

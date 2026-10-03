@@ -1,0 +1,26 @@
+# Conformance pack (docs/18 B4): the same cases are fed to cmd/eval and to `assure eval`
+# (server/cmd/eval/conformance_test.go, server/cmd/assure/eval_test.go TestEvalConformance) so the two stay one
+# measurement. TST-002 is never expected: both commands list it under unexercised_rules.
+pack: tst
+version: 0.4.2
+regimes: [FINMA]
+offer: agentic
+rules:
+  - id: TST-001
+    title: Agent without identity
+    scope: node
+    severity: high
+    condition: 'n.type == "agent" && attr(n, "identity", "none") in ["none", "shared"]'
+    message: "Agent {{n.name}} has no identity."
+    clauses: [MSFT:EntraAgentID]
+    remediation: "Assign an agent identity."
+    fixtures: { positive: fixtures/TST-001.pos.json, negative: fixtures/TST-001.neg.json }
+  - id: TST-002
+    title: Agent without a purpose
+    scope: node
+    severity: low
+    condition: 'n.type == "agent" && attr(n, "purpose", "") == ""'
+    message: "Agent {{n.name}} states no purpose."
+    clauses: [MSFT:EntraAgentID]
+    remediation: "State the agent's purpose."
+    fixtures: { positive: fixtures/TST-002.pos.json, negative: fixtures/TST-002.neg.json }

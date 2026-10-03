@@ -1,0 +1,54 @@
+{
+  "id": "arch_fx_cmp_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CMP-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_user",
+      "type": "user",
+      "name": "Staff",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "population": "employee",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Orders API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "authn": "oidc"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_user",
+      "to": "n_api",
+      "kind": "calls",
+      "auth": "obo",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

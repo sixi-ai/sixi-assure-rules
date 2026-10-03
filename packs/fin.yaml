@@ -1,0 +1,48 @@
+# FIN — the FINMA ledger rules of the regulatory mappers (agents/swarm/06-regulatory-mappers/finma-mapper.md).
+# `materiality: high` is the declared proxy for a significant outsourced function (Circ. 2018/3) and a material
+# application (Guidance 08/2024); the message says so wherever it is read.
+pack: fin
+version: 0.1.0
+regimes: [FINMA]
+offer: agentic
+rules:
+  - id: FIN-002
+    title: Client-identifying or personal data store without a criticality categorisation
+    scope: node
+    severity: medium
+    condition: 'n.type == "datastore" && regime("FINMA") && attr(n, "data_class", "") in ["cid", "pii", "phi", "secret"] && attr(n, "criticality", "") == ""'
+    requires: [n.attrs.data_class]
+    domain: 'regime("FINMA") && n.type == "datastore"'
+    message: "{{n.name}} holds {{attr(n, 'data_class', '')}} data and carries no criticality categorisation."
+    clauses: [FINMA:2023/1:Rz-CriticalData]
+    remediation: "Categorise the store in the institution's critical-data system (criticality)."
+    fixtures: { positive: fixtures/FIN-002.pos.json, negative: fixtures/FIN-002.neg.json }
+    tags: [finma, critical-data, classification]
+
+  - id: FIN-003
+    title: Material external model or service without an exit arrangement
+    scope: node
+    severity: medium
+    condition: 'n.type in ["llm_endpoint", "saas"] && regime("FINMA") && attr(n, "materiality", "") == "high" && attr(n, "criticality", "") != "critical" && !attr(n, "exit_strategy", false)'
+    requires: [n.attrs.materiality]
+    domain: 'regime("FINMA") && n.type in ["llm_endpoint", "saas"]'
+    message: "{{n.name}} supports a material application (materiality high, the declared proxy for a significant outsourced function) and declares no exit arrangement."
+    clauses: [FINMA:2018/3:Exit, FINMA:2018/3:Outsourcing]
+    remediation: "Document how the function would be insourced or transferred in an orderly way and declare exit_strategy=true once the plan exists."
+    fixtures: { positive: fixtures/FIN-003.pos.json, negative: fixtures/FIN-003.neg.json }
+    tags: [finma, outsourcing, exit]
+
+  # FIN-001 (docs/18 WS-I I2, finma-mapper): reads only declared pairs. SCP-005 owns an empty architecture value and
+  # AI-005 an empty component value; neither is read here.
+  - id: FIN-001
+    title: AI component classified above the application it belongs to
+    scope: node
+    severity: medium
+    condition: 'n.type in ["agent", "llm_endpoint"] && regime("FINMA") && ((attr(g, "materiality", "") == "low" && attr(n, "materiality", "") in ["medium", "high"]) || (attr(g, "materiality", "") == "medium" && attr(n, "materiality", "") == "high"))'
+    requires: [g.attrs.materiality, n.attrs.materiality]
+    domain: 'regime("FINMA") && n.type in ["agent", "llm_endpoint"]'
+    message: "{{n.name}} is classified materiality {{attr(n, 'materiality', '')}} while the application it belongs to is classified {{attr(g, 'materiality', '')}}: the controls may be sized on the lower value."
+    clauses: [FINMA:08/2024:Inventory, FINMA:08/2024:Governance]
+    remediation: "Reconcile the two classifications in the AI inventory: raise the application's materiality or record why the component's is lower."
+    fixtures: { positive: fixtures/FIN-001.pos.json, negative: fixtures/FIN-001.neg.json }
+    tags: [finma, inventory, classification]

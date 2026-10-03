@@ -1,0 +1,92 @@
+# ING — ingestion security (docs/03 §ING; docs/18 WS-I I2, agents/swarm/03-agentic-runtime-and-supply-chain/
+# ingestion-security.md). Deterministic CEL over where content from outside the design enters a model or an agent
+# that can act, and which node declares a screen (content_safety) before it does. The LLM never creates findings; a
+# content_safety flag is a declaration, and the policy behind it is requested as evidence, never fetched.
+#
+# Direction matters: pathAvoidingAttr and upstreamAvoidingAttr walk drawn edges, dataSources walks data flow (against
+# reads). ING-002 is a forward walk from the public entry, ING-003 a reverse walk into the index plus the one-hop pull
+# of an ingestion job that reads an outside source, ING-001 asks what feeds the agent (dataSources). dataSources has no
+# avoidance form, so ING-001 credits only the agent's own screen (TODO(decision) ADR-088: dataSourcesAvoidingAttr).
+# A write into a log sink, a hand-over to a human step or a write into the agent's own memory is not an action.
+pack: ing
+version: 0.1.0
+regimes: [OWASP, AIACT, FADP, GDPR, FINMA, ISO, MAESTRO, CSA]
+offer: agentic
+rules:
+  # AGT-003 reports the direct hop to third-party content; ING-001 the agent whose reach makes it consequential,
+  # including content that reaches it through other nodes. edge_device sources are OT-005's.
+  - id: ING-001
+    title: Acting agent fed from outside the design with no screen
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent" && !attr(n, "content_safety", false) &&
+      g.outEdges(n.id, "").exists(w,
+        (w.kind in ["writes","executes"] && !(w.to.type in ["log_sink","human_step","agent_memory"])) ||
+        (w.to.type in ["tool","mcp_server"] && (attr(w.to, "write_capable", false) ||
+          attr(w.to, "capabilities", []).exists(c, c in ["modifies_state","executes_code"])))) &&
+      (g.nodes("external_party") + g.nodes("saas") + g.nodes("tool") + g.nodes("mcp_server") + g.nodes("vector_index")).exists(s,
+        (s.type in ["external_party","saas"] || attr(s, "origin", "") == "third_party") && s.id in g.dataSources(n.id, ""))
+    message: "{{n.name}} can change state or run code, and content from {{(g.nodes('external_party') + g.nodes('saas') + g.nodes('tool') + g.nodes('mcp_server') + g.nodes('vector_index')).filter(s, (s.type in ['external_party','saas'] || attr(s, 'origin', '') == 'third_party') && s.id in g.dataSources(n.id, '')).map(s, s.name).join(', ')}} reaches it while it declares no content screen: an instruction hidden in that content can steer what it does."
+    clauses: [OWASP:LLMTop10:LLM01, OWASP:AgenticTop10:ASI01, OWASP:AgenticTop10:ASI06, AIACT:2024/1689:Art15(5), MAESTRO:L3]
+    remediation: "Screen what reaches the agent from outside the design (prompt-injection and content screening on its input) and declare it (content_safety=true); the screen's configuration and its latest test report are the evidence."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/content_safety", value: true }
+    fixtures: { positive: fixtures/ING-001.pos.json, negative: fixtures/ING-001.neg.json }
+    tags: [agentic, ingestion, prompt-injection, untrusted-input]
+
+  # Zero trust (ADR-088 §1): some walk from a public surface to a model never enters a node with content_safety=true
+  # (the model itself counts, the entry does not). Schema 1.1: an entry that declares its own input guard (detect or
+  # reject) is not reported. A gateway that fronts both the app and the agent's model calls is a walk this rule
+  # reports; the resolution is content_safety=true on that gateway.
+  - id: ING-002
+    title: Public entry reaches a model along a path with no screen
+    scope: node
+    severity: high
+    condition: |
+      n.type in ["app","api"] && attr(n, "exposure", "") == "public" && !(attr(n, "input_guard", "none") in ["detect","reject"]) &&
+      g.nodes("llm_endpoint").exists(l, g.reachable(n.id, l.id) && g.pathAvoidingAttr(n.id, l.id, "content_safety"))
+    requires: [n.attrs.exposure]
+    domain: 'n.type in ["app","api"]'
+    message: "Public {{n.name}} reaches {{g.nodes('llm_endpoint').filter(l, g.reachable(n.id, l.id) && g.pathAvoidingAttr(n.id, l.id, 'content_safety')).map(l, l.name).join(', ')}} along a path on which no node declares content screening: input from the internet reaches the model unscreened."
+    clauses: [OWASP:LLMTop10:LLM01, AIACT:2024/1689:Art15(5), MSFT:APIM-ContentSafety, ISO:27001:A.8.16]
+    remediation: "Screen input on every path from the public entry to the model: content safety on the gateway or the agent the path passes (content_safety=true), or an input guard on the entry itself (input_guard=detect or reject)."
+    fixtures: { positive: fixtures/ING-002.pos.json, negative: fixtures/ING-002.neg.json }
+    tags: [agentic, ingestion, prompt-injection, public]
+
+  # The write side of an index (the read side, acl_trimming and redaction, is DATA-002's). A hop that writes into the
+  # index fires when an outside source reaches its writer by a drawn walk on which no later node declares a screen,
+  # or when the writer itself pulls from an outside source (reads, calls or subscribes) and declares no screen.
+  - id: ING-003
+    title: Index written from outside the design with no screen
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "vector_index" &&
+      g.inEdges(n.id, "").exists(w, w.kind in ["writes","publishes","flows"] &&
+        (g.upstreamAvoidingAttr(w.from.id, "content_safety").exists(c,
+           c.type in ["external_party","saas"] || attr(c, "origin", "") == "third_party") ||
+         (!attr(w.from, "content_safety", false) && g.outEdges(w.from.id, "").exists(r, r.kind in ["reads","calls","subscribes"] &&
+           (r.to.type in ["external_party","saas"] || attr(r.to, "origin", "") == "third_party")))))
+    message: "{{n.name}} is written with content from outside the design on a path no screen covers: whatever an outsider puts in it is retrieved later as context for a model."
+    clauses: [OWASP:LLMTop10-2026:LLM05, OWASP:LLMTop10:LLM08, OWASP:AgenticTop10:ASI06, MAESTRO:L2, CSA:AICM:MDS]
+    remediation: "Screen content before it is written into the index (content_safety=true on the ingestion component or the gateway in front of it), and keep the ingestion pipeline description naming its sources as evidence."
+    fixtures: { positive: fixtures/ING-003.pos.json, negative: fixtures/ING-003.neg.json }
+    tags: [agentic, ingestion, poisoning, retrieval]
+
+  # A message an outsider publishes is delivered to the subscribed agent as input. Edge devices publishing telemetry
+  # are OT-005's.
+  - id: ING-004
+    title: Agent subscribed to a queue outsiders publish into, no screen
+    scope: edge
+    severity: medium
+    condition: |
+      e.kind == "subscribes" && e.from.type == "agent" && !attr(e.from, "content_safety", false) &&
+      g.inEdges(e.to.id, "publishes").exists(x, x.from.type in ["external_party","saas"] || attr(x.from, "origin", "") == "third_party")
+    message: "{{e.from.name}} subscribes to {{e.to.name}}, which {{g.inEdges(e.to.id, 'publishes').filter(x, x.from.type in ['external_party','saas'] || attr(x.from, 'origin', '') == 'third_party').map(x, x.from.name).join(', ')}} publish{{size(g.inEdges(e.to.id, 'publishes').filter(x, x.from.type in ['external_party','saas'] || attr(x.from, 'origin', '') == 'third_party')) == 1 ? 'es' : ''}} into, and declares no content screen: an outsider's message is the agent's input."
+    clauses: [OWASP:LLMTop10:LLM01, OWASP:AgenticTop10:ASI08, OWASP:AgenticTop10:ASI01, MAESTRO:L3]
+    remediation: "Screen the messages the agent consumes from the channel (content_safety=true on the agent), or put a screening consumer between the outside publisher and the agent."
+    patch_template:
+      - { op: add, path: "/nodes/{{e.from.id}}/attrs/content_safety", value: true }
+    fixtures: { positive: fixtures/ING-004.pos.json, negative: fixtures/ING-004.neg.json }
+    tags: [agentic, ingestion, queue, untrusted-input]

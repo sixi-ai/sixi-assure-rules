@@ -1,0 +1,77 @@
+{
+  "id": "arch_fx_aia_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture AIA-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Booking agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_ledger",
+      "type": "datastore",
+      "name": "Ledger",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_human",
+      "type": "human_step",
+      "name": "Approver",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "Case handler",
+        "approval_identity": "separate"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_human",
+      "kind": "writes",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

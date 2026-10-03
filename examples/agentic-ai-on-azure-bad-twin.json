@@ -1,4 +1,8 @@
 {
+  "schema_version": "1.1",
+  "identities": [
+    {"id": "ident_agent_id", "name": "Agent identity (agent_id)", "kind": "agent_identity", "attrs": {"x_migrated_from": "agent.identity=agent_id"}}
+  ],
   "id": "arch_demo_foundry_agent_bad",
   "tenant_id": "tenant_demo",
   "name": "Agentic AI on Azure — bad twin (autonomous agent, standing roles, no kill switch)",
@@ -99,7 +103,7 @@
       "attrs": {
         "exposure": "internal",
         "waf": true,
-        "authn": "oidc",
+        "authn": ["oidc"],
         "secrets_in": "secret_store",
         "region": "switzerlandnorth"
       }
@@ -163,7 +167,7 @@
       },
       "source": "design",
       "attrs": {
-        "identity": "agent_id",
+        "identity": "agent_id", "identity_id": "ident_agent_id",
         "autonomy": "autonomous",
         "purpose": "Triages customer payment exceptions, looks up customer context, drafts tickets and releases payments.",
         "owner": "Head of Operations",
@@ -406,11 +410,11 @@
       "from": "n_tool_cust",
       "to": "n_ledger",
       "kind": "reads",
-      "protocol": "tds",
+      "protocol": "sql",
       "auth": "connection_string",
       "encryption": "tls",
       "data_class": "cid",
-      "attrs": {}
+      "attrs": { "x_migrated_from": "protocol=tds" }
     },
     {
       "id": "e_agent_mcp_fx",
@@ -429,12 +433,13 @@
       "from": "n_agent",
       "to": "n_ledger",
       "kind": "writes",
-      "protocol": "tds",
+      "protocol": "sql",
       "auth": "agent_id",
       "encryption": "tls",
       "data_class": "cid",
       "label": "payment release (no approval)",
       "attrs": {
+        "x_migrated_from": "protocol=tds",
         "consequence": "high",
         "logged": true
       }

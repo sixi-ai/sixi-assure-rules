@@ -1,0 +1,67 @@
+# HOV — human oversight (docs/03 §HOV; docs/18 WS-I I2, agents/swarm/03-agentic-runtime-and-supply-chain/
+# human-oversight.md). Deterministic CEL over the human steps on an agent's paths: who signs the approval and what it
+# approves. The LLM never creates findings; a drawn human_step is a design claim, and the approval procedure behind it
+# is requested as evidence. HOV-003 (autonomous agent reaches a state-changing tool with no human step) ships in
+# mcp.yaml (docs/18 D2) and is not repeated here; AI-003 and AGT-006 stay where they are.
+#
+# One report per fact: human steps on a path to a machine are OT-006's (excluded by condition), and a GxP approval step
+# with a non-separate identity is GXP-002's (excluded under FDA and EU-GMP).
+pack: hov
+version: 0.1.0
+regimes: [AIACT, FINMA, OWASP, ISO, NIST, MAESTRO]
+offer: agentic
+rules:
+  # An absent approval_identity is not_checked (requires), never assumed separate and never a finding.
+  - id: HOV-001
+    title: Human step on an agent path signs under the agent's or a shared identity
+    scope: node
+    severity: high
+    condition: |
+      n.type == "human_step" && attr(n, "approval_identity", "") in ["agent","shared"] &&
+      g.nodes("agent").exists(a, g.reachable(a.id, n.id)) &&
+      !g.writersInto("edge_device").exists(w, g.reachable(n.id, w)) &&
+      !(size(attr(n, "approval_for", [])) > 0 && (regime("FDA") || regime("EU-GMP")))
+    requires: [n.attrs.approval_identity]
+    domain: 'n.type == "human_step" && g.nodes("agent").exists(a, g.reachable(a.id, n.id))'
+    message: "{{n.name}} approves what an agent proposes, but signs under {{attr(n, 'approval_identity', '') == 'agent' ? 'the identity of the agent' : 'a shared account'}}: the approval cannot be attributed to a person distinct from what it approves."
+    clauses: [AIACT:2024/1689:Art14, FINMA:08/2024:Governance, NIST:800-207:S2.1, ISO:27001:A.5.15, OWASP:AgenticTop10:ASI03]
+    remediation: "Have the approver sign with their own identity, distinct from the agent's and the executor's (approval_identity=separate); the authorisation record of the approver role is the evidence."
+    patch_template:
+      - { op: replace, path: "/nodes/{{n.id}}/attrs/approval_identity", value: separate }
+    fixtures: { positive: fixtures/HOV-001.pos.json, negative: fixtures/HOV-001.neg.json }
+    tags: [agentic, oversight, identity, approval]
+
+  # The step satisfies AI-003 structurally, yet nothing says which action it approves, so a reviewer cannot tell an
+  # approval from a notification. The empty approval scope is the finding; the scope is a question, never a patch.
+  - id: HOV-002
+    title: Approval step gates a consequential action but declares no approval scope
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "human_step" && size(attr(n, "approval_for", [])) == 0 &&
+      g.nodes("agent").exists(a, g.reachable(a.id, n.id)) &&
+      g.outEdges(n.id, "").exists(x, x.kind in ["writes","executes"] && attr(x, "consequence", "") == "high")
+    message: "{{n.name}} gates {{g.outEdges(n.id, '').filter(x, x.kind in ['writes','executes'] && attr(x, 'consequence', '') == 'high').map(x, x.to.name).join(', ')}} for an agent, but declares no approval scope (approval_for is empty): nothing says which action the person approves."
+    clauses: [AIACT:2024/1689:Art14, AIACT:2024/1689:Art14(4)(c), ISO:42001:A.9.4, FINMA:08/2024:Governance]
+    remediation: "Declare what the step approves (approval_for, for example the payment or the record change), so the approver, the reviewer and the log name the same action."
+    fixtures: { positive: fixtures/HOV-002.pos.json, negative: fixtures/HOV-002.neg.json }
+    tags: [agentic, oversight, approval]
+
+  # Schema 1.1 (ADR-047 §3): a drawn human_step is the structure, the disposition list the policy the runtime enforces
+  # per tool class; each absence is reported on its own. Restricted to autonomous agents; a semi agent's write reach is
+  # ARH-003's stop-and-cap question. The empty disposition list is the finding.
+  - id: HOV-004
+    title: Autonomous agent with write reach declares no human-in-the-loop disposition
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") == "autonomous" && size(attr(n, "human_in_the_loop", [])) == 0 &&
+      g.outEdges(n.id, "").exists(x, x.to.type in ["tool","mcp_server"] &&
+        (attr(x.to, "write_capable", false) || attr(x.to, "capabilities", []).exists(c, c in ["modifies_state","executes_code"])))
+    requires: [n.attrs.autonomy]
+    domain: 'n.type == "agent"'
+    message: "Autonomous agent {{n.name}} reaches {{g.outEdges(n.id, '').filter(x, x.to.type in ['tool','mcp_server'] && (attr(x.to, 'write_capable', false) || attr(x.to, 'capabilities', []).exists(c, c in ['modifies_state','executes_code']))).map(x, x.to.name).join(', ')}}, which change state or run code, and declares no human-in-the-loop disposition: nothing says for which tool classes it asks a person, defers or never acts."
+    clauses: [AIACT:2024/1689:Art14, AIACT:2024/1689:Art26, OWASP:AgenticTop10:ASI10, NIST:AIRMF:GOVERN]
+    remediation: "Declare per tool class what the agent does before acting (human_in_the_loop: ask, defer or deny), and route the classes that ask through a human step; the disposition is the architect's policy, so no value is proposed."
+    fixtures: { positive: fixtures/HOV-004.pos.json, negative: fixtures/HOV-004.neg.json }
+    tags: [agentic, oversight, autonomy]

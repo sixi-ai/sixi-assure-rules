@@ -1,0 +1,82 @@
+{
+  "id": "arch_fx_ot_008_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-008 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited",
+    "incident_reporting": "Plant CSIRT within 24 h (NIS2 Art. 23); CRA Art. 14 via the PSIRT."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_hs",
+      "type": "human_step",
+      "name": "Command approval",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "approver",
+        "approval_for": [
+          "command"
+        ],
+        "approval_identity": "separate"
+      }
+    },
+    {
+      "id": "n_val",
+      "type": "app",
+      "name": "Command validator",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "command_validation": true
+      }
+    },
+    {
+      "id": "n_plc",
+      "type": "edge_device",
+      "name": "PLC",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_hs_val",
+      "from": "n_hs",
+      "to": "n_val",
+      "kind": "executes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_val_plc",
+      "from": "n_val",
+      "to": "n_plc",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

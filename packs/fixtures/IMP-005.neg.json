@@ -1,0 +1,63 @@
+{
+  "id": "arch_fx_imp_005_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture IMP-005 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "DORA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "x_import_source": "terraform_plan",
+    "x_import_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_pe",
+      "type": "network",
+      "name": "Private endpoint",
+      "layer": "network",
+      "source": "declared",
+      "attrs": {
+        "x_iac_address": "azurerm_private_endpoint.db",
+        "x_iac_type": "azurerm_private_endpoint"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Core DB",
+      "layer": "data",
+      "source": "declared",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "pmk",
+        "backup": true,
+        "x_iac_address": "azurerm_mssql_database.core"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_pe",
+      "to": "n_db",
+      "kind": "flows",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

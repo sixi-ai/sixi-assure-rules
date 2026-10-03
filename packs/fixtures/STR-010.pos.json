@@ -1,0 +1,72 @@
+{
+  "id": "arch_fx_str_010_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture STR-010 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Orders service",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "c4_level": "container"
+      }
+    },
+    {
+      "id": "n_comp",
+      "type": "app",
+      "name": "Order repository",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "c4_level": "component",
+        "c4_parent": "n_app"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Orders DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "pmk",
+        "backup": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_comp_db",
+      "from": "n_comp",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "rule_id": "MR-001",
+    "ids": [
+      "n_guard"
+    ]
+  },
+  {
+    "rule_id": "MR-006",
+    "ids": [
+      "n_guard"
+    ]
+  },
+  {
+    "rule_id": "MR-007",
+    "ids": [
+      "n_decision_log"
+    ]
+  },
+  {
+    "rule_id": "MR-008",
+    "ids": [
+      "n_guard"
+    ]
+  }
+]

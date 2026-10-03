@@ -5,8 +5,9 @@
 # The Regulation applies from 20 January 2027; the delegated acts adding AI requirements to Annex III apply by
 # 2 August 2028 (Art. 8, as amended by Regulation (EU) 2026/1744) and are not loaded.
 pack: mr
-version: 0.1.0
+version: 0.2.0
 regimes: [MR]
+offer: industrial
 rules:
   - id: MR-001
     title: Self-evolving ML safety function without third-party conformity assessment
@@ -15,6 +16,8 @@ rules:
     condition: |
       regime("MR") && attr(n, "safety_function", false) && attr(n, "self_evolving", false) &&
       !(attr(n, "conformity_route", "") in ["module_b_c", "module_h", "module_g"])
+    requires: [n.attrs.safety_function, n.attrs.self_evolving]
+    domain: 'regime("MR") && n.type in ["edge_device","edge_gateway","edge_model"]'
     message: "{{n.name}} ensures a safety function with self-evolving machine-learning behaviour, an Annex I Part A category, but no notified-body procedure is recorded (conformity_route={{attr(n, 'conformity_route', 'not declared')}})."
     clauses: [MR:2023/1230:AnnexI-A5, MR:2023/1230:AnnexI-A6, MR:2023/1230:Art25(2), AIACT:2024/1689:Art6]
     remediation: "Plan the conformity assessment with a notified body — EU type-examination with conformity to type (module_b_c), full quality assurance (module_h) or unit verification (module_g) — and record it; or keep the learning out of the safety function and freeze the model that ensures it."
@@ -43,6 +46,8 @@ rules:
     condition: |
       regime("MR") && attr(n, "safety_function", false) && attr(n, "self_evolving", false) &&
       !g.nodes("log_sink").exists(l, attr(l, "retention_days", 0) >= 365 && g.dataFlows(n.id, l.id))
+    requires: [n.attrs.safety_function, n.attrs.self_evolving]
+    domain: 'regime("MR") && n.type in ["edge_device","edge_gateway","edge_model"]'
     message: "{{n.name}} is a self-evolving safety system, but its data reaches no log kept for at least a year: the data of its safety-related decision-making must be recorded and retained for one year."
     clauses: [MR:2023/1230:AnnexIII-1.2.1-SE, AIACT:2024/1689:Art12]
     remediation: "Send the inputs, outputs and model version of each safety-related decision to a log sink with retention_days ≥ 365, and keep the system correctable at all times."
@@ -62,3 +67,71 @@ rules:
     remediation: "Assess with the machine's risk assessment whether the AI command path creates a new hazard or increases a risk that needs new protective measures, and record the result (substantial_modification) with the decision; if substantial, run the conformity assessment as the manufacturer."
     fixtures: { positive: fixtures/MR-004.pos.json, negative: fixtures/MR-004.neg.json }
     tags: [machinery, substantial-modification, governance]
+
+  # Team 09 (agents/swarm/09-sector-packs/machinery-conformity.md, docs/18 WS-I I2): MR-005 to MR-008.
+  - id: MR-005
+    title: Safety model of a safety function carries no declared version
+    scope: node
+    severity: medium
+    condition: |
+      regime("MR") && n.type == "edge_model" && attr(n, "safety_function", false) && attr(n, "version", "") == ""
+    requires: [n.attrs.safety_function]
+    domain: 'regime("MR") && n.type == "edge_model"'
+    message: "{{n.name}} ensures a safety function, but no version of the model is declared: safety software must be identifiable, and every version uploaded after placing on the market appears in the tracing log and the technical documentation."
+    clauses: [MR:2023/1230:AnnexIII-1.1.9, MR:2023/1230:AnnexIII-1.2.1(f), MR:2023/1230:AnnexIV-A]
+    remediation: "Declare the version of the safety model that ships (version), record every later upload in the tracing log, and keep the version list in the technical documentation."
+    fixtures: { positive: fixtures/MR-005.pos.json, negative: fixtures/MR-005.neg.json }
+    tags: [machinery, safety-software, identification]
+
+  - id: MR-006
+    title: Write path from outside the site reaches a self-evolving safety function with neither validation nor a human step
+    scope: node
+    severity: high
+    # One reverse walk (ADR-088 §1) blocks a human step and a node declaring command_validation together, so two
+    # parallel paths, one through each control, are both controlled. upstreamAvoiding lists the controls that border
+    # the walk as sources too: a validator is the control, not the origin of an upload, so it is excluded as a source.
+    condition: |
+      regime("MR") && n.type in ["edge_model","edge_gateway"] &&
+      attr(n, "safety_function", false) && attr(n, "self_evolving", false) &&
+      g.upstreamAvoiding(n.id, ["human_step"], [], ["app", "api", "edge_device", "edge_gateway", "edge_model", "gateway"],
+        "command_validation").exists(c, !(c.layer in ["edge","human"]) &&
+          !(c.type in ["app", "api", "edge_device", "edge_gateway", "edge_model", "gateway"] && attr(c, "command_validation", false)))
+    requires: [n.attrs.safety_function, n.attrs.self_evolving]
+    domain: 'regime("MR") && n.type in ["edge_model","edge_gateway"]'
+    message: "{{n.name}} is a self-evolving safety function, and a component outside the site can reach it on a walk that passes neither a command validation nor a human step: a remote upload can change what the safety function does."
+    clauses: [MR:2023/1230:AnnexIII-1.2.1-SE, MR:2023/1230:AnnexIII-1.2.1, MR:2023/1230:AnnexIII-1.1.9, MR:2023/1230:AnnexIII-B1, AIACT:2024/1689:Art15(4)]
+    remediation: "Release every model or parameter upload to a learning safety function through a person (a human step under a separate identity) or a validator on the site side, and record the release in the tracing log."
+    fixtures: { positive: fixtures/MR-006.pos.json, negative: fixtures/MR-006.neg.json }
+    tags: [machinery, self-evolving, command-path]
+
+  - id: MR-007
+    title: Safety-decision log of a self-evolving safety system is not immutable
+    scope: node
+    severity: medium
+    condition: |
+      regime("MR") && n.type == "log_sink" && !attr(n, "immutable", false) &&
+      (g.nodes("edge_model") + g.nodes("edge_device") + g.nodes("edge_gateway")).exists(s,
+        attr(s, "safety_function", false) && attr(s, "self_evolving", false) && g.dataFlows(s.id, n.id))
+    message: "{{n.name}} receives the data of a self-evolving safety function, but it is not declared immutable: the record of safety-related decisions an authority may ask for could be altered."
+    clauses: [MR:2023/1230:AnnexIII-1.2.1-SE, MR:2023/1230:AnnexIII-1.1.9, MR:2023/1230:AnnexIII-1.2.1(f), AIACT:2024/1689:Art12]
+    remediation: "Keep the record of safety-related decisions in a sink nobody can edit (immutable=true) for at least the year the Regulation asks."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/immutable", value: true }
+    fixtures: { positive: fixtures/MR-007.pos.json, negative: fixtures/MR-007.neg.json }
+    tags: [machinery, self-evolving, decision-log]
+
+  - id: MR-008
+    title: Self-evolving safety function declared while the AI Act tier says minimal or limited
+    scope: node
+    severity: high
+    condition: |
+      regime("MR") && regime("AIACT") && n.type in ["edge_model","edge_device","edge_gateway"] &&
+      attr(n, "safety_function", false) && attr(n, "self_evolving", false) &&
+      attr(g, "ai_act_tier", "") in ["minimal", "limited"]
+    requires: [n.attrs.safety_function, n.attrs.self_evolving, g.attrs.ai_act_tier]
+    domain: 'regime("MR") && regime("AIACT") && n.type in ["edge_model","edge_device","edge_gateway"]'
+    message: "{{n.name}} is declared a self-evolving safety function of machinery, an Annex I Part A category with a third-party conformity assessment, while the architecture's AI Act tier is {{attr(g, 'ai_act_tier', '')}}: an AI system that is such a safety component is assessed as high-risk."
+    clauses: [AIACT:2024/1689:Art6, AIACT:2024/1689:AnnexI-SA(1), MR:2023/1230:Art8, MR:2023/1230:Art20(10), MR:2023/1230:AnnexI-A5]
+    remediation: "Review the AI Act tier against Article 6 with the safety function in view and record the decision (ai_act_tier), or record why the AI component is not a safety component of the machine."
+    fixtures: { positive: fixtures/MR-008.pos.json, negative: fixtures/MR-008.neg.json }
+    tags: [machinery, ai-act, classification]

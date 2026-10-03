@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_ing_003_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ING-003 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_partner",
+      "type": "external_party",
+      "name": "Partner feed",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "Ingestion gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "api",
+        "logging": true,
+        "content_safety": false,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ]
+      }
+    },
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Ingestion job",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_index",
+      "type": "vector_index",
+      "name": "Partner index",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "data_class": "internal",
+        "acl_trimming": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_partner",
+      "to": "n_gw",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_gw",
+      "to": "n_app",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e3",
+      "from": "n_app",
+      "to": "n_index",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

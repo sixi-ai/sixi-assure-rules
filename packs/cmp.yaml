@@ -1,0 +1,63 @@
+# CMP — model completeness (swarm spec model-completeness, agents/swarm/01-intake-and-model/model-completeness.md;
+# docs/18 WS-I I2). Deterministic CEL: each rule reports one undeclared fact on one node, so the checks that fact
+# silences can be named; the absence is the finding, so no rule takes a `requires:` list. No `regimes:` list and no
+# regime() guard: an undeclared fact silences a rule under every regime. None is a path rule and none fires on a note
+# (notes are never projected into the rules). CMP-005 reads gateway.functions[] (schema 1.1, ADR-047).
+pack: cmp
+version: 0.1.0
+offer: agentic
+rules:
+  - id: CMP-001
+    title: Data class undeclared on a store
+    scope: node
+    severity: low
+    condition: 'n.type in ["datastore", "vector_index"] && attr(n, "data_class", "") == ""'
+    message: "{{n.name}} declares no data class: the residency, key and data-flow rules that read it (DATA-001 to DATA-004) are not checked on it."
+    clauses: [MCSB:v1:DP-1, DORA:2022/2554:Art8]
+    remediation: "Declare the store's data class (attrs.data_class: public, internal, confidential, cid or pii) from the information classification register. The assistant never proposes a value."
+    fixtures: { positive: fixtures/CMP-001.pos.json, negative: fixtures/CMP-001.neg.json }
+    tags: [completeness, data]
+
+  - id: CMP-002
+    title: Agent autonomy undeclared
+    scope: node
+    severity: medium
+    condition: 'n.type == "agent" && !(attr(n, "autonomy", "") in ["assisted", "semi", "autonomous"])'
+    message: "{{n.name}} declares no autonomy: the kill-switch, per-hop trace and human-step rules keyed on an autonomous agent (AI-010, AI-011, AGT-006) are not checked on it."
+    clauses: [AIACT:2024/1689:Art14, FINMA:08/2024:Governance, MSFT:EntraAgentID]
+    remediation: "Declare the agent's autonomy (attrs.autonomy: assisted, semi or autonomous) as the design intends it. The assistant never proposes a value."
+    fixtures: { positive: fixtures/CMP-002.pos.json, negative: fixtures/CMP-002.neg.json }
+    tags: [completeness, agentic, oversight]
+
+  - id: CMP-003
+    title: Component origin undeclared
+    scope: node
+    severity: medium
+    condition: 'n.type in ["tool", "mcp_server"] && !(attr(n, "origin", "") in ["first_party", "third_party"])'
+    message: "{{n.name}} declares no origin: the supply-chain rules keyed on a third-party component (AGT-001, AGT-003, AGT-004, AGT-007, AI-009) are not checked on it."
+    clauses: [OWASP:AgenticTop10:ASI04, ISO:27001:A.5.21, FINMA:08/2024:Inventory]
+    remediation: "Declare whether the tool or MCP server is first- or third-party (attrs.origin) from the supplier inventory. The assistant never proposes a value."
+    fixtures: { positive: fixtures/CMP-003.pos.json, negative: fixtures/CMP-003.neg.json }
+    tags: [completeness, supply-chain]
+
+  - id: CMP-004
+    title: Exposure undeclared on an app or API that is called
+    scope: node
+    severity: low
+    condition: 'n.type in ["app", "api"] && !(attr(n, "exposure", "") in ["internal", "public"]) && size(g.in(n.id, "calls")) > 0'
+    message: "{{n.name}} is called but declares its exposure as {{attr(n, 'exposure', '') == '' ? 'nothing' : attr(n, 'exposure', '')}}: the WAF, API-key and MFA rules on public surfaces (NET-003, ZT-006, ZT-009) are not checked on it."
+    clauses: [MCSB:v1:NS-2, NIST:800-207:S2]
+    remediation: "Declare whether the app or API is reachable from outside (attrs.exposure: internal or public). The assistant never proposes a value."
+    fixtures: { positive: fixtures/CMP-004.pos.json, negative: fixtures/CMP-004.neg.json }
+    tags: [completeness, exposure]
+
+  - id: CMP-005
+    title: Gateway functions undeclared
+    scope: node
+    severity: low
+    condition: 'n.type == "gateway" && size(g.in(n.id, "calls")) > 0 && size(attr(n, "functions", [])) == 0'
+    message: "{{n.name}} is called but declares no functions: what it enforces on the path (policy, observability, identity termination) is read from its kind alone, and the function checks of the gateway rules are not checked on it."
+    clauses: [MSFT:APIM-GenAI, NIST:800-207:S2]
+    remediation: "Declare the functions the gateway enforces (attrs.functions[], schema 1.1) from its configured policies. The assistant never proposes a value."
+    fixtures: { positive: fixtures/CMP-005.pos.json, negative: fixtures/CMP-005.neg.json }
+    tags: [completeness, gateway]

@@ -1,0 +1,1496 @@
+{
+  "schema_version": "1.2",
+  "identities": [
+    {
+      "id": "ident_agent",
+      "name": "Agent identity (service assistant)",
+      "kind": "agent_identity",
+      "attrs": {}
+    }
+  ],
+  "id": "arch_team04_gateways_bad",
+  "tenant_id": "tenant_templates",
+  "name": "Service portal with partner APIs, AI gateway and plant telemetry (bad twin)",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Digital Platform",
+    "description": "A service portal and a partner order API on Azure: a WAF and API Management front the public entries, an assistant agent reaches the model through an AI gateway and retrieves from three indexes, a reporting app and a batch summariser call their own models, a vendor MCP server fetches quotes, and a plant edge gateway sends telemetry through a DMZ. Bad twin of team04-gateways-network-data: gateways, exposure, zones, co-location, residency and retrieval each carry one gap.",
+    "criticality": "high",
+    "ai_act_tier": "limited",
+    "materiality": "medium",
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "regimes": [
+      "AIACT",
+      "GDPR",
+      "IEC",
+      "MSFT"
+    ],
+    "incident_reporting": "Security incidents are escalated to the CISO on-call within 1 h; personal-data breaches are assessed by the DPO.",
+    "dr_tested_at": "2026-06-30"
+  },
+  "groups": [
+    {
+      "id": "g_users",
+      "kind": "zone",
+      "name": "Staff",
+      "node_ids": [
+        "n_user"
+      ]
+    },
+    {
+      "id": "g_partner",
+      "kind": "zone",
+      "name": "Partners and SaaS",
+      "node_ids": [
+        "n_partner",
+        "n_saas",
+        "n_quotes"
+      ]
+    },
+    {
+      "id": "g_cloud",
+      "kind": "zone",
+      "name": "Azure – Switzerland North",
+      "node_ids": [
+        "n_waf",
+        "n_web",
+        "n_apigw",
+        "n_api",
+        "n_statusgw",
+        "n_status",
+        "n_agent",
+        "n_aigw",
+        "n_llm",
+        "n_reports",
+        "n_apim_rep",
+        "n_llm_rep",
+        "n_batch",
+        "n_batchgw",
+        "n_llm_batch",
+        "n_pdf",
+        "n_fs_mcp",
+        "n_mcp",
+        "n_mcpgw",
+        "n_eval",
+        "n_egress",
+        "n_kv",
+        "n_kv_keys",
+        "n_sql",
+        "n_crm",
+        "n_lake",
+        "n_idx",
+        "n_idx_hr",
+        "n_logs",
+        "n_ingest",
+        "n_queue"
+      ]
+    },
+    {
+      "id": "g_hr",
+      "kind": "zone",
+      "name": "HR data zone",
+      "node_ids": [
+        "n_idx_ops",
+        "n_hr_docs"
+      ]
+    },
+    {
+      "id": "g_ops",
+      "kind": "zone",
+      "name": "Operations data zone",
+      "node_ids": [
+        "n_runner",
+        "n_ops_docs"
+      ]
+    },
+    {
+      "id": "g_plant",
+      "kind": "zone",
+      "name": "Plant A",
+      "node_ids": [
+        "n_egw",
+        "n_dmz",
+        "n_hist"
+      ]
+    },
+    {
+      "id": "g_agent_tb",
+      "kind": "trust_boundary",
+      "name": "Agent runtime",
+      "node_ids": [
+        "n_agent",
+        "n_aigw",
+        "n_mcpgw"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_user",
+      "type": "user",
+      "name": "Service staff",
+      "layer": "human",
+      "zone": "g_users",
+      "position": {
+        "x": 40,
+        "y": 120
+      },
+      "source": "design",
+      "attrs": {
+        "population": "employee",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_partner",
+      "type": "external_party",
+      "name": "Partner dealer system",
+      "layer": "human",
+      "zone": "g_partner",
+      "position": {
+        "x": 40,
+        "y": 360
+      },
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_saas",
+      "type": "saas",
+      "name": "Partner CRM (SaaS)",
+      "layer": "app",
+      "zone": "g_partner",
+      "position": {
+        "x": 40,
+        "y": 480
+      },
+      "source": "design",
+      "attrs": {
+        "provider": "other",
+        "region": "switzerlandnorth",
+        "criticality": "medium"
+      }
+    },
+    {
+      "id": "n_waf",
+      "type": "gateway",
+      "name": "Front Door + WAF",
+      "layer": "network",
+      "zone": "g_cloud",
+      "position": {
+        "x": 260,
+        "y": 120
+      },
+      "source": "design",
+      "attrs": {
+        "kind": "waf",
+        "logging": true,
+        "functions": [
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_web",
+      "type": "app",
+      "name": "Service portal",
+      "layer": "app",
+      "zone": "g_cloud",
+      "position": {
+        "x": 480,
+        "y": 120
+      },
+      "source": "design",
+      "attrs": {
+        "exposure": "public",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store",
+        "criticality": "high",
+        "region": "switzerlandnorth",
+        "waf": true
+      }
+    },
+    {
+      "id": "n_apigw",
+      "type": "gateway",
+      "name": "API Management (partner APIs)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 260,
+        "y": 360
+      },
+      "source": "design",
+      "attrs": {
+        "kind": "api",
+        "logging": true,
+        "functions": [
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Partner order API",
+      "layer": "app",
+      "zone": "g_cloud",
+      "position": {
+        "x": 480,
+        "y": 360
+      },
+      "source": "design",
+      "attrs": {
+        "exposure": "public",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store",
+        "criticality": "high",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_statusgw",
+      "type": "gateway",
+      "name": "Status page gateway",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 260,
+        "y": 240
+      },
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "functions": [
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_status",
+      "type": "app",
+      "name": "Public status page",
+      "layer": "app",
+      "zone": "g_cloud",
+      "position": {
+        "x": 480,
+        "y": 240
+      },
+      "source": "design",
+      "attrs": {
+        "exposure": "public",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store",
+        "criticality": "high",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Service assistant agent",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "position": {
+        "x": 700,
+        "y": 120
+      },
+      "source": "design",
+      "attrs": {
+        "output_marking": true,
+        "identity": "agent_id",
+        "identity_id": "ident_agent",
+        "autonomy": "assisted",
+        "purpose": "Answers service questions for partners and staff, grounded on approved documents.",
+        "owner": "Head of Digital Platform",
+        "materiality": "medium",
+        "kill_switch": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "rate_limit": true,
+        "criticality": "high",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_aigw",
+      "type": "gateway",
+      "name": "AI gateway (APIM GenAI policies)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 920,
+        "y": 120
+      },
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "token_limits": true,
+        "content_safety": true,
+        "semantic_cache": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI (Foundry)",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1140,
+        "y": 120
+      },
+      "source": "design",
+      "attrs": {
+        "model_card": true,
+        "provider": "azure",
+        "model": "gpt-4.1",
+        "region": "westeurope",
+        "network": "private",
+        "content_safety": true,
+        "outsourcing_registered": true,
+        "exit_strategy": true,
+        "purpose": "Generation model.",
+        "owner": "Head of Digital Platform",
+        "materiality": "medium",
+        "criticality": "high"
+      }
+    },
+    {
+      "id": "n_reports",
+      "type": "app",
+      "name": "Reporting app",
+      "layer": "app",
+      "zone": "g_cloud",
+      "position": {
+        "x": 700,
+        "y": 600
+      },
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store",
+        "criticality": "high",
+        "region": "switzerlandnorth",
+        "hosted_on": "n_vm_missing"
+      }
+    },
+    {
+      "id": "n_apim_rep",
+      "type": "gateway",
+      "name": "API Management (reporting)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 920,
+        "y": 600
+      },
+      "source": "design",
+      "attrs": {
+        "kind": "api",
+        "logging": true,
+        "token_limits": true,
+        "content_safety": true,
+        "functions": [
+          "identity_termination"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_llm_rep",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI (reporting)",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1140,
+        "y": 600
+      },
+      "source": "design",
+      "attrs": {
+        "model_card": true,
+        "provider": "azure",
+        "model": "gpt-4.1",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "content_safety": true,
+        "outsourcing_registered": true,
+        "exit_strategy": true,
+        "purpose": "Generation model.",
+        "owner": "Head of Digital Platform",
+        "materiality": "medium",
+        "criticality": "high"
+      }
+    },
+    {
+      "id": "n_batch",
+      "type": "app",
+      "name": "Batch summariser",
+      "layer": "app",
+      "zone": "g_cloud",
+      "position": {
+        "x": 700,
+        "y": 720
+      },
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store",
+        "criticality": "high",
+        "region": "switzerlandnorth",
+        "hosted_on": "n_runner"
+      }
+    },
+    {
+      "id": "n_runner",
+      "type": "api",
+      "name": "Batch runner",
+      "layer": "app",
+      "zone": "g_ops",
+      "position": {
+        "x": 700,
+        "y": 840
+      },
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store",
+        "criticality": "high",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_batchgw",
+      "type": "gateway",
+      "name": "AI gateway (batch)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 920,
+        "y": 720
+      },
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": false,
+        "token_limits": true,
+        "content_safety": true,
+        "functions": [
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_llm_batch",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI (batch)",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1140,
+        "y": 720
+      },
+      "source": "design",
+      "attrs": {
+        "model_card": true,
+        "provider": "azure",
+        "model": "gpt-4.1",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "content_safety": true,
+        "outsourcing_registered": true,
+        "exit_strategy": true,
+        "purpose": "Generation model.",
+        "owner": "Head of Digital Platform",
+        "materiality": "medium",
+        "criticality": "high"
+      }
+    },
+    {
+      "id": "n_pdf",
+      "type": "tool",
+      "name": "PDF renderer",
+      "layer": "app",
+      "zone": "g_cloud",
+      "position": {
+        "x": 700,
+        "y": 960
+      },
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "reports.render"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "reads_filesystem"
+        ],
+        "hosted_on": "n_vm_missing"
+      }
+    },
+    {
+      "id": "n_fs_mcp",
+      "type": "mcp_server",
+      "name": "Files MCP server (stdio)",
+      "layer": "app",
+      "zone": "g_cloud",
+      "position": {
+        "x": 480,
+        "y": 600
+      },
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "files.read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "reads_filesystem"
+        ]
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Market data MCP server (vendor)",
+      "layer": "app",
+      "zone": "g_cloud",
+      "position": {
+        "x": 920,
+        "y": 0
+      },
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "quotes.read"
+        ],
+        "vetted": true,
+        "integrity": "pinned",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "network_egress"
+        ]
+      }
+    },
+    {
+      "id": "n_mcpgw",
+      "type": "gateway",
+      "name": "MCP gateway (APIM MCP)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 700,
+        "y": 0
+      },
+      "source": "design",
+      "attrs": {
+        "kind": "mcp",
+        "logging": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_eval",
+      "type": "evaluation",
+      "name": "Evaluation and drift monitoring",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "position": {
+        "x": 480,
+        "y": 1080
+      },
+      "source": "design",
+      "attrs": {
+        "evaluates": [
+          "accuracy",
+          "drift",
+          "prompt_injection"
+        ],
+        "owner": "Head of Digital Platform",
+        "purpose": "Weekly evaluation of logged prompts and answers."
+      }
+    },
+    {
+      "id": "n_egress",
+      "type": "gateway",
+      "name": "Egress proxy",
+      "layer": "network",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1140,
+        "y": 0
+      },
+      "source": "design",
+      "attrs": {
+        "kind": "egress",
+        "logging": true,
+        "functions": [
+          "egress",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_quotes",
+      "type": "saas",
+      "name": "Quote feed (SaaS)",
+      "layer": "app",
+      "zone": "g_partner",
+      "position": {
+        "x": 1360,
+        "y": 0
+      },
+      "source": "design",
+      "attrs": {
+        "provider": "other",
+        "region": "switzerlandnorth",
+        "criticality": "medium"
+      }
+    },
+    {
+      "id": "n_kv",
+      "type": "secret_store",
+      "name": "Key Vault (app secrets)",
+      "layer": "identity",
+      "zone": "g_cloud",
+      "position": {
+        "x": 480,
+        "y": 480
+      },
+      "source": "design",
+      "attrs": {
+        "region": "switzerlandnorth",
+        "key_use": "secrets",
+        "network_exposure": "public"
+      }
+    },
+    {
+      "id": "n_kv_keys",
+      "type": "secret_store",
+      "name": "Key Vault (data keys)",
+      "layer": "identity",
+      "zone": "g_cloud",
+      "position": {
+        "x": 260,
+        "y": 600
+      },
+      "source": "design",
+      "attrs": {
+        "region": "westeurope",
+        "key_use": "data_encryption",
+        "network_exposure": "private"
+      }
+    },
+    {
+      "id": "n_sql",
+      "type": "datastore",
+      "name": "Orders SQL DB",
+      "layer": "data",
+      "zone": "g_cloud",
+      "position": {
+        "x": 700,
+        "y": 360
+      },
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "pii",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "criticality": "high",
+        "rto_min": 60,
+        "rpo_min": 15,
+        "retention_days": 3650
+      }
+    },
+    {
+      "id": "n_crm",
+      "type": "datastore",
+      "name": "Customer master data",
+      "layer": "data",
+      "zone": "g_cloud",
+      "position": {
+        "x": 920,
+        "y": 360
+      },
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "pii",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "criticality": "high",
+        "rto_min": 60,
+        "rpo_min": 15,
+        "retention_days": 3650
+      }
+    },
+    {
+      "id": "n_lake",
+      "type": "datastore",
+      "name": "Analytics lake",
+      "layer": "data",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1140,
+        "y": 360
+      },
+      "source": "design",
+      "attrs": {
+        "engine": "adls",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "criticality": "high",
+        "rto_min": 60,
+        "rpo_min": 15,
+        "retention_days": 3650
+      }
+    },
+    {
+      "id": "n_idx",
+      "type": "vector_index",
+      "name": "Service knowledge index",
+      "layer": "data",
+      "zone": "g_cloud",
+      "position": {
+        "x": 920,
+        "y": 240
+      },
+      "source": "design",
+      "attrs": {
+        "data_class": "cid",
+        "acl_trimming": true,
+        "redaction": true,
+        "classification": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_idx_hr",
+      "type": "vector_index",
+      "name": "HR policy index",
+      "layer": "data",
+      "zone": "g_cloud",
+      "position": {
+        "x": 1140,
+        "y": 240
+      },
+      "source": "design",
+      "attrs": {
+        "data_class": "pii",
+        "acl_trimming": true,
+        "redaction": false,
+        "classification": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_idx_ops",
+      "type": "vector_index",
+      "name": "Operations index",
+      "layer": "data",
+      "zone": "g_hr",
+      "position": {
+        "x": 1360,
+        "y": 360
+      },
+      "source": "design",
+      "attrs": {
+        "data_class": "internal",
+        "acl_trimming": false,
+        "redaction": true,
+        "classification": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_hr_docs",
+      "type": "datastore",
+      "name": "HR documents",
+      "layer": "data",
+      "zone": "g_hr",
+      "position": {
+        "x": 1360,
+        "y": 480
+      },
+      "source": "design",
+      "attrs": {
+        "engine": "blob",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "criticality": "high",
+        "rto_min": 60,
+        "rpo_min": 15,
+        "retention_days": 3650
+      }
+    },
+    {
+      "id": "n_ops_docs",
+      "type": "datastore",
+      "name": "Operations documents",
+      "layer": "data",
+      "zone": "g_ops",
+      "position": {
+        "x": 1360,
+        "y": 600
+      },
+      "source": "design",
+      "attrs": {
+        "engine": "blob",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "criticality": "high",
+        "rto_min": 60,
+        "rpo_min": 15,
+        "retention_days": 3650
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Log Analytics (immutable archive)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 480,
+        "y": 960
+      },
+      "source": "design",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_egw",
+      "type": "edge_gateway",
+      "name": "Plant edge gateway",
+      "layer": "edge",
+      "zone": "g_plant",
+      "position": {
+        "x": 40,
+        "y": 720
+      },
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": false
+      }
+    },
+    {
+      "id": "n_dmz",
+      "type": "dmz",
+      "name": "Plant DMZ",
+      "layer": "network",
+      "zone": "g_plant",
+      "position": {
+        "x": 260,
+        "y": 720
+      },
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_hist",
+      "type": "app",
+      "name": "Plant historian",
+      "layer": "app",
+      "zone": "g_plant",
+      "position": {
+        "x": 260,
+        "y": 840
+      },
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store",
+        "criticality": "medium"
+      }
+    },
+    {
+      "id": "n_ingest",
+      "type": "api",
+      "name": "Telemetry ingest API",
+      "layer": "app",
+      "zone": "g_cloud",
+      "position": {
+        "x": 480,
+        "y": 720
+      },
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store",
+        "criticality": "high",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_queue",
+      "type": "queue",
+      "name": "Telemetry queue",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "position": {
+        "x": 480,
+        "y": 840
+      },
+      "source": "design",
+      "attrs": {
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_user_waf",
+      "from": "n_user",
+      "to": "n_waf",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_waf_web",
+      "from": "n_waf",
+      "to": "n_web",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_web_agent",
+      "from": "n_web",
+      "to": "n_agent",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_user_statusgw",
+      "from": "n_user",
+      "to": "n_statusgw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_statusgw_status",
+      "from": "n_statusgw",
+      "to": "n_status",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_partner_apigw",
+      "from": "n_partner",
+      "to": "n_apigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_apigw_api",
+      "from": "n_apigw",
+      "to": "n_api",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_api_sql",
+      "from": "n_api",
+      "to": "n_sql",
+      "kind": "writes",
+      "protocol": "sql",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {}
+    },
+    {
+      "id": "e_saas_apigw",
+      "from": "n_saas",
+      "to": "n_apigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_agent_aigw",
+      "from": "n_agent",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_aigw_llm",
+      "from": "n_aigw",
+      "to": "n_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {
+        "logged": true,
+        "prompt_contains": "cid"
+      }
+    },
+    {
+      "id": "e_agent_idx",
+      "from": "n_agent",
+      "to": "n_idx",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "api_key",
+      "encryption": "tls",
+      "data_class": "cid",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_agent_idx_hr",
+      "from": "n_agent",
+      "to": "n_idx_hr",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_agent_idx_ops",
+      "from": "n_agent",
+      "to": "n_idx_ops",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_agent_crm",
+      "from": "n_agent",
+      "to": "n_crm",
+      "kind": "reads",
+      "protocol": "sql",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_reports_fsmcp",
+      "from": "n_reports",
+      "to": "n_fs_mcp",
+      "kind": "calls",
+      "protocol": "mcp_stdio",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_agent_mcpgw",
+      "from": "n_agent",
+      "to": "n_mcpgw",
+      "kind": "calls",
+      "protocol": "mcp_http",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_mcpgw_mcp",
+      "from": "n_mcpgw",
+      "to": "n_mcp",
+      "kind": "calls",
+      "protocol": "mcp_http",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_eval_logs",
+      "from": "n_eval",
+      "to": "n_logs",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_crm_lake",
+      "from": "n_crm",
+      "to": "n_lake",
+      "kind": "flows",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {}
+    },
+    {
+      "id": "e_hr_idx_ops",
+      "from": "n_hr_docs",
+      "to": "n_idx_ops",
+      "kind": "flows",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_web_kv",
+      "from": "n_web",
+      "to": "n_kv",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "secret",
+      "attrs": {}
+    },
+    {
+      "id": "e_sql_kv_keys",
+      "from": "n_sql",
+      "to": "n_kv_keys",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "secret",
+      "attrs": {}
+    },
+    {
+      "id": "e_reports_apim",
+      "from": "n_reports",
+      "to": "n_apim_rep",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_apim_llm_rep",
+      "from": "n_apim_rep",
+      "to": "n_llm_rep",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_batch_runner",
+      "from": "n_batch",
+      "to": "n_runner",
+      "kind": "calls",
+      "protocol": "other",
+      "auth": "managed_identity",
+      "encryption": "none",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_batch_gw",
+      "from": "n_batch",
+      "to": "n_batchgw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_batchgw_llm",
+      "from": "n_batchgw",
+      "to": "n_llm_batch",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_reports_pdf",
+      "from": "n_reports",
+      "to": "n_pdf",
+      "kind": "calls",
+      "protocol": "other",
+      "auth": "managed_identity",
+      "encryption": "none",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_egw_dmz",
+      "from": "n_egw",
+      "to": "n_dmz",
+      "kind": "publishes",
+      "protocol": "mqtt",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_dmz_hist",
+      "from": "n_dmz",
+      "to": "n_hist",
+      "kind": "publishes",
+      "protocol": "mqtt",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_ingest_queue",
+      "from": "n_ingest",
+      "to": "n_queue",
+      "kind": "publishes",
+      "protocol": "amqp",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_aigw_logs",
+      "from": "n_aigw",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_agent_logs",
+      "from": "n_agent",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_apigw_logs",
+      "from": "n_apigw",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_partner_api",
+      "from": "n_partner",
+      "to": "n_api",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_saas_sql",
+      "from": "n_saas",
+      "to": "n_sql",
+      "kind": "reads",
+      "protocol": "sql",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {}
+    },
+    {
+      "id": "e_mcp_quotes",
+      "from": "n_mcp",
+      "to": "n_quotes",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_egw_ingest",
+      "from": "n_egw",
+      "to": "n_ingest",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_ops_idx_ops",
+      "from": "n_ops_docs",
+      "to": "n_idx_ops",
+      "kind": "flows",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

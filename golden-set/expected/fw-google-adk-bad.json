@@ -1,0 +1,32 @@
+[
+  {
+    "rule_id": "FW-001",
+    "ids": [
+      "n_sessions"
+    ]
+  },
+  {
+    "rule_id": "FW-005",
+    "ids": [
+      "n_loop"
+    ]
+  },
+  {
+    "rule_id": "FW-006",
+    "ids": [
+      "e_loop_research"
+    ]
+  },
+  {
+    "rule_id": "FW-009",
+    "ids": [
+      "n_server"
+    ]
+  },
+  {
+    "rule_id": "FW-010",
+    "ids": [
+      "n_research"
+    ]
+  }
+]

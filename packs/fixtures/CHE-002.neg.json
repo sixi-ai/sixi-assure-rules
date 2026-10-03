@@ -1,0 +1,103 @@
+{
+  "id": "arch_fx_che_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CHE-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FADP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_user",
+      "type": "user",
+      "name": "Customer",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "population": "customer",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Claims agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "autonomous",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Claims store",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "sql",
+        "data_class": "pii",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_human",
+      "type": "human_step",
+      "name": "Case handler",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "case handler",
+        "approval_identity": "separate"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_user",
+      "to": "n_agent",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_agent",
+      "to": "n_human",
+      "kind": "delegates",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_human",
+      "to": "n_db",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

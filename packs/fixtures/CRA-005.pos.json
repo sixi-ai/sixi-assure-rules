@@ -1,0 +1,90 @@
+{
+  "id": "arch_fx_cra_005_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CRA-005 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "CRA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Actively exploited vulnerabilities reported through the PSIRT."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_prod",
+      "type": "product",
+      "name": "Agent appliance",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "cra_scope": true,
+        "sbom": true,
+        "secure_boot": true,
+        "ota_signed": true,
+        "version": "1.4.0",
+        "owner": "Fixture owner"
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Appliance agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "content_safety": true,
+        "c4_parent": "n_prod"
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Appliance API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "c4_parent": "n_prod"
+      }
+    },
+    {
+      "id": "n_sink",
+      "type": "log_sink",
+      "name": "Appliance log",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 365,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_api_sink",
+      "from": "n_api",
+      "to": "n_sink",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

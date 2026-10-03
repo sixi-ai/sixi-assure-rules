@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_arh_001_tool_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ARH-001 tool (pos)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "OWASP",
+      "MAESTRO",
+      "MCSB"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Autonomous analyst agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "autonomous",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "sandbox": "container"
+      }
+    },
+    {
+      "id": "n_tool",
+      "type": "tool",
+      "name": "Code executor",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "capabilities": [
+          "executes_code"
+        ],
+        "origin": "first_party",
+        "egress_policy": "disabled",
+        "sandbox": "process"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_tool",
+      "kind": "executes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -75,17 +75,13 @@
   ],
   "edges": [
     {
-      "id": "e1",
+      "id": "e2",
       "from": "n_agent",
-      "to": "n_human",
-      "kind": "executes",
+      "to": "n_logs",
+      "kind": "writes",
       "auth": "agent_id",
       "encryption": "tls",
-      "attrs": {
-        "consequence": "high",
-        "logged": true
-      },
-      "data_class": "cid"
+      "attrs": {}
     },
     {
       "id": "e3",
@@ -101,13 +97,17 @@
       "data_class": "cid"
     },
     {
-      "id": "e2",
+      "id": "e4",
       "from": "n_agent",
-      "to": "n_logs",
-      "kind": "writes",
+      "to": "n_human",
+      "kind": "executes",
       "auth": "agent_id",
       "encryption": "tls",
-      "attrs": {}
+      "attrs": {
+        "consequence": "high",
+        "logged": true
+      },
+      "data_class": "cid"
     }
   ],
   "findings": [],

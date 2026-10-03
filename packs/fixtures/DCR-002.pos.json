@@ -1,0 +1,82 @@
+{
+  "id": "arch_fx_dcr_002_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DCR-002 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FADP",
+      "FINMA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Customer DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "pii",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      }
+    },
+    {
+      "id": "n_kv",
+      "type": "secret_store",
+      "name": "Key Vault (data keys)",
+      "layer": "identity",
+      "source": "design",
+      "attrs": {
+        "key_use": "data_encryption",
+        "network_exposure": "private",
+        "region": "eastus"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_db",
+      "to": "n_kv",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

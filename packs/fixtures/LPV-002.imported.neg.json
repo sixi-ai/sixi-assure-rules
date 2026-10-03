@@ -1,0 +1,82 @@
+{
+  "id": "arch_fx_lpv_002_imported_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture LPV-002 (an imported tool whose scopes: [] is the importer's placeholder: silent and not_checked, ADR-093-C2)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Research agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 02 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "tool_scopes": [
+          "docs.read"
+        ]
+      }
+    },
+    {
+      "id": "n_tool",
+      "type": "tool",
+      "name": "Docs tool",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [],
+        "vetted": true,
+        "logged": true,
+        "write_capable": false,
+        "owner": "Fixture owner"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_tool",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": [],
+  "provenance": {
+    "/nodes/n_tool": {
+      "kind": "imported",
+      "identifier": "mcp_server_json:weather",
+      "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "imported_by": "usr_fixture",
+      "imported_at": "2026-09-30T08:00:00Z",
+      "fetched_at": "2026-09-30T08:00:00Z",
+      "last_seen_import": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "cadence_days": 30
+    }
+  }
+}

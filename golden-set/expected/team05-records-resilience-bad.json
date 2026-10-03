@@ -1,0 +1,128 @@
+[
+  {
+    "rule_id": "EVD-001",
+    "ids": [
+      "n_logs_ev"
+    ]
+  },
+  {
+    "rule_id": "EVD-003",
+    "ids": [
+      "e_b_sec"
+    ]
+  },
+  {
+    "rule_id": "EVL-001",
+    "ids": [
+      "n_eval_offline"
+    ]
+  },
+  {
+    "rule_id": "EVL-002",
+    "ids": [
+      "n_agent_c"
+    ]
+  },
+  {
+    "rule_id": "EVL-002",
+    "ids": [
+      "n_agent_d"
+    ]
+  },
+  {
+    "rule_id": "EVL-003",
+    "ids": [
+      "n_eval"
+    ]
+  },
+  {
+    "rule_id": "EVL-004",
+    "ids": [
+      "n_eval"
+    ]
+  },
+  {
+    "rule_id": "IRR-002",
+    "ids": [
+      "arch_gs_team05_records_resilience_bad"
+    ]
+  },
+  {
+    "rule_id": "IRR-003",
+    "ids": [
+      "arch_gs_team05_records_resilience_bad"
+    ]
+  },
+  {
+    "rule_id": "IRR-004",
+    "ids": [
+      "arch_gs_team05_records_resilience_bad"
+    ]
+  },
+  {
+    "rule_id": "LOG-003",
+    "ids": [
+      "n_logs_ev"
+    ]
+  },
+  {
+    "rule_id": "LOG-003",
+    "ids": [
+      "n_logs_sec"
+    ]
+  },
+  {
+    "rule_id": "LOG-006",
+    "ids": [
+      "n_agent_c"
+    ]
+  },
+  {
+    "rule_id": "LOG-007",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "LOG-007",
+    "ids": [
+      "n_agent_b"
+    ]
+  },
+  {
+    "rule_id": "LOG-007",
+    "ids": [
+      "n_agent_d"
+    ]
+  },
+  {
+    "rule_id": "LOG-009",
+    "ids": [
+      "n_agent_d"
+    ]
+  },
+  {
+    "rule_id": "RES-004",
+    "ids": [
+      "n_app"
+    ]
+  },
+  {
+    "rule_id": "RES-005",
+    "ids": [
+      "n_app"
+    ]
+  },
+  {
+    "rule_id": "RES-007",
+    "ids": [
+      "n_logs_ev"
+    ]
+  },
+  {
+    "rule_id": "CMP-005",
+    "ids": [
+      "n_gw"
+    ]
+  }
+]

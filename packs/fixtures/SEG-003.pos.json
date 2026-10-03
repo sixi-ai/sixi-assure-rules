@@ -1,0 +1,93 @@
+{
+  "id": "arch_fx_seg_003_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SEG-003 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_a",
+      "kind": "zone",
+      "name": "Plant zone",
+      "node_ids": [
+        "n_egw",
+        "n_dmz",
+        "n_api"
+      ],
+      "attrs": {}
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_egw",
+      "type": "edge_gateway",
+      "name": "Edge gateway",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": true,
+        "sbom": true
+      },
+      "zone": "g_a"
+    },
+    {
+      "id": "n_dmz",
+      "type": "dmz",
+      "name": "Plant DMZ",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {},
+      "zone": "g_a"
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Ingest API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      },
+      "zone": "g_a"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_egw",
+      "to": "n_dmz",
+      "kind": "flows",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_dmz",
+      "to": "n_api",
+      "kind": "flows",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

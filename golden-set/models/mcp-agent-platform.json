@@ -1,0 +1,1268 @@
+{
+  "schema_version": "1.2",
+  "identities": [
+    {
+      "id": "id_orch",
+      "name": "Orchestrator agent identity",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/11111111-2222-3333-4444-555555555555/v2.0",
+      "federation": "entra_agent_id",
+      "credential_type": "federated",
+      "credential_ttl": 3600,
+      "sponsor": "Head of Research Platforms",
+      "owner": "Head of Agent Platform",
+      "blueprint": "Platform agent blueprint",
+      "registry": "n_reg",
+      "trust_domain": "contoso.onmicrosoft.com"
+    },
+    {
+      "id": "id_worker",
+      "name": "Research worker identity",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/11111111-2222-3333-4444-555555555555/v2.0",
+      "federation": "entra_agent_id",
+      "credential_type": "federated",
+      "credential_ttl": 3600,
+      "sponsor": "Head of Research Platforms",
+      "owner": "Head of Agent Platform",
+      "blueprint": "Platform agent blueprint",
+      "registry": "n_reg",
+      "trust_domain": "contoso.onmicrosoft.com"
+    },
+    {
+      "id": "id_report",
+      "name": "Report agent identity",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/11111111-2222-3333-4444-555555555555/v2.0",
+      "federation": "entra_agent_id",
+      "credential_type": "federated",
+      "credential_ttl": 3600,
+      "sponsor": "Head of Research Platforms",
+      "owner": "Head of Agent Platform",
+      "blueprint": "Platform agent blueprint",
+      "registry": "n_reg",
+      "trust_domain": "contoso.onmicrosoft.com"
+    },
+    {
+      "id": "id_mcp_docs",
+      "name": "Docs MCP server workload identity",
+      "kind": "workload_identity",
+      "issuer": "https://login.microsoftonline.com/11111111-2222-3333-4444-555555555555/v2.0",
+      "federation": "workload_identity_federation",
+      "credential_type": "managed_identity",
+      "owner": "Head of Agent Platform",
+      "trust_domain": "contoso.onmicrosoft.com"
+    },
+    {
+      "id": "id_market",
+      "name": "Market data MCP server (vendor identity)",
+      "kind": "service_principal",
+      "issuer": "https://login.vendor.example",
+      "federation": "oidc_client",
+      "credential_type": "federated",
+      "owner": "Vendor platform team"
+    },
+    {
+      "id": "id_peer",
+      "name": "Partner research agent identity",
+      "kind": "agent_identity",
+      "issuer": "https://idp.partner.example",
+      "federation": "oidc_client",
+      "credential_type": "federated",
+      "owner": "Partner agent team",
+      "registry": "n_reg"
+    },
+    {
+      "id": "id_peer2",
+      "name": "Partner pricing agent identity",
+      "kind": "agent_identity",
+      "issuer": "https://idp.partner.example",
+      "federation": "oidc_client",
+      "credential_type": "federated",
+      "owner": "Partner agent team",
+      "registry": "n_reg"
+    }
+  ],
+  "id": "arch_gs_mcp_platform",
+  "tenant_id": "tenant_templates",
+  "name": "Agent platform with an MCP gateway, a registry and A2A partners",
+  "version": 1,
+  "attrs": {
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "criticality": "high",
+    "description": "An agent platform: an orchestrator and an autonomous worker reach MCP servers through an MCP gateway, credentials come from a token vault, agents and MCP servers are listed in a registry, and partner agents are reached over A2A through an A2A gateway.",
+    "dr_tested_at": "2026-07-02",
+    "incident_reporting": "A token, consent or agent-card incident is escalated to the security operations centre within 2 h.",
+    "ai_act_tier": "limited",
+    "materiality": "high",
+    "owner": "Head of Agent Platform",
+    "sponsor": "Head of Research Platforms",
+    "regimes": [
+      "OWASP",
+      "MSFT",
+      "MCSB",
+      "NIST",
+      "MAESTRO"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_cloud",
+      "kind": "zone",
+      "name": "Azure – switzerlandnorth",
+      "node_ids": [
+        "n_system",
+        "n_entra",
+        "n_web",
+        "n_orch",
+        "n_worker",
+        "n_aigw",
+        "n_llm",
+        "n_logs",
+        "n_eval",
+        "n_mcpgw",
+        "n_mcp_docs",
+        "n_mcp_tickets",
+        "n_reg",
+        "n_broker",
+        "n_mem",
+        "n_a2agw",
+        "n_hs"
+      ],
+      "attrs": {
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "g_research",
+      "kind": "zone",
+      "name": "Research tenant – switzerlandwest",
+      "node_ids": [
+        "n_report"
+      ],
+      "attrs": {
+        "region": "switzerlandwest"
+      }
+    },
+    {
+      "id": "g_users",
+      "kind": "zone",
+      "name": "Users",
+      "node_ids": [
+        "n_user"
+      ]
+    },
+    {
+      "id": "g_agent_tb",
+      "kind": "trust_boundary",
+      "name": "Agent runtime",
+      "node_ids": [
+        "n_orch",
+        "n_worker",
+        "n_aigw",
+        "n_mem"
+      ]
+    },
+    {
+      "id": "g_research_tb",
+      "kind": "trust_boundary",
+      "name": "Research tenant agents",
+      "node_ids": [
+        "n_report"
+      ]
+    },
+    {
+      "id": "g_vendor",
+      "kind": "zone",
+      "name": "Tool vendor (external)",
+      "node_ids": [
+        "n_mcp_market"
+      ]
+    },
+    {
+      "id": "g_vendor_tb",
+      "kind": "trust_boundary",
+      "name": "Vendor trust boundary – MCP",
+      "node_ids": [
+        "n_mcp_market"
+      ]
+    },
+    {
+      "id": "g_partner",
+      "kind": "zone",
+      "name": "Partner organisation (external)",
+      "node_ids": [
+        "n_peer",
+        "n_peer2"
+      ]
+    },
+    {
+      "id": "g_partner_tb",
+      "kind": "trust_boundary",
+      "name": "Partner trust boundary – A2A",
+      "node_ids": [
+        "n_peer",
+        "n_peer2"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_system",
+      "type": "app",
+      "name": "Research assistant platform",
+      "layer": "app",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 260,
+        "y": 0
+      },
+      "attrs": {
+        "c4_kind": "SoftwareSystem",
+        "c4_level": "context",
+        "criticality": "high",
+        "exposure": "internal",
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_user",
+      "type": "user",
+      "name": "Analyst (employee)",
+      "layer": "human",
+      "zone": "g_users",
+      "source": "design",
+      "position": {
+        "x": 40,
+        "y": 120
+      },
+      "attrs": {
+        "c4_kind": "Person",
+        "c4_level": "context",
+        "mfa": true,
+        "population": "employee"
+      }
+    },
+    {
+      "id": "n_entra",
+      "type": "identity_provider",
+      "name": "Entra ID (user and agent identities)",
+      "layer": "identity",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 260,
+        "y": 480
+      },
+      "attrs": {
+        "c4_kind": "Identity",
+        "c4_level": "container",
+        "provider_service": "azure/entra-id"
+      }
+    },
+    {
+      "id": "n_web",
+      "type": "app",
+      "name": "Research web app",
+      "layer": "app",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 260,
+        "y": 120
+      },
+      "attrs": {
+        "authn": [
+          "oidc"
+        ],
+        "c4_kind": "Container",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "criticality": "high",
+        "exposure": "internal",
+        "provider_service": "azure/app-service",
+        "region": "switzerlandnorth",
+        "secrets_in": "secret_store",
+        "waf": true
+      }
+    },
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Orchestrator agent",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 120
+      },
+      "attrs": {
+        "ai_disclosure": true,
+        "content_safety": true,
+        "criticality": "high",
+        "identity": "agent_id",
+        "kill_switch": true,
+        "rate_limit": true,
+        "materiality": "high",
+        "output_marking": true,
+        "owner": "Head of Agent Platform",
+        "provider_service": "azure/ai-foundry",
+        "region": "switzerlandnorth",
+        "sponsor": "Head of Research Platforms",
+        "hosting": "managed_platform",
+        "sandbox": "managed",
+        "c4_kind": "Agent",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "identity_id": "id_orch",
+        "autonomy": "semi",
+        "purpose": "Plans research requests, delegates sub-tasks to the worker, the report agent and partner agents over A2A; it changes nothing itself.",
+        "egress_policy": "default_deny_allowlist",
+        "egress_allowlist": [
+          "a2a-gateway.contoso.example"
+        ]
+      }
+    },
+    {
+      "id": "n_worker",
+      "type": "agent",
+      "name": "Research worker agent",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 700,
+        "y": 240
+      },
+      "attrs": {
+        "ai_disclosure": true,
+        "content_safety": true,
+        "criticality": "high",
+        "identity": "agent_id",
+        "kill_switch": true,
+        "rate_limit": true,
+        "materiality": "high",
+        "output_marking": true,
+        "owner": "Head of Agent Platform",
+        "provider_service": "azure/ai-foundry",
+        "region": "switzerlandnorth",
+        "sponsor": "Head of Research Platforms",
+        "hosting": "managed_platform",
+        "sandbox": "container",
+        "c4_kind": "Agent",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "identity_id": "id_worker",
+        "autonomy": "autonomous",
+        "purpose": "Runs research sub-tasks with MCP tools, keeps working notes in its memory and opens tickets after an analyst approves.",
+        "egress_policy": "default_deny_allowlist",
+        "egress_allowlist": [
+          "mcp-gateway.contoso.example"
+        ],
+        "human_in_the_loop": [
+          {
+            "tool_class": "ticket_write",
+            "disposition": "ask"
+          }
+        ]
+      }
+    },
+    {
+      "id": "n_report",
+      "type": "agent",
+      "name": "Report agent (research tenant)",
+      "layer": "ai",
+      "zone": "g_research",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 360
+      },
+      "attrs": {
+        "ai_disclosure": true,
+        "content_safety": true,
+        "criticality": "high",
+        "identity": "agent_id",
+        "kill_switch": true,
+        "rate_limit": true,
+        "materiality": "high",
+        "output_marking": true,
+        "owner": "Head of Agent Platform",
+        "provider_service": "azure/ai-foundry",
+        "region": "switzerlandwest",
+        "sponsor": "Head of Research Platforms",
+        "hosting": "managed_platform",
+        "sandbox": "managed",
+        "c4_kind": "Agent",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "identity_id": "id_report",
+        "autonomy": "assisted",
+        "purpose": "Writes the research report from the worker results delegated by the orchestrator.",
+        "integrity": "signed",
+        "egress_policy": "default_deny_allowlist",
+        "egress_allowlist": [
+          "none"
+        ]
+      }
+    },
+    {
+      "id": "n_aigw",
+      "type": "gateway",
+      "name": "AI gateway (APIM GenAI policies)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 920,
+        "y": 120
+      },
+      "attrs": {
+        "c4_kind": "Gateway",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "content_safety": true,
+        "kind": "ai",
+        "logging": true,
+        "provider_service": "azure/api-management",
+        "region": "switzerlandnorth",
+        "token_limits": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ]
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI (Foundry)",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 1140,
+        "y": 120
+      },
+      "attrs": {
+        "c4_kind": "Container",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "content_safety": true,
+        "criticality": "high",
+        "exit_strategy": true,
+        "materiality": "high",
+        "model": "gpt-4.1",
+        "model_card": true,
+        "network": "private",
+        "outsourcing_registered": true,
+        "owner": "Head of Agent Platform",
+        "provider": "azure",
+        "provider_service": "azure/openai",
+        "purpose": "Generation model for the research agents.",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Log Analytics (immutable archive)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 600
+      },
+      "attrs": {
+        "c4_kind": "DataStore",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "immutable": true,
+        "provider_service": "azure/monitor",
+        "region": "switzerlandnorth",
+        "retention_days": 3650,
+        "purpose": "evidence"
+      }
+    },
+    {
+      "id": "n_eval",
+      "type": "evaluation",
+      "name": "Evaluation & drift monitoring",
+      "layer": "ai",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 700,
+        "y": 600
+      },
+      "attrs": {
+        "c4_kind": "Container",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "evaluates": [
+          "accuracy",
+          "drift"
+        ],
+        "owner": "Head of Agent Platform",
+        "provider_service": "azure/ai-foundry",
+        "purpose": "Offline golden-set evaluation and drift checks on logged prompts, responses and tool calls."
+      }
+    },
+    {
+      "id": "n_mcpgw",
+      "type": "gateway",
+      "name": "MCP gateway (APIM MCP)",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 920,
+        "y": 360
+      },
+      "attrs": {
+        "c4_kind": "Gateway",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "kind": "mcp",
+        "logging": true,
+        "provider_service": "azure/api-management",
+        "region": "switzerlandnorth",
+        "functions": [
+          "identity_termination",
+          "credential_brokerage",
+          "policy",
+          "observability"
+        ]
+      }
+    },
+    {
+      "id": "n_mcp_docs",
+      "type": "mcp_server",
+      "name": "Research documents MCP server",
+      "layer": "app",
+      "zone": "g_cloud",
+      "source": "declared",
+      "position": {
+        "x": 1140,
+        "y": 360
+      },
+      "attrs": {
+        "c4_kind": "Container",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "origin": "first_party",
+        "scopes": [
+          "documents.read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "queries_database"
+        ],
+        "identity_id": "id_mcp_docs",
+        "spec_version": "2026-07-28",
+        "transport": "streamable_http",
+        "auth_mode": "oauth21",
+        "resource_metadata": true,
+        "client_registration": "pre_registered",
+        "registry_entry": "io.contoso/research-docs",
+        "sandbox": "container",
+        "discover_supported": true,
+        "cache_scope": "private",
+        "exposure": "private_network",
+        "owner": "Head of Agent Platform",
+        "provider_service": "azure/container-apps"
+      }
+    },
+    {
+      "id": "n_mcp_tickets",
+      "type": "mcp_server",
+      "name": "Ticketing MCP server",
+      "layer": "app",
+      "zone": "g_cloud",
+      "source": "declared",
+      "position": {
+        "x": 1140,
+        "y": 480
+      },
+      "attrs": {
+        "c4_kind": "Container",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "origin": "first_party",
+        "scopes": [
+          "tickets.write"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": true,
+        "capabilities": [
+          "modifies_state"
+        ],
+        "spec_version": "2026-07-28",
+        "transport": "streamable_http",
+        "auth_mode": "oauth21",
+        "resource_metadata": true,
+        "client_registration": "pre_registered",
+        "registry_entry": "io.contoso/tickets",
+        "sandbox": "container",
+        "exposure": "private_network",
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_mcp_market",
+      "type": "mcp_server",
+      "name": "Market data MCP server (vendor)",
+      "layer": "app",
+      "zone": "g_vendor",
+      "source": "declared",
+      "position": {
+        "x": 1360,
+        "y": 360
+      },
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "quotes.read"
+        ],
+        "vetted": true,
+        "integrity": "pinned",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "queries_database"
+        ],
+        "identity_id": "id_market",
+        "spec_version": "2026-07-28",
+        "transport": "streamable_http",
+        "auth_mode": "oauth21",
+        "resource_metadata": true,
+        "client_registration": "cimd",
+        "registry_entry": "io.vendor/market-data",
+        "exposure": "public",
+        "owner": "Vendor platform team",
+        "supplier_assessed": true
+      },
+      "description": "Operated by the market data vendor; reached only through the MCP gateway."
+    },
+    {
+      "id": "n_reg",
+      "type": "agent_registry",
+      "name": "Agent and MCP registry",
+      "layer": "identity",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 700,
+        "y": 480
+      },
+      "attrs": {
+        "kind": "custom",
+        "verification": "signed",
+        "owner": "Head of Agent Platform",
+        "region": "switzerlandnorth",
+        "trust_anchor": {
+          "key_id": "kid-partner-directory-2026",
+          "fetched_at": "2026-09-30T08:00:00Z"
+        }
+      }
+    },
+    {
+      "id": "n_broker",
+      "type": "credential_broker",
+      "name": "Token vault (credential broker)",
+      "layer": "identity",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 920,
+        "y": 600
+      },
+      "attrs": {
+        "issues": "short_lived_token",
+        "max_lifetime": 3600,
+        "owner": "Head of Agent Platform",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_mem",
+      "type": "agent_memory",
+      "name": "Worker memory (notes)",
+      "layer": "data",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 700,
+        "y": 360
+      },
+      "attrs": {
+        "write_path": "broker",
+        "validated": true,
+        "scope": "agent",
+        "owner": "Head of Agent Platform",
+        "data_class": "internal",
+        "retention_days": 30,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_hs",
+      "type": "human_step",
+      "name": "Analyst approves the ticket",
+      "layer": "human",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 920,
+        "y": 480
+      },
+      "attrs": {
+        "role": "research analyst",
+        "approval_for": [
+          "ticket_write"
+        ],
+        "approval_identity": "separate"
+      }
+    },
+    {
+      "id": "n_a2agw",
+      "type": "gateway",
+      "name": "A2A gateway",
+      "layer": "platform",
+      "zone": "g_cloud",
+      "source": "design",
+      "position": {
+        "x": 700,
+        "y": 0
+      },
+      "attrs": {
+        "c4_kind": "Gateway",
+        "c4_level": "container",
+        "c4_parent": "n_system",
+        "kind": "a2a",
+        "logging": true,
+        "provider_service": "azure/api-management",
+        "region": "switzerlandnorth",
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ]
+      }
+    },
+    {
+      "id": "n_peer",
+      "type": "external_agent",
+      "name": "Partner research agent",
+      "layer": "ai",
+      "zone": "g_partner",
+      "source": "declared",
+      "position": {
+        "x": 1140,
+        "y": 0
+      },
+      "attrs": {
+        "card_url": "https://agents.partner.example/research/.well-known/agent-card.json",
+        "card_signed": true,
+        "integrity": "signed",
+        "security_schemes": [
+          "oauth2"
+        ],
+        "identity_id": "id_peer",
+        "owner": "Partner agent team",
+        "inbound_auth": "oauth"
+      },
+      "description": "A partner organisation’s agent, reached over A2A through the A2A gateway."
+    },
+    {
+      "id": "n_peer2",
+      "type": "external_agent",
+      "name": "Partner pricing agent",
+      "layer": "ai",
+      "zone": "g_partner",
+      "source": "declared",
+      "position": {
+        "x": 1360,
+        "y": 0
+      },
+      "attrs": {
+        "card_url": "https://agents.partner.example/pricing/.well-known/agent-card.json",
+        "card_signed": true,
+        "integrity": "signed",
+        "security_schemes": [
+          "oauth2"
+        ],
+        "identity_id": "id_peer2",
+        "owner": "Partner agent team",
+        "inbound_auth": "oauth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_user_system",
+      "from": "n_user",
+      "to": "n_system",
+      "kind": "calls",
+      "label": "uses (C4 context)",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    },
+    {
+      "id": "e_user_web",
+      "from": "n_user",
+      "to": "n_web",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    },
+    {
+      "id": "e_web_entra",
+      "from": "n_web",
+      "to": "n_entra",
+      "kind": "authenticates",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {}
+    },
+    {
+      "id": "e_web_orch",
+      "from": "n_web",
+      "to": "n_orch",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_orch_entra",
+      "from": "n_orch",
+      "to": "n_entra",
+      "kind": "authenticates",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_worker_entra",
+      "from": "n_worker",
+      "to": "n_entra",
+      "kind": "authenticates",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_report_entra",
+      "from": "n_report",
+      "to": "n_entra",
+      "kind": "authenticates",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_orch_aigw",
+      "from": "n_orch",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_worker_aigw",
+      "from": "n_worker",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_report_aigw",
+      "from": "n_report",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_aigw_llm",
+      "from": "n_aigw",
+      "to": "n_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_orch_worker",
+      "from": "n_orch",
+      "to": "n_worker",
+      "kind": "delegates",
+      "label": "delegates a research sub-task",
+      "protocol": "a2a",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true,
+        "audience": "id_worker",
+        "delegation_depth": 1,
+        "token_binding": "dpop"
+      }
+    },
+    {
+      "id": "e_orch_report",
+      "from": "n_orch",
+      "to": "n_report",
+      "kind": "delegates",
+      "label": "delegates the report",
+      "protocol": "a2a",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true,
+        "audience": "id_report",
+        "delegation_depth": 1,
+        "token_binding": "mtls"
+      }
+    },
+    {
+      "id": "e_worker_mcpgw",
+      "from": "n_worker",
+      "to": "n_mcpgw",
+      "kind": "calls",
+      "protocol": "mcp_http",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "delegation_depth": 1
+      }
+    },
+    {
+      "id": "e_mcpgw_docs",
+      "from": "n_mcpgw",
+      "to": "n_mcp_docs",
+      "kind": "calls",
+      "protocol": "mcp_http",
+      "auth": "token_exchange",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "audience": "id_mcp_docs",
+        "consent": "per_client"
+      }
+    },
+    {
+      "id": "e_mcpgw_market",
+      "from": "n_mcpgw",
+      "to": "n_mcp_market",
+      "kind": "calls",
+      "protocol": "mcp_http",
+      "auth": "token_exchange",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consent": "per_client",
+        "audience": "id_market"
+      }
+    },
+    {
+      "id": "e_mcpgw_broker",
+      "from": "n_mcpgw",
+      "to": "n_broker",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "secret",
+      "attrs": {}
+    },
+    {
+      "id": "e_worker_hs",
+      "from": "n_worker",
+      "to": "n_hs",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_hs_tickets",
+      "from": "n_hs",
+      "to": "n_mcp_tickets",
+      "kind": "calls",
+      "protocol": "mcp_http",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_worker_mem",
+      "from": "n_worker",
+      "to": "n_mem",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "guarded": true,
+        "logged": true
+      }
+    },
+    {
+      "id": "e_worker_mem_read",
+      "from": "n_worker",
+      "to": "n_mem",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_orch_a2agw",
+      "from": "n_orch",
+      "to": "n_a2agw",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true,
+        "audience": "id_orch"
+      }
+    },
+    {
+      "id": "e_a2agw_peer",
+      "from": "n_a2agw",
+      "to": "n_peer",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "token_exchange",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true,
+        "audience": "id_peer",
+        "token_binding": "dpop",
+        "prompt_contains": "internal"
+      }
+    },
+    {
+      "id": "e_a2agw_peer2",
+      "from": "n_a2agw",
+      "to": "n_peer2",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "token_exchange",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true,
+        "audience": "id_peer2",
+        "token_binding": "dpop",
+        "prompt_contains": "internal"
+      }
+    },
+    {
+      "id": "e_peer_a2agw",
+      "from": "n_peer",
+      "to": "n_a2agw",
+      "kind": "calls",
+      "label": "returns task results",
+      "protocol": "a2a",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true,
+        "token_binding": "dpop"
+      }
+    },
+    {
+      "id": "e_orch_logs",
+      "from": "n_orch",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_worker_logs",
+      "from": "n_worker",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_aigw_logs",
+      "from": "n_aigw",
+      "to": "n_logs",
+      "kind": "writes",
+      "label": "prompt/response log",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    },
+    {
+      "id": "e_mcpgw_logs",
+      "from": "n_mcpgw",
+      "to": "n_logs",
+      "kind": "writes",
+      "label": "tool-call log",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_a2agw_logs",
+      "from": "n_a2agw",
+      "to": "n_logs",
+      "kind": "writes",
+      "label": "A2A task log",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_eval_logs",
+      "from": "n_eval",
+      "to": "n_logs",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": [],
+  "provenance": {
+    "/nodes/n_mcp_docs": {
+      "kind": "imported",
+      "identifier": "mcp_registry:io.contoso/research-docs",
+      "hash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "imported_by": "usr_golden",
+      "imported_at": "2026-09-01T08:00:00Z",
+      "fetched_at": "2026-09-01T08:00:00Z",
+      "last_seen_import": "3333333333333333333333333333333333333333333333333333333333333333"
+    },
+    "/nodes/n_mcp_market": {
+      "kind": "imported",
+      "identifier": "mcp_registry:io.vendor/market-data",
+      "hash": "5555555555555555555555555555555555555555555555555555555555555555",
+      "imported_by": "usr_golden",
+      "imported_at": "2026-09-01T08:00:00Z",
+      "fetched_at": "2026-09-01T08:00:00Z",
+      "last_seen_import": "5555555555555555555555555555555555555555555555555555555555555555"
+    },
+    "/nodes/n_mcp_tickets": {
+      "kind": "imported",
+      "identifier": "mcp_registry:io.contoso/tickets",
+      "hash": "4444444444444444444444444444444444444444444444444444444444444444",
+      "imported_by": "usr_golden",
+      "imported_at": "2026-09-01T08:00:00Z",
+      "fetched_at": "2026-09-01T08:00:00Z",
+      "last_seen_import": "4444444444444444444444444444444444444444444444444444444444444444"
+    },
+    "/nodes/n_peer": {
+      "kind": "imported",
+      "identifier": "a2a_card:agents.partner.example/research",
+      "hash": "6666666666666666666666666666666666666666666666666666666666666666",
+      "imported_by": "usr_golden",
+      "imported_at": "2026-09-01T08:00:00Z",
+      "fetched_at": "2026-09-01T08:00:00Z",
+      "last_seen_import": "6666666666666666666666666666666666666666666666666666666666666666"
+    },
+    "/nodes/n_peer2": {
+      "kind": "imported",
+      "identifier": "a2a_card:agents.partner.example/pricing",
+      "hash": "7777777777777777777777777777777777777777777777777777777777777777",
+      "imported_by": "usr_golden",
+      "imported_at": "2026-09-01T08:00:00Z",
+      "fetched_at": "2026-09-01T08:00:00Z",
+      "last_seen_import": "7777777777777777777777777777777777777777777777777777777777777777"
+    }
+  }
+}

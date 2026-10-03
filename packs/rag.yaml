@@ -1,0 +1,90 @@
+# RAG — retrieval security (docs/03 §RAG; docs/18 WS-I I2, agents/swarm/04-gateways-network-and-data/retrieval-security.md).
+# Deterministic CEL; the LLM never creates findings. DATA-002 (data.yaml) is the read hop of a sensitive index without ACL
+# trimming; these rules ask whether a trimming claim has a caller identity to trim by, whether retrieved text reaches a
+# model unscreened, whether a sensitive index is read unredacted with no drawn sensitive writer, and whether an index
+# aggregates several zones without trimming. acl_trimming, redaction and content_safety are declarations: absent reads
+# false by design. No regime() guard: unfiltered or unscreened retrieval is a gap under every regime of the pack.
+pack: rag
+version: 0.1.0
+regimes: [ISO, FADP, GDPR, FINMA, OWASP, AIACT, MAESTRO, NIST]
+offer: agentic
+rules:
+  # RAG-001: a filter per caller needs a caller: a shared secret or no authentication on the query hop gives the index
+  # nothing to trim by. DATA-002 is silent because trimming is declared; this rule reports that the declaration and the
+  # hop contradict each other. No template: the auth on the hop is team 02's.
+  - id: RAG-001
+    title: ACL trimming claimed on a read hop that carries no caller identity
+    scope: edge
+    severity: medium
+    condition: |
+      e.kind == "reads" && e.to.type == "vector_index" && attr(e.to, "acl_trimming", false) &&
+      e.auth in ["api_key","sas","password","connection_string","none","unknown","token_passthrough"]
+    requires: [e.auth]
+    domain: 'e.kind == "reads" && e.to.type == "vector_index"'
+    message: "{{e.from.name}} queries {{e.to.name}} with {{e.auth}}: the index declares ACL trimming, but the hop carries no caller identity to trim by."
+    clauses: [ISO:27001:A.5.15, NIST:800-207:S2.1, FINMA:2023/1:Rz-AccessMgmt, MCSB:v1:PA-7]
+    remediation: "Carry the caller's identity on the query (on-behalf-of or the agent's own identity with group claims) so the index can filter per caller."
+    fixtures: { positive: fixtures/RAG-001.pos.json, negative: fixtures/RAG-001.neg.json }
+    tags: [rag, access-control, identity]
+
+  # RAG-002: the agent reads chunks, declares no screen of its own, and some walk from it to a model never enters a node
+  # with content_safety (a gateway or the endpoint): whatever the index holds is then a prompt. pathAvoidingAttr checks
+  # the walk's nodes after the agent, so the agent's own flag is tested separately. High when the reader can act.
+  - id: RAG-002
+    title: Retrieved text reaches a model along a walk with no screen
+    scope: edge
+    severity: medium
+    condition: |
+      e.kind == "reads" && e.from.type == "agent" && e.to.type == "vector_index" && !attr(e.from, "content_safety", false) &&
+      g.nodes("llm_endpoint").exists(l, g.reachable(e.from.id, l.id) && g.pathAvoidingAttr(e.from.id, l.id, "content_safety"))
+    severity_override:
+      - when: |
+          g.out(e.from.id, "").exists(w, w.kind in ["writes","executes"] ||
+            (w.to.type in ["tool","mcp_server"] && (attr(w.to, "write_capable", false) ||
+              "modifies_state" in attr(w.to, "capabilities", []) || "executes_code" in attr(w.to, "capabilities", []))))
+        severity: high
+    message: "{{e.from.name}} reads {{e.to.name}} and passes what it retrieves to a model on a path where no node screens content: retrieved text can act as an instruction."
+    clauses: [OWASP:LLMTop10:LLM08, OWASP:LLMTop10-2026:LLM08, OWASP:AgenticTop10:ASI06, OWASP:LLMTop10:LLM01, AIACT:2024/1689:Art15(5), MAESTRO:L2]
+    remediation: "Screen retrieved text before the model (content safety on the agent, the AI gateway or the endpoint) and delimit it as data in the prompt."
+    fixtures: { positive: fixtures/RAG-002.pos.json, negative: fixtures/RAG-002.neg.json }
+    tags: [rag, prompt-injection, content-safety]
+
+  # RAG-003: DATA-001 reports the sensitive writer; when no such writer is drawn (the index is filled out of band, or its
+  # sources declare no class) DATA-001 is silent, yet the index says it holds personal or client data and is read with
+  # no redaction declared.
+  - id: RAG-003
+    title: Sensitive index read unredacted with no drawn sensitive source
+    scope: node
+    severity: high
+    condition: |
+      n.type == "vector_index" && attr(n, "data_class", "") in ["pii","phi","cid"] && !attr(n, "redaction", false) &&
+      size(g.in(n.id, "reads")) > 0 &&
+      !g.in(n.id, "").exists(w, w.kind in ["writes","flows","publishes"] && attr(w.from, "data_class", "") in ["pii","cid","phi"])
+    requires: [n.attrs.data_class]
+    domain: 'n.type == "vector_index"'
+    message: "{{n.name}} declares {{attr(n,'data_class','')}} data and is read with no redaction declared, and no drawn writer carries that class."
+    clauses: [FADP:2023:Art7-8, GDPR:Art25, ISO:27001:A.8.11, OWASP:LLMTop10:LLM02, FINMA:2023/1:Rz-CriticalData]
+    remediation: "Redact or pseudonymise personal and client data before it is embedded and before chunks are returned (redaction=true), and draw the sources that fill the index."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/redaction", value: true }
+    fixtures: { positive: fixtures/RAG-003.pos.json, negative: fixtures/RAG-003.neg.json }
+    tags: [rag, privacy, redaction]
+
+  # RAG-004: data from two or more zones is retrievable through one query with no filter per caller. DATA-002 keys on the
+  # declared class, this rule on where the data came from (g.dataZones: the distinct non-empty zones of the nodes whose
+  # data reaches the index); the class guard keeps one fact from raising two findings. A source with no zone is not
+  # counted (retrieval-security lists it).
+  - id: RAG-004
+    title: Index aggregates several zones without ACL trimming
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "vector_index" && !(attr(n, "data_class", "") in ["confidential","pii","cid","phi"]) &&
+      size(g.dataZones(n.id, "")) > 1 && !attr(n, "acl_trimming", false)
+    message: "{{n.name}} holds data from zones {{g.dataZones(n.id, '').join(', ')}} and declares no ACL trimming: one query can return chunks from every zone."
+    clauses: [ISO:27001:A.5.15, NIST:800-207:S2.1, MAESTRO:L2]
+    remediation: "Filter retrieval per caller (document-level permissions propagated to the index; acl_trimming=true), or keep one index per zone."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/acl_trimming", value: true }
+    fixtures: { positive: fixtures/RAG-004.pos.json, negative: fixtures/RAG-004.neg.json }
+    tags: [rag, access-control, zones]

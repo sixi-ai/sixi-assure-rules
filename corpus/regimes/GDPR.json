@@ -175,5 +175,77 @@
     "licence": "eu-law",
     "verified": true,
     "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (CELEX 32016R0679). The drawing evidences the transfer itself (region of each node, the flow that crosses it); the safeguard instrument is a contractual fact recorded beside it. Standing note 2026-09-16: the Digital Omnibus on data, COM(2025) 837 (procedure 2025/0360(COD)), is still in ITRE/LIBE committee — its proposed changes to Art. 4(1), Art. 9(2)(k), Art. 33 (96 h via the NIS2 single entry point), Art. 35 (EU-wide DPIA template) and new Arts. 88a/88b are not law and are not recorded here; Arts. 25, 30, 32 and 44-49 are untouched by that proposal."
+  },
+  {
+    "id": "GDPR:Art22",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 22",
+    "title": "Automated individual decision-making, including profiling",
+    "summary": "A data subject has the right not to be subject to a decision based solely on automated processing, including profiling, which produces legal effects concerning them or similarly significantly affects them, unless the decision is necessary for a contract, authorised by law with safeguards, or based on explicit consent; in the first and last cases the controller implements safeguards, at least the right to obtain human intervention, to express a point of view and to contest the decision.",
+    "excerpt": "",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all",
+      "deployer"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "automated-decision",
+      "profiling",
+      "human-intervention",
+      "privacy"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Tied to the agent's human_in_the_loop[] and human_step in the model: the drawing shows whether a person can intervene, never whether a decision is 'solely automated' in law. Cited side by side with FADP:2023:Art21. Added 2026-10-01, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
+  },
+  {
+    "id": "GDPR:Art3",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 3",
+    "title": "Territorial scope",
+    "summary": "The Regulation applies to processing in the context of the activities of an establishment of a controller or processor in the Union, whether or not the processing takes place in the Union (Art. 3(1)); and to processing of personal data of data subjects who are in the Union by a controller or processor not established in the Union, where the processing relates to offering goods or services to them in the Union, irrespective of payment, or to monitoring their behaviour as far as it takes place within the Union (Art. 3(2)).",
+    "excerpt": "",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "scope",
+      "territorial-scope",
+      "privacy"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Cited by corpus/applicability.json for GDPR's applies_when (EU establishment, or the gdpr_art3_2 intake fact for a Swiss deployer offering to or monitoring people in the EU); cited side by side with FADP. Added 2026-10-01, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
+  },
+  {
+    "id": "GDPR:Art33",
+    "regime": "GDPR",
+    "doc": "Regulation (EU) 2016/679 (GDPR)",
+    "ref": "Art. 33",
+    "title": "Notification of a personal data breach to the supervisory authority",
+    "summary": "After a personal data breach the controller notifies the competent supervisory authority without undue delay and, where feasible, within 72 hours of becoming aware of it, unless the breach is unlikely to result in a risk to the rights and freedoms of natural persons; a later notification gives the reasons for the delay. A processor notifies the controller without undue delay. The notification describes the breach, its likely consequences and the measures taken or proposed, and the controller documents every breach (Art. 33(5)).",
+    "excerpt": "",
+    "version": "2016-05-04",
+    "effective": "2018-05-25",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "tags": [
+      "incident",
+      "breach-notification",
+      "privacy",
+      "reporting"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Event-driven duty: its evidence is the declared breach notification path (the architecture's incident_reporting), cited by IRR-005 (the GDPR twin of IRR-001, which cites FADP:2023:Art24 alone; split 2026-10-02 so a finding never cites a regime the architecture does not declare); no cadence entry. The Digital Omnibus proposal COM(2025) 837 would change Art. 33 (96 hours through the NIS2 single entry point); it is not law and is not recorded here. Added 2026-10-02, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
   }
 ]

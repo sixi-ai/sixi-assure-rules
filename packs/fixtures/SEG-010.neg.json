@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_seg_010_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SEG-010 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "IEC"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Autonomous agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "autonomous",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id",
+        "egress_policy": "default_deny_allowlist",
+        "egress_allowlist": [
+          "api.partner.example"
+        ]
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Orders API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oauth"
+        ],
+        "secrets_in": "secret_store"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_api",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "rule_id": "FW-005",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "FW-008",
+    "ids": [
+      "n_codeact"
+    ]
+  },
+  {
+    "rule_id": "FW-010",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "FW-011",
+    "ids": [
+      "n_writer_host"
+    ]
+  },
+  {
+    "rule_id": "FW-013",
+    "ids": [
+      "e_writer_partner"
+    ]
+  }
+]

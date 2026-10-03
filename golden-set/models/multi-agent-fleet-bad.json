@@ -1,4 +1,9 @@
 {
+  "schema_version": "1.2",
+  "identities": [
+    {"id": "ident_agent_id", "name": "Agent identity (agent_id)", "kind": "agent_identity", "attrs": {"x_migrated_from": "agent.identity=agent_id"}},
+    {"id": "ident_user_impersonation", "name": "User impersonation", "kind": "user_account", "attrs": {"x_migrated_from": "agent.identity=user_impersonation"}}
+  ],
   "id": "arch_demo_multi_agent_bad",
   "tenant_id": "tenant_demo",
   "name": "Multi-agent fleet with A2A + MCP gateway (bad twin)",
@@ -28,13 +33,13 @@
     { "id": "n_entra", "type": "identity_provider", "name": "Entra ID (users + agent identities)", "layer": "identity", "zone": "g_cloud", "position": { "x": 260, "y": 440 }, "source": "design",
       "attrs": {} },
     { "id": "n_orch", "type": "agent", "name": "Orchestrator agent", "layer": "ai", "zone": "g_cloud", "position": { "x": 480, "y": 200 }, "source": "design",
-      "attrs": { "identity": "agent_id", "autonomy": "semi", "purpose": "Plans research requests, delegates sub-tasks to worker agents and assembles the final answer for the analyst.", "owner": "Head of Research Platforms", "materiality": "high", "kill_switch": true, "rate_limit": true, "ai_disclosure": false, "content_safety": false, "tool_scopes": [], "criticality": "high", "region": "switzerlandnorth" } },
+      "attrs": { "identity": "agent_id", "identity_id": "ident_agent_id", "autonomy": "semi", "purpose": "Plans research requests, delegates sub-tasks to worker agents and assembles the final answer for the analyst.", "owner": "Head of Research Platforms", "materiality": "high", "kill_switch": true, "rate_limit": true, "ai_disclosure": false, "content_safety": false, "tool_scopes": [], "criticality": "high", "region": "switzerlandnorth" } },
     { "id": "n_kv", "type": "secret_store", "name": "Key Vault", "layer": "identity", "zone": "g_cloud", "position": { "x": 480, "y": 440 }, "source": "design",
       "attrs": { "region": "switzerlandnorth" } },
     { "id": "n_w_research", "type": "agent", "name": "Research worker agent (autonomous)", "layer": "ai", "zone": "g_cloud", "position": { "x": 700, "y": 80 }, "source": "design",
-      "attrs": { "identity": "agent_id", "autonomy": "autonomous", "purpose": "Retrieves and summarises internal documents and market data for a delegated sub-task; read-only.", "owner": "Head of Research Platforms", "materiality": "high", "rate_limit": true, "ai_disclosure": true, "content_safety": true, "tool_scopes": ["docs.read", "market.read"], "criticality": "high", "region": "switzerlandnorth" } },
+      "attrs": { "identity": "agent_id", "identity_id": "ident_agent_id", "autonomy": "autonomous", "purpose": "Retrieves and summarises internal documents and market data for a delegated sub-task; read-only.", "owner": "Head of Research Platforms", "materiality": "high", "rate_limit": true, "ai_disclosure": true, "content_safety": true, "tool_scopes": ["docs.read", "market.read"], "criticality": "high", "region": "switzerlandnorth" } },
     { "id": "n_w_draft", "type": "agent", "name": "Drafting worker agent (assisted)", "layer": "ai", "zone": "g_cloud", "position": { "x": 700, "y": 320 }, "source": "design",
-      "attrs": { "identity": "user_impersonation", "autonomy": "assisted", "purpose": "Drafts the research note from worker outputs.", "owner": "", "materiality": "medium", "kill_switch": true, "rate_limit": true, "ai_disclosure": true, "content_safety": true, "tool_scopes": ["docs.read"], "criticality": "high", "region": "switzerlandnorth" } },
+      "attrs": { "identity": "user_impersonation", "identity_id": "ident_user_impersonation", "autonomy": "assisted", "purpose": "Drafts the research note from worker outputs.", "owner": "", "materiality": "medium", "kill_switch": true, "rate_limit": true, "ai_disclosure": true, "content_safety": true, "tool_scopes": ["docs.read"], "criticality": "high", "region": "switzerlandnorth" } },
     { "id": "n_aigw", "type": "gateway", "name": "AI gateway (APIM GenAI policies)", "layer": "platform", "zone": "g_cloud", "position": { "x": 920, "y": 200 }, "source": "design",
       "attrs": { "kind": "ai", "logging": true, "token_limits": true, "content_safety": true, "region": "switzerlandnorth" } },
     { "id": "n_mcpgw", "type": "gateway", "name": "MCP gateway (APIM, authenticated)", "layer": "platform", "zone": "g_cloud", "position": { "x": 920, "y": 440 }, "source": "design",

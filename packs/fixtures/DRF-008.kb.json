@@ -1,0 +1,9 @@
+{
+  "deprecated": {
+    "azure openai on your data": "azure ai foundry agent service",
+    "azure/openai-on-your-data": "azure ai foundry agent service",
+    "ftp": "sftp",
+    "gpt-4": "gpt-4o"
+  },
+  "freshness": {}
+}

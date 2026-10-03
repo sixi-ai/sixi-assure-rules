@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_ata_011_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ATA-011 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "identities": [
+    {
+      "id": "id_peer",
+      "name": "Identity id_peer",
+      "kind": "agent_identity",
+      "issuer": "https://idp.partner.example",
+      "federation": "oidc_client",
+      "owner": "Fixture owner",
+      "registry": "n_reg"
+    }
+  ],
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Orchestrator agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    },
+    {
+      "id": "n_peer",
+      "type": "external_agent",
+      "name": "Partner agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "card_url": "https://partner.example/.well-known/agent-card.json",
+        "card_signed": true,
+        "identity_id": "id_peer"
+      }
+    },
+    {
+      "id": "n_reg",
+      "type": "agent_registry",
+      "name": "Partner agent directory",
+      "layer": "identity",
+      "source": "design",
+      "attrs": {
+        "kind": "custom",
+        "verification": "signed",
+        "trust_anchor": {
+          "key_id": "kid-partner-2026",
+          "fetched_at": "2026-09-30T00:00:00Z"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_orch",
+      "to": "n_peer",
+      "kind": "calls",
+      "protocol": "a2a",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "prompt_contains": "internal"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

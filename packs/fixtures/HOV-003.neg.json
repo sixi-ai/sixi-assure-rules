@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_hov_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture HOV-003 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "OWASP",
+      "MCSB"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Autonomous agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "autonomous",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    },
+    {
+      "id": "n_tool",
+      "type": "tool",
+      "name": "Ticket writer",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "write"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": true,
+        "capabilities": [
+          "modifies_state"
+        ]
+      }
+    },
+    {
+      "id": "n_tool_ro",
+      "type": "tool",
+      "name": "Ticket reader",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "queries_database"
+        ]
+      }
+    },
+    {
+      "id": "n_hs",
+      "type": "human_step",
+      "name": "Approval before a state change",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "operations",
+        "approval_for": [
+          "ticket"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e2",
+      "from": "n_agent",
+      "to": "n_tool_ro",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e3",
+      "from": "n_agent",
+      "to": "n_hs",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e4",
+      "from": "n_hs",
+      "to": "n_tool",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,78 @@
+{
+  "id": "arch_fx_seg_002_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SEG-002 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_egw",
+      "type": "edge_gateway",
+      "name": "Edge gateway",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": true,
+        "sbom": true
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Ingest API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      }
+    },
+    {
+      "id": "n_queue",
+      "type": "queue",
+      "name": "Event queue",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_egw",
+      "to": "n_api",
+      "kind": "calls",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_api",
+      "to": "n_queue",
+      "kind": "publishes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

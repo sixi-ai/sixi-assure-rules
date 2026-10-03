@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_aid_002_cohosted_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture AID-002 cohosted (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST",
+      "OWASP",
+      "MSFT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "identities": [
+    {
+      "id": "id_app",
+      "name": "id_app",
+      "kind": "shared",
+      "credential_type": "managed_identity",
+      "owner": "Fixture owner"
+    }
+  ],
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Agent server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "identity_id": "id_app"
+      }
+    },
+    {
+      "id": "n_sup",
+      "type": "agent",
+      "name": "Supervisor agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "shared",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity_id": "id_app",
+        "hosted_on": "n_app"
+      }
+    },
+    {
+      "id": "n_work",
+      "type": "agent",
+      "name": "Research worker agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "shared",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity_id": "id_app",
+        "hosted_on": "n_app"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_sup",
+      "to": "n_work",
+      "kind": "delegates",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true,
+        "mode": "handoff"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

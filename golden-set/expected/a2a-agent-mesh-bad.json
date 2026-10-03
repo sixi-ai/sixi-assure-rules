@@ -22,5 +22,17 @@
     "ids": [
       "e_orch_partner"
     ]
+  },
+  {
+    "rule_id": "CMP-005",
+    "ids": [
+      "n_aigw"
+    ]
+  },
+  {
+    "rule_id": "AEI-001",
+    "ids": [
+      "n_orch"
+    ]
   }
 ]

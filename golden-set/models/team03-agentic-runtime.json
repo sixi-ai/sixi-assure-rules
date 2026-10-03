@@ -1,0 +1,1024 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_gs_team03_agentic_runtime",
+  "tenant_id": "templates",
+  "name": "Agentic runtime and supply chain",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Agent Platform",
+    "description": "Agentic runtime design (swarm team 03): four agents behind an AI gateway, MCP servers behind an MCP gateway, a verified tool registry, screened inputs, approvals under separate identities with a declared scope, scoped and guarded memories, and the web search tool behind an egress gateway.",
+    "ai_act_tier": "limited",
+    "regimes": [
+      "OWASP",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_triage",
+      "type": "agent",
+      "name": "Triage agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "purpose": "Sorts incoming requests and looks up documents and the code runner for the analysts.",
+        "owner": "Head of Agent Platform",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "autonomy": "assisted"
+      }
+    },
+    {
+      "id": "n_reviewer",
+      "type": "agent",
+      "name": "Review agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "purpose": "Reviews partner events and files tickets; consequential ledger entries pass an approval.",
+        "owner": "Head of Agent Platform",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "autonomy": "semi"
+      }
+    },
+    {
+      "id": "n_research",
+      "type": "agent",
+      "name": "Research agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "purpose": "Researches market questions with a web search tool, the partner index and the client register.",
+        "owner": "Head of Agent Platform",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "autonomy": "autonomous"
+      }
+    },
+    {
+      "id": "n_draft",
+      "type": "agent",
+      "name": "Drafting agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "purpose": "Drafts ticket updates from the research notes.",
+        "owner": "Head of Agent Platform",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "autonomy": "semi"
+      }
+    },
+    {
+      "id": "n_aigw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "content_safety": true,
+        "token_limits": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Model endpoint",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "content_safety": true,
+        "model": "gpt-4.1",
+        "network": "private",
+        "owner": "Head of Agent Platform",
+        "purpose": "Generation model for the agents.",
+        "materiality": "medium"
+      }
+    },
+    {
+      "id": "n_mcpgw",
+      "type": "gateway",
+      "name": "MCP gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "mcp",
+        "logging": true,
+        "identity": "managed_identity",
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_apigw",
+      "type": "gateway",
+      "name": "Egress API gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "api",
+        "logging": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "egress",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_mcp_kb",
+      "type": "mcp_server",
+      "name": "Knowledge base MCP server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "queries_database"
+        ],
+        "transport": "streamable_http",
+        "auth_mode": "oauth21",
+        "resource_metadata": true,
+        "client_registration": "pre_registered",
+        "exposure": "private_network",
+        "sandbox": "container",
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_tool_exec",
+      "type": "tool",
+      "name": "Code runner tool",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "executes_code"
+        ],
+        "egress_policy": "disabled"
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Agent log archive",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "immutable": true,
+        "retention_days": 3650,
+        "region": "switzerlandnorth",
+        "purpose": "evidence",
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_eval",
+      "type": "evaluation",
+      "name": "Agent evaluation and drift monitoring",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "owner": "Head of Agent Platform",
+        "evaluates": [
+          "accuracy",
+          "robustness",
+          "prompt_injection",
+          "drift"
+        ],
+        "purpose": "Evaluates the agents from their logged runs"
+      }
+    },
+    {
+      "id": "n_tool_docs",
+      "type": "tool",
+      "name": "Document search tool",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "queries_database"
+        ]
+      }
+    },
+    {
+      "id": "n_tool_docs_tp",
+      "type": "tool",
+      "name": "Partner document search (third party)",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "queries_database"
+        ]
+      }
+    },
+    {
+      "id": "n_tool_search",
+      "type": "tool",
+      "name": "Web search tool",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "network_egress"
+        ]
+      }
+    },
+    {
+      "id": "n_tool_ticket",
+      "type": "tool",
+      "name": "Ticket writer",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "tickets.write"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "write_capable": true,
+        "capabilities": [
+          "modifies_state"
+        ]
+      }
+    },
+    {
+      "id": "n_registry",
+      "type": "agent_registry",
+      "name": "Tool registry",
+      "layer": "identity",
+      "source": "design",
+      "attrs": {
+        "kind": "custom",
+        "verification": "signed",
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_mem_research",
+      "type": "agent_memory",
+      "name": "Research memory",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "scope": "agent",
+        "validated": true,
+        "write_path": "broker"
+      }
+    },
+    {
+      "id": "n_mem_draft",
+      "type": "agent_memory",
+      "name": "Drafting memory",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "scope": "agent",
+        "validated": true,
+        "write_path": "broker"
+      }
+    },
+    {
+      "id": "n_notes",
+      "type": "datastore",
+      "name": "Research notes",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "cosmos",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_tickets",
+      "type": "datastore",
+      "name": "Ticket store",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_ledger",
+      "type": "datastore",
+      "name": "Ledger",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "confidential",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_clients",
+      "type": "datastore",
+      "name": "Client register",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "cid",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true,
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_approval",
+      "type": "human_step",
+      "name": "Ledger approval",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "operations",
+        "approval_identity": "separate",
+        "approval_for": [
+          "ledger_entry"
+        ]
+      }
+    },
+    {
+      "id": "n_notify",
+      "type": "human_step",
+      "name": "Draft sign-off",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "operations",
+        "approval_identity": "separate",
+        "approval_for": [
+          "ledger_note"
+        ]
+      }
+    },
+    {
+      "id": "n_feed",
+      "type": "external_party",
+      "name": "Partner news feed",
+      "layer": "app",
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_ingest",
+      "type": "app",
+      "name": "Index ingestion job",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "owner": "Head of Agent Platform"
+      }
+    },
+    {
+      "id": "n_index",
+      "type": "vector_index",
+      "name": "Partner news index",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "data_class": "internal",
+        "acl_trimming": true,
+        "redaction": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_partner",
+      "type": "saas",
+      "name": "Partner event service",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "provider": "other",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_queue",
+      "type": "queue",
+      "name": "Partner events",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "data_class": "internal",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_ingest_gw",
+      "type": "gateway",
+      "name": "Ingestion gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "api",
+        "logging": true,
+        "content_safety": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_triage_aigw",
+      "from": "n_triage",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_reviewer_aigw",
+      "from": "n_reviewer",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_aigw",
+      "from": "n_research",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_draft_aigw",
+      "from": "n_draft",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_aigw_llm",
+      "from": "n_aigw",
+      "to": "n_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_triage_docs",
+      "from": "n_triage",
+      "to": "n_tool_docs",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_triage_docs_tp",
+      "from": "n_triage",
+      "to": "n_tool_docs_tp",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_triage_registry",
+      "from": "n_triage",
+      "to": "n_registry",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_triage_mcpgw",
+      "from": "n_triage",
+      "to": "n_mcpgw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_triage_exec",
+      "from": "n_triage",
+      "to": "n_tool_exec",
+      "kind": "executes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_mcpgw_kb",
+      "from": "n_mcpgw",
+      "to": "n_mcp_kb",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "token_exchange",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consent": "per_client"
+      }
+    },
+    {
+      "id": "e_partner_queue",
+      "from": "n_partner",
+      "to": "n_queue",
+      "kind": "publishes",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_reviewer_queue",
+      "from": "n_reviewer",
+      "to": "n_queue",
+      "kind": "subscribes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_reviewer_tickets",
+      "from": "n_reviewer",
+      "to": "n_tickets",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "low"
+      }
+    },
+    {
+      "id": "e_reviewer_approval",
+      "from": "n_reviewer",
+      "to": "n_approval",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_approval_ledger",
+      "from": "n_approval",
+      "to": "n_ledger",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_research_clients",
+      "from": "n_research",
+      "to": "n_clients",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_index",
+      "from": "n_research",
+      "to": "n_index",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_mem",
+      "from": "n_research",
+      "to": "n_mem_research",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "guarded": true
+      }
+    },
+    {
+      "id": "e_research_mem_read",
+      "from": "n_research",
+      "to": "n_mem_research",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_notes",
+      "from": "n_research",
+      "to": "n_notes",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "low"
+      }
+    },
+    {
+      "id": "e_draft_notes",
+      "from": "n_draft",
+      "to": "n_notes",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_draft_ticket",
+      "from": "n_draft",
+      "to": "n_tool_ticket",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_draft_notify",
+      "from": "n_draft",
+      "to": "n_notify",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_notify_ledger",
+      "from": "n_notify",
+      "to": "n_ledger",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_draft_mem",
+      "from": "n_draft",
+      "to": "n_mem_draft",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "guarded": true
+      }
+    },
+    {
+      "id": "e_draft_mem_read",
+      "from": "n_draft",
+      "to": "n_mem_draft",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_triage_logs",
+      "from": "n_triage",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_reviewer_logs",
+      "from": "n_reviewer",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_logs",
+      "from": "n_research",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_draft_logs",
+      "from": "n_draft",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_eval_logs",
+      "from": "n_eval",
+      "to": "n_logs",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_ingest_index",
+      "from": "n_ingest",
+      "to": "n_index",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_research_apigw",
+      "from": "n_research",
+      "to": "n_apigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_apigw_search",
+      "from": "n_apigw",
+      "to": "n_tool_search",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_ingest_gw",
+      "from": "n_ingest",
+      "to": "n_ingest_gw",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_ingest_gw_feed",
+      "from": "n_ingest_gw",
+      "to": "n_feed",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

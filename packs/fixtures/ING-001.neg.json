@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_ing_001_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ING-001 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 03 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_mcp_tp",
+      "type": "mcp_server",
+      "name": "Partner news MCP server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "capabilities": [
+          "queries_database"
+        ]
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Ticket store",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_mcp_tp",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_agent",
+      "to": "n_db",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

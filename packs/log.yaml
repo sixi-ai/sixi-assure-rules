@@ -1,7 +1,10 @@
 # LOG — logging & retention (docs/03 §LOG). Deterministic CEL; the LLM never creates findings.
+# 0.3.0 (docs/18 WS-I I2, logging-retention.md): the pack also applies under NIS2, ISO, MCSB, FADP and GDPR, so LOG-006
+# to LOG-009 run under every regime whose clause they cite (LOG-008 under FADP or GDPR alone, for instance).
 pack: log
-version: 0.1.0
-regimes: [AIACT, FINMA, CH-CO, DORA]
+version: 0.3.0
+regimes: [AIACT, FINMA, CH-CO, DORA, NIS2, ISO, MCSB, FADP, GDPR]
+offer: agentic
 rules:
   - id: LOG-001
     title: AI components without a log sink
@@ -38,18 +41,8 @@ rules:
     fixtures: { positive: fixtures/LOG-003.pos.json, negative: fixtures/LOG-003.neg.json }
     tags: [logging, immutability, finma]
 
-  - id: LOG-004
-    title: LLM traffic not logged through a gateway
-    scope: edge
-    severity: high
-    condition: |
-      e.from.type in ["agent","app"] && e.to.type == "llm_endpoint" &&
-      !g.pathThrough(e.from.id, e.to.id, "gateway")
-    message: "{{e.from.name}} → {{e.to.name}} bypasses any gateway; prompts and responses are not logged."
-    clauses: [AIACT:2024/1689:Art12, FINMA:08/2024:Monitoring]
-    remediation: "Route LLM calls through an AI gateway with prompt/response logging to the log sink."
-    fixtures: { positive: fixtures/LOG-004.pos.json, negative: fixtures/LOG-004.neg.json }
-    tags: [logging, llm, gateway]
+  # LOG-004 ("LLM traffic not logged through a gateway") is retired in 0.2.0: it shared AI-001's hop and condition, so
+  # AI-001 now reports that one fact once and cites AIACT:2024/1689:Art12 (ADR-088 §2). The id is not reused.
 
   - id: LOG-005
     title: Agent tool calls not logged
@@ -63,3 +56,74 @@ rules:
       - { op: add, path: "/edges/{{e.id}}/attrs/logged", value: true }
     fixtures: { positive: fixtures/LOG-005.pos.json, negative: fixtures/LOG-005.neg.json }
     tags: [logging, agent, tools]
+
+  # CHE-003 (docs/18 WS-I I2, swiss-mapper): LOG-002 asks the ten-year floor of sinks; this asks it of the stores an AI
+  # component writes (an agent's advice, booking or decision is a voucher for the transaction it documents). An
+  # undeclared retention_days is silent: not checked, not a finding.
+  - id: CHE-003
+    title: Store written by an AI component retains records below the ten-year floor
+    scope: node
+    severity: medium
+    condition: '(regime("CH-CO") || regime("FINMA")) && n.type == "datastore" && attr(n, "retention_days", 0) > 0 && attr(n, "retention_days", 0) < required("retention_days") && g.in(n.id, "writes").exists(w, w.from.type in ["agent", "tool", "mcp_server"])'
+    requires: [n.attrs.retention_days]
+    domain: '(regime("CH-CO") || regime("FINMA")) && n.type == "datastore" && g.in(n.id, "writes").exists(w, w.from.type in ["agent", "tool", "mcp_server"])'
+    message: "{{n.name}} is written by an AI component and retains records for {{attr(n, 'retention_days', 0)}} days; the enabled regimes keep business records for {{required('retention_days')}} days."
+    clauses: [CH-CO:958f]
+    remediation: "If the store holds accounting records or vouchers, retain them for the ten-year floor; if not, set the finding status with that reason."
+    fixtures: { positive: fixtures/CHE-003.pos.json, negative: fixtures/CHE-003.neg.json }
+    tags: [ch-co, retention, records]
+
+  # LOG-006 … LOG-009 (docs/18 WS-I I2, agents/swarm/05-logging-evidence-and-resilience/logging-retention.md): LOG-001
+  # asks whether a sink exists; these ask whether each agent's records reach one, whether what they reach can be
+  # altered, where the sink sits and (schema 1.1) whether the sink is declared for evidence. dataFlows follows writes,
+  # publishes, flows, delegates, executes and both ways along calls, so an agent whose gateway writes the sink counts as
+  # reaching it. None is a path rule.
+  - id: LOG-006
+    title: Agent whose records reach no log sink
+    scope: node
+    severity: high
+    condition: 'n.type == "agent" && g.has("log_sink") && !g.nodes("log_sink").exists(s, g.dataFlows(n.id, s.id))'
+    message: "A log sink is drawn, but nothing {{n.name}} emits reaches it, directly or through a gateway."
+    clauses: [AIACT:2024/1689:Art12, DORA-RTS:2024/1774:Art12, NIS2:2024/2690:Annex-3.2, ISO:27001:A.8.15, MCSB:v1:LT-3]
+    remediation: "Route the agent's steps, tool calls and delegation hops to the log sink (a writes edge from the agent, or through a gateway that logs on its behalf)."
+    fixtures: { positive: fixtures/LOG-006.pos.json, negative: fixtures/LOG-006.neg.json }
+    tags: [logging, agent]
+
+  # LOG-003 names the sink under FINMA; LOG-007 names the agent under any regime. The immutability of the sinks the
+  # agent reaches cannot be named as a `requires:` path (it is not the agent's attribute): the logging-retention agent
+  # lists the undeclared flag as a not-checked row instead.
+  - id: LOG-007
+    title: Agent records land only in a mutable sink
+    scope: node
+    severity: medium
+    condition: 'n.type == "agent" && g.nodes("log_sink").exists(s, g.dataFlows(n.id, s.id)) && !g.nodes("log_sink").exists(s, attr(s, "immutable", false) && g.dataFlows(n.id, s.id))'
+    message: "Every log sink {{n.name}} reaches lacks immutable=true: its records can be altered after the fact."
+    clauses: [AIACT:2024/1689:Art12, DORA-RTS:2024/1774:Art12, NIS2:2024/2690:Annex-3.2, ISO:27001:A.8.15, CH-CO:958f]
+    remediation: "Store the agent's records on an immutable (WORM / legal-hold) tier and declare immutable=true on that sink; the configuration that backs the flag is the evidence."
+    fixtures: { positive: fixtures/LOG-007.pos.json, negative: fixtures/LOG-007.neg.json }
+    tags: [logging, immutability, agent]
+
+  - id: LOG-008
+    title: Log sink outside the allowed regions
+    scope: node
+    severity: high
+    condition: 'n.type == "log_sink" && attr(n, "region", "") != "" && !(attr(n, "region", "") in tenant.allowed_regions)'
+    requires: [n.attrs.region]
+    domain: 'n.type == "log_sink"'
+    message: "{{n.name}} keeps prompts, tool arguments and approvals in {{attr(n, 'region', '')}}, outside the tenant's allowed regions."
+    clauses: [FINMA:2023/1:Rz-CriticalData, FINMA:2018/3:CID, FADP:2023:Art8, GDPR:Art44, MCSB:v1:LT-5]
+    remediation: "Move the sink to an allowed region, or record the transfer basis as a decision; the region is tenant policy, so the change is a person's call."
+    fixtures: { positive: fixtures/LOG-008.pos.json, negative: fixtures/LOG-008.neg.json }
+    tags: [logging, residency]
+
+  # Schema 1.1 (ADR-047 §3b): the guard on a declared purpose keeps every model that declares none silent.
+  - id: LOG-009
+    title: Agent records land only in an operational-purpose sink
+    scope: node
+    severity: medium
+    condition: 'n.type == "agent" && g.nodes("log_sink").exists(s, attr(s, "purpose", "") != "") && g.nodes("log_sink").exists(s, g.dataFlows(n.id, s.id)) && !g.nodes("log_sink").exists(s, attr(s, "purpose", "") in ["security", "evidence"] && g.dataFlows(n.id, s.id))'
+    message: "The model declares log sink purposes, yet {{n.name}}'s records reach only sinks declared operational."
+    clauses: [AIACT:2024/1689:Art12, AIACT:2024/1689:Art26(6), DORA-RTS:2024/1774:Art12, MCSB:v1:LT-6]
+    remediation: "Route the agent's records to the security or evidence sink as well, so the retention floor of that purpose applies to them."
+    fixtures: { positive: fixtures/LOG-009.pos.json, negative: fixtures/LOG-009.neg.json }
+    tags: [logging, retention, agent]

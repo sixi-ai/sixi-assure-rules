@@ -1,0 +1,37 @@
+{
+  "id": "arch_fx_prv_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture PRV-003 (negative)",
+  "version": 1,
+  "schema_version": "1.1",
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Search MCP server",
+      "layer": "ai",
+      "source": "declared",
+      "attrs": {
+        "origin": "third_party",
+        "registry_entry": "io.example/srv",
+        "integrity": "pinned",
+        "vetted": true
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

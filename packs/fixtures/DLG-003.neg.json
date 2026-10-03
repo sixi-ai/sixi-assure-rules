@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_dlg_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DLG-003 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_core",
+      "kind": "zone",
+      "name": "Core agents",
+      "node_ids": [
+        "n_orch"
+      ]
+    },
+    {
+      "id": "g_partner",
+      "kind": "zone",
+      "name": "Partner agents",
+      "node_ids": [
+        "n_worker"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Orchestrator",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    },
+    {
+      "id": "n_worker",
+      "type": "agent",
+      "name": "Partner worker",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_orch",
+      "to": "n_worker",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "obo",
+      "encryption": "mtls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "token_binding": "mtls"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

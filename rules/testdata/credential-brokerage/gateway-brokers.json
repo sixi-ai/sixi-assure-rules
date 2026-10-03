@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_cb_brokers",
+  "tenant_id": "tenant_fixtures",
+  "name": "Loader fixture: a gateway that brokers credentials",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Research agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "semi"
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "functions": [
+          "identity_termination",
+          "credential_brokerage",
+          "policy"
+        ]
+      }
+    },
+    {
+      "id": "n_kv",
+      "type": "secret_store",
+      "name": "Key Vault",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "key_use": "secrets",
+        "network_exposure": "private",
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_agent_gw",
+      "from": "n_agent",
+      "to": "n_gw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_gw_kv",
+      "from": "n_gw",
+      "to": "n_kv",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

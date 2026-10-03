@@ -1,0 +1,196 @@
+[
+  {
+    "rule_id": "AID-001",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "AID-002",
+    "ids": [
+      "n_report",
+      "n_worker"
+    ]
+  },
+  {
+    "rule_id": "AID-010",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "AID-011",
+    "ids": [
+      "n_report",
+      "n_worker"
+    ]
+  },
+  {
+    "rule_id": "ARH-001",
+    "ids": [
+      "n_worker"
+    ]
+  },
+  {
+    "rule_id": "ATA-006",
+    "ids": [
+      "e_a2agw_peer"
+    ]
+  },
+  {
+    "rule_id": "ATA-010",
+    "ids": [
+      "e_a2agw_peer"
+    ]
+  },
+  {
+    "rule_id": "ATA-011",
+    "ids": [
+      "n_peer2"
+    ]
+  },
+  {
+    "rule_id": "BLR-001",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "DLG-001",
+    "ids": [
+      "e_orch_worker"
+    ]
+  },
+  {
+    "rule_id": "DLG-002",
+    "ids": [
+      "e_orch_report"
+    ]
+  },
+  {
+    "rule_id": "DLG-003",
+    "ids": [
+      "e_orch_report"
+    ]
+  },
+  {
+    "rule_id": "DLG-010",
+    "ids": [
+      "e_worker_mcpgw"
+    ]
+  },
+  {
+    "rule_id": "HOV-003",
+    "ids": [
+      "e_worker_tickets"
+    ]
+  },
+  {
+    "rule_id": "MCP-002",
+    "ids": [
+      "n_mcp_docs"
+    ]
+  },
+  {
+    "rule_id": "MCP-003",
+    "ids": [
+      "e_mcpgw_market"
+    ]
+  },
+  {
+    "rule_id": "MCP-005",
+    "ids": [
+      "n_mcp_market"
+    ]
+  },
+  {
+    "rule_id": "MCP-009",
+    "ids": [
+      "e_mcpgw_docs"
+    ]
+  },
+  {
+    "rule_id": "MEM-001",
+    "ids": [
+      "n_mem"
+    ]
+  },
+  {
+    "rule_id": "MEM-004",
+    "ids": [
+      "n_mem"
+    ]
+  },
+  {
+    "rule_id": "SEG-010",
+    "ids": [
+      "n_worker"
+    ]
+  },
+  {
+    "rule_id": "SEG-011",
+    "ids": [
+      "e_orch_peer2"
+    ]
+  },
+  {
+    "rule_id": "STR-005",
+    "ids": [
+      "e_worker_tickets"
+    ]
+  },
+  {
+    "rule_id": "STR-006",
+    "ids": [
+      "e_worker_aigw"
+    ]
+  },
+  {
+    "rule_id": "TSC-001",
+    "ids": [
+      "n_mcp_market"
+    ]
+  },
+  {
+    "rule_id": "WIS-003",
+    "ids": [
+      "arch_gs_mcp_platform_bad"
+    ]
+  },
+  {
+    "rule_id": "WIS-004",
+    "ids": [
+      "n_mcp_docs"
+    ]
+  },
+  {
+    "rule_id": "WIS-010",
+    "ids": [
+      "e_worker_aigw"
+    ]
+  },
+  {
+    "rule_id": "WIS-011",
+    "ids": [
+      "e_peer_a2agw"
+    ]
+  },
+  {
+    "rule_id": "PRV-003",
+    "ids": [
+      "n_mcp_docs"
+    ]
+  },
+  {
+    "rule_id": "PRV-003",
+    "ids": [
+      "n_mcp_tickets"
+    ]
+  },
+  {
+    "rule_id": "PRV-003",
+    "ids": [
+      "n_peer2"
+    ]
+  }
+]

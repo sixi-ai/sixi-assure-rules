@@ -1,0 +1,59 @@
+{
+  "id": "arch_fx_prv_004_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture PRV-004 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Public API",
+      "layer": "app",
+      "source": "design",
+      "description": "Public API behind the WAF",
+      "attrs": {
+        "exposure": "public",
+        "authn": "oidc",
+        "waf": true
+      }
+    },
+    {
+      "id": "n_partner_api",
+      "type": "api",
+      "name": "Partner API",
+      "layer": "app",
+      "source": "design",
+      "description": "Public partner API, not behind a WAF",
+      "attrs": {
+        "exposure": "public",
+        "authn": "oidc"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Orders DB",
+      "layer": "data",
+      "source": "design",
+      "description": "Orders store; no CMK yet, platform-managed keys",
+      "attrs": {
+        "engine": "sql"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

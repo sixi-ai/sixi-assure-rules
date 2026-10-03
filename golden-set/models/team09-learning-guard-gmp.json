@@ -1,0 +1,475 @@
+{
+  "attrs": {
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "description": "Golden pair of swarm team 09 (agents/swarm/09-sector-packs): a GMP filling line whose person-detection guard learns on site, batch records written by the MES and a drafting agent, and setpoint changes approved by a person and sent through a conduit.",
+    "owner": "Head of Manufacturing IT",
+    "regimes": [
+      "MR",
+      "FDA",
+      "EU-GMP"
+    ],
+    "substantial_modification": "not_substantial"
+  },
+  "edges": [
+    {
+      "attrs": {
+        "consequence": "high",
+        "logged": true
+      },
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_qa_release",
+      "id": "e_qa_mes",
+      "kind": "executes",
+      "to": "n_mes"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_mes",
+      "id": "e_mes_records",
+      "kind": "writes",
+      "to": "n_records"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_mes",
+      "id": "e_mes_audit",
+      "kind": "writes",
+      "to": "n_audit"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_mcp",
+      "kind": "calls",
+      "to": "n_mcp"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_mcp",
+      "id": "e_mcp_records",
+      "kind": "writes",
+      "to": "n_records"
+    },
+    {
+      "attrs": {
+        "consequence": "high",
+        "logged": true
+      },
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_cmd_approval",
+      "id": "e_cmd_hub",
+      "kind": "executes",
+      "to": "n_hub"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_cmd_approval",
+      "id": "e_cmd_audit",
+      "kind": "writes",
+      "to": "n_audit"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "mtls",
+      "encryption": "mtls",
+      "from": "n_hub",
+      "id": "e_hub_gw",
+      "kind": "publishes",
+      "to": "n_gw"
+    },
+    {
+      "attrs": {
+        "consequence": "high",
+        "logged": true
+      },
+      "auth": "mtls",
+      "encryption": "mtls",
+      "from": "n_gw",
+      "id": "e_gw_plc",
+      "kind": "writes",
+      "to": "n_plc"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_gw",
+      "id": "e_gw_guard",
+      "kind": "calls",
+      "to": "n_guard"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_guard",
+      "id": "e_guard_log",
+      "kind": "writes",
+      "to": "n_decision_log"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_train",
+      "id": "e_train_release",
+      "kind": "writes",
+      "to": "n_model_release"
+    },
+    {
+      "attrs": {
+        "logged": true
+      },
+      "auth": "mtls",
+      "encryption": "mtls",
+      "from": "n_model_release",
+      "id": "e_release_guard",
+      "kind": "writes",
+      "to": "n_guard"
+    }
+  ],
+  "evidence": [],
+  "findings": [],
+  "groups": [
+    {
+      "id": "g_cloud",
+      "kind": "zone",
+      "name": "Cloud",
+      "node_ids": [
+        "n_agent",
+        "n_mcp",
+        "n_train"
+      ]
+    },
+    {
+      "id": "g_site_it",
+      "kind": "zone",
+      "name": "Site IT",
+      "node_ids": [
+        "n_records",
+        "n_mes",
+        "n_qa_release",
+        "n_audit",
+        "n_cmd_approval",
+        "n_model_release"
+      ]
+    },
+    {
+      "id": "g_conduit",
+      "kind": "zone",
+      "name": "Conduit",
+      "node_ids": [
+        "n_hub"
+      ]
+    },
+    {
+      "id": "g_line",
+      "kind": "zone",
+      "name": "Filling line",
+      "node_ids": [
+        "n_gw",
+        "n_plc",
+        "n_guard",
+        "n_decision_log"
+      ]
+    }
+  ],
+  "id": "arch_gs_team09_learning_guard_gmp",
+  "identities": [
+    {
+      "attrs": {
+        "x_migrated_from": "agent.identity=agent_id"
+      },
+      "id": "ident_agent_id",
+      "kind": "agent_identity",
+      "name": "Agent identity (agent_id)"
+    }
+  ],
+  "name": "Learning safety guard on a GMP filling line (sector packs)",
+  "nodes": [
+    {
+      "attrs": {
+        "backup": true,
+        "data_class": "confidential",
+        "engine": "sql",
+        "owner": "Head of Manufacturing IT",
+        "region": "switzerlandnorth",
+        "retention_days": 3650
+      },
+      "id": "n_records",
+      "layer": "data",
+      "name": "Batch records (eBR)",
+      "position": {
+        "x": 520,
+        "y": 80
+      },
+      "source": "design",
+      "type": "datastore",
+      "zone": "g_site_it"
+    },
+    {
+      "attrs": {
+        "exposure": "internal",
+        "gamp_category": "configured",
+        "identity": "managed_identity",
+        "owner": "Head of Manufacturing IT",
+        "supplier_assessed": true
+      },
+      "id": "n_mes",
+      "layer": "app",
+      "name": "Manufacturing execution system",
+      "position": {
+        "x": 320,
+        "y": 80
+      },
+      "source": "design",
+      "type": "app",
+      "zone": "g_site_it"
+    },
+    {
+      "attrs": {
+        "approval_for": [
+          "batch release"
+        ],
+        "approval_identity": "separate",
+        "role": "QA"
+      },
+      "id": "n_qa_release",
+      "layer": "human",
+      "name": "Batch release sign-off",
+      "position": {
+        "x": 120,
+        "y": 80
+      },
+      "source": "design",
+      "type": "human_step",
+      "zone": "g_site_it"
+    },
+    {
+      "attrs": {
+        "immutable": true,
+        "region": "switzerlandnorth",
+        "retention_days": 3650
+      },
+      "id": "n_audit",
+      "layer": "platform",
+      "name": "GxP audit trail",
+      "position": {
+        "x": 520,
+        "y": 240
+      },
+      "source": "design",
+      "type": "log_sink",
+      "zone": "g_site_it"
+    },
+    {
+      "attrs": {
+        "autonomy": "assisted",
+        "content_safety": true,
+        "identity": "agent_id",
+        "identity_id": "ident_agent_id",
+        "owner": "Head of Manufacturing IT",
+        "purpose": "Drafts deviation reports for QA review; a person enters every record."
+      },
+      "id": "n_agent",
+      "layer": "ai",
+      "name": "Deviation drafting assistant",
+      "position": {
+        "x": 120,
+        "y": 400
+      },
+      "source": "design",
+      "type": "agent",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "identity": "managed_identity",
+        "origin": "first_party",
+        "vetted": true
+      },
+      "id": "n_mcp",
+      "layer": "app",
+      "name": "Batch record tool server",
+      "position": {
+        "x": 320,
+        "y": 400
+      },
+      "source": "design",
+      "type": "mcp_server",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "approval_for": [
+          "setpoint change"
+        ],
+        "approval_identity": "separate",
+        "role": "line supervisor"
+      },
+      "id": "n_cmd_approval",
+      "layer": "human",
+      "name": "Setpoint change approval",
+      "position": {
+        "x": 120,
+        "y": 560
+      },
+      "source": "design",
+      "type": "human_step",
+      "zone": "g_site_it"
+    },
+    {
+      "attrs": {
+        "network_exposure": "private",
+        "region": "switzerlandnorth"
+      },
+      "id": "n_hub",
+      "layer": "platform",
+      "name": "Plant command conduit",
+      "position": {
+        "x": 320,
+        "y": 560
+      },
+      "source": "design",
+      "type": "broker",
+      "zone": "g_conduit"
+    },
+    {
+      "attrs": {
+        "attestation": "tpm",
+        "command_validation": true,
+        "intervention_log": true,
+        "owner": "Head of Manufacturing IT",
+        "site": "Example Pharma AG - Basel"
+      },
+      "id": "n_gw",
+      "layer": "edge",
+      "name": "Filling line gateway",
+      "position": {
+        "x": 520,
+        "y": 560
+      },
+      "source": "design",
+      "type": "edge_gateway",
+      "zone": "g_line"
+    },
+    {
+      "attrs": {
+        "attestation": "tpm",
+        "owner": "Head of Manufacturing IT",
+        "site": "Example Pharma AG - Basel"
+      },
+      "id": "n_plc",
+      "layer": "edge",
+      "name": "Filling line PLC",
+      "position": {
+        "x": 720,
+        "y": 560
+      },
+      "source": "design",
+      "type": "edge_device",
+      "zone": "g_line"
+    },
+    {
+      "attrs": {
+        "conformity_route": "module_b_c",
+        "hosted_on": "n_gw",
+        "owner": "Head of Manufacturing IT",
+        "purpose": "Stops the filler when a person enters the danger zone; learns on site.",
+        "safety_function": true,
+        "self_evolving": true,
+        "version": "2.1"
+      },
+      "id": "n_guard",
+      "layer": "edge",
+      "name": "Person-detection guard",
+      "position": {
+        "x": 720,
+        "y": 720
+      },
+      "source": "design",
+      "type": "edge_model",
+      "zone": "g_line"
+    },
+    {
+      "attrs": {
+        "immutable": true,
+        "retention_days": 730
+      },
+      "id": "n_decision_log",
+      "layer": "platform",
+      "name": "Safety decision log",
+      "position": {
+        "x": 920,
+        "y": 720
+      },
+      "source": "design",
+      "type": "log_sink",
+      "zone": "g_line"
+    },
+    {
+      "attrs": {
+        "exposure": "internal",
+        "identity": "managed_identity",
+        "owner": "Head of Manufacturing IT"
+      },
+      "id": "n_train",
+      "layer": "app",
+      "name": "Guard training service",
+      "position": {
+        "x": 120,
+        "y": 720
+      },
+      "source": "design",
+      "type": "app",
+      "zone": "g_cloud"
+    },
+    {
+      "attrs": {
+        "approval_for": [
+          "model release"
+        ],
+        "approval_identity": "separate",
+        "role": "safety engineer"
+      },
+      "id": "n_model_release",
+      "layer": "human",
+      "name": "Guard model release",
+      "position": {
+        "x": 320,
+        "y": 720
+      },
+      "source": "design",
+      "type": "human_step",
+      "zone": "g_site_it"
+    }
+  ],
+  "schema_version": "1.2",
+  "tenant_id": "tenant_templates",
+  "version": 1
+}

@@ -1,0 +1,103 @@
+{
+  "id": "arch_fx_str_005_upstreamfn_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture STR-005 (a WAF declaring identity termination further up, negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Research agent",
+      "layer": "ai",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Research summaries",
+        "owner": "Head of Research"
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "WAF",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "waf",
+        "logging": true,
+        "functions": [
+          "identity_termination"
+        ]
+      }
+    },
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Orchestrator app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Docs MCP server",
+      "layer": "ai",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "docs.read"
+        ],
+        "vetted": true,
+        "logged": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_gw",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_gw",
+      "to": "n_app",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_app",
+      "to": "n_mcp",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

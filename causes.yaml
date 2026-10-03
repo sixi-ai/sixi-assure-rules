@@ -9,94 +9,157 @@ causes:
   - id: command-path
     title: Command path
     sentence: Nothing an AI component does reaches a machine without a human approval under the approver's own identity and a validation on the device.
-    rules: [OT-001, OT-002, OT-003, OT-006, MR-002, MR-004]
+    rules: [OT-001, OT-002, OT-003, OT-006, MR-002, MR-004, OT-008, OT-009, OT-011, MR-006]
 
   - id: zone-segregation
     title: Zone segregation
     sentence: Traffic between plant zones, the edge and the data layer passes a named conduit, and data from one zone stays readable only to that zone.
-    rules: [OT-004, OT-007, NET-004, NET-005, STR-002]
+    rules: [OT-004, OT-007, NET-004, NET-005, STR-002, NIS-004, OT-010, SEG-005, SEG-001, SEG-002, SEG-003]
 
   - id: human-approval
     title: Human approval and control
     sentence: A consequential action waits for a person who approves it under their own identity, and that person can stop or slow the agent at any time.
-    rules: [AI-003, AI-010, AGT-006, GXP-002]
+    rules: [AI-003, AI-010, AGT-006, GXP-002, CHE-002, GXP-008, HOV-001, HOV-002, HOV-004, ARH-003, ARH-004]
 
   - id: records-retention
     title: Records and retention
     sentence: What the system and its agents did is written to a sink nobody can edit, kept as long as the regime asks, and restorable from a backup.
-    rules: [LOG-001, LOG-002, LOG-003, LOG-004, LOG-005, GXP-001, GXP-003, MR-003, AI-011]
+    rules: [LOG-001, LOG-002, LOG-003, LOG-005, GXP-001, GXP-003, MR-003, AI-011, CHE-004, CRA-005, CHE-003, GXP-005, GXP-006, GXP-007, MR-007, LOG-006, LOG-007, LOG-008, LOG-009, AGW-002]
+
+  - id: evidence-integrity
+    title: Evidence integrity
+    sentence: The record of the system cannot be altered, forged or moved out of reach, and every evidence record about it is fresh and verifiable offline.
+    rules: [EVD-001, EVD-003, EVD-004]
 
   - id: untrusted-input
     title: Untrusted input
     sentence: Text and data that arrive from outside the design — users, the plant floor, third-party content — pass a content-safety check before a model or agent reads them.
-    rules: [AI-002, OT-005, AGT-003]
+    rules: [AI-002, OT-005, AGT-003, RAG-002, ING-001, ING-002, ING-003, ING-004]
 
   - id: tool-supply-chain
     title: Third-party tools and MCP
     sentence: An agent reaches only tools that were vetted, pinned to a known version and declare what they do, and that cannot silently take a new name or a new action.
-    rules: [AGT-001, AGT-002, AGT-004, AGT-005, AGT-007, AI-009]
+    rules: [AGT-001, AGT-002, AGT-004, AGT-005, AGT-007, AI-009, TSC-002, TSC-003, TSC-004]
 
   - id: identity
     title: Identity, not shared secrets
     sentence: Every caller — person or workload — proves who it is with its own identity or a strong sign-in, delegation carries the user, and secrets live in a secret store.
-    rules: [ZT-001, ZT-002, ZT-003, ZT-006, ZT-007, ZT-008, ZT-009, STR-004, STR-006]
+    rules: [ZT-001, ZT-002, ZT-003, ZT-006, ZT-007, ZT-008, ZT-009, STR-004, STR-006, CRA-004, WIS-006, WIS-001, WIS-002, HAC-001, HAC-002, HAC-003, HAC-004]
 
   - id: inter-agent-trust
     title: Inter-agent trust
     sentence: An agent delegates only to a peer whose card it has verified, over a hop the transport authenticates, and never puts a credential inside the message itself.
-    rules: [ATA-001, ATA-002, ATA-003]
+    rules: [ATA-001, ATA-002, ATA-003, ATA-004, ATA-005, ATA-007]
+
+  # docs/18 D2 (ADR-047 §4): schema 1.1 agent identity, MCP posture, agent runtime and the agent mesh. Added as causes
+  # of their own so the existing taxonomy rows stay as written; ordered after inter-agent trust.
+  - id: agent-identity
+    title: Agent identity and tokens
+    sentence: Every agent runs as an identity of its own that a person sponsors, a named issuer federates and a registry lists, and every token it passes on is exchanged, addressed and sender-bound.
+    rules: [AID-001, AID-002, AID-010, AID-011, WIS-004, WIS-010, WIS-011, DLG-001, DLG-003, DLG-010, AID-003, AID-004, WIS-003, DLG-002, DLG-004]
+
+  - id: mcp-posture
+    title: MCP server posture
+    sentence: An MCP server accepts only tokens issued for it, under consent given per client, over a current transport, and nothing beyond its own host reaches it without OAuth.
+    rules: [MCP-002, MCP-003, MCP-005, MCP-009, TSC-001, MCP-004]
+
+  - id: agent-runtime
+    title: Agent runtime containment
+    sentence: An autonomous agent runs in a sandbox, reaches only the hosts it is allowed, writes memory only after validation and changes state only after a person approves.
+    rules: [ARH-001, SEG-010, MEM-001, HOV-003, MEM-002, MEM-003, MEM-004, MEM-005]
+
+  - id: agent-mesh
+    title: Agent mesh and peer cards
+    sentence: Agents reach their peers through the broker the design declares, with tokens bound to the sender, and trust a peer's card only when it is signed against a declared anchor.
+    rules: [ATA-006, ATA-010, ATA-011, SEG-011]
+
+  # docs/18 WS-M M3 (ADR-093, packs/fw.yaml): the agent framework's own settings, read from its artefacts.
+  - id: framework-settings
+    title: Agent framework settings
+    sentence: The framework an agent runs on is set so its defaults keep the design — stored state is data and expires, loops end, guardrails follow every hop, runtimes authenticate and are pinned.
+    rules: [FW-001, FW-002, FW-003, FW-004, FW-005, FW-006, FW-007, FW-008, FW-009, FW-010, FW-011, FW-012, FW-013]
 
   - id: least-privilege
     title: Least privilege
     sentence: An identity holds the narrowest scope that still lets it work, and broad or administrative access is granted only for the moment it is needed.
-    rules: [ZT-004, ZT-005, AI-008]
+    rules: [ZT-004, ZT-005, AI-008, LPV-001, LPV-002, LPV-003, LPV-004]
+
+  # docs/18 WS-I I2 (swarm team 03, autonomy-blast-radius): how far a steered agent reaches in one run.
+  - id: blast-radius
+    title: Autonomy blast radius
+    sentence: A steered agent changes state through at most one unattended component per run and reaches neither sensitive data with an open outbound channel nor a second acting agent.
+    rules: [BLR-001, BLR-002, BLR-003, BLR-004]
 
   - id: network-exposure
     title: Network exposure
     sentence: Nothing sits open on the public network; calls in and out pass a gateway that can see, filter and cut them, and every hop is encrypted.
-    rules: [NET-001, NET-002, NET-003, NET-006, AI-001, STR-005]
+    rules: [NET-001, NET-002, NET-003, NET-006, AI-001, STR-005, AGW-003, APX-004, AGW-004, APX-001, APX-002, APX-003, SEG-004, TLS-001, TLS-002, TLS-003]
 
   - id: data-protection
     title: Data protection and residency
     sentence: Sensitive data is classified before use, shown only to callers entitled to it, encrypted with the owner's own keys, kept in the chosen regions and never handed to a model unfiltered.
-    rules: [DATA-001, DATA-002, DATA-003, DATA-004, DATA-006]
+    rules: [DATA-001, DATA-002, DATA-003, DATA-004, DATA-006, FIN-002, CHE-001, AGW-005, DCR-001, DCR-002, DCR-003, RAG-001, RAG-003, RAG-004]
 
   - id: ai-transparency
     title: AI transparency and inventory
     sentence: People are told when they deal with AI and which output it produced, and every AI component is listed with its purpose, risk tier and model documentation.
-    rules: [AI-005, AI-006, AI-007, AI-012, AI-013]
+    rules: [AI-005, AI-006, AI-007, AI-012, AI-013, AIA-001, AIA-002, AIA-003, FIN-001]
 
   - id: evaluation-monitoring
     title: Evaluation and monitoring
     sentence: Every AI component is evaluated against a stated scope that covers the risks it carries, and watched afterwards for drift.
-    rules: [AI-004, AI-014, AI-015]
+    rules: [AI-004, AI-014, AI-015, EVL-001, EVL-002, EVL-003, EVL-004]
+
+  # docs/18 WS-I I2 (swarm team 07, attack-evidence-ingestor): an agent a user or an action can steer sits inside the
+  # declared scope of an adversarial evaluation; whether the test ran is an evidence record, never a rule.
+  - id: attack-resistance
+    title: Attack resistance
+    sentence: Every agent a user or an action can steer is inside the scope of an adversarial evaluation, and attack-test results are recorded as evidence, never assumed.
+    rules: [AEI-001, AEI-002]
 
   - id: resilience
     title: Resilience and continuity
     sentence: A component the business depends on survives the loss of a site — it is replicated or backed up, it has a stated recovery time, and the recovery has been rehearsed.
-    rules: [RES-001, RES-002, RES-003, DATA-005]
+    rules: [RES-001, RES-002, RES-003, DATA-005, RES-004, RES-005, RES-006, RES-007]
 
   - id: supplier-conformity
     title: Supplier and product conformity
     sentence: A product or outside service the design leans on is assessed before use and carries its own evidence — register entry, SBOM, signed updates, exit plan.
-    rules: [MR-001, GXP-004, CRA-001, CRA-002, TPR-001, TPR-002]
+    rules: [MR-001, GXP-004, CRA-001, CRA-002, TPR-001, TPR-002, FIN-003, DOR-001, DOR-002, DOR-003, DOR-004, CRA-003, CRA-006, MR-005, MR-008]
 
   - id: governance-ownership
     title: Governance and reporting
     sentence: The architecture has a named owner and a written path for reporting an incident to the people and authorities that must hear about it.
-    rules: [GOV-001, GOV-002]
+    rules: [GOV-001, GOV-002, NIS-001, NIS-003, IRR-001, IRR-002, IRR-003, IRR-004, IRR-005]
 
   - id: structure-quality
     title: Structure quality
     sentence: The model reads as one structure — every element sits inside its parent, connects to something, and every accepted decision names the source it rests on.
-    rules: [STR-001, STR-003, STR-007, STR-008]
+    rules: [STR-001, STR-003, STR-007, STR-008, STR-009, STR-010, STR-011, STR-012]
 
   - id: knowledge-freshness
     title: Knowledge freshness
     sentence: The design names services, features and documents that are still current, and every link it cites still resolves to the text it relies on.
-    rules: [DRF-001, DRF-002, DRF-003, DRF-004]
+    rules: [DRF-001, DRF-002, DRF-003, DRF-004, DRF-005, DRF-006, DRF-007, DRF-008]
+
+  - id: provenance
+    title: Provenance
+    sentence: Every fact a rule reads names where it came from, so a control drawn by hand is never weighed as one read from the infrastructure, and an imported fact is read again before its source moves on.
+    rules: [PRV-005, PRV-006, PRV-001, PRV-002, PRV-003, PRV-004]
 
   - id: import-fidelity
     title: Import fidelity
     sentence: Everything that arrives from an import is typed and named, so the rules read it as the component it really is.
-    rules: [IMP-001]
+    rules: [IMP-001, IMP-002, IMP-003, IMP-004, IMP-005, IMP-006]
+
+  # docs/18 WS-I I2 (swarm team 01, intake-scoper and model-completeness): the scope an architecture is assessed
+  # under and the facts its rules read are declared, so a silent rule is reported as not checked, never read as safe.
+  - id: scope-declaration
+    title: Scope declaration
+    sentence: The regimes, tier, regions and owner an architecture is assessed under are declared, not defaulted.
+    rules: [SCP-001, SCP-002, SCP-003, SCP-004, SCP-005]
+
+  - id: declared-facts
+    title: Declared facts
+    sentence: Every fact a rule reads is declared, so a silent rule is reported as not assessed and never read as safe.
+    rules: [CMP-001, CMP-002, CMP-003, CMP-004, CMP-005]

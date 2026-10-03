@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_fw_006_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture FW-006 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Orchestrator agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "guardrails": [
+          {
+            "stage": "input",
+            "kind": "code",
+            "blocking": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "n_worker",
+      "type": "agent",
+      "name": "Worker agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "content_safety": false,
+        "guardrails": [
+          {
+            "stage": "input",
+            "kind": "code",
+            "blocking": true
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_orch",
+      "to": "n_worker",
+      "kind": "delegates",
+      "auth": "obo",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true,
+        "mode": "as_tool"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

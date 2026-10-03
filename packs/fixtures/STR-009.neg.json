@@ -1,0 +1,53 @@
+{
+  "id": "arch_fx_str_009_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture STR-009 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_zone",
+      "kind": "zone",
+      "name": "App zone",
+      "node_ids": [
+        "n_app1",
+        "n_app2"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_app1",
+      "type": "app",
+      "name": "Front app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_app2",
+      "type": "app",
+      "name": "Back app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

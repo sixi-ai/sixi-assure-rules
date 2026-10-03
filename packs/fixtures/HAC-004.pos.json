@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_hac_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture HAC-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_user",
+      "type": "user",
+      "name": "Employee",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "population": "employee",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Assistant agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 02 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "inbound_auth": "api_key"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_user",
+      "to": "n_agent",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "api_key",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

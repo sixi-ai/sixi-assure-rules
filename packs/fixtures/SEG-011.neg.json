@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_seg_011_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SEG-011 (negative: dispatcher/worker loop through the A2A gateway)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "IEC"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_orch",
+      "type": "agent",
+      "name": "Orchestrator",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    },
+    {
+      "id": "n_a2agw",
+      "type": "gateway",
+      "name": "A2A gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "a2a",
+        "logging": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ]
+      }
+    },
+    {
+      "id": "n_worker",
+      "type": "agent",
+      "name": "Worker agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_dispatch",
+      "from": "n_a2agw",
+      "to": "n_orch",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e1",
+      "from": "n_orch",
+      "to": "n_worker",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_report",
+      "from": "n_worker",
+      "to": "n_a2agw",
+      "kind": "calls",
+      "protocol": "a2a",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

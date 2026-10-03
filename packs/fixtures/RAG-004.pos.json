@@ -1,0 +1,108 @@
+{
+  "id": "arch_fx_rag_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture RAG-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "ISO",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g1",
+      "kind": "zone",
+      "name": "HR zone",
+      "node_ids": [
+        "n_hr"
+      ],
+      "attrs": {}
+    },
+    {
+      "id": "g2",
+      "kind": "zone",
+      "name": "Operations zone",
+      "node_ids": [
+        "n_ops"
+      ],
+      "attrs": {}
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_hr",
+      "type": "datastore",
+      "name": "HR store",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      },
+      "zone": "g1"
+    },
+    {
+      "id": "n_ops",
+      "type": "datastore",
+      "name": "Operations store",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      },
+      "zone": "g2"
+    },
+    {
+      "id": "n_idx",
+      "type": "vector_index",
+      "name": "AI Search index",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "data_class": "internal",
+        "acl_trimming": false,
+        "redaction": true,
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_hr",
+      "to": "n_idx",
+      "kind": "flows",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_ops",
+      "to": "n_idx",
+      "kind": "flows",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

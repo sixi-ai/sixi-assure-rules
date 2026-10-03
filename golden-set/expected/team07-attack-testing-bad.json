@@ -1,0 +1,14 @@
+[
+  {
+    "rule_id": "AEI-001",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "AEI-002",
+    "ids": [
+      "n_agent"
+    ]
+  }
+]

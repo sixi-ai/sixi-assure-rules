@@ -1,0 +1,104 @@
+{
+  "id": "arch_fx_net_005_edgebroker_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture NET-005 (edge-layer broker, negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "IEC"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_dev",
+      "type": "edge_device",
+      "name": "Edge device",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "secure_boot": true,
+        "ota_signed": true,
+        "egress_policy": true,
+        "cra_scope": true,
+        "sbom": true
+      }
+    },
+    {
+      "id": "n_broker",
+      "type": "broker",
+      "name": "IoT Operations broker",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "network_exposure": "private"
+      }
+    },
+    {
+      "id": "n_ingest",
+      "type": "api",
+      "name": "Ingest API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "identity": "managed_identity"
+      }
+    },
+    {
+      "id": "n_lake",
+      "type": "datastore",
+      "name": "Telemetry lake",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "blob",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_dev",
+      "to": "n_broker",
+      "kind": "publishes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_broker",
+      "to": "n_ingest",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_ingest",
+      "to": "n_lake",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

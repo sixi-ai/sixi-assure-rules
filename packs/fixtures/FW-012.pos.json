@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_fw_012_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture FW-012 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Support agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true
+      }
+    },
+    {
+      "id": "n_saas",
+      "type": "saas",
+      "name": "Vendor tracing service",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "provider": "other"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_saas",
+      "kind": "flows",
+      "auth": "api_key",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      },
+      "data_class": "confidential"
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

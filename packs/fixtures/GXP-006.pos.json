@@ -1,0 +1,68 @@
+{
+  "id": "arch_fx_gxp_006_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture GXP-006 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FDA",
+      "EU-GMP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Batch record system",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "identity": "managed_identity"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Batch records",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "sql",
+        "data_class": "confidential",
+        "region": "switzerlandnorth",
+        "backup": true
+      }
+    },
+    {
+      "id": "n_audit",
+      "type": "log_sink",
+      "name": "Audit trail",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_app_db",
+      "from": "n_app",
+      "to": "n_db",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

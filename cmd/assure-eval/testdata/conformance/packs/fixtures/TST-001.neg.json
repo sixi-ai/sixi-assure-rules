@@ -1,0 +1,5 @@
+{"id": "arch_neg", "tenant_id": "t", "name": "M", "version": 1,
+  "attrs": {"owner": "o", "regimes": ["FINMA"]}, "groups": [],
+  "nodes": [{"id": "n_agent", "type": "agent", "name": "Agent", "layer": "ai",
+    "attrs": {"identity": "agent_id", "autonomy": "assisted", "purpose": "p", "owner": "o"}}],
+  "edges": [], "findings": [], "evidence": []}

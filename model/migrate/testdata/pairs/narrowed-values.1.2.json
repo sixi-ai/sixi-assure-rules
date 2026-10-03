@@ -1,0 +1,221 @@
+{
+  "attrs": {
+    "owner": "Migration tests",
+    "regimes": [
+      "NIS2"
+    ]
+  },
+  "edges": [
+    {
+      "attrs": {
+        "x_migrated_from": "protocol=http"
+      },
+      "auth": "none",
+      "encryption": "none",
+      "from": "n_app",
+      "id": "e_app_agent",
+      "kind": "calls",
+      "protocol": "other",
+      "to": "n_agent"
+    },
+    {
+      "attrs": {
+        "x_migrated_from": "protocol=SSE"
+      },
+      "auth": "none",
+      "encryption": "none",
+      "from": "n_agent",
+      "id": "e_agent_mcp",
+      "kind": "calls",
+      "protocol": "other",
+      "to": "n_mcp_int"
+    },
+    {
+      "attrs": {
+        "x_migrated_from": "protocol=wss"
+      },
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "from": "n_agent",
+      "id": "e_agent_pub",
+      "kind": "calls",
+      "protocol": "https",
+      "to": "n_mcp_pub"
+    },
+    {
+      "attrs": {
+        "x_migrated_from": "protocol=REST"
+      },
+      "auth": "api_key",
+      "encryption": "tls",
+      "from": "n_agent_open",
+      "id": "e_crawler_unk",
+      "kind": "calls",
+      "protocol": "other",
+      "to": "n_mcp_unk"
+    },
+    {
+      "attrs": {
+        "logged": true,
+        "x_migrated_from": "protocol=ftp"
+      },
+      "auth": "connection_string",
+      "encryption": "none",
+      "from": "n_app",
+      "id": "e_app_siem",
+      "kind": "writes",
+      "protocol": "other",
+      "to": "n_siem"
+    },
+    {
+      "attrs": {
+        "x_migrated_from": "protocol=webhook"
+      },
+      "auth": "api_key",
+      "encryption": "tls",
+      "from": "n_app",
+      "id": "e_app_soc",
+      "kind": "writes",
+      "protocol": "other",
+      "to": "n_soc"
+    },
+    {
+      "attrs": {
+        "x_migrated_from": "protocol=MQTTS"
+      },
+      "auth": "mtls",
+      "encryption": "mtls",
+      "from": "n_plc",
+      "id": "e_plc_ops",
+      "kind": "publishes",
+      "protocol": "mqtt",
+      "to": "n_ops_logs"
+    }
+  ],
+  "evidence": [],
+  "findings": [],
+  "groups": [],
+  "id": "arch_synthetic_narrowed_10",
+  "name": "Synthetic 1.0 model with values 1.1 narrowed (purpose, egress_policy, exposure, plaintext protocols)",
+  "nodes": [
+    {
+      "attrs": {
+        "exposure": "internal"
+      },
+      "id": "n_app",
+      "layer": "app",
+      "name": "Portal",
+      "type": "app"
+    },
+    {
+      "attrs": {
+        "retention_days": 365,
+        "x_migrated_from": "purpose=Audit trail for SIEM",
+        "x_purpose": "Audit trail for SIEM"
+      },
+      "id": "n_siem",
+      "layer": "platform",
+      "name": "SIEM",
+      "type": "log_sink"
+    },
+    {
+      "attrs": {
+        "purpose": "security",
+        "retention_days": 90,
+        "x_migrated_from": "purpose=Security"
+      },
+      "id": "n_soc",
+      "layer": "platform",
+      "name": "SOC feed",
+      "type": "log_sink"
+    },
+    {
+      "attrs": {
+        "purpose": "operational",
+        "retention_days": 30
+      },
+      "id": "n_ops_logs",
+      "layer": "platform",
+      "name": "Ops logs",
+      "type": "log_sink"
+    },
+    {
+      "attrs": {
+        "autonomy": "assisted",
+        "owner": "Ops",
+        "purpose": "answers questions",
+        "x_migrated_from": "egress_policy=true"
+      },
+      "id": "n_agent",
+      "layer": "ai",
+      "name": "Helper",
+      "type": "agent"
+    },
+    {
+      "attrs": {
+        "autonomy": "assisted",
+        "owner": "Ops",
+        "purpose": "crawls",
+        "x_migrated_from": "egress_policy=false"
+      },
+      "id": "n_agent_open",
+      "layer": "ai",
+      "name": "Crawler",
+      "type": "agent"
+    },
+    {
+      "attrs": {
+        "exposure": "private_network",
+        "origin": "first_party",
+        "scopes": [
+          "read"
+        ],
+        "x_migrated_from": "exposure=internal"
+      },
+      "id": "n_mcp_int",
+      "layer": "app",
+      "name": "Docs MCP",
+      "type": "mcp_server"
+    },
+    {
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "read"
+        ],
+        "x_migrated_from": "exposure=unknown"
+      },
+      "id": "n_mcp_unk",
+      "layer": "app",
+      "name": "Vendor MCP",
+      "type": "mcp_server"
+    },
+    {
+      "attrs": {
+        "exposure": "public",
+        "origin": "third_party",
+        "scopes": [
+          "read"
+        ]
+      },
+      "id": "n_mcp_pub",
+      "layer": "app",
+      "name": "Public MCP",
+      "type": "mcp_server"
+    },
+    {
+      "attrs": {
+        "attestation": "tpm",
+        "egress_policy": true,
+        "site": "plant"
+      },
+      "id": "n_plc",
+      "layer": "edge",
+      "name": "PLC",
+      "type": "edge_device"
+    }
+  ],
+  "schema_version": "1.2",
+  "tenant_id": "tenant_migrate",
+  "version": 2
+}

@@ -128,5 +128,57 @@
     "verified": false,
     "note": "Family-level reference used by rule packs. The standard's identity was verified via the IEC webstore on 2026-09-10; individual CR 3.x titles could not be verified because IEC standards are not publicly available.",
     "redacted": "licence"
+  },
+  {
+    "id": "IEC:62443-3-3:SR2.8",
+    "regime": "IEC",
+    "doc": "IEC 62443-3-3:2013, Industrial communication networks — Network and system security — Part 3-3: System security requirements and security levels",
+    "ref": "SR 2.8",
+    "title": "SR 2.8 — Auditable events (foundational requirement FR 2, Use control)",
+    "summary": "System security requirement on generating audit records for security-relevant events, such as access control, operator actions, configuration changes and control system events, so that actions on the control system can be traced.",
+    "excerpt": "",
+    "version": "2013-08-07",
+    "effective": "",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://webstore.iec.ch/publication/7033",
+    "tags": [
+      "audit",
+      "logging",
+      "use-control",
+      "ics"
+    ],
+    "licence": "iec",
+    "verified": false,
+    "note": "Cited by OT-008 (a command approval recorded in no immutable log). The standard's identity was verified via the IEC webstore on 2026-09-10 (see IEC:62443-3-3:Standard); the requirement title could not be verified because IEC standards are not publicly available, so the title is a cautious paraphrase to confirm against the purchased standard. IEC text is not reproduced. Added 2026-10-02, awaiting review by a named reviewer (corpus/README.md §Governance).",
+    "redacted": "licence"
+  },
+  {
+    "id": "IEC:62443-3-3:SR5.2",
+    "regime": "IEC",
+    "doc": "IEC 62443-3-3:2013, Industrial communication networks — Network and system security — Part 3-3: System security requirements and security levels",
+    "ref": "SR 5.2",
+    "title": "SR 5.2 — Zone boundary protection (foundational requirement FR 5, Restricted data flow)",
+    "summary": "System security requirement on monitoring and controlling communications at the boundaries of zones, so that data crosses a zone boundary only through a managed interface that enforces the zone's restrictions.",
+    "excerpt": "",
+    "version": "2013-08-07",
+    "effective": "",
+    "applies_to": [
+      "critical_infrastructure",
+      "all"
+    ],
+    "source_url": "https://webstore.iec.ch/publication/7033",
+    "tags": [
+      "zones",
+      "conduits",
+      "boundary",
+      "ics"
+    ],
+    "licence": "iec",
+    "verified": false,
+    "note": "Cited by OT-010, SEG-001 and SEG-003 (a hop between zones with no conduit, a conduit that separates nothing). The standard's identity was verified via the IEC webstore on 2026-09-10 (see IEC:62443-3-3:Standard); the requirement title could not be verified because IEC standards are not publicly available, so the title is a cautious paraphrase to confirm against the purchased standard. IEC text is not reproduced. Added 2026-10-02, awaiting review by a named reviewer (corpus/README.md §Governance).",
+    "redacted": "licence"
   }
 ]

@@ -110,10 +110,14 @@ func TestScanValueAndDocumentReportJSONPointers(t *testing.T) {
 func TestScanDocumentEscapesPointerTokensAndScansKeys(t *testing.T) {
 	ctx := context.Background()
 	// An x_* extension key is user-authored too (schema allows 60 characters of [A-Za-z0-9_]).
+	// The hit is reported at the object that holds the key, never at the key's own pointer: that pointer would echo
+	// the credential in the 422 detail and the log (integration 3b item 9; this assertion pinned the key's pointer
+	// before).
 	doc := map[string]any{"attrs": map[string]any{"x_AKIAIOSFODNN7EXAMPLE": 1}}
 	res := ScanDocument(ctx, SourceModel, doc)
 	require.True(t, res.Rejects())
-	assert.Equal(t, "/attrs/x_AKIAIOSFODNN7EXAMPLE", res.Findings[0].Path)
+	assert.Equal(t, "/attrs", res.Findings[0].Path)
+	assert.True(t, res.Findings[0].InKey)
 
 	doc = map[string]any{"a/b~c": "postgres://u:EXAMPLEnotarealpassword@db.example.test:5432/x"}
 	res = ScanDocument(ctx, SourceModel, doc)
@@ -239,4 +243,64 @@ func TestFindingJSONCarriesNoValue(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotContains(t, string(b), "AKIA")
 	assert.Contains(t, string(b), `"detector":"aws_access_key"`)
+}
+
+// TestCredentialShapedKeyIsNeverEchoed (integration 3b item 9): a credential-shaped object key is refused, and
+// nothing the caller is shown or the log receives (the pointer, the detail, the error) contains the key; a value hit
+// still names its own pointer.
+func TestCredentialShapedKeyIsNeverEchoed(t *testing.T) {
+	t.Parallel()
+	const key = "AKIAIOSFODNN7EXAMPLE"
+	// Review 3b finding 6: a key that only warns (a high-entropy token) is still not echoed when a value below it
+	// rejects; the value's hit is reported at the pointer of the object holding the key, at any depth below it.
+	const warnKey = "x_Zk8Qp2Lr7Vt9Wm3Xn6Yb4Hc1Jd5Ke0Fg2Sa"
+	warnOnly := ScanDocument(context.Background(), SourceModel, map[string]any{"attrs": map[string]any{warnKey: "v"}})
+	require.False(t, warnOnly.Rejects(), "the key alone only warns")
+	require.NotEmpty(t, warnOnly.Findings, "the key alone produces a warn-level finding")
+	type keyCase struct {
+		name       string
+		doc        any
+		wantPath   string
+		wantDetail string
+		wantInKey  bool
+		// wantUnder is true for a hit below a key that was itself flagged (review 3b finding 6).
+		wantUnder bool
+	}
+	cases := []keyCase{
+		{"an extension key on a node", map[string]any{"nodes": []any{map[string]any{"attrs": map[string]any{"x_" + key: true}}}},
+			"/nodes/0/attrs", "/nodes/0/attrs: aws_access_key in an object key", true, false},
+		{"a key at the document root", map[string]any{"x_" + key: "v"}, "", "(document root): aws_access_key in an object key", true, false},
+		{"a nested key under an escaped token", map[string]any{"a/b": map[string]any{key: 1}}, "/a~1b", "/a~1b: aws_access_key in an object key", true, false},
+		{"a value still names its own pointer", map[string]any{"attrs": map[string]any{"x_note": key}},
+			"/attrs/x_note", "/attrs/x_note: aws_access_key", false, false},
+		{"a rejecting value under a warn-level key", map[string]any{"attrs": map[string]any{warnKey: map[string]any{"v": key}}},
+			"/attrs", "/attrs: aws_access_key under a flagged object key", false, true},
+		{"a rejecting value deeper under a warn-level key", map[string]any{"attrs": map[string]any{warnKey: []any{map[string]any{"a/b": key}}}},
+			"/attrs", "/attrs: aws_access_key under a flagged object key", false, true},
+		{"a rejecting key under a warn-level key", map[string]any{"attrs": map[string]any{warnKey: map[string]any{"x_" + key: 1}}},
+			"/attrs", "/attrs: aws_access_key in an object key", true, true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			res := ScanDocument(context.Background(), SourceModel, tc.doc)
+			require.True(t, res.Rejects())
+			var v *Violation
+			require.ErrorAs(t, res.Err(), &v)
+			assert.Equal(t, tc.wantPath, v.Finding.Path)
+			assert.Equal(t, tc.wantInKey, v.Finding.InKey)
+			assert.Equal(t, tc.wantUnder, v.Finding.UnderKey)
+			assert.Equal(t, tc.wantDetail, v.Detail())
+			if tc.wantInKey || tc.wantUnder {
+				for _, secret := range []string{key, warnKey, strings.TrimPrefix(warnKey, "x_")} {
+					assert.NotContains(t, v.Finding.Path, secret)
+					assert.NotContains(t, v.Detail(), secret)
+					assert.NotContains(t, v.Error(), secret)
+				}
+				for _, f := range res.Findings {
+					assert.NotContains(t, f.Path, strings.TrimPrefix(warnKey, "x_"), "no finding, warn-only included, names the key")
+				}
+			}
+		})
+	}
 }

@@ -1,0 +1,50 @@
+# AIA — the AI Act ledger rules of the regulatory mappers (agents/swarm/06-regulatory-mappers/ai-act-mapper.md).
+# AIA-001 reads the interaction a person has with an agent through an app or gateway (AI-007 reads only the direct
+# hop); AIA-002 reads the declared tier against the design; AIA-003 (gpai declared as the system's tier) is built with the
+# golden pair cra-agent-product. A tier is never proposed: it is the organisation's classification decision (ADR-090 §7).
+pack: aia
+version: 0.1.0
+regimes: [AIACT]
+offer: agentic
+rules:
+  - id: AIA-001
+    title: Agent reached by people through an app or gateway declares no AI disclosure
+    scope: node
+    severity: medium
+    condition: 'n.type == "agent" && regime("AIACT") && !attr(n, "ai_disclosure", false) && !g.in(n.id, "calls").exists(x, x.from.type == "user") && g.nodes("user").exists(u, g.reachable(u.id, n.id))'
+    message: "People reach {{n.name}} through an app, API or gateway, and no AI disclosure is declared on it."
+    clauses: [AIACT:2024/1689:Art50(1), AIACT:2024/1689:Art50]
+    remediation: "Tell people at the start of the interaction that they deal with an AI system, wherever they reach the agent from (ai_disclosure=true)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/ai_disclosure", value: true }
+    fixtures: { positive: fixtures/AIA-001.pos.json, negative: fixtures/AIA-001.neg.json }
+    tags: [ai, transparency, aiact]
+
+  - id: AIA-002
+    title: Non-high-risk tier declared while an agent takes a high-consequence action no human step gates
+    scope: graph
+    severity: medium
+    condition: 'regime("AIACT") && attr(g, "ai_act_tier", "") in ["minimal", "limited"] && (g.edges("writes") + g.edges("executes")).exists(x, x.from.type == "agent" && attr(x, "consequence", "") == "high" && g.pathAvoiding(x.from.id, x.to.id, "human_step"))'
+    requires: [g.attrs.ai_act_tier]
+    message: "The architecture declares AI Act tier {{attr(g, 'ai_act_tier', '')}} while an agent writes or executes with high consequence on a path no human step gates: the classification decision should state why the system is not high-risk."
+    clauses: [AIACT:2024/1689:Art6, AIACT:2024/1689:Art7(2)(i), AIACT:2024/1689:AnnexIII]
+    remediation: "Record the classification decision with the Annex III area considered and the Art 6(3) reasoning for the non-high-risk claim, or route the action through a human step."
+    fixtures: { positive: fixtures/AIA-002.pos.json, negative: fixtures/AIA-002.neg.json }
+    tags: [ai, classification, aiact]
+
+  # AIA-003 (docs/18 WS-I I2, ai-act-mapper): built with the golden pair cra-agent-product, whose bad twin declares the
+  # gpai tier on a system that runs an agent. Graph scope: the finding names the architecture.
+  - id: AIA-003
+    title: GPAI declared as the system's tier while agents run
+    scope: graph
+    severity: low
+    condition: 'regime("AIACT") && attr(g, "ai_act_tier", "") == "gpai" && g.has("agent")'
+    requires: [g.attrs.ai_act_tier]
+    domain: 'regime("AIACT") && g.has("agent")'
+    message: "The architecture declares AI Act tier gpai while it runs agents: gpai names the model provider's obligations, and the system built on the model has an Art 6 tier of its own that is undeclared."
+    # Art113 (application dates) is not cited: its disposition is a one-off record of the date table the ledger was
+    # produced against, and a classification rule would print it checked or open by the tier (review fix, I2).
+    clauses: [AIACT:2024/1689:Art53(1)(b), AIACT:2024/1689:Art6]
+    remediation: "Record the system's own classification decision (minimal, limited, high_risk or prohibited) and keep the GPAI provider's documentation with the model endpoint."
+    fixtures: { positive: fixtures/AIA-003.pos.json, negative: fixtures/AIA-003.neg.json }
+    tags: [ai, classification, aiact, gpai]

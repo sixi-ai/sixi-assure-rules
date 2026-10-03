@@ -1,4 +1,5 @@
 {
+  "schema_version": "1.2",
   "id": "arch_demo_edge_iot_bad",
   "tenant_id": "tenant_demo",
   "name": "Edge → IoT Operations/IoT Hub → Event Hub → storage (plant telemetry) (bad twin)",
@@ -44,7 +45,7 @@
       "attrs": { "retention_days": 30, "immutable": false, "region": "westeurope" } }
   ],
   "edges": [
-    { "id": "e_plc1_egw",    "from": "n_plc1",   "to": "n_egw",    "kind": "publishes", "protocol": "opcua", "auth": "mtls",             "encryption": "none",    "data_class": "internal",     "attrs": {} },
+    { "id": "e_plc1_egw",    "from": "n_plc1",   "to": "n_egw",    "kind": "publishes", "protocol": "opc_ua", "auth": "mtls",             "encryption": "none",    "data_class": "internal",     "attrs": {} },
     { "id": "e_cam2_egw",    "from": "n_cam2",   "to": "n_egw",    "kind": "publishes", "protocol": "mqtt",  "auth": "mtls",             "encryption": "mtls",    "data_class": "pii",          "attrs": {} },
     { "id": "e_vib3_blob",   "from": "n_vib3",   "to": "n_blob",   "kind": "writes",    "protocol": "https", "auth": "api_key",          "encryption": "unknown", "data_class": "internal",     "label": "shadow uplink (bypasses gateway, DMZ and broker)", "attrs": {} },
     { "id": "e_egw_emodel",  "from": "n_egw",    "to": "n_emodel", "kind": "calls",     "protocol": "grpc",  "auth": "mtls",             "encryption": "mtls",    "data_class": "confidential", "label": "local inference", "attrs": {} },

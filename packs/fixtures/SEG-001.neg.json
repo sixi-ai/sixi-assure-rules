@@ -1,0 +1,103 @@
+{
+  "id": "arch_fx_seg_001_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SEG-001 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_a",
+      "kind": "zone",
+      "name": "Zone A",
+      "node_ids": [
+        "n_api",
+        "n_broker"
+      ],
+      "attrs": {}
+    },
+    {
+      "id": "g_b",
+      "kind": "zone",
+      "name": "Zone B",
+      "node_ids": [
+        "n_store"
+      ],
+      "attrs": {}
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Ingest API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      },
+      "zone": "g_a"
+    },
+    {
+      "id": "n_broker",
+      "type": "broker",
+      "name": "Service Bus",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "network_exposure": "private"
+      },
+      "zone": "g_a"
+    },
+    {
+      "id": "n_store",
+      "type": "datastore",
+      "name": "Lake",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      },
+      "zone": "g_b"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_api_broker",
+      "from": "n_api",
+      "to": "n_broker",
+      "kind": "publishes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_broker_store",
+      "from": "n_broker",
+      "to": "n_store",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

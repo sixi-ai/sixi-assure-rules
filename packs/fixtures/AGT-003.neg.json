@@ -32,7 +32,7 @@
         "kill_switch": true,
         "rate_limit": true,
         "ai_disclosure": true,
-        "content_safety": true
+        "content_safety": false
       }
     },
     {
@@ -54,15 +54,38 @@
         ],
         "integrity": "pinned"
       }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "Gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "api",
+        "logging": true,
+        "content_safety": true
+      }
     }
   ],
   "edges": [
     {
-      "id": "e1",
+      "id": "e2",
       "from": "n_agent",
-      "to": "n_tool_tp",
+      "to": "n_gw",
       "kind": "calls",
       "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e3",
+      "from": "n_gw",
+      "to": "n_tool_tp",
+      "kind": "calls",
+      "auth": "managed_identity",
       "encryption": "tls",
       "attrs": {
         "logged": true

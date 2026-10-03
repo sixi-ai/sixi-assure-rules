@@ -1,0 +1,32 @@
+[
+  {
+    "rule_id": "FW-002",
+    "ids": [
+      "n_mem"
+    ]
+  },
+  {
+    "rule_id": "FW-004",
+    "ids": [
+      "n_mem"
+    ]
+  },
+  {
+    "rule_id": "FW-008",
+    "ids": [
+      "n_ci"
+    ]
+  },
+  {
+    "rule_id": "FW-009",
+    "ids": [
+      "n_endpoint"
+    ]
+  },
+  {
+    "rule_id": "FW-011",
+    "ids": [
+      "n_endpoint"
+    ]
+  }
+]

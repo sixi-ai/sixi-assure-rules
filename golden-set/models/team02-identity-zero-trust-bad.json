@@ -1,0 +1,605 @@
+{
+  "schema_version": "1.2",
+  "identities": [
+    {
+      "id": "id_assistant",
+      "name": "Customer assistant identity",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/22222222-3333-4444-5555-666666666666/v2.0",
+      "owner": "Head of Customer Platforms",
+      "sponsor": "Head of Digital Channels",
+      "federation": "entra_agent_id",
+      "credential_type": "federated",
+      "credential_ttl": 3600
+    },
+    {
+      "id": "id_fulfil",
+      "name": "Fulfilment worker identity",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/22222222-3333-4444-5555-666666666666/v2.0",
+      "owner": "Head of Customer Platforms",
+      "sponsor": "Head of Digital Channels",
+      "federation": "entra_agent_id",
+      "credential_type": "federated",
+      "credential_ttl": 3600
+    },
+    {
+      "id": "id_research",
+      "name": "Order research identity",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/22222222-3333-4444-5555-666666666666/v2.0",
+      "owner": "Head of Customer Platforms",
+      "sponsor": "Head of Digital Channels",
+      "federation": "entra_agent_id",
+      "credential_type": "federated",
+      "credential_ttl": 3600
+    },
+    {
+      "id": "id_api",
+      "name": "Orders API workload identity",
+      "kind": "service_principal",
+      "issuer": "https://login.microsoftonline.com/22222222-3333-4444-5555-666666666666/v2.0",
+      "owner": "Head of Customer Platforms",
+      "sponsor": "Head of Digital Channels",
+      "federation": "static_key",
+      "credential_type": "client_secret"
+    }
+  ],
+  "id": "arch_gs_team02_identity_bad",
+  "tenant_id": "tenant_templates",
+  "name": "Retail order assistant with delegated workers and an A2A partner (bad twin)",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Customer Platforms",
+    "description": "Bad twin of the retail order assistant: the portal signs customers in itself with month-long tokens, the API accepts API keys and reads Key Vault with one, the administrator has no PIM, the fulfilment hop drops the customer's context before a tool that places orders, the research hop's token names another audience, the assistant's tool allow-list is a wildcard, the partner agent calls in unauthenticated and its card is served over plain HTTP.",
+    "criticality": "high",
+    "materiality": "medium",
+    "regimes": [
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g_home",
+      "kind": "zone",
+      "name": "Azure – switzerlandnorth",
+      "node_ids": [
+        "n_idp",
+        "n_portal",
+        "n_api",
+        "n_assistant",
+        "n_fulfil",
+        "n_research",
+        "n_orders_tool",
+        "n_lookup_tool",
+        "n_kv"
+      ],
+      "attrs": {
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "g_partner",
+      "kind": "trust_boundary",
+      "name": "Logistics partner (other organisation)",
+      "node_ids": [
+        "n_peer"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_customer",
+      "type": "user",
+      "name": "Retail customer",
+      "layer": "human",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "attrs": {
+        "population": "customer",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_admin",
+      "type": "user",
+      "name": "Platform administrator",
+      "layer": "human",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 300
+      },
+      "attrs": {
+        "population": "admin",
+        "mfa": true,
+        "pim": false
+      }
+    },
+    {
+      "id": "n_idp",
+      "type": "identity_provider",
+      "name": "Entra ID",
+      "layer": "identity",
+      "source": "design",
+      "position": {
+        "x": 600,
+        "y": -150
+      },
+      "attrs": {},
+      "zone": "g_home"
+    },
+    {
+      "id": "n_portal",
+      "type": "app",
+      "name": "Customer portal",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 250,
+        "y": 0
+      },
+      "attrs": {
+        "exposure": "public",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store",
+        "rbac_scope": "custom",
+        "region": "switzerlandnorth",
+        "owner": "Head of Digital Channels"
+      },
+      "zone": "g_home"
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Orders API",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 250,
+        "y": 300
+      },
+      "attrs": {
+        "exposure": "public",
+        "authn": [
+          "oidc",
+          "api_key"
+        ],
+        "secrets_in": "secret_store",
+        "identity_id": "id_api",
+        "rbac_scope": "custom",
+        "region": "switzerlandnorth"
+      },
+      "zone": "g_home"
+    },
+    {
+      "id": "n_assistant",
+      "type": "agent",
+      "name": "Customer assistant agent",
+      "layer": "ai",
+      "zone": "g_home",
+      "source": "design",
+      "position": {
+        "x": 250,
+        "y": 150
+      },
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "owner": "Head of Customer Platforms",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "output_marking": true,
+        "region": "switzerlandnorth",
+        "sponsor": "Head of Digital Channels",
+        "identity_id": "id_assistant",
+        "purpose": "Answers customers' order questions and hands fulfilment and research to worker agents.",
+        "tool_scopes": "*",
+        "inbound_auth": "api_key",
+        "security_schemes": [
+          "api_key",
+          "oauth2"
+        ],
+        "rbac_scope": "custom",
+        "integrity": "signed",
+        "card_url": "https://assistant.retail.example/.well-known/agent-card.json",
+        "card_signed": false
+      }
+    },
+    {
+      "id": "n_fulfil",
+      "type": "agent",
+      "name": "Fulfilment worker agent",
+      "layer": "ai",
+      "zone": "g_home",
+      "source": "design",
+      "position": {
+        "x": 500,
+        "y": 150
+      },
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "semi",
+        "owner": "Head of Customer Platforms",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "output_marking": true,
+        "region": "switzerlandnorth",
+        "sponsor": "Head of Digital Channels",
+        "identity_id": "id_fulfil",
+        "purpose": "Places and amends orders for the customer the assistant acts for.",
+        "tool_scopes": [
+          "orders.write"
+        ],
+        "rbac_scope": "contributor"
+      }
+    },
+    {
+      "id": "n_research",
+      "type": "agent",
+      "name": "Order research agent",
+      "layer": "ai",
+      "zone": "g_home",
+      "source": "design",
+      "position": {
+        "x": 500,
+        "y": 300
+      },
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "owner": "Head of Customer Platforms",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true,
+        "output_marking": true,
+        "region": "switzerlandnorth",
+        "sponsor": "Head of Digital Channels",
+        "identity_id": "id_research",
+        "purpose": "Looks orders up for the assistant.",
+        "tool_scopes": [
+          "orders.read"
+        ],
+        "rbac_scope": "custom"
+      }
+    },
+    {
+      "id": "n_orders_tool",
+      "type": "tool",
+      "name": "Order placement tool",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 750,
+        "y": 150
+      },
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "orders.write"
+        ],
+        "vetted": true,
+        "logged": true,
+        "write_capable": true,
+        "capabilities": [
+          "modifies_state"
+        ],
+        "integrity": "pinned",
+        "owner": "Head of Customer Platforms",
+        "rbac_scope": "custom"
+      },
+      "zone": "g_home"
+    },
+    {
+      "id": "n_lookup_tool",
+      "type": "tool",
+      "name": "Order lookup tool",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 750,
+        "y": 300
+      },
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "orders.read",
+          "orders.export"
+        ],
+        "vetted": true,
+        "logged": true,
+        "write_capable": false,
+        "capabilities": [
+          "queries_database"
+        ],
+        "integrity": "pinned",
+        "owner": "Head of Customer Platforms",
+        "rbac_scope": "custom"
+      },
+      "zone": "g_home"
+    },
+    {
+      "id": "n_kv",
+      "type": "secret_store",
+      "name": "Key Vault",
+      "layer": "identity",
+      "source": "design",
+      "position": {
+        "x": 600,
+        "y": 450
+      },
+      "attrs": {
+        "network_exposure": "private",
+        "key_use": "secrets",
+        "region": "switzerlandnorth"
+      },
+      "zone": "g_home"
+    },
+    {
+      "id": "n_peer",
+      "type": "external_agent",
+      "name": "Logistics partner agent",
+      "layer": "ai",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 600
+      },
+      "attrs": {
+        "owner": "Logistics partner",
+        "card_url": "http://agents.logistics.example/.well-known/agent-card.json",
+        "card_signed": false,
+        "integrity": "pinned",
+        "security_schemes": [
+          "oauth2"
+        ],
+        "inbound_auth": "oauth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_cust_portal",
+      "from": "n_customer",
+      "to": "n_portal",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "token_lifetime": 2592000
+      },
+      "label": "signs in"
+    },
+    {
+      "id": "e_cust_api",
+      "from": "n_customer",
+      "to": "n_api",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "api_key",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "token_lifetime": 3600
+      }
+    },
+    {
+      "id": "e_admin_api",
+      "from": "n_admin",
+      "to": "n_api",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "token_lifetime": 3600
+      },
+      "label": "administers"
+    },
+    {
+      "id": "e_api_idp",
+      "from": "n_api",
+      "to": "n_idp",
+      "kind": "authenticates",
+      "protocol": "https",
+      "auth": "password",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_api_kv",
+      "from": "n_api",
+      "to": "n_kv",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "api_key",
+      "encryption": "tls",
+      "data_class": "secret",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_cust_assistant",
+      "from": "n_customer",
+      "to": "n_assistant",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "token_lifetime": 3600
+      },
+      "label": "chats"
+    },
+    {
+      "id": "e_assistant_idp",
+      "from": "n_assistant",
+      "to": "n_idp",
+      "kind": "authenticates",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_assistant_kv",
+      "from": "n_assistant",
+      "to": "n_kv",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "secret",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_assistant_fulfil",
+      "from": "n_assistant",
+      "to": "n_fulfil",
+      "kind": "delegates",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "audience": "id_fulfil",
+        "delegation_depth": 1,
+        "token_binding": "dpop"
+      },
+      "label": "hands an order change"
+    },
+    {
+      "id": "e_assistant_research",
+      "from": "n_assistant",
+      "to": "n_research",
+      "kind": "delegates",
+      "protocol": "https",
+      "auth": "obo",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "audience": "api://crm-export",
+        "delegation_depth": 1,
+        "token_binding": "dpop"
+      },
+      "label": "hands an order lookup"
+    },
+    {
+      "id": "e_fulfil_orders",
+      "from": "n_fulfil",
+      "to": "n_orders_tool",
+      "kind": "executes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "scopes": [
+          "orders.write"
+        ]
+      }
+    },
+    {
+      "id": "e_research_lookup",
+      "from": "n_research",
+      "to": "n_lookup_tool",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "scopes": [
+          "orders.read"
+        ]
+      }
+    },
+    {
+      "id": "e_assistant_lookup",
+      "from": "n_assistant",
+      "to": "n_lookup_tool",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true,
+        "scopes": [
+          "orders.read",
+          "orders.refund"
+        ]
+      }
+    },
+    {
+      "id": "e_peer_assistant",
+      "from": "n_peer",
+      "to": "n_assistant",
+      "kind": "calls",
+      "protocol": "a2a",
+      "auth": "none",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true,
+        "token_binding": "dpop"
+      },
+      "label": "asks for delivery slots"
+    },
+    {
+      "id": "e_assistant_peer",
+      "from": "n_assistant",
+      "to": "n_peer",
+      "kind": "delegates",
+      "protocol": "a2a",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "confidential",
+      "attrs": {
+        "logged": true,
+        "token_binding": "dpop"
+      },
+      "label": "books a delivery"
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

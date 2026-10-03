@@ -1,0 +1,34 @@
+{
+  "id": "arch_fx_scp_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SCP-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FADP"
+    ],
+    "allowed_regions": []
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Customer DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "pii",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "pmk",
+        "backup": true
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

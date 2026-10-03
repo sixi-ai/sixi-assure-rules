@@ -1,0 +1,65 @@
+{
+  "id": "arch_fx_cra_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CRA-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "CRA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_prod",
+      "type": "product",
+      "name": "Field controller",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "version": "1.4.0",
+        "cra_scope": true,
+        "sbom": true,
+        "secure_boot": true,
+        "ota_signed": true
+      }
+    },
+    {
+      "id": "n_ext",
+      "type": "external_party",
+      "name": "Service partner",
+      "layer": "human",
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Device API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "public",
+        "c4_parent": "n_prod"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_ext",
+      "to": "n_api",
+      "kind": "calls",
+      "auth": "none",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

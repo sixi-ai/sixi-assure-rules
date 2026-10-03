@@ -1,0 +1,151 @@
+{
+  "attrs": {
+    "owner": "Migration tests",
+    "regimes": [
+      "ISO"
+    ]
+  },
+  "edges": [
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "encryption": "none",
+      "from": "n_planner",
+      "id": "e_planner_writer",
+      "kind": "delegates",
+      "to": "n_writer"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "encryption": "none",
+      "from": "n_planner",
+      "id": "e_planner_app",
+      "kind": "calls",
+      "to": "n_app"
+    },
+    {
+      "attrs": {},
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "from": "n_planner",
+      "id": "e_planner_memory",
+      "kind": "writes",
+      "to": "n_memory"
+    }
+  ],
+  "evidence": [],
+  "findings": [],
+  "groups": [],
+  "id": "arch_dangling_host",
+  "name": "Agents on an undrawn host (1.1 free-text hosted_on)",
+  "nodes": [
+    {
+      "attrs": {
+        "autonomy": "semi",
+        "owner": "team",
+        "purpose": "plans",
+        "x_migrated_from": "hosted_on=vm-7"
+      },
+      "id": "n_planner",
+      "layer": "ai",
+      "name": "Planner",
+      "source": "design",
+      "type": "agent"
+    },
+    {
+      "attrs": {
+        "autonomy": "semi",
+        "owner": "team",
+        "purpose": "writes",
+        "x_migrated_from": "hosted_on=vm-7"
+      },
+      "id": "n_writer",
+      "layer": "ai",
+      "name": "Writer",
+      "source": "design",
+      "type": "agent"
+    },
+    {
+      "attrs": {
+        "autonomy": "assisted",
+        "owner": "team",
+        "purpose": "checks",
+        "x_migrated_from": "hosted_on=n_self"
+      },
+      "id": "n_self",
+      "layer": "ai",
+      "name": "Self-hosted",
+      "source": "design",
+      "type": "agent"
+    },
+    {
+      "attrs": {
+        "autonomy": "assisted",
+        "owner": "team",
+        "purpose": "reviews",
+        "x_migrated_from": "hosted_on=n_note"
+      },
+      "id": "n_noted",
+      "layer": "ai",
+      "name": "On a note",
+      "source": "design",
+      "type": "agent"
+    },
+    {
+      "attrs": {
+        "autonomy": "assisted",
+        "hosted_on": "n_app",
+        "owner": "team",
+        "purpose": "answers"
+      },
+      "id": "n_hosted",
+      "layer": "ai",
+      "name": "On the app",
+      "source": "design",
+      "type": "agent"
+    },
+    {
+      "attrs": {
+        "scope": "session",
+        "validated": false,
+        "write_path": "every_step",
+        "x_migrated_from": "hosted_on=redis"
+      },
+      "id": "n_memory",
+      "layer": "data",
+      "name": "Memory",
+      "source": "design",
+      "type": "agent_memory"
+    },
+    {
+      "attrs": {
+        "exposure": "internal",
+        "hosted_on": "vm-7"
+      },
+      "id": "n_app",
+      "layer": "app",
+      "name": "App",
+      "source": "design",
+      "type": "app"
+    },
+    {
+      "attrs": {
+        "text": "the agents share vm-7"
+      },
+      "id": "n_note",
+      "layer": "app",
+      "name": "Note",
+      "source": "design",
+      "type": "note"
+    }
+  ],
+  "provenance": {
+    "/nodes/n_planner/attrs/owner": {
+      "kind": "declared"
+    }
+  },
+  "schema_version": "1.2",
+  "tenant_id": "tenant_migration",
+  "version": 1
+}

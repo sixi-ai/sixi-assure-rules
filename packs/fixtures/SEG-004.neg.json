@@ -1,0 +1,81 @@
+{
+  "id": "arch_fx_seg_004_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture SEG-004 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "OWASP",
+      "MCSB"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Market data MCP server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "market.read"
+        ],
+        "vetted": true,
+        "logged": true,
+        "capabilities": [
+          "network_egress"
+        ]
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "Egress gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "api",
+        "logging": true
+      }
+    },
+    {
+      "id": "n_saas",
+      "type": "saas",
+      "name": "Partner SaaS",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "provider": "other"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_mcp",
+      "to": "n_gw",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_gw",
+      "to": "n_saas",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}
