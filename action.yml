@@ -1,0 +1,105 @@
+name: Sixi Assure rules check
+description: >-
+  Assess architecture models (the Sixi Assure typed graph) against the deterministic rule packs,
+  offline, and write the findings as SARIF 2.1.0 for GitHub code scanning plus a job summary.
+  It assesses and evidences; it never certifies.
+author: Sixi AI
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  models:
+    description: >-
+      Glob(s) of model files relative to the repository root, space-separated (bash globstar,
+      e.g. "**/*.sixi.json architecture/*.json").
+    required: false
+    default: "**/*.sixi.json"
+  fail-on:
+    description: >-
+      Fail the step when a finding is at or above this severity: critical, high, medium, low,
+      info, or "none" to never fail on findings (an invalid model still fails).
+    required: false
+    default: high
+  sarif:
+    description: Path of the SARIF file to write, relative to the repository root.
+    required: false
+    default: sixi-assure.sarif
+
+outputs:
+  sarif:
+    description: Path of the SARIF file written (pass it to github/codeql-action/upload-sarif).
+    value: ${{ steps.check.outputs.sarif }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        go-version-file: ${{ github.action_path }}/go.mod
+        cache-dependency-path: ${{ github.action_path }}/go.sum
+
+    - name: Assess the models against the rule packs
+      id: check
+      shell: bash
+      # Inputs travel as environment variables and are never interpolated into the script, so a
+      # glob or a path cannot inject shell code.
+      env:
+        INPUT_MODELS: ${{ inputs.models }}
+        INPUT_FAIL_ON: ${{ inputs.fail-on }}
+        INPUT_SARIF: ${{ inputs.sarif }}
+      run: |
+        set -euo pipefail
+        # globstar needs bash 4 or later; macOS runners ship bash 3.2, so the action is for Linux runners.
+        if [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+          echo "::error::sixi-assure-rules needs bash 4 or later (found $BASH_VERSION); run it on a Linux runner (ubuntu-latest)"
+          exit 2
+        fi
+        cd "$GITHUB_WORKSPACE"
+
+        # The SARIF path goes into $GITHUB_OUTPUT as name=value: a line break would add an output.
+        case "$INPUT_SARIF" in
+          "") echo "::error::sarif must name a file"; exit 2 ;;
+          *$'\n'*|*$'\r'*) echo "::error::sarif must be a single-line path"; exit 2 ;;
+        esac
+
+        case "$INPUT_FAIL_ON" in
+          critical|high|medium|low|info) fail_on=(-fail-on "$INPUT_FAIL_ON") ;;
+          none|"") fail_on=() ;;
+          *) echo "::error::fail-on must be critical, high, medium, low, info or none (got '${INPUT_FAIL_ON//[$'\r\n']/ }')"; exit 2 ;;
+        esac
+
+        # Expand the globs (globstar; hidden directories such as .git are skipped).
+        shopt -s globstar nullglob
+        set -f; patterns=($INPUT_MODELS); set +f
+        files=()
+        for p in "${patterns[@]}"; do
+          # Regular files only: a symlink could point the check (and its SARIF line numbers) at a
+          # file outside the checkout.
+          for f in $p; do if [ -f "$f" ] && [ ! -L "$f" ]; then files+=("$f"); fi; done
+        done
+        if [ "${#files[@]}" -eq 0 ]; then
+          echo "::error::no model file matches '${INPUT_MODELS//[$'\r\n']/ }'"
+          exit 2
+        fi
+        echo "assessing ${#files[@]} model file(s)"
+
+        echo "sarif=$INPUT_SARIF" >> "$GITHUB_OUTPUT"
+        # Build the command from the action's own checkout; the packs and the policy come from
+        # there too, so the result depends only on the action ref you pinned.
+        bin="$RUNNER_TEMP/assure-check"
+        # GOWORK=off: a go.work in the caller's workspace must not change what is built;
+        # -mod=readonly: go.mod and go.sum are used as pinned, never rewritten.
+        (cd "$GITHUB_ACTION_PATH" && GOWORK=off GOFLAGS=-mod=readonly go build -trimpath -o "$bin" ./cmd/assure-check)
+
+        # The report on stdout carries model text. Workflow commands are switched off while it runs,
+        # with a token nobody can predict, so no model text can become a command ("::add-mask::",
+        # "::error::", …). assure-check also keeps model text on one line.
+        token="$(od -An -tx1 -N16 /dev/urandom | tr -d ' \n')"
+        echo "::stop-commands::$token"
+        status=0
+        "$bin" -packs "$GITHUB_ACTION_PATH/packs" -policy "$GITHUB_ACTION_PATH/policy.yaml" \
+          "${fail_on[@]}" -sarif "$INPUT_SARIF" -step-summary -- "${files[@]}" || status=$?
+        echo "::$token::"
+        exit "$status"

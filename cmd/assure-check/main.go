@@ -5,6 +5,13 @@
 //	go run ./cmd/assure-check examples/agentic-ai-on-azure-bad-twin.json
 //	go run ./cmd/assure-check -validate-only model.json
 //	go run ./cmd/assure-check -json model.json | jq '.[0].findings[0]'
+//	go run ./cmd/assure-check -fail-on high -sarif sixi-assure.sarif -step-summary models/*.sixi.json
+//
+// -sarif writes the findings as SARIF 2.1.0 (GitHub code scanning: upload it with
+// github/codeql-action/upload-sarif); -summary-md writes a Markdown summary (counts per severity,
+// the top findings with their clause ids; "-" for stdout); -step-summary appends that summary to
+// $GITHUB_STEP_SUMMARY when it is set. Both files are written before the exit status is decided,
+// so a failing gate still leaves them for the next step. No account and no network are needed.
 //
 // Findings come only from rules. The command never asserts compliance: it reports which rule
 // fired, on which element, and which clause the rule cites, so a person can check the clause at
@@ -28,6 +35,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/sixi-ai/sixi-assure-rules/corpus"
 	"github.com/sixi-ai/sixi-assure-rules/model"
@@ -48,6 +56,8 @@ type fileReport struct {
 	Groups   int             `json:"groups,omitempty"`
 	Hash     string          `json:"hash,omitempty"`
 	Findings []finding       `json:"findings,omitempty"`
+
+	raw []byte // the file as read, for the SARIF line of an element; never in -json
 }
 
 type finding struct {
@@ -75,6 +85,9 @@ func main() {
 	validateOnly := flag.Bool("validate-only", false, "validate the model, do not evaluate the rules")
 	asJSON := flag.Bool("json", false, "machine-readable output")
 	failOn := flag.String("fail-on", "", "exit 1 when a finding is at or above this severity (info|low|medium|high|critical)")
+	sarifPath := flag.String("sarif", "", "write the findings as SARIF 2.1.0 to this file (GitHub code scanning)")
+	summaryPath := flag.String("summary-md", "", "write a Markdown summary to this file (- for stdout)")
+	stepSummary := flag.Bool("step-summary", false, "append the Markdown summary to $GITHUB_STEP_SUMMARY when it is set")
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, "usage: assure-check [flags] <model.json>…")
 		flag.PrintDefaults()
@@ -89,6 +102,15 @@ func main() {
 			fmt.Fprintf(os.Stderr, "assure-check: unknown severity %q\n", *failOn)
 			os.Exit(2)
 		}
+	}
+
+	if *summaryPath == "-" && *asJSON {
+		fmt.Fprintln(os.Stderr, "assure-check: -summary-md - and -json both want stdout; write the summary to a file")
+		os.Exit(2)
+	}
+	if (*sarifPath != "" || *summaryPath != "" || *stepSummary) && *validateOnly {
+		fmt.Fprintln(os.Stderr, "assure-check: -sarif, -summary-md and -step-summary need the rules; drop -validate-only")
+		os.Exit(2)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), checkTimeout)
@@ -118,7 +140,13 @@ func main() {
 			print(os.Stdout, r)
 		}
 	}
-	os.Exit(exitCode(reports, *failOn))
+	code := exitCode(reports, *failOn)
+	out := ciOutputs{sarifPath: *sarifPath, summaryPath: *summaryPath, stepSummary: *stepSummary}
+	if err := out.write(reports, *failOn, code, os.Stdout, os.Stderr); err != nil {
+		fmt.Fprintln(os.Stderr, "assure-check:", err)
+		os.Exit(2)
+	}
+	os.Exit(code)
 }
 
 func newEngine(packsDir, policyPath string) (*rules.Engine, error) {
@@ -152,6 +180,7 @@ func check(ctx context.Context, eng *rules.Engine, path string) fileReport {
 		return rep
 	}
 	rep.OK = true
+	rep.raw = b
 	rep.Nodes, rep.Edges, rep.Groups = len(a.Nodes), len(a.Edges), len(a.Groups)
 	if h, err := model.Hash(a); err == nil && len(h) >= 12 {
 		rep.Hash = h[:12]
@@ -222,15 +251,38 @@ func stringsOf(v any) []string {
 	return out
 }
 
+// oneLine keeps model-derived text on one printable line. The plain report goes to stdout, which a
+// CI runner parses for workflow commands ("::set-output …", "::add-mask::…"): a newline or a control
+// character inside a model's text must never start a line of its own.
+func oneLine(s string) string {
+	return strings.TrimSpace(strings.Map(func(r rune) rune {
+		switch {
+		case r == '\t' || r == '\n' || r == '\r' || r == '\u2028' || r == '\u2029' || r == '\u0085':
+			return ' '
+		case unicode.IsControl(r):
+			return -1
+		}
+		return r
+	}, s))
+}
+
+func oneLineList(ids []string) string {
+	out := make([]string, 0, len(ids))
+	for _, id := range ids {
+		out = append(out, oneLine(id))
+	}
+	return strings.Join(out, ", ")
+}
+
 func print(w io.Writer, r fileReport) {
 	if !r.OK {
-		fmt.Fprintf(w, "FAIL %s\n", r.File)
+		fmt.Fprintf(w, "FAIL %s\n", oneLine(r.File))
 		for _, p := range r.Problems {
-			fmt.Fprintf(w, "  %s: %s\n", p.Path, p.Message)
+			fmt.Fprintf(w, "  %s: %s\n", oneLine(p.Path), oneLine(p.Message))
 		}
 		return
 	}
-	fmt.Fprintf(w, "OK   %s  nodes=%d edges=%d groups=%d hash=%s\n", r.File, r.Nodes, r.Edges, r.Groups, r.Hash)
+	fmt.Fprintf(w, "OK   %s  nodes=%d edges=%d groups=%d hash=%s\n", oneLine(r.File), r.Nodes, r.Edges, r.Groups, r.Hash)
 	if r.Findings == nil {
 		fmt.Fprintln(w, "     no findings")
 		return
@@ -241,17 +293,17 @@ func print(w io.Writer, r fileReport) {
 	}
 	fmt.Fprintf(w, "     %d findings (%s)\n\n", len(r.Findings), counts(bySeverity))
 	for _, f := range r.Findings {
-		fmt.Fprintf(w, "  [%-8s] %-8s %s\n", f.Severity, f.RuleID, strings.Join(f.IDs, ", "))
-		fmt.Fprintf(w, "             %s\n", f.Message)
+		fmt.Fprintf(w, "  [%-8s] %-8s %s\n", oneLine(f.Severity), oneLine(f.RuleID), oneLineList(f.IDs))
+		fmt.Fprintf(w, "             %s\n", oneLine(f.Message))
 		for _, c := range f.Clauses {
 			if c.Known {
-				fmt.Fprintf(w, "             cites %s — %s\n", c.ID, c.Cite)
+				fmt.Fprintf(w, "             cites %s — %s\n", oneLine(c.ID), oneLine(c.Cite))
 			} else {
-				fmt.Fprintf(w, "             cites %s — no clause found in the corpus\n", c.ID)
+				fmt.Fprintf(w, "             cites %s — no clause found in the corpus\n", oneLine(c.ID))
 			}
 		}
 		if f.Remediation != "" {
-			fmt.Fprintf(w, "             fix:   %s\n", f.Remediation)
+			fmt.Fprintf(w, "             fix:   %s\n", oneLine(f.Remediation))
 		}
 		fmt.Fprintln(w)
 	}
