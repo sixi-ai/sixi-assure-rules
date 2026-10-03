@@ -1,0 +1,71 @@
+{
+  "id": "arch_fx_tls_001_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture TLS-001 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "IEC"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "g1",
+      "kind": "zone",
+      "name": "Zone 1",
+      "node_ids": [
+        "n_app",
+        "n_host"
+      ],
+      "attrs": {}
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store",
+        "hosted_on": "n_host"
+      },
+      "zone": "g1"
+    },
+    {
+      "id": "n_host",
+      "type": "api",
+      "name": "Host API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      },
+      "zone": "g1"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_host",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "none",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

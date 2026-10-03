@@ -1,0 +1,61 @@
+{
+  "id": "arch_fx_irr_005_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture IRR-005 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "allowed_regions": [
+      "westeurope",
+      "northeurope"
+    ],
+    "regimes": [
+      "GDPR"
+    ],
+    "incident_reporting": "SOC on-call → CISO → competent authority per the cited clauses; to be reviewed by the owner."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "SQL DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "pii",
+        "region": "westeurope",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "geo_redundant": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

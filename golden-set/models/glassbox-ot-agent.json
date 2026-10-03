@@ -1,4 +1,8 @@
 {
+  "schema_version": "1.2",
+  "identities": [
+    {"id": "ident_managed_identity", "name": "Managed identity", "kind": "workload_identity", "credential_type": "managed_identity", "attrs": {"x_migrated_from": "agent.identity=managed_identity"}}
+  ],
   "id": "arch_tpl_glassbox_ot_agent",
   "tenant_id": "tenant_templates",
   "version": 1,
@@ -401,7 +405,7 @@
         "y": 540
       },
       "attrs": {
-        "kind": "waf",
+        "kind": "waf", "functions": ["policy", "observability"],
         "region": "switzerlandnorth",
         "provider": "azure",
         "provider_service": "Azure Front Door",
@@ -424,7 +428,7 @@
         "provider": "azure",
         "provider_service": "Azure Static Web Apps",
         "exposure": "public",
-        "authn": "oidc",
+        "authn": ["oidc"],
         "ai_disclosure": true,
         "identity": "managed_identity"
       }
@@ -441,11 +445,12 @@
         "y": 680
       },
       "attrs": {
-        "kind": "ai",
+        "kind": "ai", "functions": ["identity_termination", "policy", "observability"],
         "region": "switzerlandnorth",
         "provider": "azure",
         "provider_service": "Azure API Management",
         "logging": true,
+        "content_safety": true,
         "token_limits": true,
         "x_policies": "validate-jwt, per-IP limits, daily token budget, MCP pass-through, full log"
       }
@@ -484,7 +489,7 @@
       "attrs": {
         "region": "switzerlandnorth",
         "provider": "azure",
-        "identity": "managed_identity",
+        "identity": "managed_identity", "identity_id": "ident_managed_identity",
         "autonomy": "assisted",
         "owner": "Head of Manufacturing IT",
         "materiality": "medium",
@@ -796,7 +801,7 @@
       "attrs": {
         "description": "process tags and alarm text"
       },
-      "protocol": "opcua"
+      "protocol": "opc_ua"
     },
     {
       "id": "e_jetson_model_a",
@@ -805,8 +810,8 @@
       "kind": "calls",
       "auth": "none",
       "encryption": "none",
-      "attrs": {},
-      "protocol": "in-process"
+      "attrs": { "x_migrated_from": "protocol=in-process" },
+      "protocol": "other"
     },
     {
       "id": "e_jetson_hub_a",
@@ -841,8 +846,8 @@
       "kind": "calls",
       "auth": "none",
       "encryption": "none",
-      "attrs": {},
-      "protocol": "in-process"
+      "attrs": { "x_migrated_from": "protocol=in-process" },
+      "protocol": "other"
     },
     {
       "id": "e_validator_plc_a",
@@ -856,7 +861,7 @@
         "logged": true,
         "description": "the only write path to the machine"
       },
-      "protocol": "opcua"
+      "protocol": "opc_ua"
     },
     {
       "id": "e_plc_jetson_b",
@@ -868,7 +873,7 @@
       "attrs": {
         "description": "process tags and alarm text"
       },
-      "protocol": "opcua"
+      "protocol": "opc_ua"
     },
     {
       "id": "e_jetson_model_b",
@@ -877,8 +882,8 @@
       "kind": "calls",
       "auth": "none",
       "encryption": "none",
-      "attrs": {},
-      "protocol": "in-process"
+      "attrs": { "x_migrated_from": "protocol=in-process" },
+      "protocol": "other"
     },
     {
       "id": "e_jetson_hub_b",
@@ -913,8 +918,8 @@
       "kind": "calls",
       "auth": "none",
       "encryption": "none",
-      "attrs": {},
-      "protocol": "in-process"
+      "attrs": { "x_migrated_from": "protocol=in-process" },
+      "protocol": "other"
     },
     {
       "id": "e_validator_plc_b",
@@ -928,7 +933,7 @@
         "logged": true,
         "description": "the only write path to the machine"
       },
-      "protocol": "opcua"
+      "protocol": "opc_ua"
     },
     {
       "id": "e_ingest_hub",
@@ -947,8 +952,8 @@
       "kind": "writes",
       "auth": "managed_identity",
       "encryption": "tls",
-      "attrs": {},
-      "protocol": "tds"
+      "attrs": { "x_migrated_from": "protocol=tds" },
+      "protocol": "sql"
     },
     {
       "id": "e_ingest_audit",
@@ -1100,9 +1105,10 @@
       "auth": "managed_identity",
       "encryption": "tls",
       "attrs": {
+        "x_migrated_from": "protocol=tds",
         "description": "session context per line"
       },
-      "protocol": "tds"
+      "protocol": "sql"
     },
     {
       "id": "e_agent_interrupt",
@@ -1139,10 +1145,11 @@
       "auth": "managed_identity",
       "encryption": "tls",
       "attrs": {
+        "x_migrated_from": "protocol=tds",
         "consequence": "medium",
         "logged": true
       },
-      "protocol": "tds"
+      "protocol": "sql"
     },
     {
       "id": "e_agent_audit",
@@ -1195,9 +1202,10 @@
       "auth": "managed_identity",
       "encryption": "tls",
       "attrs": {
+        "x_migrated_from": "protocol=tds",
         "description": "the approved command"
       },
-      "protocol": "tds"
+      "protocol": "sql"
     },
     {
       "id": "e_broker_kv",

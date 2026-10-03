@@ -362,7 +362,7 @@
     ],
     "licence": "eu-law",
     "verified": true,
-    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554). Cycle facts (2026-09-16): the register template is Implementing Regulation (EU) 2024/2956; the ESAs' Joint Decision ESA 2024 22 of 8 November 2024 sets the 2026 reference date at 31 December 2025 with competent-authority submission to the ESAs by 31 March 2026. There is no single EU-wide entity-to-authority deadline — Art. 28(3) leaves that to each national competent authority."
+    "note": "Verified 2026-09-10 against the official OJ PDF (CELEX 32022R2554). Cycle facts (2026-09-16): the register template is Implementing Regulation (EU) 2024/2956; the ESAs' Joint Decision ESA 2024 22 of 8 November 2024 sets the 2026 reference date at 31 December 2025 with competent-authority submission to the ESAs by 31 March 2026. There is no single EU-wide entity-to-authority deadline — Art. 28(3) leaves that to each national competent authority. Register-of-information fields (E3, note added 2026-10-01; the field list is pending a named reviewer's check against the templates; per the templates of Implementing Regulation (EU) 2024/2956): the entity maintaining the register and its LEI; each contractual arrangement's reference number, type, start, end and notice periods; the ICT third-party service provider's identifier, name, country and parent; the type of ICT service and the function it supports, with whether that function is critical or important; the locations where data is stored and processed and where the service is provided; the data sensitivity; the substitutability and exit assessment; and the subcontracting chain of each service that supports a critical or important function."
   },
   {
     "id": "DORA:2022/2554:Art28(8)",
@@ -611,5 +611,28 @@
     "licence": "eu-law",
     "verified": true,
     "note": "Verified 2026-09-16 against the official OJ text fetched from EUR-Lex (Commission Delegated Regulation (EU) 2025/532, OJ L, 2025/532, 2.7.2025)."
+  },
+  {
+    "id": "DORA:2022/2554:Art2",
+    "regime": "DORA",
+    "doc": "Regulation (EU) 2022/2554 (DORA)",
+    "ref": "Art. 2",
+    "title": "Scope — financial entities and ICT third-party service providers",
+    "summary": "The Regulation applies to the financial entities listed in Art. 2(1) — among them credit, payment and electronic money institutions, account information service providers, investment firms, crypto-asset service providers, central securities depositories, central counterparties, trading venues, trade repositories, managers of alternative investment funds, management companies, data reporting service providers, insurance and reinsurance undertakings and intermediaries, institutions for occupational retirement provision, credit rating agencies, administrators of critical benchmarks, crowdfunding service providers and securitisation repositories — and to ICT third-party service providers; Art. 2(3) and (4) exclude certain entities.",
+    "excerpt": "",
+    "version": "2022-12-27",
+    "effective": "2025-01-17",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+    "tags": [
+      "scope",
+      "financial-entity",
+      "applicability"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Cited by corpus/applicability.json for DORA's applies_when and for the NIS2 lex-specialis exclusion: whether the organisation is a financial entity is the entity_type intake fact an admin declares. Added 2026-10-01, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
   }
 ]

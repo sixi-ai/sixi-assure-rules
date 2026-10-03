@@ -1,0 +1,110 @@
+# BLR — autonomy blast radius (docs/03 §BLR; docs/18 WS-I I2, agents/swarm/03-agentic-runtime-and-supply-chain/
+# autonomy-blast-radius.md). Assume a semi-autonomous or autonomous agent is steered anyway: how far does the harm
+# travel before a person (human_step) or a gateway stops it. Reach is drawn reach: a closure over the edges of the
+# model, never inferred from a description, a tool scope or a knowledge fact. The LLM never creates findings.
+#
+# Every path term is a forward pathAvoiding from the steerable agent (node scope; the ADR-088 reverse form is for edge
+# rules), never pathThrough, so a missing control on some path fires. A state change is a write or execute that does
+# not land in a log sink, a human step or an agent memory, or a tool or MCP server declaring write_capable, modifies_state,
+# executes_code or sends_message. Each rule requires the agent's autonomy: an agent with no declared level is
+# not_checked here and reported by CMP-002 (model-completeness).
+pack: blr
+version: 0.1.0
+regimes: [OWASP, AIACT, FINMA, MCSB, ISO, FADP]
+offer: agentic
+rules:
+  # One steering compounds into a second agent's writes (the ASI08 cascade). The second agent's own autonomy is not
+  # read: a steered orchestrator steers an assisted worker just as well.
+  - id: BLR-001
+    title: Steered agent pulls a second acting agent into the run with no person between
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") in ["semi","autonomous"] &&
+      g.nodes("agent").exists(b, b.id != n.id && g.reachable(n.id, b.id) && g.pathAvoiding(n.id, b.id, "human_step") &&
+        g.outEdges(b.id, "").exists(w,
+          (w.kind in ["writes","executes"] && !(w.to.type in ["log_sink","human_step","agent_memory"])) ||
+          (w.to.type in ["tool","mcp_server"] && (attr(w.to, "write_capable", false) ||
+            attr(w.to, "capabilities", []).exists(c, c in ["modifies_state","executes_code","sends_message"])))))
+    requires: [n.attrs.autonomy]
+    domain: 'n.type == "agent"'
+    message: "If {{n.name}} is steered, it reaches {{g.nodes('agent').filter(b, b.id != n.id && g.reachable(n.id, b.id) && g.pathAvoiding(n.id, b.id, 'human_step') && g.outEdges(b.id, '').exists(w, (w.kind in ['writes','executes'] && !(w.to.type in ['log_sink','human_step','agent_memory'])) || (w.to.type in ['tool','mcp_server'] && (attr(w.to, 'write_capable', false) || attr(w.to, 'capabilities', []).exists(c, c in ['modifies_state','executes_code','sends_message']))))).map(b, b.name).join(', ')}} with no person between, and that agent changes state: one steering compounds into a second agent's actions."
+    clauses: [OWASP:AgenticTop10:ASI08, OWASP:AgenticTop10:ASI01, AIACT:2024/1689:Art14, MAESTRO:L7]
+    remediation: "Put a human step between the steerable agent and the agent that changes state, or split the work so that the agent reading untrusted content cannot start an acting agent; the human-oversight measures name the step."
+    fixtures: { positive: fixtures/BLR-001.pos.json, negative: fixtures/BLR-001.neg.json }
+    tags: [agentic, blast-radius, cascade]
+
+  # The two halves of an exfiltration in one run: data of a sensitive class (or a secret) can move into the agent's
+  # context (dataFlows follows reads against the arrow and calls both ways), and some path from the agent to a component
+  # that sends or egresses never passes a gateway.
+  - id: BLR-002
+    title: Steered agent joins sensitive data and an unguarded outbound channel in one run
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") in ["semi","autonomous"] &&
+      ((g.nodes("datastore") + g.nodes("vector_index")).exists(d, attr(d, "data_class", "") in ["pii","cid","phi","secret"] && g.dataFlows(d.id, n.id)) ||
+       g.outEdges(n.id, "reads").exists(r, r.to.type == "secret_store") ||
+       (g.nodes("tool") + g.nodes("mcp_server")).exists(t, g.reachable(n.id, t.id) && "reads_secrets" in attr(t, "capabilities", []))) &&
+      (g.nodes("tool") + g.nodes("mcp_server") + g.nodes("saas") + g.nodes("external_party")).exists(x, g.reachable(n.id, x.id) &&
+        (x.type in ["saas","external_party"] || attr(x, "capabilities", []).exists(c, c in ["network_egress","sends_message"])) &&
+        g.pathAvoiding(n.id, x.id, "gateway"))
+    requires: [n.attrs.autonomy]
+    domain: 'n.type == "agent"'
+    message: "If {{n.name}} is steered, sensitive data reaches its context and it reaches {{(g.nodes('tool') + g.nodes('mcp_server') + g.nodes('saas') + g.nodes('external_party')).filter(x, g.reachable(n.id, x.id) && (x.type in ['saas','external_party'] || attr(x, 'capabilities', []).exists(c, c in ['network_egress','sends_message'])) && g.pathAvoiding(n.id, x.id, 'gateway')).map(x, x.name).join(', ')}} on a path no gateway covers: both halves of an exfiltration are in one run."
+    clauses: [OWASP:AgenticTop10:ASI02, MCSB:v1:DP-2, FINMA:2023/1:Rz-CriticalData, FADP:2023:Art8, ISO:27001:A.8.21]
+    remediation: "Route the agent's outbound channel through a gateway that applies an egress policy, or keep the sensitive store out of the reach of an agent that can send; the gateway's egress policy is the evidence."
+    fixtures: { positive: fixtures/BLR-002.pos.json, negative: fixtures/BLR-002.neg.json }
+    tags: [agentic, blast-radius, exfiltration]
+
+  # The count of state-changing tools and written datastores the agent reaches with no person on some path exceeds the
+  # cap (policy blast_radius_writers read with capped(): a regime entry is a ceiling, the tenant may set a lower value,
+  # 0 included, or a higher one where no regime caps it; one when neither names the key). A store written only by a
+  # human step is not counted; a log sink is a different type and never counts.
+  - id: BLR-003
+    title: Steered agent reaches more unattended state changes than policy allows
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") in ["semi","autonomous"] &&
+      cel.bind(cap, capped("blast_radius_writers"),
+        size((g.nodes("tool") + g.nodes("mcp_server")).filter(t,
+          (attr(t, "write_capable", false) || attr(t, "capabilities", []).exists(c, c in ["modifies_state","executes_code","sends_message"])) &&
+          g.reachable(n.id, t.id) && g.pathAvoiding(n.id, t.id, "human_step"))) +
+        size(g.nodes("datastore").filter(d, g.inEdges(d.id, "writes").exists(w, w.from.type != "human_step" &&
+          (w.from.id == n.id || (g.reachable(n.id, w.from.id) && g.pathAvoiding(n.id, w.from.id, "human_step")))))) >
+        (cap >= 0 ? cap : 1))
+    requires: [n.attrs.autonomy]
+    domain: 'n.type == "agent"'
+    message: "If {{n.name}} is steered, it changes state unattended through {{((g.nodes('tool') + g.nodes('mcp_server')).filter(t, (attr(t, 'write_capable', false) || attr(t, 'capabilities', []).exists(c, c in ['modifies_state','executes_code','sends_message'])) && g.reachable(n.id, t.id) && g.pathAvoiding(n.id, t.id, 'human_step')).map(t, t.name) + g.nodes('datastore').filter(d, g.inEdges(d.id, 'writes').exists(w, w.from.type != 'human_step' && (w.from.id == n.id || (g.reachable(n.id, w.from.id) && g.pathAvoiding(n.id, w.from.id, 'human_step'))))).map(d, d.name)).join(', ')}}, more than the policy allows in one run."
+    clauses: [OWASP:LLMTop10:LLM06, OWASP:AgenticTop10:ASI02, MCSB:v1:PA-7, ISO:42001:A.9.4]
+    remediation: "Put a human step before all but the one state change the tenant accepts unattended, or split the agent so that each part reaches fewer writers; a higher cap is the tenant's decision (policy blast_radius_writers)."
+    fixtures: { positive: fixtures/BLR-003.pos.json, negative: fixtures/BLR-003.neg.json }
+    tags: [agentic, blast-radius, excessive-agency]
+
+  # No drawn call or delegation joins the two agents (BLR-001 is silent), yet a store the first writes (writes,
+  # publishes, flows) is one the second reads (reads, subscribes), and the second declares no screen and changes state:
+  # the cascade travels through the store. The write is read on the drawn hop, not through dataFlows, whose calls-both-
+  # ways reading would join every two agents behind one shared gateway.
+  # content_safety is read as the only control a store-mediated path can carry; it is never proposed here.
+  - id: BLR-004
+    title: Steered agent's output reaches a second acting agent through a store it never screens
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") in ["semi","autonomous"] &&
+      g.nodes("agent").exists(b, b.id != n.id && !g.reachable(n.id, b.id) && !attr(b, "content_safety", false) &&
+        (g.nodes("datastore") + g.nodes("queue") + g.nodes("vector_index") + g.nodes("agent_memory")).exists(s,
+          g.inEdges(s.id, "").exists(iw, iw.from.id == n.id && iw.kind in ["writes","publishes","flows"]) &&
+          g.inEdges(s.id, "").exists(r, r.from.id == b.id && r.kind in ["reads","subscribes"])) &&
+        g.outEdges(b.id, "").exists(w,
+          (w.kind in ["writes","executes"] && !(w.to.type in ["log_sink","human_step","agent_memory"])) ||
+          (w.to.type in ["tool","mcp_server"] && (attr(w.to, "write_capable", false) ||
+            attr(w.to, "capabilities", []).exists(c, c in ["modifies_state","executes_code","sends_message"])))))
+    requires: [n.attrs.autonomy]
+    domain: 'n.type == "agent"'
+    message: "If {{n.name}} is steered, what it writes reaches {{g.nodes('agent').filter(b, b.id != n.id && !g.reachable(n.id, b.id) && !attr(b, 'content_safety', false) && (g.nodes('datastore') + g.nodes('queue') + g.nodes('vector_index') + g.nodes('agent_memory')).exists(s, g.inEdges(s.id, '').exists(iw, iw.from.id == n.id && iw.kind in ['writes','publishes','flows']) && g.inEdges(s.id, '').exists(r, r.from.id == b.id && r.kind in ['reads','subscribes'])) && g.outEdges(b.id, '').exists(w, (w.kind in ['writes','executes'] && !(w.to.type in ['log_sink','human_step','agent_memory'])) || (w.to.type in ['tool','mcp_server'] && (attr(w.to, 'write_capable', false) || attr(w.to, 'capabilities', []).exists(c, c in ['modifies_state','executes_code','sends_message']))))).map(b, b.name).join(', ')}} through a store that agent reads without a screen, and that agent changes state: the cascade travels through the store."
+    clauses: [OWASP:AgenticTop10:ASI06, OWASP:AgenticTop10:ASI08, OWASP:LLMTop10:LLM01]
+    remediation: "Screen what the second agent reads from the shared store (content safety on its input), or keep the steerable agent's output out of the store an acting agent reads."
+    fixtures: { positive: fixtures/BLR-004.pos.json, negative: fixtures/BLR-004.neg.json }
+    tags: [agentic, blast-radius, cascade, shared-state]

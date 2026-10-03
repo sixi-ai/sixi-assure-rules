@@ -1,0 +1,61 @@
+# EVD — evidence integrity (docs/03 §EVD; docs/18 WS-I I2, agents/swarm/05-logging-evidence-and-resilience/
+# evidence-chain-integrity.md). Deterministic CEL over the sink the design keeps its own records in; the LLM never
+# creates findings. Sixi's own evidence chain (verification, signatures, anchoring, freshness) is a ledger check of
+# the evidence-chain-integrity agent, never a finding: no rule here reads the chain. EVD-002 is withdrawn (the sink's
+# region is LOG-008's) and its id is not reused.
+pack: evd
+version: 0.1.0
+regimes: [AIACT, FINMA, CH-CO, DORA, FDA, EU-GMP, ISO, MCSB]
+offer: agentic
+rules:
+  # Schema 1.1 (ADR-047 §3b): LOG-003 asks immutability of every sink under FINMA, GXP-001 of any sink under GxP; this
+  # asks it of the sink declared as the evidence sink, under every regime of the pack.
+  - id: EVD-001
+    title: Evidence sink not immutable
+    scope: node
+    severity: high
+    condition: 'n.type == "log_sink" && attr(n, "purpose", "") == "evidence" && !attr(n, "immutable", false)'
+    requires: [n.attrs.purpose, n.attrs.immutable]
+    domain: 'n.type == "log_sink"'
+    message: "{{n.name}} is declared the evidence sink but not immutable: the record of the system can be rewritten."
+    clauses: [FDA:21CFR11:11.10(e), EU-GMP:Annex11:9, DORA-RTS:2024/1774:Art12, ISO:27001:A.8.15, CH-CO:958f]
+    remediation: "Keep the evidence sink on an immutable (WORM / legal-hold) tier and declare immutable=true; the audit-trail configuration is the evidence."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/immutable", value: true }
+    fixtures: { positive: fixtures/EVD-001.pos.json, negative: fixtures/EVD-001.neg.json }
+    tags: [evidence, immutability, logging]
+
+  # A writer that needs no identity can append records nobody made. Shared secrets (api_key, password,
+  # connection_string) are STR-006 and ZT-001; this rule reads none and unknown only. An empty auth is neither: not
+  # checked, never a finding.
+  - id: EVD-003
+    title: Unauthenticated write into a record sink
+    scope: edge
+    severity: high
+    condition: 'e.kind in ["writes", "publishes"] && e.to.type == "log_sink" && e.auth in ["none", "unknown"]'
+    requires: [e.auth]
+    domain: 'e.kind in ["writes", "publishes"] && e.to.type == "log_sink"'
+    severity_override:
+      - { when: 'e.auth == "unknown"', severity: medium }
+    message: "{{e.from.name}} writes into {{e.to.name}} with auth={{e.auth}}: the audit trail cannot say who appended a record."
+    clauses: [FDA:21CFR11:11.10(e), EU-GMP:Annex11:12, ISO:27001:A.8.15, NIST:800-207:S2]
+    remediation: "Authenticate every writer of the record sink with its own identity (managed identity, or the agent's own identity for an agent)."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/auth", value: '{{e.from.type == "agent" ? "agent_id" : "managed_identity"}}' }
+    fixtures: { positive: fixtures/EVD-003.pos.json, negative: fixtures/EVD-003.neg.json }
+    tags: [evidence, identity, logging]
+
+  # Schema 1.1: LOG-001 says no sink exists; this says the model declares sink purposes and none of its sinks is the
+  # record of the system, so the evidence floors have nothing to bind to. The purpose guard keeps every model that
+  # declares no purpose silent (the evidence-chain-integrity agent lists that as not checked).
+  - id: EVD-004
+    title: No sink declared as the evidence sink
+    scope: graph
+    severity: medium
+    condition: '(g.has("agent") || g.has("llm_endpoint")) && g.has("log_sink") && g.nodes("log_sink").exists(s, attr(s, "purpose", "") != "") && !g.nodes("log_sink").exists(s, attr(s, "purpose", "") == "evidence") && (regime("FINMA") || regime("FDA") || regime("EU-GMP") || regime("CH-CO") || (regime("AIACT") && attr(g, "ai_act_tier", "") == "high_risk"))'
+    requires: [g.attrs.ai_act_tier]
+    message: "The model declares log sink purposes, but none of its sinks is declared the evidence sink."
+    clauses: [AIACT:2024/1689:Art12, AIACT:2024/1689:Art19, AIACT:2024/1689:Art26(6), CH-CO:958f, FDA:21CFR11:11.10(c), ISO:27001:A.5.33]
+    remediation: "Declare the immutable sink with the longest retention as the evidence sink (purpose=evidence), or add one."
+    fixtures: { positive: fixtures/EVD-004.pos.json, negative: fixtures/EVD-004.neg.json }
+    tags: [evidence, logging, records]

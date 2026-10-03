@@ -42,6 +42,14 @@ type Finding struct {
 	Path       string  `json:"path"`       // JSON pointer for structured input, "bytes[off:len]" for raw input
 	Confidence float64 `json:"confidence"` // 0..1; entropy-only hits never reach the reject threshold on their own
 	Reject     bool    `json:"reject"`     // false = warn-only (certificates, entropy-only)
+	// InKey is true when the hit is in an object key rather than a value. Path is then the pointer of the object
+	// that holds the key, never the key's own pointer: a pointer ending in the key would echo the credential in
+	// the 422 detail, the log line and the problem body (integration 3b item 9).
+	InKey bool `json:"in_key,omitempty"`
+	// UnderKey is true when the hit is in the subtree of an object key that itself produced a finding (warn-only
+	// included). Path is then the pointer of the object holding that key, for the same reason as InKey: every pointer
+	// below the key contains it (review 3b finding 6).
+	UnderKey bool `json:"under_key,omitempty"`
 }
 
 // Result is the outcome of one scan.
@@ -83,8 +91,22 @@ func (v *Violation) Error() string {
 // Unwrap lets callers use errors.Is(err, ErrSecretDetected).
 func (v *Violation) Unwrap() error { return ErrSecretDetected }
 
-// Detail is the problem+json detail: "<pointer>: <detector>".
-func (v *Violation) Detail() string { return v.Finding.Path + ": " + v.Finding.Detector }
+// Detail is the problem+json detail: "<pointer>: <detector>", or for a hit in an object key
+// "<pointer of the object>: <detector> in an object key", or for a hit below a key that was itself
+// flagged "<pointer of the object>: <detector> under a flagged object key" (the key is never repeated).
+func (v *Violation) Detail() string {
+	if v.Finding.InKey || v.Finding.UnderKey {
+		parent := v.Finding.Path
+		if parent == "" {
+			parent = "(document root)"
+		}
+		if v.Finding.InKey {
+			return parent + ": " + v.Finding.Detector + " in an object key"
+		}
+		return parent + ": " + v.Finding.Detector + " under a flagged object key"
+	}
+	return v.Finding.Path + ": " + v.Finding.Detector
+}
 
 // PathHash is the sha256 hex of a JSON pointer, for the secret_rejected evidence payload
 // (the pointer itself can name a user-authored extension key, so only its hash is stored).
@@ -139,7 +161,7 @@ func ScanValue(_ context.Context, src Source, pointer, text string) Result {
 // Object keys are visited in sorted order so the reported pointer is deterministic.
 func ScanDocument(_ context.Context, src Source, doc any) Result {
 	r := Result{Source: src}
-	walk(&r, make([]byte, 0, 64), doc)
+	walk(&r, make([]byte, 0, 64), doc, false)
 	return r
 }
 
@@ -164,11 +186,15 @@ func CheckDocument(ctx context.Context, src Source, doc any) error {
 }
 
 // walk visits doc depth-first, appending JSON pointer tokens to ptr. It returns false once a
-// rejecting finding has been recorded so the caller stops descending.
-func walk(r *Result, ptr []byte, v any) bool {
+// rejecting finding has been recorded so the caller stops descending. Below an object key that
+// produced a finding, hidden is true: ptr stays the pointer of the object holding that key (no
+// token is appended, since every pointer below contains the key) and findings are marked UnderKey.
+func walk(r *Result, ptr []byte, v any, hidden bool) bool {
 	switch t := v.(type) {
 	case string:
+		before := len(r.Findings)
 		scanInto(r, ptr, true, t)
+		markHidden(r, before, hidden)
 		return !r.Rejects()
 	case map[string]any:
 		keys := make([]string, 0, len(t))
@@ -177,7 +203,6 @@ func walk(r *Result, ptr []byte, v any) bool {
 		}
 		sort.Strings(keys)
 		for _, k := range keys {
-			child := appendToken(ptr, k)
 			// The key itself is untrusted (x_<60 chars> is user-authored, ADR-041 §Context).
 			// The schema's x_ prefix is stripped first: it is a word character, so it would
 			// swallow the word boundary the prefixed detectors (AKIA…, ghp_…) anchor on.
@@ -185,18 +210,36 @@ func walk(r *Result, ptr []byte, v any) bool {
 			if rest, cut := strings.CutPrefix(k, "x_"); cut {
 				keyText = rest
 			}
-			scanInto(r, child, true, keyText)
+			// A hit in the key is reported at the object's pointer (ptr), not the key's (child): the key is the
+			// credential, and the pointer is shown to the person and written to the log.
+			before := len(r.Findings)
+			scanInto(r, ptr, true, keyText)
+			for i := before; i < len(r.Findings); i++ {
+				r.Findings[i].InKey = true
+			}
+			markHidden(r, before, hidden)
 			if r.Rejects() {
 				return false
 			}
-			if !walk(r, child, t[k]) {
+			// A key that produced any finding (a warn-only one too) hides its subtree's pointers: they would
+			// all contain it (review 3b finding 6).
+			childHidden := hidden || len(r.Findings) > before
+			child := ptr
+			if !childHidden {
+				child = appendToken(ptr, k)
+			}
+			if !walk(r, child, t[k], childHidden) {
 				return false
 			}
 		}
 		return true
 	case []any:
 		for i, e := range t {
-			if !walk(r, appendToken(ptr, strconv.Itoa(i)), e) {
+			child := ptr
+			if !hidden {
+				child = appendToken(ptr, strconv.Itoa(i))
+			}
+			if !walk(r, child, e, hidden) {
 				return false
 			}
 		}
@@ -204,6 +247,16 @@ func walk(r *Result, ptr []byte, v any) bool {
 	default:
 		// numbers, booleans, null: no free text, nothing to scan.
 		return true
+	}
+}
+
+// markHidden marks the findings recorded since before as below a flagged key, when hidden.
+func markHidden(r *Result, before int, hidden bool) {
+	if !hidden {
+		return
+	}
+	for i := before; i < len(r.Findings); i++ {
+		r.Findings[i].UnderKey = true
 	}
 }
 

@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_wis_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture WIS-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "identities": [
+    {
+      "id": "id_api",
+      "name": "Identity id_api",
+      "kind": "service_principal",
+      "issuer": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0",
+      "owner": "Fixture owner",
+      "credential_type": "client_secret"
+    }
+  ],
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Orders web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "secrets_in": "secret_store"
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Orders API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oauth"
+        ],
+        "secrets_in": "secret_store",
+        "provider_service": "azure/app-service",
+        "identity_id": "id_api"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_app",
+      "to": "n_api",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

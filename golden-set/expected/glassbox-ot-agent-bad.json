@@ -6,6 +6,14 @@
     ]
   },
   {
+    "rule_id": "AI-003",
+    "ids": [
+      "e_jetson_a_plc_b",
+      "e_jetson_plc_b",
+      "e_validator_plc_a"
+    ]
+  },
+  {
     "rule_id": "AI-012",
     "ids": [
       "n_agent"
@@ -44,15 +52,21 @@
     ]
   },
   {
-    "rule_id": "LOG-002",
+    "rule_id": "ING-002",
     "ids": [
-      "n_appins"
+      "n_web"
     ]
   },
   {
-    "rule_id": "LOG-004",
+    "rule_id": "IRR-001",
     "ids": [
-      "e_agent_foundry"
+      "arch_demo_glassbox_ot_agent_bad"
+    ]
+  },
+  {
+    "rule_id": "LOG-002",
+    "ids": [
+      "n_appins"
     ]
   },
   {
@@ -87,6 +101,12 @@
       "e_op_a_front",
       "e_op_b_front",
       "e_qa_front"
+    ]
+  },
+  {
+    "rule_id": "NIS-001",
+    "ids": [
+      "arch_demo_glassbox_ot_agent_bad"
     ]
   },
   {
@@ -134,9 +154,21 @@
     ]
   },
   {
+    "rule_id": "OT-009",
+    "ids": [
+      "n_kv"
+    ]
+  },
+  {
     "rule_id": "STR-005",
     "ids": [
       "e_agent_mcp"
+    ]
+  },
+  {
+    "rule_id": "WIS-001",
+    "ids": [
+      "n_kv"
     ]
   },
   {
@@ -146,6 +178,12 @@
       "e_op_a_front",
       "e_op_b_front",
       "e_qa_front"
+    ]
+  },
+  {
+    "rule_id": "CMP-005",
+    "ids": [
+      "n_apim"
     ]
   }
 ]

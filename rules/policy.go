@@ -11,7 +11,8 @@ import (
 )
 
 // PolicyTable is the parsed policy.yaml: numeric requirements per regime plus the default
-// allowed regions. required("<key>") in CEL resolves through Required.
+// allowed regions. required("<key>") in CEL resolves through Required (a floor), capped("<key>")
+// through Cap (a ceiling).
 //
 //	retention_days: { default: 365, FINMA: 3650, CH-CO: 3650, AIACT_deployer: 180 }
 //	regions: { allowed_default: [switzerlandnorth, switzerlandwest] }
@@ -25,7 +26,12 @@ type PolicyTable struct {
 // DefaultPolicyTable mirrors policy.yaml (used when the file is unavailable, e.g. tests).
 func DefaultPolicyTable() *PolicyTable {
 	return &PolicyTable{
-		tables:         map[string]map[string]int{"retention_days": {"default": 365, "FINMA": 3650, "CH-CO": 3650, "AIACT_deployer": 180}},
+		tables: map[string]map[string]int{
+			"retention_days":           {"default": 365, "FINMA": 3650, "CH-CO": 3650, "AIACT_deployer": 180},
+			"blast_radius_writers":     {"default": 1},
+			"credential_rotation_days": {"default": 90},
+			"human_token_lifetime_s":   {"default": 3600},
+		},
 		regionsDefault: []string{"switzerlandnorth", "switzerlandwest"},
 	}
 }
@@ -142,6 +148,45 @@ func (t *PolicyTable) Required(code string, p Policy) int {
 		best = table["default"]
 	}
 	return maxInt(best, p.Requirements[code])
+}
+
+// Cap returns the effective upper bound for code under the policy, for keys that limit rather than
+// require (capped("<key>") in CEL, e.g. blast_radius_writers): the smallest entry of the enabled
+// regimes is a ceiling; the tenant's value, when set, replaces the default and may be lower (0 allowed)
+// but never above a regime ceiling. ok is false when neither the table nor the tenant names the key.
+func (t *PolicyTable) Cap(code string, p Policy) (limit int, ok bool) {
+	tenant, tenantSet := p.Requirements[code]
+	if tenantSet && tenant < 0 {
+		tenant = 0
+	}
+	table, inTable := t.tables[code]
+	if !inTable {
+		return tenant, tenantSet
+	}
+	enabled := regimeSet(p.Regimes)
+	ceiling, capped := 0, false
+	for key, v := range table {
+		if key == "default" {
+			continue
+		}
+		regime := key
+		if i := strings.Index(key, "_"); i > 0 {
+			regime = key[:i]
+		}
+		if enabled[CanonRegime(regime)] && (!capped || v < ceiling) {
+			ceiling, capped = v, true
+		}
+	}
+	switch {
+	case tenantSet && capped:
+		return min(tenant, ceiling), true
+	case tenantSet:
+		return tenant, true
+	case capped:
+		return ceiling, true
+	}
+	def, hasDefault := table["default"]
+	return def, hasDefault
 }
 
 func maxInt(a, b int) int {

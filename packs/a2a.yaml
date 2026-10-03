@@ -25,15 +25,16 @@
 # a prompt to an LLM endpoint. ATA-002 and ATA-003 are the A2A reading of the same shortcuts, and
 # they cite ASI07 because an A2A message is forwarded, logged and replayed by further agents.
 pack: a2a
-version: 0.1.0
+version: 0.2.0
 regimes: [OWASP, AIACT, FINMA, MAESTRO, MCSB, NIST]
+offer: agentic
 rules:
   - id: ATA-001
     title: A2A peer across a boundary declares no verified agent card
     scope: edge
     severity: high
     condition: |
-      e.protocol.lowerAscii() == "a2a" &&
+      e.protocol == "a2a" &&
       e.to.type in ["agent","app","api","saas","external_party","mcp_server"] &&
       size(e.from.group_ids) + size(e.to.group_ids) > 0 &&
       !e.from.group_ids.exists(gid, gid in e.to.group_ids) &&
@@ -51,10 +52,12 @@ rules:
     scope: edge
     severity: high
     condition: |
-      e.protocol.lowerAscii() == "a2a" &&
-      e.auth in ["api_key","password"] &&
+      e.protocol == "a2a" &&
+      e.auth in ["api_key","sas","password"] &&
       size(e.from.group_ids) + size(e.to.group_ids) > 0 &&
       !e.from.group_ids.exists(gid, gid in e.to.group_ids)
+    requires: [e.auth]
+    domain: 'e.protocol.lowerAscii() == "a2a"'
     message: "{{e.from.name}} → {{e.to.name}} speaks A2A across a boundary authenticated with {{e.auth}}: a shared secret names no agent, cannot be scoped to one skill and cannot be withdrawn from one caller."
     clauses: [OWASP:AgenticTop10:ASI07, MCSB:v1:IM-8, NIST:800-207:S2]
     remediation: "Authenticate the hop with OAuth 2.0 client credentials (auth=oauth_client), the calling agent's own identity (agent_id) or mutual TLS, carried in the transport's Authorization header; keep API keys and HTTP Basic inside a single trust boundary."
@@ -68,10 +71,143 @@ rules:
     scope: edge
     severity: critical
     condition: |
-      e.protocol.lowerAscii() == "a2a" &&
+      e.protocol == "a2a" &&
       (attr(e, "prompt_contains", "") == "secrets" || e.data_class == "secret")
+    requires: [e.attrs.prompt_contains, e.data_class]
+    domain: 'e.protocol.lowerAscii() == "a2a"'
     message: "The A2A messages {{e.from.name}} sends {{e.to.name}} are declared to carry credentials (data_class={{e.data_class}}, prompt_contains={{attr(e,'prompt_contains','none')}}): a task payload is stored with the task, logged, and passed on to whatever agent the peer delegates to, so the secret travels further than the hop."
     clauses: [OWASP:AgenticTop10:ASI07, OWASP:AgenticTop10:ASI03, MCSB:v1:IM-8]
     remediation: "Move the credential into the transport: OAuth 2.0 client credentials or mutual TLS in the Authorization header, with the secret held in a secret store. Where the peer needs access of its own, delegate with a scoped token it obtains itself rather than handing it yours. The declaration describes the design, so change the design — not the label."
     fixtures: { positive: fixtures/ATA-003.pos.json, negative: fixtures/ATA-003.neg.json }
     tags: [a2a, secrets, identity, payload]
+
+  # ---- docs/18 D2 (ADR-047 §4): schema 1.1 A2A peers (swarm agent inter-agent-trust) -------------------------------------
+  # The A2A specification is not law: the card rules cite ASI07 and the identity clauses, and carry the specification's
+  # card-signing sections as documentation references (`references:`, read 2026-10-01 from github.com/a2aproject/A2A).
+  # ATA-010 and ATA-011 take numbers above the spec's reserved ATA-004 … ATA-007 so parallel increments never collide.
+  - id: ATA-006
+    title: A2A bearer token across a boundary without sender constraint
+    scope: edge
+    severity: high
+    # Agent → agent delegates hops are DLG-003's (zt pack), so no hop is reported by both.
+    condition: |
+      e.protocol == "a2a" &&
+      e.auth in ["oauth_client","agent_id","obo","token_exchange","jwt_assertion"] &&
+      size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids) &&
+      !(e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent") &&
+      attr(e, "token_binding", "") == "none"
+    requires: [e.attrs.token_binding]
+    domain: 'e.protocol == "a2a" && size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids) && !(e.kind == "delegates" && e.from.type == "agent" && e.to.type == "agent")'
+    message: "{{e.from.name}} → {{e.to.name}} speaks A2A across a boundary with a bearer token (auth={{e.auth}}, token_binding=none): a token read anywhere on the way is replayable against the peer."
+    clauses: [OWASP:AgenticTop10:ASI07, MCSB:v1:IM-8, NIST:800-207A:Model]
+    remediation: "Bind the token to its sender (token_binding=dpop, or mtls where the hop already runs mutual TLS)."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/attrs/token_binding", value: dpop }
+    fixtures: { positive: fixtures/ATA-006.pos.json, negative: fixtures/ATA-006.neg.json }
+    tags: [a2a, token, boundary]
+
+  - id: ATA-010
+    title: External A2A peer declares no verified-signed or pinned agent card
+    scope: edge
+    severity: high
+    # ATA-001's question for the schema 1.1 external_agent (an A2A peer outside the organisation's control, so every
+    # hop to it crosses a trust boundary whether or not a group is drawn). ATA-001 keeps its 1.0 type list.
+    # Integrity alone clears it (C2 handover, Reconcile A 2026-10-02): `card_signed` says a checkable signature is
+    # present, not that it verified (the A2A importer sets it without a JWKS, docs/13), so only integrity signed (a
+    # signature verified against a key) or pinned (a fetched copy fixed) ties the card to its provider. ATA-011 still
+    # reads card_signed for the trust-anchor question.
+    condition: |
+      e.to.type == "external_agent" && e.kind in ["calls","delegates","reads","writes","executes"] &&
+      !(attr(e.to, "integrity", "") in ["signed","pinned"])
+    message: "{{e.from.name}} reaches the external agent {{e.to.name}}, whose agent card is declared neither verified-signed nor pinned (integrity {{attr(e.to, 'integrity', 'not declared')}}{{attr(e.to, 'card_signed', false) == true ? '; a signature is present but card_signed alone records no verification' : ''}}): nothing ties the skills, endpoint and security schemes it advertises to its provider."
+    clauses: [OWASP:AgenticTop10:ASI07, OWASP:AgenticTop10:ASI04, MAESTRO:L7]
+    remediation: "Accept the peer's card only once its JWS signature is verified against the provider's key, and record that verification (integrity=signed, with the trust anchor ATA-011 asks for; the A2A importer records it when the provider's JWKS is uploaded beside the card), or pin a fetched copy (integrity=pinned) and re-assess when it changes. card_signed=true alone records a signature, not its verification, and does not clear this finding."
+    references:
+      - { kind: document, title: "A2A Protocol Specification §8.4 Agent Card Signing", url: "https://github.com/a2aproject/A2A/blob/main/docs/specification.md", fetched_at: "2026-10-01" }
+    fixtures: { positive: fixtures/ATA-010.pos.json, negative: fixtures/ATA-010.neg.json }
+    tags: [a2a, agent-card, supply-chain, boundary]
+
+  - id: ATA-011
+    title: Signed A2A card with no declared trust anchor
+    scope: node
+    severity: medium
+    # The card is declared signed, but the key it is verified against is declared nowhere: the peer's identity names no
+    # agent_registry, or the registry it names declares no trust_anchor.key_id.
+    condition: |
+      n.type == "external_agent" && attr(n, "card_signed", false) == true &&
+      !g.nodes("agent_registry").exists(r, r.id == n.identity.registry &&
+        cel.bind(ta, attr(r, "trust_anchor", {}), "key_id" in ta && string(ta.key_id) != ""))
+    requires: [n.attrs.card_signed]
+    domain: 'n.type == "external_agent"'
+    message: "{{n.name}} declares a signed agent card, but no trust anchor is declared for it ({{n.identity.registry == '' ? 'its identity names no registry' : 'registry ' + n.identity.registry + ' declares no trust_anchor key'}}): a signature checked against whatever key the card itself points to says nothing about the provider."
+    clauses: [OWASP:AgenticTop10:ASI07, MCSB:v1:IM-4, OWASP:AgenticTop10:ASI04]
+    remediation: "Name the registry the peer's identity is listed in (identities[].registry) and declare the key its cards are verified against there (agent_registry trust_anchor {key_id, fetched_at}); record the verification as evidence."
+    references:
+      - { kind: document, title: "A2A Protocol Specification §8.4.3 Signature Verification (key from kid/jku or a trusted key store)", url: "https://github.com/a2aproject/A2A/blob/main/docs/specification.md", fetched_at: "2026-10-01" }
+    fixtures: { positive: fixtures/ATA-011.pos.json, negative: fixtures/ATA-011.neg.json }
+    tags: [a2a, agent-card, trust-anchor]
+
+  # ---- docs/18 WS-I I2, swarm team 02 (agent inter-agent-trust): the spec's ATA-004, ATA-005 and ATA-007 ---------------
+  # "crossing" is STR-002's reading: the endpoints share no group. Only an explicit weak value reports; an absent schema
+  # 1.1 attribute is not_checked (requires), never a finding. The A2A specification is not law: ATA-005 and ATA-007 carry
+  # it as a documentation reference (the document D2 read on 2026-10-01), never as a clause.
+  - id: ATA-004
+    title: Inbound A2A entry from a foreign peer without authentication
+    scope: edge
+    severity: high
+    # STR-002 excludes an external_party source and ZT-006 reads only api_key into a public app or API, so a partner agent
+    # that calls into ours with no declared authentication was reported by nothing. external_agent is the schema 1.1 peer.
+    condition: |
+      e.protocol.lowerAscii() == "a2a" && e.from.type in ["external_party","saas","external_agent"] &&
+      e.to.type in ["agent","app","api"] &&
+      size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids) &&
+      e.auth in ["","none","unknown"]
+    message: "{{e.from.name}} calls {{e.to.name}} over A2A across a boundary with no declared authentication (auth={{e.auth}}): any party that can reach the endpoint can hand our agent a task."
+    clauses: [OWASP:AgenticTop10:ASI07, NIST:800-207:S2, MCSB:v1:IM-1, NIS2:2022/2555:Art21(2)(j)]
+    remediation: "Authenticate the inbound peer (OAuth 2.0 client credentials, auth=oauth_client, or mutual TLS) and reject unauthenticated A2A tasks at the agent's endpoint."
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/auth", value: oauth_client }
+    fixtures: { positive: fixtures/ATA-004.pos.json, negative: fixtures/ATA-004.neg.json }
+    tags: [a2a, identity, inbound, boundary]
+
+  - id: ATA-005
+    title: A2A-reachable agent advertises a shared-secret or open scheme
+    scope: node
+    severity: high
+    # What the agent's card offers every caller (inbound_auth, security_schemes, schema 1.1), not what one drawn caller
+    # uses (ATA-002, ATA-004). The vocabularies are the schema's: authnMethod for inbound_auth, the A2A card scheme kinds
+    # for security_schemes.
+    condition: |
+      n.type in ["agent","external_agent"] &&
+      g.in(n.id, "").exists(x, x.protocol.lowerAscii() == "a2a" &&
+        size(x.from.group_ids) + size(n.group_ids) > 0 && !x.from.group_ids.exists(gid, gid in n.group_ids)) &&
+      (attr(n, "inbound_auth", "") in ["none","api_key","basic"] ||
+        attr(n, "security_schemes", []).exists(s, s in ["api_key","http_basic","none"]))
+    requires: [n.attrs.inbound_auth, n.attrs.security_schemes]
+    domain: 'n.type in ["agent","external_agent"] && g.in(n.id, "").exists(x, x.protocol.lowerAscii() == "a2a" && size(x.from.group_ids) + size(n.group_ids) > 0 && !x.from.group_ids.exists(gid, gid in n.group_ids))'
+    message: "{{n.name}} is reached over A2A across a boundary and its card offers a shared-secret or open scheme (inbound_auth={{attr(n,'inbound_auth','')}}, security_schemes={{attr(n,'security_schemes',[]).join(', ')}}): every caller may take the weakest scheme the card advertises."
+    clauses: [OWASP:AgenticTop10:ASI07, MCSB:v1:IM-8, NIST:800-207A:Model]
+    remediation: "Advertise only token or mutual-TLS schemes on the card (security_schemes oauth2, openid_connect or mtls; inbound_auth oauth or mtls) and have the provider remove API-key, HTTP Basic and anonymous access."
+    references:
+      - { kind: document, title: "A2A Protocol Specification: Agent Card security schemes", url: "https://github.com/a2aproject/A2A/blob/main/docs/specification.md", fetched_at: "2026-10-01" }
+    fixtures: { positive: fixtures/ATA-005.pos.json, negative: fixtures/ATA-005.neg.json }
+    tags: [a2a, agent-card, identity, boundary]
+
+  - id: ATA-007
+    title: Peer card discovered over an unauthenticated channel
+    scope: edge
+    severity: medium
+    # card_url is model content read by one prefix test and never fetched (never a target).
+    condition: |
+      e.protocol.lowerAscii() == "a2a" &&
+      size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids) &&
+      attr(e.to, "card_url", "") != "" && !attr(e.to, "card_url", "").lowerAscii().startsWith("https://")
+    requires: [e.to.attrs.card_url]
+    domain: 'e.protocol.lowerAscii() == "a2a" && size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids) && e.to.type in ["agent","external_agent"]'
+    message: "{{e.from.name}} speaks A2A to {{e.to.name}} across a boundary, and {{e.to.name}}'s card is declared to be served without TLS: a card fetched over plain HTTP can be swapped before any signature is checked."
+    clauses: [OWASP:AgenticTop10:ASI07, OWASP:AgenticTop10:ASI04, MCSB:v1:IM-4, MCSB:v1:DP-3]
+    remediation: "Serve and fetch the peer's agent card over HTTPS only (card_url https://…) and verify its signature against the provider's key."
+    references:
+      - { kind: document, title: "A2A Protocol Specification: Agent Card discovery", url: "https://github.com/a2aproject/A2A/blob/main/docs/specification.md", fetched_at: "2026-10-01" }
+    fixtures: { positive: fixtures/ATA-007.pos.json, negative: fixtures/ATA-007.neg.json }
+    tags: [a2a, agent-card, discovery, boundary]

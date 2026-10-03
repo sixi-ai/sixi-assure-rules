@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_ing_002_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ING-002 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_web",
+      "type": "app",
+      "name": "Public web app",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "public",
+        "waf": true
+      }
+    },
+    {
+      "id": "n_aigw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "token_limits": true,
+        "logging": true,
+        "content_safety": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ]
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Model endpoint",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "content_safety": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_web",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n_aigw",
+      "to": "n_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

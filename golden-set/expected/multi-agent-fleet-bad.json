@@ -94,15 +94,27 @@
     ]
   },
   {
-    "rule_id": "LOG-001",
+    "rule_id": "AID-003",
     "ids": [
-      "arch_demo_multi_agent_bad"
+      "n_w_research"
     ]
   },
   {
-    "rule_id": "LOG-004",
+    "rule_id": "ARH-004",
     "ids": [
-      "e_research_llm"
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "ARH-004",
+    "ids": [
+      "n_w_research"
+    ]
+  },
+  {
+    "rule_id": "LOG-001",
+    "ids": [
+      "arch_demo_multi_agent_bad"
     ]
   },
   {
@@ -146,6 +158,18 @@
     "rule_id": "ZT-008",
     "ids": [
       "e_draft_docs"
+    ]
+  },
+  {
+    "rule_id": "CMP-005",
+    "ids": [
+      "n_aigw"
+    ]
+  },
+  {
+    "rule_id": "CMP-005",
+    "ids": [
+      "n_mcpgw"
     ]
   }
 ]

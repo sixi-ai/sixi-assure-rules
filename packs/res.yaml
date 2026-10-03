@@ -1,13 +1,18 @@
 # RES — resilience (docs/03 §RES). Deterministic CEL; the LLM never creates findings.
+# 0.2.0 (docs/18 WS-I I2, resilience-continuity.md): the pack also applies under NIS2, ISO and CH-CO, so RES-006's
+# NIS2 and ISO branches and RES-004, RES-005 and RES-007 (which cite NIS2 and CH-CO clauses) run where they cite.
 pack: res
-version: 0.1.0
-regimes: [DORA, FINMA]
+version: 0.2.0
+regimes: [DORA, FINMA, NIS2, ISO, CH-CO]
+offer: agentic
 rules:
   - id: RES-001
     title: Critical component without geo-redundancy
     scope: node
     severity: high
     condition: 'attr(n, "criticality", "") == "critical" && !attr(n, "geo_redundant", false)'
+    requires: [n.attrs.criticality]
+    domain: 'n.type in ["agent","llm_endpoint","datastore","app","api","saas"]'
     message: "Critical component {{n.name}} is not geo-redundant."
     clauses: [DORA:2022/2554:Art11-12, FINMA:2023/1:Rz-BCM]
     remediation: "Deploy across paired regions / availability zones with failover (geo_redundant=true)."
@@ -19,6 +24,8 @@ rules:
     scope: node
     severity: medium
     condition: 'attr(n, "criticality", "") == "critical" && (attr(n, "rto_min", 0) == 0 || attr(n, "rpo_min", 0) == 0)'
+    requires: [n.attrs.criticality]
+    domain: 'n.type in ["agent","llm_endpoint","datastore","app","api","saas"]'
     message: "Critical component {{n.name}} has no RTO/RPO defined."
     clauses: [DORA:2022/2554:Art11]
     remediation: "Define recovery time and recovery point objectives (rto_min, rpo_min) and test them."
@@ -35,3 +42,65 @@ rules:
     remediation: "Run and record a DR test (dr_tested_at) at least yearly."
     fixtures: { positive: fixtures/RES-003.pos.json, negative: fixtures/RES-003.neg.json }
     tags: [resilience, dora, testing]
+
+  # RES-004 … RES-007 (docs/18 WS-I I2, agents/swarm/05-logging-evidence-and-resilience/resilience-continuity.md):
+  # resilience is a property of a node and its direct dependencies, so none is a path rule. A critical component is
+  # only as available as what it reads, writes or calls; a store hosted on the node it serves shares its redundancy. A log
+  # sink is not a dependency here: a sink outage does not stop the critical function, and the evidence sink is RES-007's.
+  - id: RES-004
+    title: Critical component depends on a non-redundant store or service
+    scope: node
+    severity: high
+    condition: 'attr(n, "criticality", "") == "critical" && attr(n, "geo_redundant", false) && g.out(n.id, "").exists(x, x.kind in ["reads", "writes", "calls", "subscribes", "publishes"] && x.to.type in ["datastore", "queue", "vector_index", "secret_store", "identity_provider", "llm_endpoint"] && attr(x.to, "hosted_on", "") != n.id && !attr(x.to, "geo_redundant", false))'
+    requires: [n.attrs.criticality, n.attrs.geo_redundant]
+    domain: 'n.type in ["agent","llm_endpoint","datastore","app","api","saas","queue","vector_index","secret_store","identity_provider","log_sink"]'
+    message: "{{n.name}} is critical and geo-redundant, but a store or service it depends on is not: the critical function fails with that dependency."
+    clauses: [DORA:2022/2554:Art12(4), FINMA:2023/1:Rz-OpRes, NIS2:2022/2555:Art21(2)(c)]
+    remediation: "Make the dependency geo-redundant (paired region, zone or replica), or record why the critical function tolerates its loss; a third party's redundancy is a contract question, not a flag."
+    fixtures: { positive: fixtures/RES-004.pos.json, negative: fixtures/RES-004.neg.json }
+    tags: [resilience, dependencies]
+
+  # A dependency with undeclared objectives (0) never exceeds the consumer's: the resilience-continuity agent lists it
+  # as a not-checked row. No template: recovery objectives are business tolerances a person states.
+  - id: RES-005
+    title: Dependency recovery objective exceeds the consumer's
+    scope: node
+    severity: medium
+    condition: 'attr(n, "criticality", "") == "critical" && attr(n, "rto_min", 0) > 0 && attr(n, "rpo_min", 0) > 0 && g.out(n.id, "").exists(x, x.kind in ["reads", "writes", "calls", "subscribes", "publishes"] && (attr(x.to, "rto_min", 0) > attr(n, "rto_min", 0) || attr(x.to, "rpo_min", 0) > attr(n, "rpo_min", 0)))'
+    requires: [n.attrs.criticality, n.attrs.rto_min, n.attrs.rpo_min]
+    domain: 'n.type in ["agent","llm_endpoint","datastore","app","api","saas","queue","vector_index","secret_store","identity_provider","log_sink"]'
+    message: "{{n.name}} declares RTO {{attr(n, 'rto_min', 0)}} min / RPO {{attr(n, 'rpo_min', 0)}} min, but a dependency it reads, writes or calls declares longer objectives."
+    clauses: [DORA:2022/2554:Art11, FINMA:2023/1:Rz-OpRes, FINMA:2023/1:Rz-BCM]
+    remediation: "Align the dependency's recovery objectives with the critical component's tolerance, or restate the component's objectives to what its slowest dependency can meet."
+    fixtures: { positive: fixtures/RES-005.pos.json, negative: fixtures/RES-005.neg.json }
+    tags: [resilience, bcm, dependencies]
+
+  # RES-003 asks for a recorded test under DORA; FINMA (and NIS2 or ISO where the pack applies) ask the same of an
+  # architecture with a critical component. g.nodes has no wildcard type, so the types are enumerated.
+  - id: RES-006
+    title: Recovery test not recorded (FINMA, NIS2, ISO)
+    scope: graph
+    severity: low
+    condition: '!regime("DORA") && (regime("FINMA") || regime("NIS2") || regime("ISO")) && attr(g, "dr_tested_at", "") == "" && (g.nodes("datastore").exists(n, attr(n, "criticality", "") == "critical") || g.nodes("llm_endpoint").exists(n, attr(n, "criticality", "") == "critical") || g.nodes("agent").exists(n, attr(n, "criticality", "") == "critical") || g.nodes("queue").exists(n, attr(n, "criticality", "") == "critical"))'
+    message: "The architecture has a critical component but no recovery test is recorded (dr_tested_at)."
+    clauses: [FINMA:2023/1:Rz-BCM, NIS2:2022/2555:Art21(2)(c), ISO:27001:A.5.30]
+    remediation: "Test recovery of the critical components and record the date (dr_tested_at); the test report is the evidence."
+    fixtures: { positive: fixtures/RES-006.pos.json, negative: fixtures/RES-006.neg.json }
+    tags: [resilience, testing, finma]
+
+  # Schema 1.1 (ADR-047 §3b): DATA-005 reads datastores only; the sink the design names as its record of the system
+  # is a store too. The purpose guard keeps every model that declares no purpose silent.
+  - id: RES-007
+    title: Evidence sink without backup or redundancy
+    scope: node
+    severity: medium
+    condition: 'n.type == "log_sink" && attr(n, "purpose", "") == "evidence" && !(attr(n, "backup", false) || attr(n, "geo_redundant", false))'
+    requires: [n.attrs.purpose]
+    domain: 'n.type == "log_sink"'
+    message: "{{n.name}} is the evidence sink but declares neither backup nor geo-redundancy: the record of the system is a single copy."
+    clauses: [NIS2:2024/2690:Annex-3.2, DORA-RTS:2024/1774:Art12, CH-CO:958f]
+    remediation: "Back the evidence sink up (backup=true) or replicate it (geo_redundant=true); the backup configuration is the evidence."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/backup", value: true }
+    fixtures: { positive: fixtures/RES-007.pos.json, negative: fixtures/RES-007.neg.json }
+    tags: [resilience, backup, logging]

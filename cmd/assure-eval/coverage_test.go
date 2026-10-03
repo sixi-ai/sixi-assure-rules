@@ -22,16 +22,37 @@ import (
 )
 
 // goldenModelCount is the size of the golden set (docs/09 §2): 6 templates and their 6 bad twins,
-// plus the A2A pair that exercises the a2a pack (ADR-062 C3).
-const goldenModelCount = 14
+// plus the A2A pair that exercises the a2a pack (ADR-062 C3), plus the four regulatory-mapper pairs
+// (dora-third-party, cra-agent-product, nis2-ledger, swiss-ledger; docs/18 WS-I I2) that exercise the DOR, FIN, CRA,
+// NIS and CHE rules. Set to the number of model files on disk: other increments add pairs in parallel.
+// Swarm team 09 adds team09-learning-guard-gmp{,-bad} (docs/18 WS-I I2), which exercises MR, GXP and OT-008/010/011.
+// docs/18 D2 adds mcp-agent-platform{,-bad} (schema 1.1: MCP gateway, registry, credential broker, A2A peers), which
+// exercises the mcp pack and the D2 rules of the zt, a2a and net packs.
+// Swarm team 05 adds team05-records-resilience{,-bad} (docs/18 WS-I I2), which exercises the evd, evl and irr packs and
+// LOG-006/007/009, RES-004/005/007.
+// Swarm team 09 (review fix, 2026-10-01) adds machinery-learning-guard{,-bad}, the spec's MR + AIACT pair, so MR-008
+// has golden-set precision and recall (the GMP pair declares no AI Act tier).
+// Swarm team 04 adds team04-gateways-network-data{,-bad} (docs/18 WS-I I2, born at 1.1), which exercises the rag
+// pack and the AGW, APX, SEG-001..004, TLS and DCR rules of the ai, net and data packs.
+// Swarm team 01 adds team01-import-provenance{,-bad} (docs/18 WS-I I2, born at 1.1 with a provenance sidecar), which
+// exercises the scp, cmp, imp and prov packs and STR-001/007/009..012 of the c4 pack.
+// Swarm team 02 adds team02-identity-zero-trust{,-bad} (docs/18 WS-I I2, schema 1.1 native, regimes NIST), which
+// exercises the lpv pack, the team 02 rules of the zt and a2a packs and ZT-005, ZT-006, STR-002 and STR-004.
+// Swarm team 03 adds team03-agentic-runtime{,-bad} (docs/18 WS-I I2, schema 1.1 native, regimes OWASP and AIACT),
+// which exercises the arh, tsc, ing, hov, mem and blr packs and MCP-004.
+// Swarm team 07 adds team07-attack-testing{,-bad} (docs/18 WS-I I2, schema 1.1 native, regimes FINMA, AIACT and DORA),
+// which exercises the aei pack (AEI-001, AEI-002); the count is the number of model files on disk at its build.
+// docs/18 WS-M M3 and M5 (ADR-093) add the five framework pairs fw-{langgraph,ms-agent-framework,foundry-agent-service,
+// google-adk,openai-agents}{,-bad} (schema 1.2 native, regimes OWASP and AIACT): each clean twin is a blueprint template
+// of the gallery (arch_tpl_fw_*), each bad twin (arch_gs_fw_*_bad) exercises the fw pack.
+const goldenModelCount = 50
 
 // packsNotInGoldenModels are packs no hand-authored golden model can exercise, with the reason
 // and where they are covered instead. Every entry is a deliberate gap: keep this list empty
 // unless a rule can only fire on machine-generated input.
+// docs/18 WS-I I2 (swarm team 01): the imp and prov exemptions are gone; the team01-import-provenance bad twin carries
+// the importers' residue (x_unmapped_style, x_import_*) and a provenance sidecar, so both packs are measured.
 var packsNotInGoldenModels = map[string]string{
-	"imp": "IMP-001 fires on x_unmapped_style, an attribute only the draw.io importer writes " +
-		"(the draw.io importer in the Sixi Assure product); covered by packs/fixtures/IMP-001.{pos,neg}.json, " +
-		"the importer golden files (the importer golden files in the Sixi Assure product)",
 	"drift": "drift rules need knowledge facts (kb.available); the golden set is evaluated without facts " +
 		"so every DRF rule is silent there by design; exercised by packs/fixtures/DRF-00N.{pos,neg,kb}.json " +
 		"and the A6 curator test",

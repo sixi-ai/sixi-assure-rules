@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_fw_008_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture FW-008 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Analyst agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true
+      }
+    },
+    {
+      "id": "n_tool",
+      "type": "tool",
+      "name": "Code interpreter",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "capabilities": [
+          "executes_code"
+        ],
+        "origin": "first_party",
+        "sandbox": "container",
+        "egress_policy": "disabled"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_tool",
+      "kind": "executes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

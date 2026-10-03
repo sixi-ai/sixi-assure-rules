@@ -1,0 +1,78 @@
+# LPV — least privilege (swarm agent privilege-scoper, agents/swarm/02-identity-and-zero-trust/privilege-scoper.md;
+# docs/18 WS-I I2). Deterministic CEL over declared scopes and roles; the LLM never creates findings. The
+# requested-versus-needed claims diff needs runtime claims and stays out (docs/03 §STR coverage note): these rules read
+# declared scopes only. `scopes` and `tool_scopes` are "*" or a list, so every `in`/`all` on a scope value is guarded by
+# `type(x) == list` ("s in '*'" would be an evaluation error). LPV-003 reads the schema 1.1 edge `scopes`.
+pack: lpv
+version: 0.1.0
+regimes: [MCSB, NIST, OWASP, MAESTRO, ISO, FINMA]
+offer: agentic
+rules:
+  - id: LPV-001
+    title: Agent with a wildcard tool allow-list
+    scope: node
+    severity: high
+    # The agent side of AI-008: whatever scopes its tools declare, the agent may use all of them. An empty list is not
+    # "*" and is the privilege-scoper agent's not_checked row, never a finding.
+    condition: |
+      n.type == "agent" && type(attr(n, "tool_scopes", [])) == string && attr(n, "tool_scopes", "") == "*" &&
+      g.out(n.id, "").exists(x, x.to.type in ["tool","mcp_server"])
+    requires: [n.attrs.tool_scopes]
+    domain: 'n.type == "agent" && g.out(n.id, "").exists(x, x.to.type in ["tool","mcp_server"])'
+    message: "Agent {{n.name}} may use every scope of every tool it reaches (tool_scopes=\"*\"): a steered agent acts with all of them."
+    clauses: [OWASP:AgenticTop10:ASI02, OWASP:LLMTop10-2026:LLM03, MCSB:v1:PA-7]
+    remediation: "List the scopes the agent needs on each tool (tool_scopes as an explicit list), never \"*\"; the union of the scopes its tools declare is the widest list that still works."
+    fixtures: { positive: fixtures/LPV-001.pos.json, negative: fixtures/LPV-001.neg.json }
+    tags: [privilege, agent, tools]
+
+  - id: LPV-002
+    title: Tool scope outside the agent's allow-list
+    scope: edge
+    severity: high
+    # Either the allow-list is not enforced on this hop or the drawing is wrong; both are reported, neither is assumed.
+    condition: |
+      e.from.type == "agent" && e.to.type in ["tool","mcp_server"] &&
+      type(attr(e.from, "tool_scopes", [])) == list && size(attr(e.from, "tool_scopes", [])) > 0 &&
+      type(attr(e.to, "scopes", [])) == list && size(attr(e.to, "scopes", [])) > 0 &&
+      !attr(e.to, "scopes", []).all(s, s in attr(e.from, "tool_scopes", []))
+    requires: [e.from.attrs.tool_scopes, e.to.attrs.scopes]
+    domain: 'e.from.type == "agent" && e.to.type in ["tool","mcp_server"]'
+    message: "{{e.to.name}} declares scopes agent {{e.from.name}}'s allow-list does not grant ({{attr(e.to, 'scopes', []).filter(s, !(s in attr(e.from, 'tool_scopes', []))).join(', ')}}): either the allow-list is not enforced on this hop or the design is wrong."
+    clauses: [OWASP:AgenticTop10:ASI02, MCSB:v1:PA-7, ISO:27001:A.5.15, FINMA:2023/1:Rz-AccessMgmt]
+    remediation: "Decide whether the agent needs the scope on this tool: if not, narrow the tool's scopes or remove the hop; if so, grant it explicitly on the agent's allow-list and record the decision."
+    fixtures: { positive: fixtures/LPV-002.pos.json, negative: fixtures/LPV-002.neg.json }
+    tags: [privilege, agent, tools]
+
+  - id: LPV-003
+    title: Hop token scopes wider than the tool declares
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type == "agent" && e.to.type in ["tool","mcp_server"] &&
+      size(attr(e, "scopes", [])) > 0 &&
+      type(attr(e.to, "scopes", [])) == list && size(attr(e.to, "scopes", [])) > 0 &&
+      !attr(e, "scopes", []).all(s, s in attr(e.to, "scopes", []))
+    requires: [e.attrs.scopes, e.to.attrs.scopes]
+    domain: 'e.from.type == "agent" && e.to.type in ["tool","mcp_server"]'
+    message: "The token {{e.from.name}} presents to {{e.to.name}} carries scopes the tool does not declare ({{attr(e, 'scopes', []).filter(s, !(s in attr(e.to, 'scopes', []))).join(', ')}}): a compromised tool can replay it where those scopes count."
+    clauses: [NIST:800-207:S2.1, MCSB:v1:PA-7, OWASP:AgenticTop10:ASI03]
+    remediation: "Request the token for this call with the tool's declared scopes only (edge scopes within the tool's scopes)."
+    fixtures: { positive: fixtures/LPV-003.pos.json, negative: fixtures/LPV-003.neg.json }
+    tags: [privilege, token, tools]
+
+  - id: LPV-004
+    title: Standing Contributor role on a non-human actor
+    scope: node
+    severity: medium
+    # Below ZT-004's threshold (owner, subscription_contributor stay there, so no node is reported twice); reader and
+    # custom are not reported.
+    condition: 'n.type in ["agent","tool","mcp_server"] && attr(n, "rbac_scope", "") == "contributor"'
+    requires: [n.attrs.rbac_scope]
+    domain: 'n.type in ["agent","tool","mcp_server"]'
+    message: "{{n.name}} holds a standing Contributor role: a built-in write role on an identity that never elevates."
+    clauses: [MCSB:v1:PA-7, OWASP:AgenticTop10:ASI03, NIST:800-207:S2.1]
+    remediation: "Replace the built-in role with a custom role scoped to the actions and resources the component needs (rbac_scope=custom); the role's actions are a person's decision."
+    patch_template:
+      - { op: replace, path: "/nodes/{{n.id}}/attrs/rbac_scope", value: custom }
+    fixtures: { positive: fixtures/LPV-004.pos.json, negative: fixtures/LPV-004.neg.json }
+    tags: [privilege, rbac, non-human]

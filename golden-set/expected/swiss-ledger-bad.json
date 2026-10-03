@@ -1,0 +1,27 @@
+[
+  {
+    "rule_id": "CHE-001",
+    "ids": [
+      "n_agent",
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "CHE-002",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
+    "rule_id": "CHE-003",
+    "ids": [
+      "n_cases"
+    ]
+  },
+  {
+    "rule_id": "CHE-004",
+    "ids": [
+      "n_portal"
+    ]
+  }
+]

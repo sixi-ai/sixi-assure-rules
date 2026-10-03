@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_ing_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ING-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_saas",
+      "type": "saas",
+      "name": "Partner SaaS",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "provider": "other",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_queue",
+      "type": "queue",
+      "name": "Inbound events",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "data_class": "internal"
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the team 03 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "content_safety": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e2",
+      "from": "n_saas",
+      "to": "n_queue",
+      "kind": "publishes",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_queue",
+      "kind": "subscribes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

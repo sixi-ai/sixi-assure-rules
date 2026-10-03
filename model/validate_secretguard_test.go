@@ -71,6 +71,10 @@ func TestValidateJSONRefusesSecretsInEveryFreeTextLeaf(t *testing.T) {
 		{"node x_ extension value", func(d map[string]any) {
 			d["nodes"].([]any)[0].(map[string]any)["attrs"].(map[string]any)["x_note"] = "ghp_EXAMPLEnotarealtoken0123456789abcdef"
 		}, "/nodes/0/attrs/x_note", "github_token"},
+		{"note text (ADR-081)", func(d map[string]any) {
+			d["nodes"] = append(d["nodes"].([]any), map[string]any{"id": "n_note", "type": "note", "name": "Note",
+				"layer": "app", "source": "design", "attrs": map[string]any{"text": "rotate " + awsKey + " before go-live", "tone": "warning"}})
+		}, "/nodes/2/attrs/text", "aws_access_key"},
 		{"edge label", func(d map[string]any) {
 			d["edges"].([]any)[0].(map[string]any)["label"] = "auth header eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJleGFtcGxlIn0.EXAMPLEnotarealsignature"
 		}, "/edges/0/label", "jwt"},

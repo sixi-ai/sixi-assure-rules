@@ -3,8 +3,9 @@
 # nodes flagged `x_unmapped_style`. Rules only assess typed components, so the user must finish
 # the typing before the assessment of an imported map can be trusted.
 pack: imp
-version: 0.1.0
+version: 0.2.0
 regimes: [FINMA, CH-CO, FADP, CH-ISG, DORA, AIACT, CRA, NIS2, ISO, MCSB, NIST, IEC, OWASP, MAESTRO, MSFT]
+offer: agentic
 rules:
   - id: IMP-001
     title: Untyped component from import
@@ -16,3 +17,71 @@ rules:
     remediation: "Open the node and set its type (and the attributes the type requires): the draw.io shape was not recognised, so no rule assesses this component yet."
     fixtures: { positive: fixtures/IMP-001.pos.json, negative: fixtures/IMP-001.neg.json }
     tags: [import]
+
+  # IMP-002 to IMP-006 (docs/18 WS-I I2, swarm team 01, import-fidelity): each names one loss on one element so the
+  # checks it silences can be listed. IMP-002 to IMP-004 decide only on an imported architecture (x_import_source set):
+  # an x_ attribute written by hand on a drawn model is an extension, not an import loss. They read the importers' residue in the model (x_import_*, x_iac_*,
+  # x_components and the x_<name> demotions), never the file. IMP-006 reads x_import_unmapped, which the agentic
+  # importers write (internal/importer/agentic_detect.go); its domain is an imported architecture, and an import that
+  # records no count is not_checked (the default 0 is never read as "nothing unmodelled").
+  - id: IMP-002
+    title: Imported id not kept
+    scope: node
+    severity: low
+    condition: 'attr(g, "x_import_source", "") != "" && attr(n, "x_import_previous_id", "") != ""'
+    message: "{{n.name}} was given a new id on import ({{attr(n, 'x_import_previous_id', '')}} was already taken): references to the old id in other records no longer resolve."
+    clauses: [DORA:2022/2554:Art8, NIS2:2022/2555:Art21(2)(i), AIACT:2024/1689:AnnexIV(6)]
+    remediation: "Reconcile the asset register entry to the new id, or export the source again with unique ids and re-import it through the preview."
+    fixtures: { positive: fixtures/IMP-002.pos.json, negative: fixtures/IMP-002.neg.json }
+    tags: [import, ids]
+
+  - id: IMP-003
+    title: Imported attribute demoted to an extension
+    scope: node
+    severity: medium
+    condition: |
+      attr(g, "x_import_source", "") != "" &&
+      n.attrs.exists(k, k in ["x_exposure", "x_data_class", "x_engine", "x_region", "x_network_exposure", "x_encryption_key",
+        "x_autonomy", "x_identity", "x_origin", "x_scopes", "x_capabilities", "x_integrity", "x_kind", "x_retention_days",
+        "x_network", "x_provider", "x_authn", "x_secrets_in", "x_acl_trimming", "x_redaction", "x_identity_id",
+        "x_functions", "x_auth_mode", "x_transport"])
+    message: "{{n.name}} carries an imported attribute the schema refused, kept as an extension ({{n.attrs.filter(k, k in ['x_exposure', 'x_data_class', 'x_engine', 'x_region', 'x_network_exposure', 'x_encryption_key', 'x_autonomy', 'x_identity', 'x_origin', 'x_scopes', 'x_capabilities', 'x_integrity', 'x_kind', 'x_retention_days', 'x_network', 'x_provider', 'x_authn', 'x_secrets_in', 'x_acl_trimming', 'x_redaction', 'x_identity_id', 'x_functions', 'x_auth_mode', 'x_transport']).join(', ')}}): no rule reads an extension, so the checks on that attribute are not run."
+    clauses: [DORA:2022/2554:Art8, AIACT:2024/1689:AnnexIV(2)(c), NIS2:2022/2555:Art21(2)(i)]
+    remediation: "Declare the attribute under its schema name with a value the schema accepts and remove the x_ twin; the import-fidelity agent proposes it where the value is already valid."
+    fixtures: { positive: fixtures/IMP-003.pos.json, negative: fixtures/IMP-003.neg.json }
+    tags: [import, attributes]
+
+  - id: IMP-004
+    title: Components folded on import
+    scope: node
+    severity: low
+    condition: 'attr(g, "x_import_source", "") != "" && attr(n, "x_components", "") != ""'
+    message: "{{n.name}} had its components folded on import: their names are kept, but the components and their relationships are not in the model and no rule assesses them."
+    clauses: [AIACT:2024/1689:AnnexIV(2)(c), DORA:2022/2554:Art8]
+    remediation: "Model the components that matter for the assessment (at least those that hold data, call models or cross a boundary) with their relationships."
+    fixtures: { positive: fixtures/IMP-004.pos.json, negative: fixtures/IMP-004.neg.json }
+    tags: [import, c4]
+
+  - id: IMP-005
+    title: Declared-infrastructure placement or target unresolved
+    scope: node
+    severity: medium
+    condition: 'n.source == "declared" && (attr(n, "x_iac_target", "") == "not in this file" || attr(n, "x_iac_subnets", 0) > 1)'
+    message: "{{n.name}} was imported from an infrastructure plan with {{attr(n, 'x_iac_target', '') == 'not in this file' ? 'a target that is not in the file' : 'several subnets and no zone chosen'}}: the network rules on the target or the zone are not run."
+    clauses: [MCSB:v1:NS-1, MCSB:v1:NS-2, DORA:2022/2554:Art8]
+    remediation: "Add the target resource to the plan and import it again, or place the node in the zone it runs in."
+    fixtures: { positive: fixtures/IMP-005.pos.json, negative: fixtures/IMP-005.neg.json }
+    tags: [import, iac, network]
+
+  - id: IMP-006
+    title: Import left resources unmodelled
+    scope: graph
+    severity: low
+    condition: 'attr(g, "x_import_unmapped", 0) > 0'
+    requires: [g.attrs.x_import_unmapped]
+    domain: 'attr(g, "x_import_source", "") != ""'
+    message: "The import from {{attr(g, 'x_import_source', '')}} left {{attr(g, 'x_import_unmapped', 0)}} source fields or resources unmodelled: nothing assesses them."
+    clauses: [DORA:2022/2554:Art8, NIS2:2022/2555:Art21(2)(i)]
+    remediation: "Review the import preview's unmapped list and model, or record as out of scope, each resource that matters for the assessment."
+    fixtures: { positive: fixtures/IMP-006.pos.json, negative: fixtures/IMP-006.neg.json }
+    tags: [import, coverage]

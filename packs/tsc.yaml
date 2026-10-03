@@ -1,0 +1,67 @@
+# TSC — tool supply chain (docs/03 §TSC; docs/18 WS-I I2, agents/swarm/03-agentic-runtime-and-supply-chain/
+# tool-supply-chain.md). Deterministic CEL over what the architect declares about third-party tools and MCP servers
+# and the registry agents resolve them from. The LLM never creates findings; no rule fetches a manifest, a registry
+# entry or a signature: origin, integrity, registry_entry and verification are declarations, and the artefacts behind
+# them are requested as evidence by the tool-supply-chain agent. TSC-001 (third-party server not in the registry)
+# ships in mcp.yaml (docs/18 D2) and is not repeated here; AGT-001, AGT-002, AGT-004 and AI-009 stay where they are.
+pack: tsc
+version: 0.1.0
+regimes: [OWASP, AIACT, FINMA, DORA, NIS2, ISO, MAESTRO]
+offer: agentic
+rules:
+  # AGT-001 reads exact name equality. An agent that matches tool names loosely resolves "document_search_tool" and
+  # "Document search tool" the same way. o.name != n.name keeps AGT-001 and TSC-002 from reporting one element twice;
+  # a parenthesised suffix such as "(third party)" is not stripped, because it is a disambiguation, not a collision.
+  - id: TSC-002
+    title: Third-party tool name shadows another tool's name after normalisation
+    scope: node
+    severity: medium
+    condition: |
+      n.type in ["tool","mcp_server"] && attr(n, "origin", "") == "third_party" &&
+      (g.nodes("tool") + g.nodes("mcp_server")).exists(o, o.id != n.id && o.name != n.name &&
+        o.name.lowerAscii().replace(" ", "").replace("-", "").replace("_", "") ==
+        n.name.lowerAscii().replace(" ", "").replace("-", "").replace("_", ""))
+    requires: [n.attrs.origin]
+    domain: 'n.type in ["tool","mcp_server"]'
+    message: "Third-party {{n.name}} has the name of {{(g.nodes('tool') + g.nodes('mcp_server')).filter(o, o.id != n.id && o.name != n.name && o.name.lowerAscii().replace(' ', '').replace('-', '').replace('_', '') == n.name.lowerAscii().replace(' ', '').replace('-', '').replace('_', '')).map(o, o.name).join(', ')}} once case, spaces, hyphens and underscores are ignored: an agent that resolves tools by name may call it in place of the other."
+    clauses: [OWASP:AgenticTop10:ASI04, OWASP:AgenticTop10:ASI02]
+    remediation: "Give the third-party component a namespaced name that cannot collide (for example a supplier prefix), and bind the agent to the trusted tool by id in its runtime configuration; the configuration is the evidence."
+    fixtures: { positive: fixtures/TSC-002.pos.json, negative: fixtures/TSC-002.neg.json }
+    tags: [agentic, supply-chain, shadowing, mcp]
+
+  # docs/02 §3 `pinned` covers a version tag the supplier can re-publish as well as a content digest; only `signed` ties
+  # the definition to the supplier's key. For a component that can run code, read secrets or change state the design
+  # asks for the signature. Absent or `none` integrity is AGT-004's, so no element is reported twice. Low until
+  # integrity gains a pinned_digest value (docs/02 §3 refinement); a digest pin is accepted through the evidence request.
+  - id: TSC-003
+    title: Code-, secret- or state-capable third-party component pinned but not signed
+    scope: node
+    severity: low
+    condition: |
+      n.type in ["tool","mcp_server"] && attr(n, "origin", "") == "third_party" &&
+      attr(n, "capabilities", []).exists(c, c in ["executes_code","reads_secrets","modifies_state"]) &&
+      attr(n, "integrity", "") == "pinned"
+    requires: [n.attrs.origin, n.attrs.capabilities]
+    domain: 'n.type in ["tool","mcp_server"]'
+    message: "Third-party {{n.name}} can {{attr(n, 'capabilities', []).filter(c, c in ['executes_code','reads_secrets','modifies_state']).join(', ')}} and is pinned but not signed: a pin on a version tag does not tie its definition to the supplier's key."
+    clauses: [OWASP:AgenticTop10:ASI04, OWASP:AgenticTop10:ASI05, CRA:2024/2847:AnnexI-PtI-2(f), ISO:27001:A.5.21]
+    remediation: "Verify the supplier's signature on the component's definition before the agent runtime loads it (integrity=signed once the supplier signs), or pin it to a content digest and keep the pin record as evidence."
+    fixtures: { positive: fixtures/TSC-003.pos.json, negative: fixtures/TSC-003.neg.json }
+    tags: [agentic, supply-chain, integrity, mcp]
+
+  # Schema 1.1 (ADR-047): a registry agents read tools from whose entries nobody verifies is the one place a shadow
+  # tool enters for every agent at once. Only an explicit `none` reports; an undeclared verification is not_checked.
+  - id: TSC-004
+    title: Agents resolve tools through a registry that verifies nothing
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent_registry" && attr(n, "verification", "") == "none" &&
+      g.inEdges(n.id, "").exists(x, x.from.type == "agent")
+    requires: [n.attrs.verification]
+    domain: 'n.type == "agent_registry" && g.inEdges(n.id, "").exists(x, x.from.type == "agent")'
+    message: "{{g.inEdges(n.id, '').filter(x, x.from.type == 'agent').map(x, x.from.name).join(', ')}} resolve{{size(g.inEdges(n.id, '').filter(x, x.from.type == 'agent')) == 1 ? 's' : ''}} tools through {{n.name}}, which declares that its entries are not verified (verification=none): a listing nobody checked reaches every agent that reads it."
+    clauses: [OWASP:AgenticTop10:ASI04, MAESTRO:L7, ISO:27001:A.5.21, FINMA:2018/3:Register]
+    remediation: "Verify entries before they are listed (namespace verification, a review on admission, or a checked signature) and declare it (verification=namespace, reviewed or signed); the registry's admission procedure is the evidence."
+    fixtures: { positive: fixtures/TSC-004.pos.json, negative: fixtures/TSC-004.neg.json }
+    tags: [agentic, supply-chain, registry]

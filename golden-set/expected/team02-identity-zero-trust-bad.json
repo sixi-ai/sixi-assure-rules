@@ -1,0 +1,147 @@
+[
+  {
+    "rule_id": "AID-003",
+    "ids": [
+      "n_fulfil"
+    ]
+  },
+  {
+    "rule_id": "AID-004",
+    "ids": [
+      "n_research"
+    ]
+  },
+  {
+    "rule_id": "ATA-004",
+    "ids": [
+      "e_peer_assistant"
+    ]
+  },
+  {
+    "rule_id": "ATA-005",
+    "ids": [
+      "n_assistant"
+    ]
+  },
+  {
+    "rule_id": "ATA-007",
+    "ids": [
+      "e_assistant_peer"
+    ]
+  },
+  {
+    "rule_id": "DLG-002",
+    "ids": [
+      "e_assistant_research"
+    ]
+  },
+  {
+    "rule_id": "DLG-004",
+    "ids": [
+      "n_orders_tool"
+    ]
+  },
+  {
+    "rule_id": "HAC-001",
+    "ids": [
+      "n_api"
+    ]
+  },
+  {
+    "rule_id": "HAC-002",
+    "ids": [
+      "e_cust_portal"
+    ]
+  },
+  {
+    "rule_id": "HAC-003",
+    "ids": [
+      "n_portal"
+    ]
+  },
+  {
+    "rule_id": "HAC-004",
+    "ids": [
+      "e_cust_assistant"
+    ]
+  },
+  {
+    "rule_id": "LPV-001",
+    "ids": [
+      "n_assistant"
+    ]
+  },
+  {
+    "rule_id": "LPV-002",
+    "ids": [
+      "e_research_lookup"
+    ]
+  },
+  {
+    "rule_id": "LPV-003",
+    "ids": [
+      "e_assistant_lookup"
+    ]
+  },
+  {
+    "rule_id": "LPV-004",
+    "ids": [
+      "n_fulfil"
+    ]
+  },
+  {
+    "rule_id": "STR-002",
+    "ids": [
+      "e_peer_assistant"
+    ]
+  },
+  {
+    "rule_id": "STR-004",
+    "ids": [
+      "n_api"
+    ]
+  },
+  {
+    "rule_id": "STR-006",
+    "ids": [
+      "e_api_idp",
+      "e_api_kv"
+    ]
+  },
+  {
+    "rule_id": "WIS-001",
+    "ids": [
+      "n_kv"
+    ]
+  },
+  {
+    "rule_id": "WIS-002",
+    "ids": [
+      "n_portal"
+    ]
+  },
+  {
+    "rule_id": "WIS-003",
+    "ids": [
+      "arch_gs_team02_identity_bad"
+    ]
+  },
+  {
+    "rule_id": "ZT-003",
+    "ids": [
+      "e_assistant_fulfil"
+    ]
+  },
+  {
+    "rule_id": "ZT-005",
+    "ids": [
+      "e_admin_api"
+    ]
+  },
+  {
+    "rule_id": "ZT-006",
+    "ids": [
+      "e_cust_api"
+    ]
+  }
+]

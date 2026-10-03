@@ -1,18 +1,36 @@
 # AI — AI-specific controls (docs/03 §AI). Deterministic CEL; the LLM never creates findings.
 pack: ai
-version: 0.2.0
+version: 0.4.0
 regimes: [AIACT, FINMA, OWASP, ISO, MAESTRO, DORA, MSFT]
+offer: agentic
 rules:
   - id: AI-001
-    title: LLM called without an AI gateway
+    title: LLM called without a gateway on every path
     scope: edge
     severity: high
+    # All paths (ADR-088 §1, B2a): the hop into the model fires when an agent or app reaches its source by some walk
+    # that enters no AI gateway and the source is not one itself, so a bypass edge beside a gated route and a chain
+    # through a tool both report on the last ungated hop. A hop out of a human step is the person's action, not the
+    # agent's. Absorbs LOG-004 (same hop, same fact; one finding per fact, ADR-088 §2).
+    # Gateway functions (B2b, ADR-088 Amendments): a gateway counts when it declares `observability` and `policy` in
+    # functions[], whatever its kind; one that declares no functions counts by its kind ("ai"). A hop out of a gateway
+    # of another declared kind (api, waf, mcp, a2a, egress) is AGW-003's, one finding per hop. `requires` reports the
+    # hop out of a kind-credited gateway not_checked (facts_missing: what it enforces is undeclared); a kind-credited
+    # gateway further up the walk is decided, not not_checked (docs/03 Known limits). The walk is the function-aware
+    # g.upstreamAvoiding(id, types, kinds, needFunctions) of rules/cel.go: it stops at a gateway that
+    # credits the hop and walks through every other one, at any chain length (Reconcile A, 2026-10-02: the fixed
+    # three-in-series unrolling and its false-negative class are gone).
     condition: |
-      e.from.type in ["agent","app"] && e.to.type == "llm_endpoint" &&
-      !g.pathThrough(e.from.id, e.to.id, "gateway")
-    message: "{{e.from.name}} calls {{e.to.name}} directly: no token limits, content safety or prompt/response logging."
-    clauses: [MSFT:APIM-GenAI, FINMA:08/2024:Monitoring]
-    remediation: "Route through an AI gateway (APIM GenAI policies: token limits, content safety, logging); Private Link."
+      e.to.type == "llm_endpoint" && e.from.type != "human_step" &&
+      !(e.from.type == "gateway" && !(attr(e.from, "kind", "") in ["", "ai"])) &&
+      !(e.from.type == "gateway" && cel.bind(fs, attr(e.from, "functions", []), size(fs) > 0 ? ["observability", "policy"].all(f, f in fs) : attr(e.from, "kind", "") == "ai")) &&
+      (e.from.type == "gateway" ? g.in(e.from.id, "").map(x, x.from.id) : [e.from.id]).exists(s,
+        g.upstreamAvoiding(s, ["gateway"], ["ai"], ["observability", "policy"]).exists(a, a.type in ["agent", "app"]))
+    requires: [e.from.attrs.functions]
+    domain: 'e.to.type == "llm_endpoint" && e.from.type != "human_step"'
+    message: "{{e.from.name}} calls {{e.to.name}} on a path no AI gateway gates: no token limits, content safety or prompt/response logging."
+    clauses: [MSFT:APIM-GenAI, FINMA:08/2024:Monitoring, AIACT:2024/1689:Art12]
+    remediation: "Route every path to the model through an AI gateway (APIM GenAI policies: token limits, content safety, prompt/response logging to the log sink); close the direct route; Private Link."
     patch_template:
       - { op: add, path: "/nodes/-", value: { id: "{{new:gw}}", type: gateway, name: "AI gateway (APIM)", layer: platform, attrs: { kind: ai, logging: true, token_limits: true, content_safety: true } } }
       - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:gw}}" }
@@ -37,12 +55,36 @@ rules:
     title: Consequential agent action without human approval
     scope: edge
     severity: high
+    # All paths (ADR-088 §1): a high-consequence write or execute fires when an agent reaches its source by some walk
+    # that enters no human step. The hop into a step and the hop out of one are the approval itself, never the gap.
     condition: |
-      e.from.type == "agent" && e.kind in ["writes","executes"] && attr(e, "consequence", "") == "high" &&
-      !g.pathThrough(e.from.id, e.to.id, "human_step")
-    message: "{{e.from.name}} performs a high-consequence {{e.kind}} on {{e.to.name}} with no human approval step."
+      e.kind in ["writes","executes"] && attr(e, "consequence", "") == "high" &&
+      e.from.type != "human_step" && e.to.type != "human_step" &&
+      g.upstreamAvoiding(e.from.id, ["human_step"], []).exists(a, a.type == "agent")
+    requires: [e.attrs.consequence]
+    domain: 'e.kind in ["writes","executes"] && e.from.type != "human_step" && e.to.type != "human_step"'
+    message: "{{e.from.name}} performs a high-consequence {{e.kind}} on {{e.to.name}} on a path with no human approval step."
     clauses: [AIACT:2024/1689:Art14, FINMA:08/2024:Governance]
     remediation: "Insert a human approval step before the action; make the action reversible; add a kill switch."
+    remediation_by_framework:
+      langgraph:
+        text: 'Compile with `interrupt_before=["tools"]` (static, and visible in graph JSON metadata) or call `interrupt()` in the node and resume with `Command(resume=…)` (needs a checkpointer and leaves no trace in any artefact).'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/langgraph/langgraph/graph/state.py#L1183-L1217'
+      ms_agent_framework:
+        text: 'Set the tool''s approval to always (YAML `approvalMode: {kind: always}`) and `requireApproval: true` on workflow `InvokeMcpTool` and `InvokeFunctionTool`, which default to false.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/declarative/agent_framework_declarative/_models.py#L737-L778'
+      foundry_agent_service:
+        text: 'Set `require_approval: "always"` on the MCP tool and answer `submit_tool_approval` or `mcp_approval_response` from a reviewed decision, not automatically as both samples do; the approval records no approver.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/79479173c15b68431f01eb255a098a6e1de97ddb/specification/ai/Azure.AI.Agents/tools/tool_resources.tsp#L144-L193'
+      google_adk:
+        text: 'Use `FunctionTool(require_confirmation=True)`, or in YAML a `LongRunningFunctionTool` approval step as in the HITL sample.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/tools/function_tool.py#L391-L410'
+      openai_agents:
+        text: 'Set `needs_approval=True` on the function tool or `as_tool` and resume with `RunState.approve()` or `reject()`.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/tool.py#L503-L516'
+      crewai:
+        text: '`human_input: true` reviews a task''s final answer, not each tool call; a per-tool gate was not found in the source files read.'
+        source: 'https://raw.githubusercontent.com/crewAIInc/crewAI/ca1d55abb368cd24344de1ddad97bc493b21ffa0/lib/crewai/src/crewai/task.py#L233-L236'
     patch_template:
       - { op: add, path: "/nodes/-", value: { id: "{{new:hs}}", type: human_step, name: "Approval (four-eyes)", layer: human, attrs: { role: operations } } }
       - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:hs}}" }
@@ -116,6 +158,8 @@ rules:
     scope: node
     severity: medium
     condition: 'n.type in ["tool","mcp_server"] && attr(n, "origin", "") == "third_party" && !attr(n, "vetted", false)'
+    requires: [n.attrs.origin]
+    domain: 'n.type in ["tool","mcp_server"]'
     message: "Third-party {{n.name}} is not vetted or registered."
     clauses: [DORA:2022/2554:Art28, FINMA:2018/3:DueDiligence]
     remediation: "Perform due diligence, register the provider and record the vetting (vetted=true)."
@@ -129,9 +173,30 @@ rules:
     condition: |
       n.type == "agent" && attr(n, "autonomy", "") == "autonomous" &&
       !(attr(n, "kill_switch", false) && attr(n, "rate_limit", false))
+    requires: [n.attrs.autonomy]
+    domain: 'n.type == "agent"'
     message: "Autonomous agent {{n.name}} lacks a kill switch and/or rate limits."
     clauses: [FINMA:08/2024:Governance, ISO:42001:A.9.4]
     remediation: "Add a kill switch and rate limits (tokens, tool calls, spend) for autonomous agents."
+    remediation_by_framework:
+      langgraph:
+        text: 'Bound every node with `TimeoutPolicy` and `RetryPolicy`; a kill switch is not a construct in the libraries read, so it is declared on the deployment.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/langgraph/langgraph/types.py#L427-L540'
+      ms_agent_framework:
+        text: 'Set `FunctionInvocationConfiguration.max_function_calls` and `max_duration_seconds` (unlimited by default) and stop runs from agent middleware with `MiddlewareTermination`.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/core/agent_framework/_tools.py#L1765-L1780'
+      foundry_agent_service:
+        text: 'The v2 agent has a `state`, which can derive from its identity or blueprint, whose `status` is active or disabled; disabling it is the kill switch, and a rate limit was not found in the agent definition read.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/agents/models.tsp#L151-L160'
+      google_adk:
+        text: 'Set `max_iterations` on loops and register a plugin whose `before_model` callback returns a response to stop every model call in the runner.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/agents/loop_agent.py#L84-L89'
+      openai_agents:
+        text: 'Pass `max_turns` to agents used as tools and switch tools off with `is_enabled`.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/agent.py#L606-L629'
+      crewai:
+        text: 'Set `max_iter`, `max_execution_time` and `max_rpm`.'
+        source: 'https://raw.githubusercontent.com/crewAIInc/crewAI/ca1d55abb368cd24344de1ddad97bc493b21ffa0/lib/cli/src/crewai_cli/templates/json_crew/agent_settings.jsonc#L7-L17'
     fixtures: { positive: fixtures/AI-010.pos.json, negative: fixtures/AI-010.neg.json }
     tags: [ai, agent, controls]
 
@@ -142,6 +207,8 @@ rules:
     condition: |
       e.from.type == "agent" && e.to.type == "agent" && attr(e.to, "autonomy", "") == "autonomous" &&
       !attr(e, "logged", false)
+    requires: [e.to.attrs.autonomy]
+    domain: 'e.from.type == "agent" && e.to.type == "agent"'
     message: "{{e.from.name}} → {{e.to.name}} (autonomous) hop has no trace."
     clauses: [AIACT:2024/1689:Art12]
     remediation: "Emit a per-hop trace (correlation id, task, tokens) to the log sink (logged=true on the edge)."
@@ -203,8 +270,116 @@ rules:
     condition: |
       n.type == "evaluation" && attr(g, "ai_act_tier", "") == "high_risk" &&
       !(["robustness","bias"].all(s, s in attr(n, "evaluates", [])))
+    requires: [g.attrs.ai_act_tier]
+    domain: 'n.type == "evaluation"'
     message: "{{n.name}} evaluates a high-risk system without declaring robustness and bias in its scope."
     clauses: [AIACT:2024/1689:Art15(1), AIACT:2024/1689:Art15(4), AIACT:2024/1689:Art9(2)]
     remediation: "Add robustness (input perturbation, consistency) and bias (representation across groups) to the evaluation scope and its plan."
     fixtures: { positive: fixtures/AI-015.pos.json, negative: fixtures/AI-015.neg.json }
     tags: [ai, evaluation, robustness, bias]
+
+  # AGW-003 (swarm agent ai-gateway, agents/swarm/04-gateways-network-and-data/ai-gateway.md; docs/18 B2a + B2b). The
+  # complement of AI-001's gateway guard: the hop into the model leaves a gateway of another declared kind (api, waf;
+  # schema 1.1 mcp, a2a, egress) and an agent or app reaches that gateway by a walk entering no AI gateway, so an API
+  # gateway or WAF in front of the model is not counted as an AI gateway, while an AI gateway further up the walk is
+  # credited (one finding per hop: AI-001 never reports this hop). A gateway that declares `observability` and
+  # `policy` in functions[] is exempt whatever its kind (B2b: what it enforces decides once it is declared), on the hop
+  # and further up the walk; the walk is AI-001's (every gateway blocked, up to three that do not count followed). An
+  # absent kind is not_checked here and AI-001's. The spec names a pack agw.yaml; the rule lives in ai.yaml because a
+  # pack with no golden expectation fails TestEveryPackIsExercisedByAGoldenModel and the spec's golden pair needs
+  # migration pairs outside this increment (deviation recorded in docs/03, AGW-003 row, and in the B2b review report;
+  # until the pair lands cmd/eval lists AGW-003 under unexercised_rules).
+  - id: AGW-003
+    title: Model hop out of a gateway that is not an AI gateway
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type == "gateway" && e.to.type == "llm_endpoint" &&
+      attr(e.from, "kind", "") != "" && attr(e.from, "kind", "") != "ai" &&
+      !(["observability", "policy"].all(f, f in attr(e.from, "functions", []))) &&
+      g.in(e.from.id, "").exists(x,
+        g.upstreamAvoiding(x.from.id, ["gateway"], ["ai"], ["observability", "policy"]).exists(a, a.type in ["agent", "app"]))
+    requires: [e.from.attrs.kind]
+    domain: 'e.from.type == "gateway" && e.to.type == "llm_endpoint"'
+    message: "{{e.from.name}} is the last hop before {{e.to.name}} but is a {{attr(e.from,'kind','')}} gateway, not an AI gateway: no token limits, content safety or prompt/response logging is declared for the model route."
+    clauses: [MSFT:APIM-GenAI, MSFT:APIM-TokenLimit, NIST:800-207:S3, OWASP:LLMTop10-2026:LLM06]
+    remediation: "Put an AI gateway (token limits, content safety, prompt/response logging) between this gateway and the model, or declare the gateway's functions (observability and policy) if it enforces them for the model route."
+    patch_template:
+      - { op: add, path: "/nodes/-", value: { id: "{{new:gw}}", type: gateway, name: "AI gateway (APIM)", layer: platform, attrs: { kind: ai, logging: true, token_limits: true, content_safety: true } } }
+      - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:gw}}" }
+      - { op: add, path: "/edges/-", value: { id: "{{new:e}}", from: "{{new:gw}}", to: "{{e.to.id}}", kind: calls, auth: managed_identity, encryption: tls, attrs: { logged: true } } }
+    fixtures: { positive: fixtures/AGW-003.pos.json, negative: fixtures/AGW-003.neg.json }
+    tags: [ai, gateway, kind]
+
+  # ---- swarm team 04 (docs/18 WS-I I2, agents/swarm/04-gateways-network-and-data/ai-gateway.md) -------------------
+  # AGW-002, AGW-004 and AGW-005 live beside AGW-003 in this pack rather than in the spec's agw.yaml: the four AGW
+  # rules keep one home, and the pack's regimes already hold every clause they cite (deviation recorded in docs/03 §AI).
+  # AGW-001 is withdrawn (AI-001 reports the agent → tool → model walk on its last ungated hop) and its id stays unused.
+  #
+  # AGW-002: every walk from the caller to the model enters a gateway (AI-001 is quiet; a gateway of another kind is
+  # AGW-003's question), yet some walk enters no node that declares logging. pathAvoidingAttr reads the boolean on
+  # the walk's nodes after the caller and holds only for a model the caller reaches; the model carries no `logging`,
+  # so it never satisfies the check by itself.
+  # An absent `logging` reads false by design (ai-gateway lists that absence as a not-checked row of its own). The
+  # first guard is necessary and cheap: when every gateway declares logging, a walk that avoids logging avoids every
+  # gateway, so no walk can satisfy both terms and the walks are skipped (the 500-node budget, docs/09).
+  # Cost (measured 2026-10-02 on perf-500, full catalog, allocations as the load-independent measure): the two walks
+  # are cached per caller (cel.go avoidingWalk), so a caller costs at most two walks and the message re-reads the
+  # caches. A further prune on an unlogged gateway the caller reaches was measured and not taken: every perf-500
+  # gateway is unlogged and 85 of 136 callers reach one, so it trades the 51 walks it skips for forward walks and adds
+  # one to each of the other 85 callers (+8k allocations). TODO(decision): a native helper in cel.go would cut the
+  # per-model calls (owner: rules engine).
+  - id: AGW-002
+    title: Gateway on the model path declares no logging
+    scope: node
+    severity: high
+    condition: |
+      n.type in ["agent","app","api","tool","mcp_server"] && g.nodes("gateway").exists(gw, !attr(gw, "logging", false)) &&
+      g.nodes("llm_endpoint").exists(l, g.pathAvoidingAttr(n.id, l.id, "logging") && !g.pathAvoiding(n.id, l.id, "gateway"))
+    message: "{{n.name}} reaches {{g.nodes('llm_endpoint').filter(l, g.pathAvoidingAttr(n.id, l.id, 'logging') && !g.pathAvoiding(n.id, l.id, 'gateway')).map(l, l.name).join(', ')}} through a gateway, but on some path no gateway declares logging: prompts and completions are not recorded."
+    clauses: [MSFT:APIM-LLMLogging, AIACT:2024/1689:Art12, ISO:27001:A.8.15, DORA-RTS:2024/1774:Art12, NIS2:2024/2690:Annex-3.2]
+    remediation: "Declare prompt and completion logging on the gateway the model path passes (logging=true), backed by a diagnostic setting that sends the records to the log sink."
+    fixtures: { positive: fixtures/AGW-002.pos.json, negative: fixtures/AGW-002.neg.json }
+    tags: [ai, gateway, logging]
+
+  # AGW-004 (schema 1.1): the gateway declares what it enforces (ADR-047 functions[]) and separately claims a flag no
+  # declared function backs: logging without observability, token_limits or content_safety without policy. An empty
+  # functions[] is model-completeness's (CMP-005); an absent one is not_checked (facts_missing).
+  - id: AGW-004
+    title: Gateway claim without the function that enforces it
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "gateway" && size(attr(n, "functions", [])) > 0 &&
+      ((attr(n, "logging", false) && !("observability" in attr(n, "functions", []))) ||
+       ((attr(n, "token_limits", false) || attr(n, "content_safety", false)) && !("policy" in attr(n, "functions", []))))
+    requires: [n.attrs.functions]
+    domain: 'n.type == "gateway"'
+    message: "{{n.name}} declares {{[attr(n, 'logging', false) && !('observability' in attr(n, 'functions', [])) ? 'logging without the observability function' : '', (attr(n, 'token_limits', false) || attr(n, 'content_safety', false)) && !('policy' in attr(n, 'functions', [])) ? 'token limits or content safety without the policy function' : ''].filter(s, s != '').join(' and ')}}: the flag is a claim no declared function backs."
+    clauses: [MSFT:APIM-GenAI, MSFT:APIM-LLMLogging, MSFT:APIM-ContentSafety, MSFT:APIM-TokenLimit, NIST:800-207A:Model]
+    remediation: "Declare the function that enforces each claimed control (observability for logging, policy for token limits and content safety) once the gateway's exported policy shows it, or correct the claim."
+    fixtures: { positive: fixtures/AGW-004.pos.json, negative: fixtures/AGW-004.neg.json }
+    tags: [ai, gateway, functions]
+
+  # AGW-005: a completion cached by prompt similarity can be served to another user or tenant than the one whose data
+  # produced it; no node attribute says how the cache is keyed (TODO(decision) ADR-088: a gateway cache_scope beside
+  # ADR-047's mcp_server.cache_scope), so the declared cache on a declared sensitive hop is the fact. DATA-006
+  # (ingestion-security) reports what the prompt carries; this rule reports what the gateway keeps of it.
+  - id: AGW-005
+    title: Semantic cache on a model hop carrying personal, client or secret data
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type == "gateway" && e.to.type == "llm_endpoint" && attr(e.from, "semantic_cache", false) &&
+      (attr(e, "prompt_contains", "") in ["pii","cid","secrets"] || e.data_class in ["pii","phi","cid","secret"])
+    requires: [e.from.attrs.semantic_cache, e.attrs.prompt_contains]
+    domain: 'e.from.type == "gateway" && e.to.type == "llm_endpoint"'
+    message: "{{e.from.name}} caches completions by prompt similarity on the hop to {{e.to.name}}, which carries {{attr(e, 'prompt_contains', '') != '' ? attr(e, 'prompt_contains', '') : e.data_class}} data: a cached answer can reach a caller other than the one whose data produced it."
+    clauses: [OWASP:LLMTop10-2026:LLM02, OWASP:LLMTop10-2026:LLM08, FADP:2023:Art7, GDPR:Art32, FINMA:2018/3:CID]
+    remediation: "Disable the semantic cache on this route (semantic_cache=false), or key the cache per user or tenant (vary-by) and record that design as evidence."
+    references:
+      - { kind: document, title: "Azure API Management policy reference: llm-semantic-cache-lookup (vary-by partitioning)", url: "https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/api-management/llm-semantic-cache-lookup-policy.md", fetched_at: "2026-10-01" }
+    patch_template:
+      - { op: replace, path: "/nodes/{{e.from.id}}/attrs/semantic_cache", value: false }
+    fixtures: { positive: fixtures/AGW-005.pos.json, negative: fixtures/AGW-005.neg.json }
+    tags: [ai, gateway, cache, privacy]

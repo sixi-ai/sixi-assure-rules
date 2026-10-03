@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_mcp_003_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture MCP-003 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "OWASP",
+      "MCSB"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "identities": [
+    {
+      "id": "id_mcp",
+      "name": "Identity id_mcp",
+      "kind": "workload_identity",
+      "issuer": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0",
+      "federation": "workload_identity_federation",
+      "owner": "Fixture owner",
+      "ref": "https://mcp.vendor.example/mcp"
+    }
+  ],
+  "groups": [
+    {
+      "id": "g_home",
+      "kind": "zone",
+      "name": "Agent platform",
+      "node_ids": [
+        "n_agent",
+        "n_gw"
+      ]
+    },
+    {
+      "id": "g_vendor",
+      "kind": "trust_boundary",
+      "name": "Tool vendor",
+      "node_ids": [
+        "n_mcp"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity": "agent_id"
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "MCP gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "mcp",
+        "logging": true,
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ]
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Vendor MCP server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "scopes": [
+          "read"
+        ],
+        "vetted": true,
+        "integrity": "signed",
+        "logged": true,
+        "capabilities": [
+          "queries_database"
+        ],
+        "identity_id": "id_mcp",
+        "transport": "streamable_http",
+        "auth_mode": "oauth21",
+        "resource_metadata": true,
+        "registry_entry": "io.example/vendor"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "n_agent",
+      "to": "n_gw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e1",
+      "from": "n_gw",
+      "to": "n_mcp",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "token_passthrough",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

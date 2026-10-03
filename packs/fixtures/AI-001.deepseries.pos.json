@@ -1,0 +1,184 @@
+{
+  "id": "arch_fx_ai_001_deepseries_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture AI-001 (five gateways in series, none crediting the hop, positive: the walk is exact at any length)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "limited"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_gw1",
+      "type": "gateway",
+      "name": "AI gateway 1",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "functions": [
+          "identity_termination"
+        ]
+      }
+    },
+    {
+      "id": "n_gw2",
+      "type": "gateway",
+      "name": "AI gateway 2",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "functions": [
+          "egress"
+        ]
+      }
+    },
+    {
+      "id": "n_gw3",
+      "type": "gateway",
+      "name": "AI gateway 3",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "functions": [
+          "observability"
+        ]
+      }
+    },
+    {
+      "id": "n_gw4",
+      "type": "gateway",
+      "name": "AI gateway 4",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "functions": [
+          "policy"
+        ]
+      }
+    },
+    {
+      "id": "n_gw5",
+      "type": "gateway",
+      "name": "AI gateway 5",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true,
+        "functions": [
+          "egress"
+        ]
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "purpose": "Fixture model",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "outsourcing_registered": true,
+        "exit_strategy": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_gw1",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_gw1",
+      "to": "n_gw2",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_gw2",
+      "to": "n_gw3",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e4",
+      "from": "n_gw3",
+      "to": "n_gw4",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e5",
+      "from": "n_gw4",
+      "to": "n_gw5",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e6",
+      "from": "n_gw5",
+      "to": "n_llm",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

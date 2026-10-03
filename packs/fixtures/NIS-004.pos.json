@@ -1,0 +1,66 @@
+{
+  "id": "arch_fx_nis_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture NIS-004 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [
+    {
+      "id": "z_ops",
+      "kind": "zone",
+      "name": "Operations zone",
+      "node_ids": [
+        "n_db",
+        "n_saas"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_saas",
+      "type": "saas",
+      "name": "Partner SaaS",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "provider": "other"
+      },
+      "zone": "z_ops"
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Operations DB",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth"
+      },
+      "zone": "z_ops"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_saas",
+      "to": "n_db",
+      "kind": "writes",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

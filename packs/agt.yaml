@@ -6,8 +6,9 @@
 # AGT-002's pattern vocabulary is derived from Apache-2.0 YARA rules in Cisco AI Defense's
 # MCP Scanner; see rules/NOTICE.md for the attribution and the list of changes.
 pack: agt
-version: 0.1.0
+version: 0.2.0
 regimes: [OWASP, AIACT, FINMA, MAESTRO]
+offer: agentic
 rules:
   - id: AGT-001
     title: Third-party tool shadows the name of another tool
@@ -40,15 +41,36 @@ rules:
     title: Agent ingests third-party content without content safety
     scope: edge
     severity: medium
+    # All paths (ADR-088 §1): the hop into the third-party source fires when an agent without content safety reaches
+    # its source by some walk that enters no gateway (of any kind) and no agent with content_safety: retrieved text
+    # that passes an agent with content safety is screened there before it travels further up. The source is not a
+    # gateway; a hop out of a human step is the person's action. The template sets content_safety on e.from, which is
+    # the agent only on a direct hop (docs/03 §AGT).
     condition: |
-      e.from.type == "agent" && e.kind in ["reads","calls"] &&
+      e.kind in ["reads","calls"] &&
       e.to.type in ["tool","mcp_server","saas","vector_index","datastore"] &&
       attr(e.to, "origin", "") == "third_party" &&
-      !attr(e.from, "content_safety", false) &&
-      !g.pathThrough(e.from.id, e.to.id, "gateway")
-    message: "{{e.from.name}} takes content from the third-party {{e.to.name}} with no content safety and no gateway on the path: retrieved text can carry instructions."
+      e.from.type != "gateway" && e.from.type != "human_step" &&
+      g.upstreamAvoiding(e.from.id, ["gateway"], [], ["agent"], "content_safety").exists(a, a.type == "agent" && !attr(a, "content_safety", false))
+    message: "{{e.from.name}} takes content from the third-party {{e.to.name}} on a path with no gateway, for an agent with no content safety: retrieved text can carry instructions."
     clauses: [OWASP:LLMTop10:LLM01, OWASP:AgenticTop10:ASI06, AIACT:2024/1689:Art15(5)]
     remediation: "Enable content safety / prompt shields on the agent, or route the call through a gateway that screens retrieved content before it reaches the model context."
+    remediation_by_framework:
+      langgraph:
+        text: 'No built-in content filter was found in the LangGraph source files read; screen retrieved content in `post_model_hook` or around the call with `ToolNode.wrap_tool_call`.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/prebuilt/langgraph/prebuilt/chat_agent_executor.py#L296-L297'
+      ms_agent_framework:
+        text: 'Add function middleware that inspects tool results and can end the run with `MiddlewareTermination`; FIDES labels untrusted content but is experimental.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/core/agent_framework/_middleware.py#L838-L846'
+      foundry_agent_service:
+        text: 'Name a Responsible-AI policy in `rai_config.rai_policy_name`; on the invocations protocol a `rai_config` without invocations moderation "leaves the invocations path without content-safety moderation".'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/bb83f364d8d79a7c64cc5d6ed9677cbe27c8e1cb/specification/ai-foundry/data-plane/Foundry/src/agents/models.tsp#L329-L341'
+      google_adk:
+        text: 'Set `generate_content_config.modelArmorConfig` (or `safetySettings`) and screen tool results in an `after_tool` callback or plugin.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/agents/config_schemas/AgentConfig.json#L2094-L2109'
+      openai_agents:
+        text: 'Attach a `ToolOutputGuardrail` to the function tool, or tool guardrails to the MCP server.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/tool_guardrails.py#L152-L215'
     patch_template:
       - { op: add, path: "/nodes/{{e.from.id}}/attrs/content_safety", value: true }
     fixtures: { positive: fixtures/AGT-003.pos.json, negative: fixtures/AGT-003.neg.json }
@@ -82,6 +104,22 @@ rules:
     message: "{{n.name}} can call an unvetted third-party component and, in the same context, write: content from the untrusted side can steer the write."
     clauses: [OWASP:AgenticTop10:ASI03, OWASP:AgenticTop10:ASI02]
     remediation: "Vet the third-party component, or split the agent so that reading untrusted content and writing are separate agents with separate identities and scopes."
+    remediation_by_framework:
+      langgraph:
+        text: 'Put the third-party tool and the write tool on different supervisor workers; with the default `output_mode="last_message"` only a worker''s last message returns to the supervisor.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph-supervisor-py/88859b34017ac3569bbd4a3092c7e77593a0a960/langgraph_supervisor/supervisor.py#L77-L86'
+      ms_agent_framework:
+        text: 'Restrict the MCP tool with `allowed_tools`, since `None` exposes every tool, and keep write tools on a separate agent reached through `as_tool` with approval.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/python/packages/core/agent_framework/_mcp.py#L925-L934'
+      foundry_agent_service:
+        text: 'Narrow the MCP tool''s `allowed_tools` and move the write tools to a child agent reached as a `connected_agent` or an `a2a` tool.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/79479173c15b68431f01eb255a098a6e1de97ddb/specification/ai/Azure.AI.Agents/tools/models.tsp#L157-L174'
+      google_adk:
+        text: 'Set `tool_filter` on the `McpToolset` and keep write tools on a sub-agent with `disallow_transfer_to_peers: true`.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/tools/mcp_tool/mcp_toolset.py#L719-L762'
+      openai_agents:
+        text: 'Filter the MCP server''s tools with a static `allowed_tool_names` list and expose write tools only through another agent''s `as_tool` with `needs_approval`.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/mcp/util.py#L122-L130'
     fixtures: { positive: fixtures/AGT-005.pos.json, negative: fixtures/AGT-005.neg.json }
     tags: [agentic, mcp, least-privilege]
 
@@ -89,13 +127,31 @@ rules:
     title: Autonomous agent reaches a code-executing tool with no approval step
     scope: edge
     severity: high
+    # All paths (ADR-088 §1): the hop into the code-executing tool fires when an autonomous agent reaches its source by
+    # some walk that enters no human step and the source is not one itself.
     condition: |
-      e.from.type == "agent" && attr(e.from, "autonomy", "") == "autonomous" &&
       e.to.type in ["tool","mcp_server"] && "executes_code" in attr(e.to, "capabilities", []) &&
-      !g.pathThrough(e.from.id, e.to.id, "human_step")
-    message: "{{e.from.name}} runs autonomously and reaches {{e.to.name}}, which is declared to execute code, with no human approval on the path."
+      e.from.type != "human_step" &&
+      g.upstreamAvoiding(e.from.id, ["human_step"], []).exists(a, a.type == "agent" && attr(a, "autonomy", "") == "autonomous")
+    message: "{{e.from.name}} reaches {{e.to.name}}, which is declared to execute code, on a path from an autonomous agent with no human approval step."
     clauses: [OWASP:AgenticTop10:ASI05, AIACT:2024/1689:Art14]
     remediation: "Insert a human approval step before the call, or remove the executes_code capability by replacing the tool with a bounded operation."
+    remediation_by_framework:
+      langgraph:
+        text: 'Compile with `interrupt_before` on the node that runs the code tool; no sandbox was found in the source files read.'
+        source: 'https://raw.githubusercontent.com/langchain-ai/langgraph/4be610c6bc7c042038f671d6def9f523ca385a69/libs/langgraph/langgraph/graph/state.py#L1183-L1217'
+      ms_agent_framework:
+        text: 'Set the CodeAct provider''s `approval_mode` to `always_require`; it defaults to `never_require`, and configured mounts and domains count as approval for those capabilities.'
+        source: 'https://raw.githubusercontent.com/microsoft/agent-framework/7634356a1de0fd5de287544113c34d32afeeba83/docs/features/code_act/python-implementation.md#L168'
+      foundry_agent_service:
+        text: 'The code interpreter has no approval field in the specs read; (Sixi Assure proposes) run code through a client-executed `function` tool so the client approves before anything executes.'
+        source: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/79479173c15b68431f01eb255a098a6e1de97ddb/specification/ai/Azure.AI.Agents/tools/models.tsp#L22-L27'
+      google_adk:
+        text: 'Wrap execution in a `FunctionTool(require_confirmation=True)`; a built-in `LlmAgent` YAML cannot declare a `code_executor` at all.'
+        source: 'https://raw.githubusercontent.com/google/adk-python/d594b693053fb29c3b30815270a31cd17990eab2/src/google/adk/tools/function_tool.py#L391-L410'
+      openai_agents:
+        text: 'Set `needs_approval` on `ShellTool`.'
+        source: 'https://raw.githubusercontent.com/openai/openai-agents-python/28e9f4fca26dd1c7e679398b87182868ecfad714/src/agents/tool.py#L1471-L1484'
     patch_template:
       - { op: add, path: "/nodes/-", value: { id: "{{new:hs}}", type: human_step, name: "Approval before code execution", layer: human, attrs: { role: operations } } }
       - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:hs}}" }

@@ -1,4 +1,8 @@
 {
+  "schema_version": "1.2",
+  "identities": [
+    {"id": "ident_agent_id", "name": "Agent identity (agent_id)", "kind": "agent_identity", "attrs": {"x_migrated_from": "agent.identity=agent_id"}}
+  ],
   "id": "arch_gs_a2a_mesh",
   "tenant_id": "tenant_templates",
   "name": "Agent mesh with an A2A partner agent",
@@ -144,7 +148,7 @@
         "y": 120
       },
       "attrs": {
-        "authn": "oidc",
+        "authn": ["oidc"],
         "c4_kind": "Container",
         "c4_level": "container",
         "c4_parent": "n_system",
@@ -175,7 +179,7 @@
         "c4_parent": "n_system",
         "content_safety": true,
         "criticality": "high",
-        "identity": "agent_id",
+        "identity": "agent_id", "identity_id": "ident_agent_id",
         "kill_switch": true,
         "materiality": "high",
         "output_marking": true,
@@ -202,7 +206,7 @@
         "c4_level": "container",
         "c4_parent": "n_system",
         "content_safety": true,
-        "kind": "ai",
+        "kind": "ai", "functions": ["identity_termination", "policy", "observability"],
         "logging": true,
         "provider_service": "azure/api-management",
         "region": "switzerlandnorth",
@@ -277,7 +281,8 @@
         "c4_parent": "n_system",
         "evaluates": [
           "accuracy",
-          "drift"
+          "drift",
+          "prompt_injection"
         ],
         "owner": "Head of Agent Platform",
         "provider_service": "azure/ai-foundry",

@@ -1,0 +1,134 @@
+[
+  {
+    "rule_id": "AGW-002",
+    "ids": [
+      "n_batch"
+    ]
+  },
+  {
+    "rule_id": "AGW-003",
+    "ids": [
+      "e_apim_llm_rep"
+    ]
+  },
+  {
+    "rule_id": "AGW-004",
+    "ids": [
+      "n_apim_rep"
+    ]
+  },
+  {
+    "rule_id": "AGW-005",
+    "ids": [
+      "e_aigw_llm"
+    ]
+  },
+  {
+    "rule_id": "APX-001",
+    "ids": [
+      "e_partner_api"
+    ]
+  },
+  {
+    "rule_id": "APX-002",
+    "ids": [
+      "n_kv"
+    ]
+  },
+  {
+    "rule_id": "APX-003",
+    "ids": [
+      "e_saas_sql"
+    ]
+  },
+  {
+    "rule_id": "APX-004",
+    "ids": [
+      "e_statusgw_status"
+    ]
+  },
+  {
+    "rule_id": "DCR-001",
+    "ids": [
+      "n_llm"
+    ]
+  },
+  {
+    "rule_id": "DCR-002",
+    "ids": [
+      "n_kv_keys"
+    ]
+  },
+  {
+    "rule_id": "DCR-003",
+    "ids": [
+      "e_crm_lake"
+    ]
+  },
+  {
+    "rule_id": "RAG-001",
+    "ids": [
+      "e_agent_idx"
+    ]
+  },
+  {
+    "rule_id": "RAG-003",
+    "ids": [
+      "n_idx_hr"
+    ]
+  },
+  {
+    "rule_id": "RAG-004",
+    "ids": [
+      "n_idx_ops"
+    ]
+  },
+  {
+    "rule_id": "SEG-001",
+    "ids": [
+      "e_ops_idx_ops"
+    ]
+  },
+  {
+    "rule_id": "SEG-002",
+    "ids": [
+      "n_egw"
+    ]
+  },
+  {
+    "rule_id": "SEG-003",
+    "ids": [
+      "n_dmz"
+    ]
+  },
+  {
+    "rule_id": "SEG-004",
+    "ids": [
+      "n_mcp"
+    ]
+  },
+  {
+    "rule_id": "STR-006",
+    "ids": [
+      "e_agent_idx"
+    ]
+  },
+  {
+    "rule_id": "TLS-001",
+    "ids": [
+      "e_batch_runner"
+    ]
+  },
+  {
+    "rule_id": "TLS-002",
+    "ids": [
+      "e_reports_pdf"
+    ]
+  },
+  {
+    "rule_id": "TLS-003",
+    "ids": [
+      "e_reports_fsmcp"
+    ]
+  }
+]

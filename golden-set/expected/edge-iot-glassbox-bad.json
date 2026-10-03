@@ -44,6 +44,12 @@
     ]
   },
   {
+    "rule_id": "LOG-008",
+    "ids": [
+      "n_logs"
+    ]
+  },
+  {
     "rule_id": "NET-004",
     "ids": [
       "e_egw_dmz",

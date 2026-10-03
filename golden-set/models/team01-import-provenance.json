@@ -1,0 +1,373 @@
+{
+  "id": "arch_gs_team01_import_provenance",
+  "tenant_id": "tenant_templates",
+  "name": "Payments back office imported from a Terraform plan",
+  "version": 1,
+  "schema_version": "1.2",
+  "attrs": {
+    "owner": "Head of Platform Engineering",
+    "description": "A payments back office imported from its Terraform plan: a public web front, an API gateway, an orders API with its components, two stores and a private endpoint; the provenance sidecar records the plan it was read from.",
+    "regimes": [
+      "FINMA",
+      "FADP",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Security events go to the SOC; the CISO informs FINMA of a successful cyber attack within 24 hours, per the cyber reporting guidance.",
+    "dr_tested_at": "2026-06-30",
+    "x_import_source": "terraform_plan",
+    "x_import_tool": "terraform 1.9.8",
+    "x_import_unmapped": 0,
+    "decisions": [
+      {
+        "id": "dec_1",
+        "title": "Reach the orders store with a connection string",
+        "status": "superseded",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "NIST:AIRMF:MAP"
+          }
+        ],
+        "superseded_by": "dec_2"
+      },
+      {
+        "id": "dec_2",
+        "title": "Reach the orders store with a managed identity",
+        "status": "accepted",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "MCSB:v1:IM-1"
+          }
+        ]
+      }
+    ],
+    "x_import_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "materiality": "medium"
+  },
+  "groups": [
+    {
+      "id": "g_app",
+      "kind": "zone",
+      "name": "App and data zone",
+      "node_ids": [
+        "n_web",
+        "n_gw",
+        "n_api",
+        "n_comp",
+        "n_comp2",
+        "n_batch",
+        "n_legacy",
+        "n_core",
+        "n_tool",
+        "n_db",
+        "n_db2",
+        "n_pe"
+      ],
+      "attrs": {
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_web",
+      "type": "app",
+      "name": "Payments web front",
+      "layer": "app",
+      "zone": "g_app",
+      "source": "declared",
+      "description": "Public web front behind the WAF",
+      "attrs": {
+        "exposure": "public",
+        "secrets_in": "secret_store",
+        "x_iac_address": "azurerm_linux_web_app.front",
+        "waf": true
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "API gateway",
+      "layer": "platform",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "kind": "api",
+        "logging": true,
+        "functions": [
+          "policy",
+          "observability"
+        ],
+        "x_iac_address": "azurerm_api_management.front"
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Orders API",
+      "layer": "app",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "exposure": "internal",
+        "identity": "managed_identity",
+        "c4_level": "container",
+        "x_iac_address": "azurerm_linux_function_app.orders"
+      }
+    },
+    {
+      "id": "n_comp",
+      "type": "app",
+      "name": "Order repository",
+      "layer": "app",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "exposure": "internal",
+        "identity": "managed_identity",
+        "c4_level": "component",
+        "c4_parent": "n_api"
+      }
+    },
+    {
+      "id": "n_comp2",
+      "type": "app",
+      "name": "Order validator",
+      "layer": "app",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "exposure": "internal",
+        "c4_level": "component",
+        "c4_parent": "n_api"
+      }
+    },
+    {
+      "id": "n_batch",
+      "type": "app",
+      "name": "Settlement batch",
+      "layer": "app",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "exposure": "internal",
+        "c4_parent": "n_api"
+      }
+    },
+    {
+      "id": "n_legacy",
+      "type": "app",
+      "name": "Legacy settlement VM",
+      "layer": "app",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "exposure": "internal",
+        "x_iac_address": "azurerm_linux_virtual_machine.legacy"
+      }
+    },
+    {
+      "id": "n_core",
+      "type": "app",
+      "name": "Core ledger",
+      "layer": "app",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "exposure": "internal",
+        "x_iac_address": "azurerm_container_app.core"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Orders DB",
+      "layer": "data",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "engine": "azure_sql",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "pmk",
+        "backup": true,
+        "geo_redundant": true,
+        "criticality": "critical",
+        "rto_min": 60,
+        "rpo_min": 15,
+        "x_iac_address": "azurerm_mssql_database.orders",
+        "data_class": "internal"
+      }
+    },
+    {
+      "id": "n_db2",
+      "type": "datastore",
+      "name": "Orders DB replica",
+      "layer": "data",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "pmk",
+        "backup": true,
+        "x_iac_address": "azurerm_mssql_database.orders_copy"
+      }
+    },
+    {
+      "id": "n_pe",
+      "type": "network",
+      "name": "Orders private endpoint",
+      "layer": "network",
+      "zone": "g_app",
+      "source": "declared",
+      "attrs": {
+        "x_iac_address": "azurerm_private_endpoint.orders",
+        "x_iac_type": "azurerm_private_endpoint"
+      }
+    },
+    {
+      "id": "n_tool",
+      "type": "tool",
+      "name": "Order lookup tool",
+      "layer": "app",
+      "zone": "g_app",
+      "source": "design",
+      "attrs": {
+        "scopes": [
+          "orders.read"
+        ],
+        "integrity": "pinned",
+        "vetted": true,
+        "origin": "first_party"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_web_gw",
+      "from": "n_web",
+      "to": "n_gw",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_gw_api",
+      "from": "n_gw",
+      "to": "n_api",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_api_comp",
+      "from": "n_api",
+      "to": "n_comp",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_api_comp2",
+      "from": "n_api",
+      "to": "n_comp2",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_comp_db",
+      "from": "n_comp",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_batch_db2",
+      "from": "n_batch",
+      "to": "n_db2",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_core_db",
+      "from": "n_core",
+      "to": "n_db",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_legacy_core",
+      "from": "n_legacy",
+      "to": "n_core",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_api_db",
+      "from": "n_api",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_pe_db",
+      "from": "n_pe",
+      "to": "n_db",
+      "kind": "flows",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": [],
+  "provenance": {
+    "/nodes/n_db": {
+      "kind": "imported",
+      "identifier": "terraform_plan:payments",
+      "hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "imported_by": "usr_golden",
+      "imported_at": "2026-01-05T08:00:00Z",
+      "fetched_at": "2026-01-05T08:00:00Z",
+      "last_seen_import": "2222222222222222222222222222222222222222222222222222222222222222",
+      "cadence_days": 0
+    },
+    "/nodes/n_web": {
+      "kind": "imported",
+      "identifier": "terraform_plan:payments",
+      "hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "imported_by": "usr_golden",
+      "imported_at": "2026-01-05T08:00:00Z",
+      "fetched_at": "2026-01-05T08:00:00Z",
+      "last_seen_import": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  }
+}

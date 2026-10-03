@@ -4,8 +4,9 @@
 # approver's own identity and a validation on the device; OT text is untrusted input; zones stay separate in the
 # data layer. "Machine write" = an edge of kind writes/executes into an edge_device.
 pack: ot
-version: 0.3.0
+version: 0.5.0
 regimes: [IEC, CRA, NIS2, AIACT, ISO, OWASP, MAESTRO, FDA, EU-GMP, MR]
+offer: industrial
 rules:
   - id: OT-001
     title: AI component can reach a machine write without human approval
@@ -43,6 +44,8 @@ rules:
       n.type == "secret_store" && attr(n, "key_use", "") == "command_signing" &&
       (g.nodes("agent") + g.nodes("mcp_server") + g.nodes("llm_endpoint") + g.nodes("tool")).exists(x,
         g.pathAvoiding(x.id, n.id, "human_step"))
+    requires: [n.attrs.key_use]
+    domain: 'n.type == "secret_store"'
     message: "An AI component can reach {{n.name}}, which holds the command-signing key: whatever can sign can forge an approved command."
     clauses: [ISO:27001:A.8.24, OWASP:AgenticTop10:ASI03, NIST:800-207:S2.1]
     remediation: "Grant the signing key to the command broker's identity alone, behind the human approval; keep AI components and their tools off every path to the key store."
@@ -56,6 +59,8 @@ rules:
     condition: |
       e.kind in ["writes","executes"] && e.from.layer == "edge" && e.to.layer == "edge" &&
       e.from.zone != "" && e.to.zone != "" && e.from.zone != e.to.zone
+    requires: [e.from.zone, e.to.zone]
+    domain: 'e.kind in ["writes","executes"] && e.from.layer == "edge" && e.to.layer == "edge"'
     message: "{{e.from.name}} writes {{e.to.name}} in another zone ({{e.from.zone}} → {{e.to.zone}}) directly, not through a conduit."
     clauses: [IEC:62443-3-2:Zones, IEC:62443-3-3:SR5.1, NIS2:2022/2555:Art21]
     remediation: "Keep machine writes inside their zone; traffic between zones goes through a conduit with its own controls."
@@ -104,3 +109,71 @@ rules:
       - { op: add, path: "/nodes/{{n.id}}/attrs/row_level_security", value: true }
     fixtures: { positive: fixtures/OT-007.pos.json, negative: fixtures/OT-007.neg.json }
     tags: [ot, zones, data-layer]
+
+  # Team 09 (agents/swarm/09-sector-packs/ot-command-path.md, docs/18 WS-I I2): OT-008 to OT-011.
+  - id: OT-008
+    title: Command approval recorded in no immutable log
+    scope: node
+    severity: high
+    condition: |
+      n.type == "human_step" && g.writersInto("edge_device").exists(w, g.reachable(n.id, w)) &&
+      !g.nodes("log_sink").exists(l, attr(l, "immutable", false) && g.dataFlows(n.id, l.id))
+    message: "{{n.name}} approves commands that reach an OT device, but its data reaches no log sink declared immutable: who approved which command, and when, can be altered after the fact."
+    clauses: [AIACT:2024/1689:Art12, AIACT:2024/1689:Art14, ISO:27001:A.8.15, IEC:62443-3-3:SR2.8, OWASP:AgenticTop10:ASI09]
+    remediation: "Record every approval (approver identity, command hash, time, device verdict) in a log sink nobody can edit (immutable=true) that the approval step or the component it drives writes to."
+    fixtures: { positive: fixtures/OT-008.pos.json, negative: fixtures/OT-008.neg.json }
+    tags: [ot, command-path, audit-trail]
+
+  - id: OT-009
+    title: Command-signing key readable off the command path, by a second reader or from the public network
+    scope: node
+    severity: high
+    # The key signs machine commands, so the rule needs a machine write to protect (team 09 handover): a model with no
+    # writes or executes edge into an edge_device has no command path, and a key declared for command signing there is
+    # not assessed against one (silent, not a finding on every reader).
+    condition: |
+      n.type == "secret_store" && attr(n, "key_use", "") == "command_signing" &&
+      size(g.writersInto("edge_device")) > 0 &&
+      (attr(n, "network_exposure", "") == "public" ||
+        g.in(n.id, "*").exists(x, g.in(n.id, "*").exists(y, x.from.id != y.from.id)) ||
+        g.in(n.id, "*").exists(x, !g.writersInto("edge_device").exists(w, g.reachable(x.from.id, w))))
+    requires: [n.attrs.key_use, n.attrs.network_exposure]
+    domain: 'n.type == "secret_store"'
+    message: "{{n.name}} holds the command-signing key, but it is reachable from the public network, read by more than one component, or read by a component that sends no command (network_exposure={{attr(n, 'network_exposure', 'not declared')}}, readers={{size(g.in(n.id, '*').filter(x, !g.in(n.id, '*').exists(y, y.id < x.id && y.from.id == x.from.id)))}}): every reader can forge an approved command."
+    clauses: [ISO:27001:A.8.24, NIST:800-207:S2.1, OWASP:AgenticTop10:ASI03, CRA:2024/2847:AnnexI-PtI-2(f)]
+    remediation: "Keep the signing key private to the network and readable by the identity of the one component that sends approved commands; move every other reader to a key of its own."
+    fixtures: { positive: fixtures/OT-009.pos.json, negative: fixtures/OT-009.neg.json }
+    tags: [ot, command-path, keys]
+
+  - id: OT-010
+    title: Command approval reaches a device in another zone on a walk with no conduit
+    scope: node
+    severity: high
+    # One reverse walk (ADR-088 §1) that avoids brokers and DMZs together: a broker on one path and a DMZ on a parallel
+    # one are each a conduit, so the approval is reported only when a single walk passes neither.
+    condition: |
+      n.type == "human_step" && n.zone != "" &&
+      g.nodes("edge_device").exists(d, d.zone != "" && d.zone != n.zone &&
+        g.upstreamAvoiding(d.id, ["broker", "dmz"], []).exists(c, c.id == n.id))
+    requires: [n.zone]
+    domain: 'n.type == "human_step"'
+    message: "Commands approved at {{n.name}} (zone {{n.zone}}) can reach a device in another zone on a walk that passes no broker or DMZ conduit."
+    clauses: [IEC:62443-3-2:Zones, IEC:62443-3-3:SR5.1, IEC:62443-3-3:SR5.2, NIS2:2024/2690:Annex-6.8]
+    remediation: "Route every approved command from its zone to the plant through a named conduit (a broker or a DMZ with its own controls); a data diode carries no command and is no conduit for one."
+    fixtures: { positive: fixtures/OT-010.pos.json, negative: fixtures/OT-010.neg.json }
+    tags: [ot, zones, command-path]
+
+  - id: OT-011
+    title: Command validation declared outside the edge layer
+    scope: edge
+    severity: medium
+    condition: |
+      e.kind in ["writes","executes"] && e.to.type == "edge_device" &&
+      attr(e.from, "command_validation", false) && e.from.layer != "edge"
+    requires: [e.from.attrs.command_validation, e.from.layer]
+    domain: 'e.kind in ["writes","executes"] && e.to.type == "edge_device"'
+    message: "{{e.from.name}} validates the commands it writes to {{e.to.name}}, but it runs in the {{e.from.layer}} layer, not on the device side: the machine still acts on whatever the network delivers between the validator and the device."
+    clauses: [IEC:62443-4-2:CR3.x, CRA:2024/2847:AnnexI-PtI-2(f), MR:2023/1230:AnnexIII-1.1.9]
+    remediation: "Run the command validation (signature, freshness, nonce, allow-list, range, machine state) in the edge layer, on the gateway or the device that writes the machine (hosted_on the gateway)."
+    fixtures: { positive: fixtures/OT-011.pos.json, negative: fixtures/OT-011.neg.json }
+    tags: [ot, command-path, device]

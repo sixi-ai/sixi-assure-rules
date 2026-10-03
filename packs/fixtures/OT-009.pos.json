@@ -1,0 +1,94 @@
+{
+  "id": "arch_fx_ot_009_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-009 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "ISO"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_brk",
+      "type": "app",
+      "name": "Command broker",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "command_validation": true
+      }
+    },
+    {
+      "id": "n_report",
+      "type": "app",
+      "name": "Reporting service",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal"
+      }
+    },
+    {
+      "id": "n_kv",
+      "type": "secret_store",
+      "name": "Signing keys",
+      "layer": "identity",
+      "source": "design",
+      "attrs": {
+        "key_use": "command_signing",
+        "network_exposure": "private"
+      }
+    },
+    {
+      "id": "n_plc",
+      "type": "edge_device",
+      "name": "PLC",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_brk_kv",
+      "from": "n_brk",
+      "to": "n_kv",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_report_kv",
+      "from": "n_report",
+      "to": "n_kv",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_brk_plc",
+      "from": "n_brk",
+      "to": "n_plc",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -1,0 +1,59 @@
+# ARH — agent runtime hardening (docs/03 §ARH; docs/18 WS-I I2, agents/swarm/03-agentic-runtime-and-supply-chain/
+# agent-runtime-hardening.md). Deterministic CEL over what the architect declares about an agent: its autonomy level,
+# the two levers a person holds over it (kill_switch, rate_limit) and the gateway that enforces the rate limit on its
+# model path. The LLM never creates findings. ARH-001 (code execution outside a sandbox) ships in mcp.yaml (docs/18 D2)
+# and is not repeated here; AI-010 (autonomous agent without both levers) stays in ai.yaml.
+#
+# A flag is a claim, not a control: kill_switch=true or token_limits=true closes a rule here, and the
+# agent-runtime-hardening planner asks for the procedure or the gateway policy behind it as evidence.
+pack: arh
+version: 0.1.0
+regimes: [AIACT, FINMA, OWASP, ISO, MSFT, DORA]
+offer: agentic
+rules:
+  # ARH-002 (agent autonomy level undeclared) is not built: CMP-002 (model-completeness, cmp.yaml) decides the same
+  # condition under every regime, and one fact raises one finding. The agent-runtime-hardening agent reads that finding
+  # and lists the checks the absence silences (AI-010, ARH-001, ARH-003, ARH-004) as not checked.
+  # AI-010 asks both levers of an autonomous agent; a semi-autonomous agent that writes, executes or reaches a
+  # state-changing or code-executing tool needs them too. An agent that only reads does not, and a write into a log
+  # sink, a hand-over to a human step or a write into its own memory is not a write reach.
+  - id: ARH-003
+    title: Semi-autonomous agent with write reach and no kill switch or rate limit
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") == "semi" &&
+      !(attr(n, "kill_switch", false) && attr(n, "rate_limit", false)) &&
+      g.outEdges(n.id, "").exists(x,
+        (x.kind in ["writes","executes"] && !(x.to.type in ["log_sink","human_step","agent_memory"])) ||
+        (x.to.type in ["tool","mcp_server"] && (attr(x.to, "write_capable", false) ||
+          attr(x.to, "capabilities", []).exists(c, c in ["modifies_state","executes_code"]))))
+    requires: [n.attrs.autonomy]
+    domain: 'n.type == "agent"'
+    message: "Semi-autonomous agent {{n.name}} can write, execute or reach a state-changing tool, yet declares {{attr(n, 'kill_switch', false) ? 'no rate limit' : (attr(n, 'rate_limit', false) ? 'no kill switch' : 'neither a kill switch nor a rate limit')}}: nobody can stop or slow it once a run goes wrong."
+    clauses: [AIACT:2024/1689:Art14, FINMA:08/2024:Governance, OWASP:AgenticTop10:ASI10]
+    remediation: "Give the agent a kill switch a named person can activate and a rate limit on tool calls, tokens and spend (kill_switch=true, rate_limit=true); the procedure and the enforcing policy are the evidence."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/kill_switch", value: true }
+      - { op: add, path: "/nodes/{{n.id}}/attrs/rate_limit", value: true }
+    fixtures: { positive: fixtures/ARH-003.pos.json, negative: fixtures/ARH-003.neg.json }
+    tags: [agentic, runtime, kill-switch, rate-limit]
+
+  # Zero trust (ADR-088 §1): some walk from the agent to a model never enters a node with token_limits=true, so the
+  # agent's declared rate limit is enforced by nothing on that walk. A node rule with a forward walk: pathAvoidingAttr,
+  # never pathThrough. With no gateway on the walk at all AI-001 is open on the same hop as well; the claim is
+  # unenforced either way.
+  - id: ARH-004
+    title: Declared rate limit not enforced on the model path
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") in ["semi","autonomous"] && attr(n, "rate_limit", false) &&
+      g.nodes("llm_endpoint").exists(l, g.reachable(n.id, l.id) && g.pathAvoidingAttr(n.id, l.id, "token_limits"))
+    requires: [n.attrs.autonomy, n.attrs.rate_limit]
+    domain: 'n.type == "agent"'
+    message: "{{n.name}} declares a rate limit, yet a path from it to {{g.nodes('llm_endpoint').filter(l, g.reachable(n.id, l.id) && g.pathAvoidingAttr(n.id, l.id, 'token_limits')).map(l, l.name).join(', ')}} passes no gateway that enforces token limits: the limit is a claim nothing on that path applies."
+    clauses: [MSFT:APIM-TokenLimit, OWASP:AgenticTop10:ASI08, DORA:2022/2554:Art9]
+    remediation: "Route every model call of the agent through a gateway that enforces token and request limits (token_limits=true on that gateway), and keep the exported gateway policy as the evidence."
+    fixtures: { positive: fixtures/ARH-004.pos.json, negative: fixtures/ARH-004.neg.json }
+    tags: [agentic, runtime, rate-limit, gateway]

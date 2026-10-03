@@ -196,7 +196,7 @@ func TestGoldenPatchesResolveFindings(t *testing.T) {
 			if tc.rule == "AI-003" {
 				// The inserted approval step sits between agent and datastore; neither hop reports AI-003.
 				_, still := findingsByRule(after)["AI-003"]
-				assert.False(t, still, "AI-003 must be clean on both hops (endpoints count in pathThrough)")
+				assert.False(t, still, "AI-003 must be clean on both hops (the hops into and out of a human step are exempt, ADR-088 Amendments)")
 			}
 			if tc.rule == "AI-001" {
 				_, still := findingsByRule(after)["AI-001"]

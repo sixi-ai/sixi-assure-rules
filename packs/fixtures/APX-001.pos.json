@@ -1,0 +1,53 @@
+{
+  "id": "arch_fx_apx_001_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture APX-001 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "IEC"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_partner",
+      "type": "external_party",
+      "name": "Partner system",
+      "layer": "human",
+      "source": "design",
+      "attrs": {}
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Public API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "public",
+        "authn": "oidc",
+        "secrets_in": "secret_store"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_partner",
+      "to": "n_api",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

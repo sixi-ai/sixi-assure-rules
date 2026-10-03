@@ -1,0 +1,480 @@
+{
+  "schema": "sixi-assure/golden-set-result/v1",
+  "run_date": "2026-10-02",
+  "catalog_hash": "9b3d615502eb6cb4ee75e3f98c899d0d6b42c274f92253c340ef5f4f29eb9d2d",
+  "thresholds": {
+    "precision": 0.9,
+    "recall": 0.85
+  },
+  "models": 50,
+  "rules": 270,
+  "authors": {
+    "rule-authors": 404
+  },
+  "by_pack": [
+    {
+      "pack": "a2a",
+      "version": "0.2.0",
+      "hash": "eb87da721ea2c5a8d995369eb2c8a947cfb5681b482e596bf86df5236fa89c76",
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 9,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "aei",
+      "version": "0.1.0",
+      "hash": "50ada92edf59356c03e4d9c89f3788be588a836f59e823ecab54ccc3c0487d7a",
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 2,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "agt",
+      "version": "0.2.0",
+      "hash": "43e3c079079cfb4028af9ae172ad0e911a2a41102091f534846ca7964989945d",
+      "tp": 15,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 7,
+      "unexercised_rules": [
+        "AGT-006"
+      ]
+    },
+    {
+      "pack": "ai",
+      "version": "0.4.0",
+      "hash": "609ea291679f6cbbf7e11bc59cedf9ef38746b8cf1b29c16ae59de83948de0ba",
+      "tp": 34,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 19,
+      "unexercised_rules": [
+        "AI-015"
+      ]
+    },
+    {
+      "pack": "aia",
+      "version": "0.1.0",
+      "hash": "0c2ea7a6063b2b17d300b314f14398959121d59340c9bb9b36647639bfe7c706",
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 3,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "arh",
+      "version": "0.1.0",
+      "hash": "9c5d20430fa31b2ec7c81ad781aaf7fb44b5478761f2db1f9f1b87cf150ec72d",
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 2,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "blr",
+      "version": "0.1.0",
+      "hash": "32f7369a7e7cee46652813a46426059e4354bdab9267beabdca417255148a278",
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 4,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "c4",
+      "version": "0.4.0",
+      "hash": "7255d9c0ba01a1b4c361a4b50842d7f8dce52e77869e43e3444dbe7892b724ed",
+      "tp": 22,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 12,
+      "unexercised_rules": [
+        "STR-008"
+      ]
+    },
+    {
+      "pack": "cmp",
+      "version": "0.1.0",
+      "hash": "cfcf84a96a2d5e90337e1da18b2f70819b31c2c7ea25e18ea1bdd0e16e7bd7a6",
+      "tp": 12,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 5,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "data",
+      "version": "0.4.0",
+      "hash": "ba7f7c09fbdfd3ce1ac6c972bbb828cd0108747d10275f94c420d019c19d9142",
+      "tp": 20,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 11,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "drift",
+      "version": "0.2.0",
+      "hash": "c4b679881a4ce449209340e88ee3e27cf2f71044a6d434233be9952e2d6f5df5",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 8,
+      "unexercised_rules": [
+        "DRF-001",
+        "DRF-002",
+        "DRF-003",
+        "DRF-004",
+        "DRF-005",
+        "DRF-006",
+        "DRF-007",
+        "DRF-008"
+      ]
+    },
+    {
+      "pack": "evd",
+      "version": "0.1.0",
+      "hash": "83c52366bb456ae76f43b13d99cb89acaa93f0eb164b4c60064ccef31e875a2d",
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 3,
+      "unexercised_rules": [
+        "EVD-004"
+      ]
+    },
+    {
+      "pack": "evl",
+      "version": "0.1.0",
+      "hash": "9948d83c5c3e0eedaf2a0980a49b075f57e6b79392ca2698d1f3e886d39bff01",
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 4,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "fin",
+      "version": "0.1.0",
+      "hash": "5908e2f4d1afadafa237b0abaea574ce937d1c787d2c43df2ca9378136455cfa",
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 3,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "fw",
+      "version": "0.1.0",
+      "hash": "0c18290a31604b7618fc8d57263c609df25050cca5469556ecf17b8affb8f191",
+      "tp": 29,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 13,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "gov",
+      "version": "0.3.0",
+      "hash": "5a0765b53354ef960b49c52b4dd3006eb1625ff1ec8ae154547b3e8c1e8963c7",
+      "tp": 23,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 12,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "gxp",
+      "version": "0.3.0",
+      "hash": "e976a8bb3441d6e98cabdc2a4c7dc05addfac95a6dd41dd21c89a6c78d74cbba",
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 8,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "hov",
+      "version": "0.1.0",
+      "hash": "34e3762f1f6d9d12a9b980da88298da120839c606dfa69d0e03ab1bf285e184f",
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 3,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "imp",
+      "version": "0.2.0",
+      "hash": "ab4ca15283a1c028c6899ccc47b369fd39a16760e094fd0de938080102635804",
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 6,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "ing",
+      "version": "0.1.0",
+      "hash": "c109e43abe942074be895937b90c03c8a0b4d1e9de859587fdcb39084e90fc2a",
+      "tp": 7,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 4,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "irr",
+      "version": "0.1.0",
+      "hash": "fd943d8f8ab2507aed8b0704b3000d764cb2047ed1c9135c1f8f5e934017240d",
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 5,
+      "unexercised_rules": [
+        "IRR-005"
+      ]
+    },
+    {
+      "pack": "log",
+      "version": "0.3.0",
+      "hash": "c8a9f29252b377259c2ef533764e6c7aaf10d05cea07d11ce59f321af4164dcd",
+      "tp": 19,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 9,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "lpv",
+      "version": "0.1.0",
+      "hash": "1d257dfde0e68e26e880b4b396cef90db3d63d1392b7e717d40df43d62e9325d",
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 4,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "mcp",
+      "version": "0.1.0",
+      "hash": "5ef2b87ee0962c71777f6dce92205a54d8877d4906598fbeb05e0321e7046afe",
+      "tp": 9,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 9,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "mem",
+      "version": "0.1.0",
+      "hash": "e1f4746b26adce790eb128c76d8276f5dc89011df6c996d3a07b852f997a07fd",
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 4,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "mr",
+      "version": "0.2.0",
+      "hash": "dab9266207656e0e9dedf962d4027820620b616f2897016e40e7be364d60de21",
+      "tp": 12,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 8,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "net",
+      "version": "0.3.0",
+      "hash": "5608d6552f64487d8228af8d7b20aaf95745c02e9d7942d993ebb4388e808cb3",
+      "tp": 32,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 20,
+      "unexercised_rules": [
+        "SEG-005"
+      ]
+    },
+    {
+      "pack": "ot",
+      "version": "0.5.0",
+      "hash": "5c1d8badeb6547d6e06261d5d237f33ef4da315f090099dc8fcaee3b0d65cae6",
+      "tp": 13,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 11,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "prov",
+      "version": "0.1.0",
+      "hash": "85820eb5cfd595d6900e3ce275aa7e69e9d719fc1d26a07e1fcb8259e6c9d2ea",
+      "tp": 9,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 6,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "rag",
+      "version": "0.1.0",
+      "hash": "db40cd5eba47c08d1cb15c5dbf388e2e0192ae4e065e434b21b158223f28b5b1",
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 4,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "res",
+      "version": "0.2.0",
+      "hash": "8914a644fe525f10b3f2ae330d0cdd24a630f848243abe4d6b923d2dbc249cdd",
+      "tp": 12,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 7,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "scp",
+      "version": "0.1.0",
+      "hash": "3efb994220b2dfdad4ccfada34dcdbaa6069d01406310b803174ecc7eb82b04c",
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 5,
+      "unexercised_rules": [
+        "SCP-001"
+      ]
+    },
+    {
+      "pack": "tpr",
+      "version": "0.3.0",
+      "hash": "9f081725634fd6cbb49f027ad56bad2ec2faf44297acd09d2b1a06582fd0f41f",
+      "tp": 9,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 6,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "tsc",
+      "version": "0.1.0",
+      "hash": "db02cabd8772e562bbcfccaf1c4244c963a7e0c289c697b0200d319d104fec43",
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 3,
+      "unexercised_rules": []
+    },
+    {
+      "pack": "zt",
+      "version": "0.4.0",
+      "hash": "70a0e471d8bbe54a9388376a49fb348006dacd9dce1e9c39fdbb4b3eb1f83939",
+      "tp": 48,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 31,
+      "unexercised_rules": [
+        "WIS-006"
+      ]
+    }
+  ],
+  "unexercised_rules": [
+    "AGT-006",
+    "AI-015",
+    "DRF-001",
+    "DRF-002",
+    "DRF-003",
+    "DRF-004",
+    "DRF-005",
+    "DRF-006",
+    "DRF-007",
+    "DRF-008",
+    "EVD-004",
+    "IRR-005",
+    "SCP-001",
+    "SEG-005",
+    "STR-008",
+    "WIS-006"
+  ],
+  "note": "Measured against the golden set's own expectations (golden-set/AUTHORS.md says who wrote them). A pack hash names exactly the rules these numbers are about; a different hash is a different measurement. A rule under unexercised_rules has no golden expectation: its pack's precision and recall do not measure it."
+}

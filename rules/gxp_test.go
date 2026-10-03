@@ -54,7 +54,8 @@ func TestGlassBoxGxPControlsAreEvidenced(t *testing.T) {
 	base := loadModel(t, repoPath("golden-set", "models", "glassbox-ot-agent.json"))
 	require.Contains(t, base.Attrs["regimes"], "FDA")
 	require.Contains(t, base.Attrs["regimes"], "EU-GMP")
-	require.Empty(t, evaluateWith(t, base), "the template is silent")
+	// The template is silent but for NIS-001: it ships no accepted NIS2 transposition decision (team 06 review fix).
+	require.Equal(t, glassboxTemplateBaseline, evaluateWith(t, base), "the template is silent but for NIS-001")
 	tests := []struct {
 		name   string
 		node   string

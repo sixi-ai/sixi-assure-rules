@@ -142,8 +142,73 @@ func TestViewsGolden(t *testing.T) {
 	if ok {
 		assert.Equal(t, "n_web", el.ID)
 	}
-	assert.Len(t, m.Identities, 2, "the identity provider node and the auth kinds summary")
+	// Schema 1.1 moved this value: the golden model's agent now runs as an identity entity (the
+	// 1.0 → 1.1 migration created ident_agent_id), which the projection lists after the identity
+	// provider node and the auth kinds summary.
+	assert.Len(t, m.Identities, 3, "the identity provider node, the auth kinds summary and the agent's identity entity")
 	assert.NotEmpty(t, m.Identities[1].AuthKinds)
+	assert.Equal(t, Identity{ID: "ident_agent_id", Name: "Agent identity (agent_id)", Type: "identity", Kind: "agent_identity",
+		Used: []string{"n_agent"}}, m.Identities[2])
+}
+
+// TestSchema11Projection: identities reach relationship technology text and the identity list;
+// registries and brokers are containers; the round trip stays the identity (ADR-047 §5).
+func TestSchema11Projection(t *testing.T) {
+	ttl := int64(900)
+	a := model.Empty("arch_c4_11", "t", "c4 1.1")
+	a.Identities = []model.Identity{
+		{ID: "id_planner", Name: "Planner identity", Kind: "agent_identity", Federation: "entra_agent_id", Issuer: "https://login.example.org"},
+		{ID: "id_job", Kind: "workload_identity", CredentialType: "managed_identity", CredentialTTL: &ttl},
+	}
+	a.Nodes = []model.Node{
+		{ID: "ag", Type: "agent", Name: "Planner", Layer: "ai", Attrs: model.Attrs{"identity": "agent_id", "identity_id": "id_planner"}},
+		{ID: "job", Type: "api", Name: "Job API", Layer: "app", Attrs: model.Attrs{"exposure": "internal", "identity_id": "id_job"}},
+		{ID: "reg", Type: "agent_registry", Name: "Registry", Layer: "identity", Attrs: model.Attrs{"kind": "mcp"}},
+		{ID: "vault", Type: "credential_broker", Name: "Vault", Layer: "identity", Attrs: model.Attrs{"issues": "certificate"}},
+		{ID: "mem", Type: "agent_memory", Name: "Memory", Layer: "data", Attrs: model.Attrs{}},
+		{ID: "peer", Type: "external_agent", Name: "Peer", Layer: "ai", Attrs: model.Attrs{}},
+	}
+	a.Edges = []model.Edge{
+		{ID: "e1", From: "ag", To: "job", Kind: "calls", Protocol: "https", Auth: "token_exchange", Encryption: "tls"},
+		{ID: "e2", From: "job", To: "vault", Kind: "reads", Protocol: "https", Auth: "managed_identity", Encryption: "tls"},
+		{ID: "e3", From: "ag", To: "peer", Kind: "delegates", Auth: "jwt_assertion", Encryption: "tls"},
+		{ID: "e4", From: "peer", To: "reg", Kind: "reads", Protocol: "https", Auth: "none", Encryption: "tls"},
+	}
+	require.NoError(t, model.Validate(a))
+	before, err := model.Canonical(a)
+	require.NoError(t, err)
+
+	m := Project(a)
+	tech := map[string]string{}
+	for _, r := range m.Relationships {
+		tech[r.ID] = r.Technology
+	}
+	assert.Equal(t, map[string]string{
+		"e1": "https · as Planner identity (agent_identity, entra_agent_id)",
+		"e2": "https · as id_job (workload_identity, managed_identity)",
+		"e3": "as Planner identity (agent_identity, entra_agent_id)",
+		"e4": "https",
+	}, tech)
+	kinds := map[string]string{}
+	for _, e := range m.Elements {
+		kinds[e.ID] = e.Level + "/" + e.Kind
+	}
+	assert.Equal(t, "container/Container", kinds["reg"])
+	assert.Equal(t, "container/Container", kinds["vault"])
+	var entities []Identity
+	for _, id := range m.Identities {
+		if id.Type == "identity" {
+			entities = append(entities, id)
+		}
+	}
+	require.Len(t, entities, 2)
+	assert.Equal(t, []string{"ag"}, entities[0].Used)
+	assert.Equal(t, "entra_agent_id", entities[0].Federation)
+	assert.Equal(t, "managed_identity", entities[1].CredentialType)
+
+	after, err := model.Canonical(m.Unproject())
+	require.NoError(t, err)
+	assert.Equal(t, string(before), string(after), "the projection never changes the model")
 }
 
 func TestDiffAppliesToTarget(t *testing.T) {
@@ -160,6 +225,9 @@ func TestDiffAppliesToTarget(t *testing.T) {
 		to.Edges = append(to.Edges, model.Edge{ID: "e_diff_new", From: to.Nodes[0].ID, To: "n_diff_new", Kind: "reads", Auth: "managed_identity", Encryption: "tls", Attrs: model.Attrs{}})
 		to.Groups = append(to.Groups, model.Group{ID: "g_diff_new", Kind: "trust_boundary", Name: "New boundary", NodeIDs: []string{"n_diff_new"}, Attrs: model.Attrs{}})
 		to.Attrs["decisions"] = []any{map[string]any{"id": "dec_1", "title": "Use managed identity", "status": "proposed"}}
+		// Schema 1.1: a new identity the new node runs as travels in the same patch.
+		to.Identities = append(to.Identities, model.Identity{ID: "id_diff_new", Kind: "service_principal"})
+		to.Node("n_diff_new").Attrs["identity_id"] = "id_diff_new"
 		require.NoError(t, model.Validate(to), name)
 
 		ops, err := Diff(a, to)
@@ -225,4 +293,121 @@ func TestOpsHelpersApply(t *testing.T) {
 	assert.Error(t, err)
 	_, err = model.Apply(got, []model.PatchOp{RemoveRelationship("e_ops_new"), GroupIntoBoundary(model.Group{ID: g.ID, NodeIDs: g.NodeIDs}), RemoveElement("n_ops_new")}, false)
 	assert.NoError(t, err)
+}
+
+// TestNotesStayOutOfTheProjection (ADR-081): a note is never a C4 element or a boundary member,
+// the views are what they were without it, and canvas → C4 → canvas still returns the notes.
+func TestNotesStayOutOfTheProjection(t *testing.T) {
+	for name, a := range fixtures(t) {
+		plain := Project(a)
+		withNote, err := a.Clone()
+		require.NoError(t, err)
+		note := model.Node{ID: "n_note", Type: model.NodeTypeNote, Name: "Note", Layer: "app", Source: model.SourceDesign,
+			Attrs: model.Attrs{"text": "Decided: one region.", "tone": "decision", "c4_kind": KindSoftwareSystem}}
+		if len(withNote.Groups) > 0 {
+			withNote.Groups[0].NodeIDs = append(withNote.Groups[0].NodeIDs, note.ID)
+			if withNote.Groups[0].Kind == "zone" {
+				note.Zone = withNote.Groups[0].ID
+			}
+		}
+		withNote.Nodes = append(withNote.Nodes, note)
+		require.NoError(t, model.Validate(withNote), name)
+
+		m := Project(withNote)
+		assert.Len(t, m.Elements, len(a.Nodes), name)
+		for _, b := range m.Boundaries {
+			assert.NotContains(t, b.Members, "n_note", name)
+		}
+		_, found := m.ElementByName("n_note")
+		assert.False(t, found, name)
+		assert.Equal(t, ids(plain.ContextView().Elements), ids(m.ContextView().Elements), name)
+		assert.Equal(t, ids(plain.ContainerView("").Elements), ids(m.ContainerView("").Elements), name)
+		assert.Equal(t, len(plain.ContextView().Boundaries), len(m.ContextView().Boundaries), name)
+		assert.Len(t, m.Systems(), len(plain.Systems()), "%s: a note never becomes a system", name)
+
+		before, err := model.Canonical(withNote)
+		require.NoError(t, err)
+		after, err := model.Canonical(m.Unproject())
+		require.NoError(t, err)
+		assert.Equal(t, string(before), string(after), "%s: the round trip keeps the note", name)
+	}
+}
+
+func ids(els []Element) []string {
+	out := make([]string, 0, len(els))
+	for _, e := range els {
+		out = append(out, e.ID)
+	}
+	return out
+}
+
+// TestDiffCarriesIdentities: a patch that adds an element running as a new identity carries the
+// identity, and one that drops every identity removes the collection (schema 1.1).
+func TestDiffCarriesIdentities(t *testing.T) {
+	from := model.Empty("arch_d", "t", "d")
+	to, err := from.Clone()
+	require.NoError(t, err)
+	to.Identities = []model.Identity{{ID: "id_a", Kind: "agent_identity"}}
+	to.Nodes = []model.Node{{ID: "ag", Type: "agent", Name: "A", Layer: "ai", Attrs: model.Attrs{"identity_id": "id_a"}}}
+	require.NoError(t, model.Validate(to))
+	ops, err := Diff(from, to)
+	require.NoError(t, err)
+	require.Equal(t, "/identities", ops[0].Path, "the identity is added before the node that runs as it")
+	got, err := model.Apply(from, ops, false)
+	require.NoError(t, err)
+	assert.Equal(t, "id_a", got.IdentityOf(got.Node("ag")).ID)
+
+	back, err := Diff(got, from)
+	require.NoError(t, err)
+	reverted, err := model.Apply(got, back, false)
+	require.NoError(t, err)
+	assert.Empty(t, reverted.Identities)
+	assert.Empty(t, reverted.Nodes)
+}
+
+// TestDiffNilAndEmptyIdentitiesAreEqual: Identities is omitempty, so nil and [] marshal to the same
+// document (no identities member). Diff emits no op between them in either direction, and the
+// patch it returns applies (a remove of the absent member would fail).
+func TestDiffNilAndEmptyIdentitiesAreEqual(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		name     string
+		from, to []model.Identity
+	}{
+		{"nil to empty", nil, []model.Identity{}},
+		{"empty to nil", []model.Identity{}, nil},
+		{"empty to empty", []model.Identity{}, []model.Identity{}},
+		{"nil to nil", nil, nil},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			from := model.Empty("arch_d", "t", "d")
+			from.Nodes = []model.Node{{ID: "a", Type: "app", Name: "A", Layer: "app", Attrs: model.Attrs{}}}
+			to, err := from.Clone()
+			require.NoError(t, err)
+			to.Nodes = append(to.Nodes, model.Node{ID: "b", Type: "app", Name: "B", Layer: "app", Attrs: model.Attrs{}})
+			from.Identities, to.Identities = tc.from, tc.to
+			ops, err := Diff(from, to)
+			require.NoError(t, err)
+			for _, op := range ops {
+				assert.NotEqual(t, "/identities", op.Path, "no identities op between nil and empty")
+			}
+			got, err := model.Apply(from, ops, false)
+			require.NoError(t, err)
+			assert.Empty(t, got.Identities)
+			assert.NotNil(t, got.Node("b"))
+		})
+	}
+
+	// A document that carries "identities": [] decodes to an empty, non-nil list (the assistant
+	// path diffs it against a generated architecture whose list is nil).
+	a, err := model.ValidateJSON([]byte(`{"schema_version":"` + model.CurrentSchemaVersion + `","id":"arch_d","tenant_id":"t","name":"d","version":1,
+		"attrs":{},"groups":[],"nodes":[],"edges":[],"findings":[],"evidence":[],"identities":[]}`))
+	require.NoError(t, err)
+	require.NotNil(t, a.Identities)
+	gen := model.Empty("arch_d", "t", "d")
+	gen.Identities = nil
+	ops, err := Diff(a, gen)
+	require.NoError(t, err)
+	assert.Empty(t, ops, "nothing differs: no remove of the absent identities member")
 }

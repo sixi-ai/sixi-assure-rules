@@ -1241,7 +1241,9 @@
     "effective": "2027-12-02",
     "applies_to": [
       "deployer",
-      "high_risk"
+      "high_risk",
+      "public_body",
+      "annex_iii_5bc"
     ],
     "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
     "tags": [
@@ -1252,7 +1254,7 @@
     ],
     "licence": "eu-law",
     "verified": true,
-    "note": "Verified 2026-09-16 against the official OJ text of Regulation (EU) 2024/1689 fetched from EUR-Lex (CELEX 32024R1689). A drawing supplies the scaffolding — the deployment processes, the population reachable through the drawn path, the human-oversight step and the complaint or remediation component — and never the assessment's conclusion. Consolidation note 2026-09-16: EUR-Lex still publishes no consolidated text of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, so the amended dates were read from the amending Regulation itself."
+    "note": "Verified 2026-09-16 against the official OJ text of Regulation (EU) 2024/1689 fetched from EUR-Lex (CELEX 32024R1689). A drawing supplies the scaffolding — the deployment processes, the population reachable through the drawn path, the human-oversight step and the complaint or remediation component — and never the assessment's conclusion. Consolidation note 2026-09-16: EUR-Lex still publishes no consolidated text of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, so the amended dates were read from the amending Regulation itself. Scope tokens added 2026-10-01 (E3): public_body (public bodies and private entities providing public services) and annex_iii_5bc (deployers of Annex III points 5(b) and 5(c) systems); the applicability layer (corpus/applicability.json clause_scopes) evaluates them over the organisation's intake facts. The tokens are pending a named reviewer's check; the record's text is unchanged."
   },
   {
     "id": "AIACT:2024/1689:Art40",
@@ -1305,5 +1307,129 @@
     "licence": "eu-law",
     "verified": true,
     "note": "Verified 2026-09-16 against the official OJ text of Regulation (EU) 2024/1689 fetched from EUR-Lex (CELEX 32024R1689). Regulation (EU) 2026/1744 retained the registration of self-assessed non-high-risk systems in simplified form; check the amended wording against the consolidated text when EUR-Lex publishes it. Consolidation note 2026-09-16: EUR-Lex still publishes no consolidated text of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, so the amended dates were read from the amending Regulation itself."
+  },
+  {
+    "id": "AIACT:2024/1689:Art73",
+    "regime": "AIACT",
+    "doc": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744",
+    "ref": "Art. 73",
+    "title": "Reporting of serious incidents",
+    "summary": "Providers of high-risk AI systems placed on the Union market report any serious incident to the market surveillance authority of the Member State where it occurred, immediately after establishing a causal link (or its reasonable likelihood) and within the outer time limits the article sets, which are shorter for a widespread infringement or a death; the report is followed by an investigation that does not alter the system before the authorities are informed. Deployers inform the provider first (Art. 26(5)).",
+    "excerpt": "",
+    "version": "2026-07-24",
+    "effective": "2027-12-02",
+    "applies_to": [
+      "high_risk",
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    "tags": [
+      "incident",
+      "reporting",
+      "serious-incident",
+      "high_risk",
+      "principle:accountability"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Event-driven duty: its evidence is the declared serious-incident reporting path (authority, contact, SLA), not a periodic record; no cadence entry. Application date 2027-12-02 for Annex III systems per Art. 113 as amended by Regulation (EU) 2026/1744 (read from corpus/calendar.json). Added 2026-10-01, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
+  },
+  {
+    "id": "AIACT:2024/1689:Art2(1)",
+    "regime": "AIACT",
+    "doc": "Regulation (EU) 2024/1689 (AI Act)",
+    "ref": "Art. 2(1)",
+    "title": "Scope — who the Regulation applies to",
+    "summary": "The Regulation applies to providers placing AI systems on the Union market or putting them into service there, or placing general-purpose AI models on the Union market, wherever they are established; to deployers established or located in the Union; to providers and deployers established or located in a third country where the output of the AI system is used in the Union; to importers, distributors and product manufacturers placing an AI system on the market with their product; to authorised representatives of providers not established in the Union; and to affected persons located in the Union.",
+    "excerpt": "",
+    "version": "2024-07-12",
+    "effective": "2024-08-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    "tags": [
+      "scope",
+      "territorial-scope",
+      "applicability"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Cited by corpus/applicability.json for the AI Act's applies_when (establishment in the EU, EU market, output used in the EU): Assure reads the answer from the declared intake facts, never from a drawing. Added 2026-10-01, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
+  },
+  {
+    "id": "AIACT:2024/1689:Art19",
+    "regime": "AIACT",
+    "doc": "Regulation (EU) 2024/1689 (AI Act)",
+    "ref": "Art. 19",
+    "title": "Automatically generated logs",
+    "summary": "Providers of high-risk AI systems keep the logs their systems generate automatically under Art. 12(1), to the extent the logs are under their control, for a period appropriate to the intended purpose and of at least six months, unless Union or national law, in particular on the protection of personal data, provides otherwise. Providers that are financial institutions keep them as part of the documentation kept under Union financial services law.",
+    "excerpt": "",
+    "version": "2024-07-12",
+    "effective": "2027-12-02",
+    "applies_to": [
+      "high_risk",
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    "tags": [
+      "logging",
+      "retention",
+      "provider",
+      "evidence"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "The provider's counterpart of AIACT:2024/1689:Art26(6) (deployers). Cited by EVD-004: the declared evidence sink is where the retained logs are kept. Application date as Art. 12 (Art. 113 as amended by Regulation (EU) 2026/1744). Added 2026-10-02, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
+  },
+  {
+    "id": "AIACT:2024/1689:Art26(5)",
+    "regime": "AIACT",
+    "doc": "Regulation (EU) 2024/1689 (AI Act)",
+    "ref": "Art. 26(5)",
+    "title": "Deployer obligations — monitoring of operation and informing the provider",
+    "summary": "Deployers monitor the operation of a high-risk AI system on the basis of the instructions for use and, where relevant, inform the provider in accordance with Art. 72. Where they have reason to consider that use in accordance with the instructions may present a risk within the meaning of Art. 79(1), they inform the provider or distributor and the market surveillance authority without undue delay and suspend use; where they identify a serious incident, they inform first the provider and then the importer or distributor and the market surveillance authorities. For financial institutions the monitoring duty is met by complying with the internal-governance rules of Union financial services law.",
+    "excerpt": "",
+    "version": "2024-07-12",
+    "effective": "2027-12-02",
+    "applies_to": [
+      "high_risk",
+      "deployer"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    "tags": [
+      "monitoring",
+      "deployer",
+      "incident",
+      "high-risk"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Cited by EVL-002 (an evaluation that sees nothing an agent emits leaves its operation unmonitored); the informing duty is event-driven and its evidence is the declared path to the provider. Added 2026-10-02, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
+  },
+  {
+    "id": "AIACT:2024/1689:AnnexI-SA(1)",
+    "regime": "AIACT",
+    "doc": "Regulation (EU) 2024/1689 (AI Act)",
+    "ref": "Annex I, Section A, point 1",
+    "title": "List of Union harmonisation legislation — Section A, point 1: machinery",
+    "summary": "Annex I lists the Union harmonisation legislation behind the first high-risk category of Art. 6(1); Section A, point 1 is the machinery legislation (Directive 2006/42/EC, which Regulation (EU) 2023/1230 replaces from 20 January 2027). An AI system that is a safety component of such a product, or is itself the product, and that the legislation sends to a third-party conformity assessment, is high-risk.",
+    "excerpt": "",
+    "version": "2024-07-12",
+    "effective": "",
+    "applies_to": [
+      "high_risk",
+      "provider"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    "tags": [
+      "classification",
+      "machinery",
+      "high-risk",
+      "annex-i"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Title and reference, cited by MR-008 beside Art. 6 and MR:2023/1230:Art8. Regulation (EU) 2026/1744 amends Regulation (EU) 2023/1230 as well as the AI Act; whether it moves the machinery legislation out of Section A, and the application date of the Annex I category after it, could not be checked offline: the reviewer confirms both against the consolidated text before the record is verified. Added 2026-10-02, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
   }
 ]

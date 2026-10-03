@@ -1,7 +1,8 @@
 # NET — network (docs/03 §NET). Deterministic CEL; the LLM never creates findings.
 pack: net
-version: 0.1.0
+version: 0.3.0
 regimes: [MCSB, IEC, CRA, ISO, DORA, FINMA, OWASP]
+offer: agentic
 rules:
   - id: NET-001
     title: Datastore exposed to the public network
@@ -33,10 +34,24 @@ rules:
     title: Public app or API without a gateway/WAF in front
     scope: edge
     severity: medium
+    # All paths (ADR-088 §1, B2a): the hop into a public app or API fires when a user reaches its source by some walk
+    # that enters no WAF or API gateway and the source is not one itself. A direct edge beside a gated route reports; a
+    # gateway of no declared kind is not a WAF or API gateway. A hop out of a gateway of another declared kind (ai;
+    # schema 1.1 mcp, a2a, egress) is APX-004's, one finding per hop.
+    # Gateway functions (B2b, ADR-088 Amendments): a gateway counts when it declares `policy` in functions[], whatever
+    # its kind; one that declares no functions counts by its kind (api or waf). `requires` reports the hop out of a
+    # kind-credited gateway not_checked (facts_missing); one further up the walk is decided (docs/03 Known limits). The
+    # walk (the function-aware g.upstreamAvoiding of cel.go) stops at a gateway that credits the hop and walks through
+    # every other one, at any chain length.
     condition: |
-      e.from.type == "user" && e.to.type in ["app","api"] && attr(e.to, "exposure", "") == "public" &&
-      !g.pathThrough(e.from.id, e.to.id, "gateway")
-    message: "{{e.from.name}} reaches public {{e.to.name}} with no WAF or API gateway on the path."
+      e.to.type in ["app","api"] && attr(e.to, "exposure", "") == "public" &&
+      !(e.from.type == "gateway" && !(attr(e.from, "kind", "") in ["", "api", "waf"])) &&
+      !(e.from.type == "gateway" && cel.bind(fs, attr(e.from, "functions", []), size(fs) > 0 ? "policy" in fs : attr(e.from, "kind", "") in ["api", "waf"])) &&
+      (e.from.type == "gateway" ? g.in(e.from.id, "").map(x, x.from.id) : [e.from.id]).exists(s,
+        g.upstreamAvoiding(s, ["gateway"], ["api", "waf"], ["policy"]).exists(a, a.type == "user"))
+    requires: [e.to.attrs.exposure, e.from.attrs.functions]
+    domain: 'e.to.type in ["app","api"]'
+    message: "{{e.from.name}} reaches public {{e.to.name}} on a path with no WAF or API gateway."
     clauses: [MCSB:v1:NS-6, OWASP:ASVS:V1]
     remediation: "Place a WAF (Front Door / Application Gateway) or API gateway in front of the public endpoint."
     fixtures: { positive: fixtures/NET-003.pos.json, negative: fixtures/NET-003.neg.json }
@@ -59,10 +74,15 @@ rules:
     title: Edge traffic reaches a datastore without a broker/DMZ conduit
     scope: edge
     severity: high
+    # All paths (ADR-088 §1): the hop into a datastore fires when an edge-layer node reaches its source by some walk
+    # that enters no broker or DMZ and the source is not one itself, so a direct write beside a brokered route and an
+    # edge → app → store chain both report on the last hop before the store. upstreamAvoiding lists the controls
+    # that border the walk as sources too: a broker or DMZ placed in the edge layer (IoT Operations on site, a plant
+    # DMZ) is the conduit, not edge traffic, so it never counts as the source.
     condition: |
-      e.from.layer == "edge" && e.to.type == "datastore" &&
-      !g.pathThrough(e.from.id, e.to.id, "broker") && !g.pathThrough(e.from.id, e.to.id, "dmz")
-    message: "{{e.from.name}} writes to {{e.to.name}} directly; no broker or DMZ conduit separates the OT zone."
+      e.to.type == "datastore" && !(e.from.type in ["broker","dmz"]) &&
+      g.upstreamAvoiding(e.from.id, ["broker","dmz"], []).exists(a, a.layer == "edge" && !(a.type in ["broker","dmz"]))
+    message: "{{e.from.name}} → {{e.to.name}} carries edge traffic into the store on a path with no broker or DMZ conduit separating the OT zone."
     clauses: [IEC:62443-3-3:SR5.1, IEC:62443-3-2:Zones]
     remediation: "Route edge telemetry through a broker (IoT Hub / IoT Operations) or a DMZ conduit between zones."
     fixtures: { positive: fixtures/NET-005.pos.json, negative: fixtures/NET-005.neg.json }
@@ -79,6 +99,8 @@ rules:
       !(e.encryption == "none" && (attr(e.from, "hosted_on", "") == e.to.id || attr(e.to, "hosted_on", "") == e.from.id ||
         (attr(e.from, "hosted_on", "") != "" && attr(e.from, "hosted_on", "") == attr(e.to, "hosted_on", ""))))
     severity_override:
+      # transport-encryption (docs/18 WS-I I2): an undeclared transport on a hop that declares client, personal, health or secret data stays high.
+      - { when: 'e.encryption == "unknown" && e.data_class in ["pii","phi","cid","secret"]', severity: high }
       - { when: 'e.encryption == "unknown"', severity: medium }
     message: "{{e.from.name}} → {{e.to.name}} transport encryption is {{e.encryption}}."
     clauses: [ISO:27001:A.8.24, DORA-RTS:2024/1774:Art6]
@@ -87,3 +109,306 @@ rules:
       - { op: replace, path: "/edges/{{e.id}}/encryption", value: tls }
     fixtures: { positive: fixtures/NET-006.pos.json, negative: fixtures/NET-006.neg.json }
     tags: [network, encryption]
+
+  # APX-004 (swarm agent api-gateway-exposure, agents/swarm/04-gateways-network-and-data/api-gateway-exposure.md;
+  # docs/18 B2a + B2b). The complement of NET-003's gateway guard: the hop into a public app or API leaves a gateway of
+  # another declared kind (ai; schema 1.1 mcp, a2a, egress) and a user, partner or SaaS reaches that gateway by a walk
+  # entering no WAF or API gateway, so a token-limiting AI gateway in front of a web app is not counted as a WAF, while
+  # a WAF further up the walk is credited (one finding per hop: NET-003 never reports this hop). A gateway that
+  # declares `policy` in functions[] is exempt whatever its kind (B2b), on the hop and further up the walk; the walk is
+  # NET-003's (every gateway blocked, up to three that do not count followed). An absent kind is not_checked.
+  - id: APX-004
+    title: Public entry's gateway hop is not an API gateway or WAF
+    scope: edge
+    severity: medium
+    condition: |
+      e.from.type == "gateway" && e.to.type in ["app","api"] && attr(e.to, "exposure", "") == "public" &&
+      attr(e.from, "kind", "") != "" && !(attr(e.from, "kind", "") in ["api", "waf"]) &&
+      !("policy" in attr(e.from, "functions", [])) &&
+      g.in(e.from.id, "").exists(x,
+        g.upstreamAvoiding(x.from.id, ["gateway"], ["api", "waf"], ["policy"]).exists(a, a.type in ["user", "external_party", "saas"]))
+    requires: [e.from.attrs.kind, e.to.attrs.exposure]
+    domain: 'e.from.type == "gateway" && e.to.type in ["app","api"]'
+    message: "{{e.from.name}} fronts public {{e.to.name}} but is a {{attr(e.from,'kind','')}} gateway, not a WAF or API gateway: no web rule set or API policy is declared on this entry."
+    clauses: [MCSB:v1:NS-6, ISO:27001:A.8.21]
+    remediation: "Place a WAF (Front Door / Application Gateway) or an API gateway in front of the public entry, or declare the gateway's `policy` function if it enforces a rule set for this route."
+    fixtures: { positive: fixtures/APX-004.pos.json, negative: fixtures/APX-004.neg.json }
+    tags: [network, waf, gateway, kind]
+
+  # SEG-005 (swarm agent network-segmentation; docs/18 E6, self-assessment limitation 24). Schema 1.1's `environment`
+  # makes the separation of environments assessable: a datastore or index that declares it serves more than one
+  # environment (`shared`), or that components of different declared environments read or write (staging and
+  # production, or a store declared for one environment reached from another), mixes environments that
+  # ISO/IEC 27001 A.8.31 asks to keep separate. Undeclared environments are not compared ("" and "unknown"); a store
+  # without `environment` whose callers agree is not_checked (facts_missing).
+  - id: SEG-005
+    title: Datastore shared across deployment environments
+    scope: node
+    severity: medium
+    condition: |
+      n.type in ["datastore","vector_index"] && (
+        attr(n, "environment", "") == "shared" ||
+        g.in(n.id, "").exists(x, attr(x.from, "environment", "") in ["production", "staging", "test", "development"] && (
+          (attr(n, "environment", "") in ["production", "staging", "test", "development"] &&
+           attr(x.from, "environment", "") != attr(n, "environment", "")) ||
+          g.in(n.id, "").exists(y, attr(y.from, "environment", "") in ["production", "staging", "test", "development"] &&
+            attr(y.from, "environment", "") != attr(x.from, "environment", "")))))
+    requires: [n.attrs.environment]
+    domain: 'n.type in ["datastore","vector_index"]'
+    message: "{{n.name}} serves more than one deployment environment (declared {{attr(n,'environment','undeclared')}}, or reached from components of different environments): a change or a credential in one environment reaches the data of another."
+    clauses: [ISO:27001:A.8.31]
+    remediation: "Give each environment its own store (or instance) and its own credentials; declare each store's environment (production, staging, test, development)."
+    fixtures: { positive: fixtures/SEG-005.pos.json, negative: fixtures/SEG-005.neg.json }
+    tags: [network, segmentation, environments]
+
+  # ---- docs/18 D2: agent egress and brokered agent-to-agent traffic (swarm agent network-segmentation) ---------------
+  # SEG-010 and SEG-011 take numbers above the spec's reserved SEG-001 … SEG-004 (and E6's SEG-005) so parallel
+  # increments never collide.
+  - id: SEG-010
+    title: Autonomous agent with default-allow or undeclared egress
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") == "autonomous" &&
+      attr(n, "egress_policy", "") in ["default_allow","undeclared"]
+    requires: [n.attrs.autonomy, n.attrs.egress_policy]
+    domain: 'n.type == "agent"'
+    message: "Autonomous agent {{n.name}} declares egress {{attr(n,'egress_policy','')}}: a steered run can send what it reads to any host, and fetch instructions from any host, with no person in the loop."
+    clauses: [MCSB:v1:NS-3, OWASP:AgenticTop10:ASI02, NIST:800-207:S2.1, ISO:27001:A.8.21]
+    remediation: "Deny egress by default and list the hosts the agent may reach (egress_policy=default_deny_allowlist with egress_allowlist[]), enforced by an egress gateway or firewall on its path."
+    references:
+      - { kind: document, title: "MCP 2026-07-28 Security Best Practices: Server-Side Request Forgery (egress proxies)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/docs/2026-07-28/tutorials/security/security_best_practices.mdx", fetched_at: "2026-10-01" }
+    patch_template:
+      - { op: replace, path: "/nodes/{{n.id}}/attrs/egress_policy", value: default_deny_allowlist }
+    fixtures: { positive: fixtures/SEG-010.pos.json, negative: fixtures/SEG-010.neg.json }
+    tags: [network, egress, agentic]
+
+  - id: SEG-011
+    title: Direct agent-to-agent edge bypasses a declared broker
+    scope: edge
+    severity: medium
+    # The design routes these two agents through a broker (a `broker` node or a gateway of kind a2a): the caller
+    # reaches it and it reaches the callee, yet a direct edge between the agents is drawn beside that route, so the
+    # broker's authentication, policy and log see only part of the traffic. The route must not use the reported edge:
+    # it leaves the caller by another edge that does not go straight to the callee, and enters the callee by another
+    # edge that does not come straight from the caller. So a dispatcher/worker loop (broker → A, A → B, B → broker)
+    # is no brokered route between A and B. Limit: a walk that loops back through either agent still counts.
+    condition: |
+      e.from.type == "agent" && e.to.type in ["agent","external_agent"] && e.kind in ["calls","delegates"] &&
+      (g.nodes("broker") + g.nodes("gateway").filter(x, attr(x, "kind", "") == "a2a")).exists(b,
+        b.id != e.from.id && b.id != e.to.id &&
+        g.outEdges(e.from.id, "").exists(x, x.id != e.id && x.to.id != e.to.id && (x.to.id == b.id || g.reachable(x.to.id, b.id))) &&
+        g.inEdges(e.to.id, "").exists(y, y.id != e.id && y.from.id != e.from.id && (y.from.id == b.id || g.reachable(b.id, y.from.id))))
+    message: "{{e.from.name}} → {{e.to.name}} is a direct agent-to-agent edge beside the brokered route through {{(g.nodes('broker') + g.nodes('gateway').filter(x, attr(x, 'kind', '') == 'a2a')).filter(b, b.id != e.from.id && b.id != e.to.id && g.outEdges(e.from.id, '').exists(x, x.id != e.id && x.to.id != e.to.id && (x.to.id == b.id || g.reachable(x.to.id, b.id))) && g.inEdges(e.to.id, '').exists(y, y.id != e.id && y.from.id != e.from.id && (y.from.id == b.id || g.reachable(b.id, y.from.id)))).map(b, b.name).join(', ')}}: the broker's authentication, policy and log see only part of the traffic between the two agents."
+    clauses: [MCSB:v1:NS-1, OWASP:AgenticTop10:ASI07, NIST:800-207:S2.1, ISO:27001:A.8.22]
+    remediation: "Route the call through the declared broker (or A2A gateway) and remove the direct edge, so every message between the agents passes the same authentication, policy and log."
+    fixtures: { positive: fixtures/SEG-011.pos.json, negative: fixtures/SEG-011.neg.json }
+    tags: [network, agentic, a2a, broker]
+
+  # ---- swarm team 04 (docs/18 WS-I I2): api-gateway-exposure's APX-001 to APX-003 -----------------------------------
+  # APX-001 asks NET-003's question of the callers outside the tenant: a partner system, a SaaS webhook or (schema 1.1)
+  # a peer agent reaching a public app or API by a walk with no gateway that counts. The walk and the gateway crediting
+  # are NET-003's (a gateway counts when it declares `policy` in functions[], whatever its kind; one that declares no
+  # functions counts by its kind, api or waf; up to three that do not count followed), so the two rules agree on what
+  # fronts an entry. A hop both a user and a partner reach raises NET-003 and APX-001 (two sources, two severities).
+  - id: APX-001
+    title: Third-party caller reaches a public app or API with no gateway on the path
+    scope: edge
+    severity: high
+    condition: |
+      e.kind == "calls" && e.to.type in ["app","api"] && attr(e.to, "exposure", "") == "public" &&
+      !(e.from.type == "gateway" && !(attr(e.from, "kind", "") in ["", "api", "waf"])) &&
+      !(e.from.type == "gateway" && cel.bind(fs, attr(e.from, "functions", []), size(fs) > 0 ? "policy" in fs : attr(e.from, "kind", "") in ["api", "waf"])) &&
+      (e.from.type == "gateway" ? g.in(e.from.id, "").map(x, x.from.id) : [e.from.id]).exists(s,
+        g.upstreamAvoiding(s, ["gateway"], []).exists(a, a.type in ["external_party", "saas", "external_agent"] ||
+          (a.type == "gateway" && !(cel.bind(fs, attr(a, "functions", []), size(fs) > 0 ? "policy" in fs : attr(a, "kind", "") in ["api", "waf"])) &&
+           g.in(a.id, "").exists(u, g.upstreamAvoiding(u.from.id, ["gateway"], []).exists(b, b.type in ["external_party", "saas", "external_agent"] ||
+            (b.type == "gateway" && !(cel.bind(fs, attr(b, "functions", []), size(fs) > 0 ? "policy" in fs : attr(b, "kind", "") in ["api", "waf"])) &&
+             g.in(b.id, "").exists(v, g.upstreamAvoiding(v.from.id, ["gateway"], []).exists(c, c.type in ["external_party", "saas", "external_agent"] ||
+              (c.type == "gateway" && !(cel.bind(fs, attr(c, "functions", []), size(fs) > 0 ? "policy" in fs : attr(c, "kind", "") in ["api", "waf"])) &&
+               g.in(c.id, "").exists(w, g.upstreamAvoiding(w.from.id, ["gateway"], []).exists(d, d.type in ["external_party", "saas", "external_agent"])))))))))))
+    requires: [e.to.attrs.exposure, e.from.attrs.functions]
+    domain: 'e.kind == "calls" && e.to.type in ["app","api"]'
+    message: "{{e.from.name}} → {{e.to.name}}: a partner, SaaS or peer agent reaches public {{e.to.name}} on a path with no WAF or API gateway."
+    clauses: [MCSB:v1:NS-6, MCSB:v1:NS-3, ISO:27001:A.8.21]
+    remediation: "Front the public entry with an API gateway or WAF on every path a third party uses, and route the partner's calls through it."
+    fixtures: { positive: fixtures/APX-001.pos.json, negative: fixtures/APX-001.neg.json }
+    tags: [network, gateway, third-party]
+
+  # APX-002: NET-001's question asked of the key store. A command-signing store is ot-command-path's OT-009 (one fact,
+  # one finding); an absent key_use reads "not signing" by design.
+  - id: APX-002
+    title: Secret store exposed to the public network
+    scope: node
+    severity: high
+    condition: |
+      n.type == "secret_store" && attr(n, "network_exposure", "") == "public" && attr(n, "key_use", "") != "command_signing"
+    requires: [n.attrs.network_exposure]
+    domain: 'n.type == "secret_store"'
+    message: "{{n.name}} (a secret store) is reachable from the public network."
+    clauses: [MCSB:v1:DP-8, MCSB:v1:NS-2, FINMA:2023/1:Rz-Cyber]
+    remediation: "Use a Private Endpoint for the vault and deny public network access (network_exposure=private)."
+    patch_template:
+      - { op: add, path: "/nodes/{{n.id}}/attrs/network_exposure", value: private }
+    fixtures: { positive: fixtures/APX-002.pos.json, negative: fixtures/APX-002.neg.json }
+    tags: [network, secrets]
+
+  # APX-003: a store a party outside the tenant reads or writes with no app, API or gateway in between is exposed
+  # beyond the tenant whatever its network_exposure says. Types and kind decide; nothing is required.
+  - id: APX-003
+    title: Third-party system reads or writes a datastore or secret store directly
+    scope: edge
+    severity: high
+    condition: 'e.from.type in ["external_party","saas"] && e.to.type in ["datastore","secret_store"] && e.kind in ["reads","writes"]'
+    message: "{{e.from.name}} {{e.kind}} {{e.to.name}} directly: a party outside the tenant touches the store with no service or gateway in between."
+    clauses: [NIS2:2024/2690:Annex-6.8, MCSB:v1:NS-1, ISO:27001:A.8.22]
+    remediation: "Route the third party through a service or API of the tenant that reads or writes the store on its behalf, under its own identity."
+    fixtures: { positive: fixtures/APX-003.pos.json, negative: fixtures/APX-003.neg.json }
+    tags: [network, third-party, datastore]
+
+  # ---- swarm team 04 (docs/18 WS-I I2): network-segmentation's SEG-001 to SEG-004 -----------------------------------
+  # The spec names a seg.yaml; the SEG rules live here beside SEG-005, SEG-010 and SEG-011 so the prefix keeps one home.
+  # SEG-001 generalises OT-004 beyond the edge layer: a write, execute, publish or flow leaves one declared zone and lands
+  # in another with no conduit or gateway as an endpoint. Edge → edge hops stay OT-004's, and a hop NET-005 reports (its
+  # own condition, restated) stays NET-005's, so one hop raises one finding. Human-layer endpoints are personas.
+  - id: SEG-001
+    title: Data hop between two zones with no conduit at either end
+    scope: edge
+    severity: medium
+    condition: |
+      e.kind in ["writes","executes","publishes","flows"] && e.from.zone != "" && e.to.zone != "" && e.from.zone != e.to.zone &&
+      e.from.layer != "human" && e.to.layer != "human" &&
+      !(e.from.type in ["broker","dmz","data_diode","gateway"]) && !(e.to.type in ["broker","dmz","data_diode","gateway"]) &&
+      !(e.from.layer == "edge" && e.to.layer == "edge") &&
+      !(e.to.type == "datastore" &&
+        g.upstreamAvoiding(e.from.id, ["broker","dmz"], []).exists(a, a.layer == "edge" && !(a.type in ["broker","dmz"])))
+    requires: [e.from.zone, e.to.zone]
+    domain: 'e.kind in ["writes","executes","publishes","flows"]'
+    message: "{{e.from.name}} → {{e.to.name}} carries data from zone {{e.from.zone}} into zone {{e.to.zone}} directly, with no broker, DMZ, diode or gateway at either end."
+    clauses: [IEC:62443-3-2:Zones, IEC:62443-3-3:SR5.1, IEC:62443-3-3:SR5.2, ISO:27001:A.8.22, MCSB:v1:NS-1, NIS2:2024/2690:Annex-6.8]
+    remediation: "Pass the flow between the two zones through a conduit (broker, DMZ or data diode) or a gateway that carries the boundary's controls."
+    fixtures: { positive: fixtures/SEG-001.pos.json, negative: fixtures/SEG-001.neg.json }
+    tags: [network, segmentation, zones]
+
+  # SEG-002: NET-005's question for the targets that are not stores: an edge component reaches a queue, an index, a
+  # model or an agent outside the edge layer along one walk that enters no broker, DMZ or data diode (a datastore target
+  # is NET-005's on every walk). The cached forward walks (pathAvoiding, one per conduit type) decide it exactly when the
+  # model draws at most one conduit type; with two or more, the one reverse walk that avoids all three (upstreamAvoiding,
+  # ADR-088 §1) decides the pairs the forward walks let through. The order keeps the rule inside the per-rule budget on
+  # the 500-node model (TestPerf500NodesUnderOneSecond).
+  - id: SEG-002
+    title: Edge component reaches cloud messaging, an index, a model or an agent with no conduit on the path
+    scope: node
+    severity: high
+    condition: |
+      n.layer == "edge" && n.type in ["edge_device","edge_gateway","edge_model"] &&
+      cel.bind(hd, g.has("dmz"), cel.bind(hdd, g.has("data_diode"), cel.bind(multi, [g.has("broker"), hd, hdd].filter(h, h).size() >= 2,
+        (g.nodes("queue") + g.nodes("vector_index") + g.nodes("llm_endpoint") + g.nodes("agent")).exists(x, x.layer != "edge" &&
+          g.pathAvoiding(n.id, x.id, "broker") && (!hd || g.pathAvoiding(n.id, x.id, "dmz")) && (!hdd || g.pathAvoiding(n.id, x.id, "data_diode")) &&
+          (!multi || g.upstreamAvoiding(x.id, ["broker","dmz","data_diode"], []).exists(a, a.id == n.id))))))
+    message: "{{n.name}} reaches {{cel.bind(hd, g.has('dmz'), cel.bind(hdd, g.has('data_diode'), cel.bind(multi, [g.has('broker'), hd, hdd].filter(h, h).size() >= 2, (g.nodes('queue') + g.nodes('vector_index') + g.nodes('llm_endpoint') + g.nodes('agent')).filter(x, x.layer != 'edge' && g.pathAvoiding(n.id, x.id, 'broker') && (!hd || g.pathAvoiding(n.id, x.id, 'dmz')) && (!hdd || g.pathAvoiding(n.id, x.id, 'data_diode')) && (!multi || g.upstreamAvoiding(x.id, ['broker','dmz','data_diode'], []).exists(a, a.id == n.id))).map(x, x.name).join(', '))))}} outside the edge layer on a path with no broker, DMZ or data diode."
+    clauses: [IEC:62443-3-3:SR5.1, IEC:62443-3-2:Zones, NIS2:2024/2690:Annex-6.8, MCSB:v1:NS-1, MAESTRO:L4]
+    remediation: "Route the edge component's traffic to the cloud through a broker (IoT Hub / IoT Operations), a DMZ or a data diode."
+    fixtures: { positive: fixtures/SEG-002.pos.json, negative: fixtures/SEG-002.neg.json }
+    tags: [network, segmentation, edge, ot]
+
+  # SEG-003: a DMZ or diode drawn outside every zone and trust boundary in a model that declares zones, or one whose every
+  # neighbour sits in its own zone: the box is on the canvas but on no boundary. A broker inside a zone is a message hub,
+  # not a mis-drawn conduit, so it is not covered. A model with no zones is silent (network-segmentation lists it).
+  - id: SEG-003
+    title: Conduit that separates nothing
+    scope: node
+    severity: low
+    condition: |
+      n.type in ["dmz","data_diode"] &&
+      ((n.zone == "" && !n.inZone("trust_boundary") && g.nodes.exists(x, x.zone != "")) ||
+       (n.zone != "" && size(g.in(n.id, "*") + g.out(n.id, "*")) > 0 &&
+        (g.in(n.id, "*") + g.out(n.id, "*")).all(y, y.from.zone == n.zone && y.to.zone == n.zone)))
+    message: "{{n.name}} ({{n.type}}) sits on no boundary: {{n.zone == '' ? 'it is outside every zone and trust boundary' : 'every neighbour is in its own zone ' + n.zone}}."
+    clauses: [IEC:62443-3-2:Zones, IEC:62443-3-3:SR5.2, ISO:27001:A.8.22]
+    remediation: "Place the conduit between the zones it separates (its neighbours in two zones), or inside the trust boundary it guards."
+    fixtures: { positive: fixtures/SEG-003.pos.json, negative: fixtures/SEG-003.neg.json }
+    tags: [network, segmentation, zones]
+
+  # SEG-004: the MCP-010 egress question (docs/research/06 §8, handed over by mcp-server-posture): a server or tool that
+  # declares it opens outbound connections reaches a SaaS, a partner, a peer agent or a public model on a walk that
+  # enters no gateway or DMZ (one reverse walk). Any gateway counts: the reverse walk blocks by type, so an egress
+  # function (schema 1.1 kind egress, functions[] egress) is not required yet (TODO(decision) ADR-088 §3: a
+  # function-aware walk); network-segmentation lists that silence. Reference: MCP 2026-07-28 security best practices.
+  - id: SEG-004
+    title: Egress-capable component reaches an outside party with no egress control on the path
+    scope: node
+    severity: high
+    condition: |
+      n.type in ["mcp_server","tool"] && "network_egress" in attr(n, "capabilities", []) &&
+      (g.nodes("saas") + g.nodes("external_party") + g.nodes("external_agent") + g.nodes("llm_endpoint")).exists(x,
+        !(x.type == "llm_endpoint" && attr(x, "network", "public") == "private") &&
+        g.upstreamAvoiding(x.id, ["gateway","dmz"], []).exists(a, a.id == n.id))
+    requires: [n.attrs.capabilities]
+    domain: 'n.type in ["mcp_server","tool"]'
+    message: "{{n.name}} declares network egress and reaches {{(g.nodes('saas') + g.nodes('external_party') + g.nodes('external_agent') + g.nodes('llm_endpoint')).filter(x, !(x.type == 'llm_endpoint' && attr(x, 'network', 'public') == 'private') && g.upstreamAvoiding(x.id, ['gateway','dmz'], []).exists(a, a.id == n.id)).map(x, x.name).join(', ')}} with no gateway or DMZ on the path."
+    clauses: [MCSB:v1:NS-3, ISO:27001:A.8.21, NIST:800-207:S2.1, OWASP:AgenticTop10:ASI02, MAESTRO:L4]
+    remediation: "Send the component's outbound calls through an egress gateway or proxy that enforces an allow-list, and declare it on the path."
+    references:
+      - { kind: document, title: "MCP 2026-07-28 Security Best Practices: Server-Side Request Forgery (egress proxies)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/docs/2026-07-28/tutorials/security/security_best_practices.mdx", fetched_at: "2026-10-01" }
+    fixtures: { positive: fixtures/SEG-004.pos.json, negative: fixtures/SEG-004.neg.json }
+    tags: [network, egress, mcp]
+
+  # ---- swarm team 04 (docs/18 WS-I I2): transport-encryption's TLS-001 to TLS-003 -----------------------------------
+  # NET-006 exempts `none` between co-located nodes (one hosted_on the other, or both on the same host). These rules make
+  # the exemption itself assessable; each restates NET-006's co-location test.
+  # TLS-001: two nodes that share no group (zone, trust boundary, schema 1.1 tenant or jurisdiction) cannot be one process
+  # or one device: the declared exemption contradicts the drawing. No template (the grouping or the exemption is wrong).
+  - id: TLS-001
+    title: Co-location exemption claimed across a boundary
+    scope: edge
+    severity: high
+    condition: |
+      e.encryption == "none" &&
+      (attr(e.from, "hosted_on", "") == e.to.id || attr(e.to, "hosted_on", "") == e.from.id ||
+       (attr(e.from, "hosted_on", "") != "" && attr(e.from, "hosted_on", "") == attr(e.to, "hosted_on", ""))) &&
+      size(e.from.group_ids) + size(e.to.group_ids) > 0 && !e.from.group_ids.exists(gid, gid in e.to.group_ids)
+    message: "{{e.from.name}} → {{e.to.name}} is unencrypted under a co-location exemption, but the two nodes share no zone or boundary group."
+    clauses: [NIST:800-207:S2.1, ISO:27001:A.8.20, MCSB:v1:DP-3]
+    remediation: "Either place the co-located nodes in the same group, or encrypt the hop (TLS or mTLS) and drop the co-location claim."
+    fixtures: { positive: fixtures/TLS-001.pos.json, negative: fixtures/TLS-001.neg.json }
+    tags: [network, encryption, colocation]
+
+  # TLS-002: NET-006's "same host" branch compares two strings; a host id that names no node grants the exemption to a
+  # host the drawing does not hold. The single-sided branches need no rule (a dangling hosted_on never equals the
+  # peer's id, so NET-006 fires). No template: the host is asked for, never invented.
+  - id: TLS-002
+    title: Co-location exemption on a host that is not in the model
+    scope: edge
+    severity: medium
+    condition: |
+      e.encryption == "none" && attr(e.from, "hosted_on", "") != "" &&
+      attr(e.from, "hosted_on", "") == attr(e.to, "hosted_on", "") &&
+      !g.nodes.exists(h, h.id == attr(e.from, "hosted_on", ""))
+    message: "{{e.from.name}} → {{e.to.name}} is unencrypted because both run on host {{attr(e.from, 'hosted_on', '')}}, which is not in the model."
+    clauses: [ISO:27001:A.8.24, MCSB:v1:DP-3]
+    remediation: "Draw the host both components run on, or encrypt the hop (TLS or mTLS)."
+    fixtures: { positive: fixtures/TLS-002.pos.json, negative: fixtures/TLS-002.neg.json }
+    tags: [network, encryption, colocation]
+
+  # TLS-003: a hop that claims a process-local transport (the 1.0 free text in-process, kept as protocol_text after the
+  # 1.1 migration; the 1.1 enum mcp_stdio) between nodes the drawing does not co-locate is an undeclared exemption,
+  # whatever encryption says. The condition reads e.protocol as well as protocol_text, so an undeclared protocol is
+  # not_checked (requires), not decided on the empty spelling. The planner proposes hosted_on on a tool, MCP server or
+  # edge model target (no template: which node is the host is a design fact).
+  - id: TLS-003
+    title: Local transport declared with no co-location
+    scope: edge
+    severity: medium
+    condition: |
+      (e.protocol.lowerAscii() in ["in-process","in_process","mcp_stdio","stdio"] ||
+       e.protocol_text.lowerAscii() in ["in-process","in_process","mcp_stdio","stdio"]) &&
+      !(attr(e.from, "hosted_on", "") == e.to.id || attr(e.to, "hosted_on", "") == e.from.id ||
+        (attr(e.from, "hosted_on", "") != "" && attr(e.from, "hosted_on", "") == attr(e.to, "hosted_on", "")))
+    requires: [e.protocol]
+    domain: 'true'
+    message: "{{e.from.name}} → {{e.to.name}} declares the process-local transport {{e.protocol_text}}, but neither node is hosted on the other or on a shared host."
+    clauses: [NIST:800-207:S2.1, ISO:27001:A.8.20]
+    remediation: "Declare the co-location (hosted_on on the component that runs inside the other), or declare the network protocol and its encryption."
+    fixtures: { positive: fixtures/TLS-003.pos.json, negative: fixtures/TLS-003.neg.json }
+    tags: [network, encryption, colocation, mcp]

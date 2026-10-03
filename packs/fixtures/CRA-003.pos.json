@@ -1,0 +1,74 @@
+{
+  "id": "arch_fx_cra_003_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CRA-003 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "CRA"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Actively exploited vulnerabilities reported through the PSIRT."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_prod",
+      "type": "product",
+      "name": "Agent appliance",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "cra_scope": true,
+        "sbom": true,
+        "secure_boot": true,
+        "ota_signed": true,
+        "version": "1.4.0",
+        "owner": "Fixture owner"
+      }
+    },
+    {
+      "id": "n_mcp_tp",
+      "type": "mcp_server",
+      "name": "Partner MCP server",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "origin": "third_party",
+        "vetted": true,
+        "c4_parent": "n_prod",
+        "capabilities": [
+          "network_egress"
+        ]
+      }
+    },
+    {
+      "id": "n_sink",
+      "type": "log_sink",
+      "name": "Appliance log",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 365,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_mcp_sink",
+      "from": "n_mcp_tp",
+      "to": "n_sink",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

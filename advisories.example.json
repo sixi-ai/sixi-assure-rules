@@ -1,0 +1,27 @@
+{
+  "schema": "sixi-assure/rule-advisories/v1",
+  "updated": "2026-10-01",
+  "signature": null,
+  "advisories": [
+    {
+      "advisory_id": "SAA-2026-001",
+      "pack": "net",
+      "pack_version": "0.1.0",
+      "affected_rules": ["NET-003"],
+      "nature": "false_negative",
+      "published": "2026-10-01",
+      "summary": "Example fixture, not a published advisory: NET-003 reads clean when a bypass edge sits beside the gated route, because pathThrough is existential (docs/03 known false-negative classes). Re-read NET-003 results on models with two routes from a user to a public app.",
+      "replacement_pack_version": "0.1.1"
+    },
+    {
+      "advisory_id": "SAA-2026-002",
+      "pack": "ai",
+      "pack_version": "0.2.0",
+      "affected_rules": ["AI-013", "AI-014"],
+      "nature": "wrong_citation",
+      "published": "2026-10-01",
+      "summary": "Example fixture, not a published advisory: a corrected clause id on two rules; the findings stand, the citation each carries is re-read against the corpus version the report names.",
+      "replacement_pack_version": null
+    }
+  ]
+}

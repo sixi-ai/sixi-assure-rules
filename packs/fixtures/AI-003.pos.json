@@ -95,6 +95,32 @@
       "auth": "agent_id",
       "encryption": "tls",
       "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_human",
+      "to": "n_ledger",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high",
+        "logged": true
+      },
+      "data_class": "cid"
+    },
+    {
+      "id": "e4",
+      "from": "n_agent",
+      "to": "n_human",
+      "kind": "executes",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high",
+        "logged": true
+      },
+      "data_class": "cid"
     }
   ],
   "findings": [],

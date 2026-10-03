@@ -91,8 +91,9 @@ func AddDecision(a *model.Architecture, d Decision) []model.PatchOp {
 	return []model.PatchOp{{Op: "add", Path: "/attrs/decisions/-", Value: raw(d)}}
 }
 
-// Diff computes the patch that turns `from` into `to`: removed edges, nodes and groups, then added
-// groups, nodes and edges, then wholesale replacements of changed ones, then root attrs. Applying
+// Diff computes the patch that turns `from` into `to`: removed edges, nodes and groups, then the
+// identities (schema 1.1), then added groups, nodes and edges, then wholesale replacements of
+// changed ones, then root attrs. Applying
 // the result with model.Apply yields `to` (canonically equal); the tests prove it on every fixture.
 func Diff(from, to *model.Architecture) ([]model.PatchOp, error) {
 	var ops []model.PatchOp
@@ -131,6 +132,23 @@ func Diff(from, to *model.Architecture) ([]model.PatchOp, error) {
 	for _, g := range from.Groups {
 		if _, ok := toGroups[g.ID]; !ok {
 			ops = append(ops, model.PatchOp{Op: "remove", Path: "/groups/" + g.ID})
+		}
+	}
+	// identities (schema 1.1): the collection is small and its entries are referenced by nodes, so
+	// a change is one op that sets the whole list (add on a present member replaces it, RFC 6902).
+	// Identities is omitempty, so a nil and an empty list are the same document (no member at all):
+	// no op between them, and a remove only when from has entries, else the member is absent.
+	if len(from.Identities) > 0 || len(to.Identities) > 0 {
+		sameIdentities, err := equalJSON(from.Identities, to.Identities)
+		if err != nil {
+			return nil, err
+		}
+		switch {
+		case sameIdentities:
+		case len(to.Identities) == 0:
+			ops = append(ops, model.PatchOp{Op: "remove", Path: "/identities"})
+		default:
+			ops = append(ops, model.PatchOp{Op: "add", Path: "/identities", Value: raw(to.Identities)})
 		}
 	}
 	// additions: groups, nodes, edges

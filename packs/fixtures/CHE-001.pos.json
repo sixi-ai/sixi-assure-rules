@@ -1,0 +1,85 @@
+{
+  "id": "arch_fx_che_001_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CHE-001 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FADP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_ehr",
+      "type": "datastore",
+      "name": "Health records",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "sql",
+        "data_class": "phi",
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Clinical agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "model": "gpt-4o"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_read",
+      "from": "n_agent",
+      "to": "n_ehr",
+      "kind": "reads",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_llm",
+      "from": "n_agent",
+      "to": "n_llm",
+      "kind": "calls",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

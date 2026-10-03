@@ -1,0 +1,113 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_zt_003_boundary_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture ZT-003 boundary (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST",
+      "OWASP",
+      "MSFT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "identities": [
+    {
+      "id": "id_app",
+      "name": "id_app",
+      "kind": "shared",
+      "credential_type": "managed_identity",
+      "owner": "Fixture owner"
+    }
+  ],
+  "groups": [
+    {
+      "id": "g_a",
+      "kind": "trust_boundary",
+      "name": "Boundary A",
+      "node_ids": [
+        "n_sup"
+      ]
+    },
+    {
+      "id": "g_b",
+      "kind": "trust_boundary",
+      "name": "Boundary B",
+      "node_ids": [
+        "n_work"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Agent server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "identity_id": "id_app"
+      }
+    },
+    {
+      "id": "n_sup",
+      "type": "agent",
+      "name": "Supervisor agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "shared",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity_id": "id_app",
+        "hosted_on": "n_app"
+      }
+    },
+    {
+      "id": "n_work",
+      "type": "agent",
+      "name": "Research worker agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "shared",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity_id": "id_app",
+        "hosted_on": "n_app"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_sup",
+      "to": "n_work",
+      "kind": "delegates",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true,
+        "mode": "handoff"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

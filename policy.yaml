@@ -4,5 +4,15 @@ retention_days:
   FINMA: 3650        # CH Code of Obligations Art. 958f
   CH-CO: 3650        # CH Code of Obligations Art. 958f (log pack regime CH-CO)
   AIACT_deployer: 180 # AI Act Art. 26(6)
+# Spec defaults of the identity rules (agents/swarm/02, final polish 2026-10-02). required() reads them like every key
+# above; WIS-003 and HAC-002 keep their fallback for a table without the row.
+credential_rotation_days:
+  default: 90            # WIS-003: a static credential (client_secret, api_key, certificate) rotates within 90 days
+human_token_lifetime_s:
+  default: 3600          # HAC-002: a person's token on a public entry lives at most 3600 s
 regions:
   allowed_default: [switzerlandnorth, switzerlandwest]
+# Caps consumed by CEL helper capped("<key>") — an upper bound: a regime entry is a ceiling; the tenant may set a
+# lower value (0 allowed), or a higher one where no enabled regime caps it (PolicyTable.Cap)
+blast_radius_writers:
+  default: 1             # BLR-003: unattended state changes one steered agent may reach per run

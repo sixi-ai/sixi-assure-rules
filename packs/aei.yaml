@@ -1,0 +1,59 @@
+# AEI — attack-test coverage (docs/03 §AEI; docs/18 WS-I I2, agents/swarm/07-verification-and-audit/
+# attack-evidence-ingestor.md). Deterministic CEL; the LLM never creates findings, and no rule here reads a scan
+# result: design-time rules say whether an agent a user or an action can steer is inside the declared scope of an
+# adversarial evaluation; whether a test was run is an evidence record the attack-evidence-ingestor asks for.
+#
+# Both rules speak only where a scoped evaluation exists (size(evaluates) > 0): "no evaluation" stays AI-004's and
+# "evaluation with no scope" AI-014's (evaluation-monitoring). The regime guard is the AI-014 reading: an undeclared
+# AI Act tier is never a reason to stay silent. The spec's AEI-003 ("agent whose data reaches no evaluation") is not
+# built: EVL-002 (evl.yaml, team 05) already decides the same fact on the same element for every evaluation.
+pack: aei
+version: 0.1.0
+regimes: [AIACT, FINMA, DORA, OWASP, MAESTRO]
+offer: agentic
+rules:
+  - id: AEI-001
+    title: User-facing agent outside every adversarial evaluation
+    scope: node
+    severity: medium
+    condition: >-
+      n.type == "agent" &&
+      g.in(n.id, "calls").exists(x, x.from.type in ["user", "external_party", "app", "api", "gateway"]) &&
+      g.nodes("evaluation").exists(ev, size(attr(ev, "evaluates", [])) > 0) &&
+      !g.nodes("evaluation").exists(ev, "prompt_injection" in attr(ev, "evaluates", [])) &&
+      ((regime("AIACT") && attr(g, "ai_act_tier", "") in ["", "high_risk"]) || regime("FINMA") || regime("DORA"))
+    # No requires and no domain (docs/03 "requires and not_checked"): the fact whose absence silences AEI-001 is the
+    # evaluations' `evaluates` scope, on another element, and a requires path is n., e., g.attrs. or kb only; the one
+    # expressible fact it reads, the tier, is defaulted ("" reads high_risk) and never silences it (TestShippedRequires),
+    # and a domain without requires is refused at load. TODO(decision): a requires form over g.nodes(<type>) (rules
+    # engine owner). Until then the attack-evidence-ingestor reports the silence: one not_checked row per user-facing
+    # agent ("evaluation" or "evaluation.evaluates", facts_missing), merged into the ledger by the coverage auditor.
+    message: "{{n.name}} is called from a user-facing entry, and no declared evaluation scope names prompt_injection: resistance to adversarial input is not in any test plan for it."
+    clauses: [AIACT:2024/1689:Art15(5), OWASP:LLMTop10:LLM01, FINMA:08/2024:Testing, DORA:2022/2554:Art25]
+    remediation: "Add prompt_injection to the scope of the evaluation whose data path covers the agent, and keep the adversarial test report (a signed scanner file or a third-party report) as evidence."
+    fixtures: { positive: fixtures/AEI-001.pos.json, negative: fixtures/AEI-001.neg.json }
+    tags: [evaluation, adversarial, agent, testing]
+
+  # An agent that can be steered into an action has not been tested for steering. autonomy is required (docs/02 §3):
+  # an agent that does not declare it is not_checked, never read as assisted.
+  - id: AEI-002
+    title: Acting agent outside every adversarial evaluation
+    scope: node
+    severity: high
+    condition: >-
+      n.type == "agent" && attr(n, "autonomy", "") in ["semi", "autonomous"] &&
+      g.out(n.id, "").exists(x, x.to.type in ["tool", "mcp_server"] &&
+        (attr(x.to, "write_capable", false) ||
+         attr(x.to, "capabilities", []).exists(c, c in ["executes_code", "modifies_state", "sends_message", "network_egress"]))) &&
+      g.nodes("evaluation").exists(ev, size(attr(ev, "evaluates", [])) > 0) &&
+      !g.nodes("evaluation").exists(ev, "prompt_injection" in attr(ev, "evaluates", [])) &&
+      ((regime("AIACT") && attr(g, "ai_act_tier", "") in ["", "high_risk"]) || regime("FINMA") || regime("DORA"))
+    requires: [n.attrs.autonomy]
+    domain: 'n.type == "agent" && g.out(n.id, "").exists(x, x.to.type in ["tool", "mcp_server"])'
+    severity_override:
+      - { when: 'attr(n, "autonomy", "") == "semi"', severity: medium }
+    message: "{{n.name}} acts through a tool that writes, executes or sends, and no declared evaluation scope names prompt_injection: the agent has not been tested for being steered into that action."
+    clauses: [OWASP:AgenticTop10:ASI01, OWASP:AgenticTop10:ASI05, AIACT:2024/1689:Art15(5), MAESTRO:L5]
+    remediation: "Add prompt_injection to the scope of the evaluation whose data path covers the agent, and keep the adversarial test report covering the agent's tool actions as evidence."
+    fixtures: { positive: fixtures/AEI-002.pos.json, negative: fixtures/AEI-002.neg.json }
+    tags: [evaluation, adversarial, agent, autonomy, testing]

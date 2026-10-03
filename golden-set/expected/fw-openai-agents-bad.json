@@ -1,0 +1,44 @@
+[
+  {
+    "rule_id": "ATA-010",
+    "ids": [
+      "e_triage_partner"
+    ]
+  },
+  {
+    "rule_id": "FW-003",
+    "ids": [
+      "n_session"
+    ]
+  },
+  {
+    "rule_id": "FW-005",
+    "ids": [
+      "n_triage"
+    ]
+  },
+  {
+    "rule_id": "FW-006",
+    "ids": [
+      "e_triage_support"
+    ]
+  },
+  {
+    "rule_id": "FW-007",
+    "ids": [
+      "e_triage_partner"
+    ]
+  },
+  {
+    "rule_id": "FW-012",
+    "ids": [
+      "e_triage_tracing"
+    ]
+  },
+  {
+    "rule_id": "STR-006",
+    "ids": [
+      "e_triage_tracing"
+    ]
+  }
+]

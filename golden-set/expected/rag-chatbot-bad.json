@@ -37,6 +37,12 @@
     ]
   },
   {
+    "rule_id": "AIA-001",
+    "ids": [
+      "n_agent"
+    ]
+  },
+  {
     "rule_id": "DATA-001",
     "ids": [
       "e_crm_search"
@@ -74,7 +80,31 @@
     ]
   },
   {
+    "rule_id": "FIN-002",
+    "ids": [
+      "n_crm"
+    ]
+  },
+  {
     "rule_id": "GOV-001",
+    "ids": [
+      "arch_demo_rag_bad"
+    ]
+  },
+  {
+    "rule_id": "ING-002",
+    "ids": [
+      "n_web"
+    ]
+  },
+  {
+    "rule_id": "IRR-001",
+    "ids": [
+      "arch_demo_rag_bad"
+    ]
+  },
+  {
+    "rule_id": "IRR-002",
     "ids": [
       "arch_demo_rag_bad"
     ]
@@ -83,12 +113,6 @@
     "rule_id": "LOG-001",
     "ids": [
       "arch_demo_rag_bad"
-    ]
-  },
-  {
-    "rule_id": "LOG-004",
-    "ids": [
-      "e_agent_llm"
     ]
   },
   {
@@ -116,6 +140,12 @@
     ]
   },
   {
+    "rule_id": "RAG-002",
+    "ids": [
+      "e_agent_search"
+    ]
+  },
+  {
     "rule_id": "RES-001",
     "ids": [
       "n_sql"
@@ -125,6 +155,12 @@
     "rule_id": "RES-002",
     "ids": [
       "n_sql"
+    ]
+  },
+  {
+    "rule_id": "RES-006",
+    "ids": [
+      "arch_demo_rag_bad"
     ]
   },
   {
@@ -138,6 +174,12 @@
     "rule_id": "TPR-001",
     "ids": [
       "n_llm"
+    ]
+  },
+  {
+    "rule_id": "WIS-002",
+    "ids": [
+      "n_web"
     ]
   },
   {

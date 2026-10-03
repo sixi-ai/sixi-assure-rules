@@ -1,0 +1,223 @@
+{
+  "schema": "sixi-assure/rule-advisories/v1",
+  "updated": "2026-10-02",
+  "signature": null,
+  "advisories": [
+    {
+      "advisory_id": "SAA-2026-001",
+      "pack": "ai",
+      "pack_version": "0.2.0",
+      "affected_rules": [
+        "AI-001",
+        "AI-003"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-01",
+      "summary": "AI-001 and AI-003 read only the direct hop: a model call or consequential action reached through an intermediate node with no gateway or human step on one of its paths raised no finding. 0.3.0 assesses every path (ADR-088 all-paths semantics).",
+      "replacement_pack_version": "0.3.0"
+    },
+    {
+      "advisory_id": "SAA-2026-002",
+      "pack": "net",
+      "pack_version": "0.1.0",
+      "affected_rules": [
+        "NET-003",
+        "NET-005"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-01",
+      "summary": "NET-003 and NET-005 accepted any gateway or conduit on one path: a public app or API, or edge traffic to a datastore, reached by a second path around the WAF or broker raised no finding. 0.2.0 assesses every path (ADR-088 all-paths semantics).",
+      "replacement_pack_version": "0.2.0"
+    },
+    {
+      "advisory_id": "SAA-2026-003",
+      "pack": "c4",
+      "pack_version": "0.1.0",
+      "affected_rules": [
+        "STR-005"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-01",
+      "summary": "STR-005 accepted a gateway of any kind on one path: an agent reaching an MCP server around the gateway, or through a gateway that is not an ai, api or mcp kind, raised no finding. 0.2.0 assesses every path (ADR-088 all-paths semantics).",
+      "replacement_pack_version": "0.2.0"
+    },
+    {
+      "advisory_id": "SAA-2026-004",
+      "pack": "agt",
+      "pack_version": "0.1.0",
+      "affected_rules": [
+        "AGT-003",
+        "AGT-006"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-01",
+      "summary": "AGT-003 and AGT-006 read only the direct hop: third-party content, or a code-executing tool, reached from an agent through intermediate nodes with no content safety or human approval step on one path raised no finding. 0.2.0 assesses every path (ADR-088).",
+      "replacement_pack_version": "0.2.0"
+    },
+    {
+      "advisory_id": "SAA-2026-005",
+      "pack": "zt",
+      "pack_version": "0.1.0",
+      "affected_rules": [
+        "ZT-001"
+      ],
+      "nature": "false_positive",
+      "published": "2026-10-01",
+      "summary": "ZT-001 reported one shared secret several times, once per edge from the same calling node into stores on one host. 0.2.0 reports one finding per calling node, secret and host and names the sibling hops in the message (ADR-088 Amendments, B3).",
+      "replacement_pack_version": "0.2.0"
+    },
+    {
+      "advisory_id": "SAA-2026-006",
+      "pack": "c4",
+      "pack_version": "0.1.0",
+      "affected_rules": [
+        "STR-006"
+      ],
+      "nature": "false_positive",
+      "published": "2026-10-01",
+      "summary": "STR-006 reported one shared secret several times, once per relationship from the same caller into stores on one host. 0.2.0 reports one finding per calling node, secret and host and names the sibling hops in the message (ADR-088 Amendments, B3).",
+      "replacement_pack_version": "0.2.0"
+    },
+    {
+      "advisory_id": "SAA-2026-007",
+      "pack": "ai",
+      "pack_version": "0.3.0",
+      "affected_rules": [
+        "AI-001"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-02",
+      "summary": "AI-001 credited an AI gateway whose declared functions lack observability or policy, and its walk ended after three gateways in series. 0.4.0 credits a gateway by its declared functions, or by kind when it declares none, at any chain length; the hop out of an api or waf gateway is AGW-003's.",
+      "replacement_pack_version": "0.4.0"
+    },
+    {
+      "advisory_id": "SAA-2026-008",
+      "pack": "net",
+      "pack_version": "0.2.0",
+      "affected_rules": [
+        "NET-003"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-02",
+      "summary": "NET-003 credited a WAF or API gateway whose declared functions lack policy, and its walk ended after three gateways in series. 0.3.0 credits a gateway by its declared functions, or by kind (api, waf) when it declares none, at any chain length; the hop out of an AI gateway is APX-004's.",
+      "replacement_pack_version": "0.3.0"
+    },
+    {
+      "advisory_id": "SAA-2026-009",
+      "pack": "c4",
+      "pack_version": "0.2.0",
+      "affected_rules": [
+        "STR-005"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-02",
+      "summary": "STR-005 credited an ai, api or mcp gateway whose declared functions lack identity_termination, and walked through at most two such gateways in series. 0.3.0 credits a gateway by its declared functions, or by kind when it declares none, at any chain length.",
+      "replacement_pack_version": "0.3.0"
+    },
+    {
+      "advisory_id": "SAA-2026-010",
+      "pack": "tpr",
+      "pack_version": "0.2.0",
+      "affected_rules": [
+        "TPR-001"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-02",
+      "summary": "TPR-001 read only llm_endpoint and saas nodes: a managed gateway, datastore, secret store, queue, identity provider or log sink that names a provider service and declares outsourcing_registered false raised no finding. 0.3.0 reads external services by function, not type.",
+      "replacement_pack_version": "0.3.0"
+    },
+    {
+      "advisory_id": "SAA-2026-011",
+      "pack": "zt",
+      "pack_version": "0.2.0",
+      "affected_rules": [
+        "AID-001",
+        "AID-003",
+        "AID-004"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-02",
+      "summary": "AID-001, AID-003 and AID-004 skipped every identity whose id starts with ident_ (the 1.0 to 1.1 migration prefix), native or since completed. 0.3.0 reads the migration mark and assesses a migrated identity once its issuer, sponsor or registry is declared.",
+      "replacement_pack_version": "0.3.0"
+    },
+    {
+      "advisory_id": "SAA-2026-012",
+      "pack": "zt",
+      "pack_version": "0.2.0",
+      "affected_rules": [
+        "ZT-002",
+        "ZT-003",
+        "AID-002"
+      ],
+      "nature": "false_positive",
+      "published": "2026-10-02",
+      "summary": "ZT-002, ZT-003 and AID-002 read agents that run in one app or API under its identity (schema 1.2 hosted_on) as separate principals. 0.3.0 reads co-hosted agents as one principal (ADR-093 SD-2): one finding per deployment, no OBO asked of an in-process hop.",
+      "replacement_pack_version": "0.3.0"
+    },
+    {
+      "advisory_id": "SAA-2026-013",
+      "pack": "zt",
+      "pack_version": "0.3.0",
+      "affected_rules": [
+        "ZT-001",
+        "ZT-006",
+        "WIS-001",
+        "WIS-010"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-02",
+      "summary": "ZT-001, ZT-006, WIS-001 and WIS-010 did not read auth sas, a shared access signature (a static bearer secret) drawable in the schema 1.2 drafts of 2026-10-01: a sas hop raised none of the findings its api_key twin raises. 0.4.0 reads sas as a shared secret (FS-23).",
+      "replacement_pack_version": "0.4.0"
+    },
+    {
+      "advisory_id": "SAA-2026-014",
+      "pack": "c4",
+      "pack_version": "0.3.0",
+      "affected_rules": [
+        "STR-006"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-02",
+      "summary": "STR-006 did not read auth sas, a shared access signature (a static bearer secret) drawable in the schema 1.2 drafts of 2026-10-01: a sas hop raised no finding where its api_key twin raised one. 0.4.0 reads sas as a shared secret (FS-23).",
+      "replacement_pack_version": "0.4.0"
+    },
+    {
+      "advisory_id": "SAA-2026-015",
+      "pack": "a2a",
+      "pack_version": "0.1.0",
+      "affected_rules": [
+        "ATA-002",
+        "ATA-010"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-02",
+      "summary": "As evaluated by the product from 2026-10-01: ATA-002 did not read auth sas, and ATA-010 (added that day) was cleared by card_signed, which records a signature, not its verification. 0.2.0 names sas and clears ATA-010 only on integrity signed or pinned.",
+      "replacement_pack_version": "0.2.0"
+    },
+    {
+      "advisory_id": "SAA-2026-016",
+      "pack": "data",
+      "pack_version": "0.3.0",
+      "affected_rules": [
+        "DATA-003",
+        "DATA-004"
+      ],
+      "nature": "false_negative",
+      "published": "2026-10-02",
+      "summary": "DATA-003 and DATA-004 read only the single data_class: a store that lists pii, cid, phi, secret or confidential in data_classes[] (schema 1.1) beside a non-sensitive data_class, or without one, raised no residency or key finding. 0.4.0 reads data_classes[] too.",
+      "replacement_pack_version": "0.4.0"
+    },
+    {
+      "advisory_id": "SAA-2026-017",
+      "pack": "ot",
+      "pack_version": "0.4.0",
+      "affected_rules": [
+        "OT-009"
+      ],
+      "nature": "false_positive",
+      "published": "2026-10-02",
+      "summary": "OT-009 reported a command-signing key's readers and exposure in a model with no writes or executes edge into an edge_device, where no machine command path exists to protect. 0.5.0 assesses the key only when a machine write is drawn.",
+      "replacement_pack_version": "0.5.0"
+    }
+  ]
+}

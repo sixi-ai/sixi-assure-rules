@@ -88,9 +88,18 @@
     {
       "id": "e2",
       "from": "n_agent",
-      "to": "n_logs",
-      "kind": "writes",
+      "to": "n_gw",
+      "kind": "calls",
       "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_gw",
+      "to": "n_llm",
+      "kind": "calls",
+      "auth": "managed_identity",
       "encryption": "tls",
       "attrs": {}
     }

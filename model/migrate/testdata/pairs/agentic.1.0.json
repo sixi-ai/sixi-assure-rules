@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "id": "arch_synthetic_agentic_10",
+  "tenant_id": "tenant_migrate",
+  "name": "Synthetic 1.0 agentic model (identities, protocols, authn)",
+  "version": 3,
+  "attrs": { "owner": "Migration tests", "regimes": ["AIACT", "OWASP"] },
+  "groups": [
+    { "id": "g_tb", "kind": "trust_boundary", "name": "Agent runtime", "node_ids": ["n_planner", "n_worker", "n_ops"] }
+  ],
+  "nodes": [
+    { "id": "ident_agent_id", "type": "app", "name": "A node whose id the migration would pick", "layer": "app",
+      "attrs": { "exposure": "internal", "authn": "oidc" } },
+    { "id": "n_api", "type": "api", "name": "Orders API", "layer": "app", "attrs": { "exposure": "public", "authn": "" } },
+    { "id": "n_planner", "type": "agent", "name": "Planner", "layer": "ai",
+      "attrs": { "identity": "agent_id", "autonomy": "semi", "purpose": "plans", "owner": "Ops" } },
+    { "id": "n_worker", "type": "agent", "name": "Worker", "layer": "ai",
+      "attrs": { "identity": "agent_id", "autonomy": "autonomous", "purpose": "acts", "owner": "Ops" } },
+    { "id": "n_ops", "type": "agent", "name": "Ops bot", "layer": "ai",
+      "attrs": { "identity": "managed_identity", "autonomy": "assisted", "purpose": "reports", "owner": "Ops" } },
+    { "id": "n_legacy", "type": "agent", "name": "Legacy bot", "layer": "ai",
+      "attrs": { "identity": "shared", "autonomy": "assisted", "purpose": "legacy", "owner": "Ops" } },
+    { "id": "n_draft", "type": "agent", "name": "Draft agent", "layer": "ai", "attrs": { "autonomy": "assisted" } },
+    { "id": "n_tool", "type": "tool", "name": "Run job", "layer": "app",
+      "attrs": { "identity": "managed_identity", "origin": "first_party", "scopes": ["jobs.run"] } },
+    { "id": "n_sql", "type": "datastore", "name": "Orders DB", "layer": "data",
+      "attrs": { "engine": "postgres", "data_class": "pii", "region": "switzerlandnorth" } },
+    { "id": "n_plc", "type": "edge_device", "name": "PLC", "layer": "edge", "attrs": { "site": "plant", "attestation": "tpm" } }
+  ],
+  "edges": [
+    { "id": "e_api_planner", "from": "n_api", "to": "n_planner", "kind": "calls", "protocol": "HTTPS", "auth": "oauth_client", "encryption": "tls", "attrs": {} },
+    { "id": "e_planner_worker", "from": "n_planner", "to": "n_worker", "kind": "delegates", "protocol": "A2A", "auth": "obo", "encryption": "tls", "attrs": {} },
+    { "id": "e_worker_tool", "from": "n_worker", "to": "n_tool", "kind": "calls", "protocol": "in-process", "auth": "none", "encryption": "none", "attrs": { "logged": true } },
+    { "id": "e_tool_sql", "from": "n_tool", "to": "n_sql", "kind": "writes", "protocol": "tds", "auth": "managed_identity", "encryption": "tls", "data_class": "pii", "attrs": {} },
+    { "id": "e_ops_sql", "from": "n_ops", "to": "n_sql", "kind": "reads", "protocol": "PostgreSQL", "auth": "managed_identity", "encryption": "tls", "attrs": {} },
+    { "id": "e_ops_plc", "from": "n_ops", "to": "n_plc", "kind": "reads", "protocol": "OPC UA", "auth": "mtls", "encryption": "mtls", "attrs": {} },
+    { "id": "e_legacy_api", "from": "n_legacy", "to": "n_api", "kind": "calls", "protocol": "devtools", "auth": "api_key", "encryption": "tls", "attrs": { "x_migrated_from": "auth=legacy_token" } },
+    { "id": "e_draft_tool", "from": "n_draft", "to": "n_tool", "kind": "calls", "protocol": "", "auth": "unknown", "encryption": "unknown", "attrs": {} }
+  ],
+  "findings": [],
+  "evidence": []
+}

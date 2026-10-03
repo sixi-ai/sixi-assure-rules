@@ -1,0 +1,92 @@
+{
+  "id": "arch_fx_che_004_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CHE-004 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "CH-ISG"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_user",
+      "type": "user",
+      "name": "Citizen",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "population": "customer",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_app",
+      "type": "app",
+      "name": "Public portal",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "public"
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "API gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "api"
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Log Analytics",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_user",
+      "to": "n_app",
+      "kind": "calls",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_gw",
+      "to": "n_logs",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e3",
+      "from": "n_app",
+      "to": "n_logs",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

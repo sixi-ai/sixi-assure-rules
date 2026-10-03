@@ -1,0 +1,237 @@
+# MCP — MCP servers and the agent runtime around them (docs/03 §MCP, ADR-047 §4, docs/18 D2). Deterministic CEL over
+# what the architect declares in schema 1.1; the LLM never creates findings.
+#
+# The MCP specification is not law, so it is never a clause: the rules cite the corpus clauses the design breaks
+# (OWASP Agentic Top 10, MCSB, NIST, MAESTRO, Entra Agent ID) and carry the specification sections as documentation
+# references (`references:`, kind document, url + fetched_at, ADR-030 style). The specification was read on
+# 2026-10-01 from its source repository (github.com/modelcontextprotocol/modelcontextprotocol, revision 2026-07-28);
+# modelcontextprotocol.io renders the same files. Every finding carries the references as a structured `references`
+# field (ADR-095), so the messages name no section.
+#
+# Only an explicit weak value reports where the attribute is a 1.1 declaration (`auth_mode`, `consent`, `validated`,
+# agent `sandbox`); an absent value is a `not_checked` row through `requires:` (ADR-088 §4), never a finding. Two
+# deliberate exceptions, as the owning specs state: TSC-001 reads an absent `registry_entry` as the gap once the design
+# draws a registry, and ARH-001 reads an absent sandbox on a code-executing MCP server as none.
+#
+# Owners in the assurance swarm (agents/swarm): mcp-server-posture (MCP-002, MCP-003, MCP-005, MCP-009),
+# tool-supply-chain (TSC-001), human-oversight (HOV-003), agent-memory-state (MEM-001), agent-runtime-hardening
+# (ARH-001). ADR-047 §4 "third-party MCP server with no gateway" is STR-005 (c4.yaml, the B1 all-paths rewrite), which
+# the mcp-server-posture spec names MCP-001: no second rule reports the same hop.
+pack: mcp
+version: 0.1.0
+regimes: [OWASP, MAESTRO, NIST, MCSB, MSFT, ISO]
+offer: agentic
+rules:
+  - id: MCP-003
+    title: Token passthrough or a foreign audience into an MCP server
+    scope: edge
+    severity: critical
+    # A hop into an MCP server forwards a token issued for someone else (auth token_passthrough), or declares an
+    # audience that is none of the names the server goes by. The audience is a resource indicator (RFC 8707, which the
+    # MCP authorization profile requires), so it is compared with every name the design gives the server: its
+    # identity_id, its identity's ref (where the canonical server URI belongs), its node id and its external_ref. A
+    # URI-shaped audience is foreign only when the server declares a URI-shaped name to differ from; while its
+    # identity declares no ref, such a hop is not_checked (requires), and one whose server declares only names that are
+    # not URIs (a client id, an object id) is outside the rule's decision (domain): a critical needs a declared
+    # mismatch, never a difference in spelling between a URI and an identifier.
+    condition: |
+      e.to.type == "mcp_server" && e.kind in ["calls","reads","writes","executes"] &&
+      (e.auth == "token_passthrough" ||
+        cel.bind(aud, attr(e, "audience", ""),
+          aud != "" && aud != attr(e.to, "identity_id", "") && aud != e.to.identity.ref && aud != e.to.id &&
+          aud != e.to.external_ref &&
+          (!aud.matches("^[A-Za-z][A-Za-z0-9+.-]*:") || e.to.identity.ref.matches("^[A-Za-z][A-Za-z0-9+.-]*:") ||
+           e.to.external_ref.matches("^[A-Za-z][A-Za-z0-9+.-]*:"))))
+    requires: [e.attrs.audience, e.to.attrs.identity_id, e.to.identity.ref]
+    domain: |
+      e.to.type == "mcp_server" && e.kind in ["calls","reads","writes","executes"] &&
+      (e.auth == "token_passthrough" || !attr(e, "audience", "").matches("^[A-Za-z][A-Za-z0-9+.-]*:") ||
+       e.to.identity.ref == "" || e.to.identity.ref.matches("^[A-Za-z][A-Za-z0-9+.-]*:") ||
+       e.to.external_ref.matches("^[A-Za-z][A-Za-z0-9+.-]*:"))
+    message: "{{e.from.name}} → {{e.to.name}} {{e.auth == 'token_passthrough' ? 'forwards a token that was issued for another resource (auth=token_passthrough)' : 'carries a token addressed to ' + string(attr(e, 'audience', '')) + ', which is none of the names the server goes by (identity ' + string(attr(e.to, 'identity_id', '')) + (e.to.identity.ref != '' ? ', ' + e.to.identity.ref : '') + ')'}}: the server cannot tell the caller from whoever the token was minted for, and every downstream audit names the wrong party."
+    clauses: [OWASP:AgenticTop10:ASI03, OWASP:AgenticTop10:ASI07, MCSB:v1:IM-8, NIST:800-207:S2.1]
+    remediation: "Exchange the caller's token for one issued to this MCP server (auth=token_exchange, RFC 8693) and declare the server as its audience (edge audience = the server's canonical URI, recorded as its identity's ref, or its identity_id); the server validates the audience and rejects any other token."
+    references:
+      - { kind: document, title: "MCP 2026-07-28 Authorization: Access Token Usage and Token Handling (servers accept only tokens issued for them and never transit others)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/authorization/index.mdx", fetched_at: "2026-10-01" }
+      - { kind: document, title: "MCP 2026-07-28 Security Best Practices: Token Passthrough", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/docs/2026-07-28/tutorials/security/security_best_practices.mdx", fetched_at: "2026-10-01" }
+    fixtures: { positive: fixtures/MCP-003.pos.json, negative: fixtures/MCP-003.neg.json }
+    tags: [mcp, identity, token, agentic, boundary]
+
+  - id: MCP-009
+    title: MCP gateway forwards a blanket consent to a server
+    scope: edge
+    severity: critical
+    # The confused-deputy shape: an MCP gateway acting as an OAuth proxy with one static client id reuses one consent
+    # for every client behind it.
+    condition: |
+      e.from.type == "gateway" && attr(e.from, "kind", "") == "mcp" && e.to.type == "mcp_server" &&
+      attr(e, "consent", "") == "blanket"
+    requires: [e.from.attrs.kind, e.attrs.consent]
+    domain: 'e.from.type == "gateway" && e.to.type == "mcp_server"'
+    message: "{{e.from.name}} forwards calls to {{e.to.name}} on a blanket consent: one consent given to the gateway's client id stands for every client behind it, so a client the user never approved acts with the user's grant."
+    clauses: [OWASP:AgenticTop10:ASI03, OWASP:AgenticTop10:ASI02, MCSB:v1:IM-7]
+    remediation: "Obtain the user's consent per client before the gateway forwards to the server's authorization server (consent=per_client), and keep the consent record with the client id it names."
+    references:
+      - { kind: document, title: "MCP 2026-07-28 Authorization Security Considerations: Confused Deputy Problem (per-client consent for proxy servers with static client ids)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/authorization/security-considerations.mdx", fetched_at: "2026-10-01" }
+      - { kind: document, title: "MCP 2026-07-28 Security Best Practices: Confused Deputy Problem", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/docs/2026-07-28/tutorials/security/security_best_practices.mdx", fetched_at: "2026-10-01" }
+    patch_template:
+      - { op: replace, path: "/edges/{{e.id}}/attrs/consent", value: per_client }
+    fixtures: { positive: fixtures/MCP-009.pos.json, negative: fixtures/MCP-009.neg.json }
+    tags: [mcp, consent, gateway, agentic]
+
+  - id: MCP-002
+    title: MCP server reachable beyond its host without OAuth
+    scope: node
+    severity: high
+    # docs/18 D2 "exposed beyond loopback without OAuth" and the mcp-server-posture MCP-002 (HTTP transport accepting an
+    # API key or nothing) are one fact, so one rule: a server that does not declare loopback exposure or stdio, and is
+    # declared on the network (private_network or public) or on an HTTP transport, authenticates with none or api_key.
+    condition: |
+      n.type == "mcp_server" && attr(n, "auth_mode", "") in ["none","api_key"] &&
+      attr(n, "exposure", "") != "loopback" && attr(n, "transport", "") != "stdio" &&
+      (attr(n, "exposure", "") in ["private_network","public"] || attr(n, "transport", "") in ["streamable_http","http_sse"])
+    requires: [n.attrs.auth_mode, n.attrs.exposure]
+    domain: 'n.type == "mcp_server"'
+    severity_override:
+      - { when: 'attr(n, "exposure", "") == "public"', severity: critical }
+    message: "{{n.name}} is reachable beyond its own host (exposure={{attr(n,'exposure','undeclared')}}, transport={{attr(n,'transport','undeclared')}}) and authenticates its clients with {{attr(n,'auth_mode','')}}: any caller on that network reaches every tool it serves."
+    clauses: [OWASP:AgenticTop10:ASI03, MCSB:v1:IM-1, MCSB:v1:IM-9, NIST:800-207A:Model]
+    remediation: "Authenticate clients with OAuth 2.1 and publish protected resource metadata (auth_mode=oauth21, resource_metadata=true); a local server binds to loopback only (exposure=loopback) or runs over stdio."
+    references:
+      - { kind: document, title: "MCP 2026-07-28 Authorization: Protocol Requirements (HTTP transports conform to the OAuth profile)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/authorization/index.mdx", fetched_at: "2026-10-01" }
+      - { kind: document, title: "MCP 2026-07-28 Streamable HTTP: Security & Endpoint (bind locally to 127.0.0.1, authenticate all connections)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/transports/streamable-http.mdx", fetched_at: "2026-10-01" }
+    patch_template:
+      - { op: replace, path: "/nodes/{{n.id}}/attrs/auth_mode", value: oauth21 }
+    fixtures: { positive: fixtures/MCP-002.pos.json, negative: fixtures/MCP-002.neg.json }
+    tags: [mcp, identity, network, exposure, agentic]
+
+  - id: MCP-005
+    title: Deprecated MCP transport or DCR-only client registration
+    scope: node
+    severity: low
+    # HTTP+SSE and RFC 7591 dynamic client registration are Deprecated under the 2026-07-28 feature lifecycle (a
+    # twelve-month window before removal). A 1.0 edge whose free-text protocol said SSE keeps that spelling in
+    # e.protocol_text (docs/02 §8), so an undeclared transport drawn as an SSE hop still reports.
+    condition: |
+      n.type == "mcp_server" &&
+      (attr(n, "transport", "") == "http_sse" || attr(n, "client_registration", "") == "dcr" ||
+       g.inEdges(n.id, "").exists(x, x.protocol_text.lowerAscii().matches("^(http[ +_-]?)?sse$|^mcp[ _-]?sse$")))
+    requires: [n.attrs.transport, n.attrs.client_registration]
+    domain: 'n.type == "mcp_server"'
+    message: "{{n.name}} rests on a deprecated MCP feature ({{attr(n,'transport','') == 'http_sse' || g.inEdges(n.id, '').exists(x, x.protocol_text.lowerAscii().matches('^(http[ +_-]?)?sse$|^mcp[ _-]?sse$')) ? 'the HTTP+SSE transport' : ''}}{{(attr(n,'transport','') == 'http_sse' || g.inEdges(n.id, '').exists(x, x.protocol_text.lowerAscii().matches('^(http[ +_-]?)?sse$|^mcp[ _-]?sse$'))) && attr(n,'client_registration','') == 'dcr' ? ' and ' : ''}}{{attr(n,'client_registration','') == 'dcr' ? 'dynamic client registration only' : ''}}): the specification may remove it from 2027-07-28."
+    clauses: [OWASP:AgenticTop10:ASI04, MAESTRO:L3]
+    remediation: "Move the server to the Streamable HTTP transport (transport=streamable_http) and register clients with Client ID Metadata Documents or pre-registration (client_registration=cimd or pre_registered)."
+    references:
+      - { kind: document, title: "MCP 2026-07-28 Key Changes: Deprecated (HTTP+SSE transport; RFC 7591 dynamic client registration)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx", fetched_at: "2026-10-01" }
+      - { kind: document, title: "MCP 2026-07-28 Client Registration: Dynamic Client Registration (deprecated)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/authorization/client-registration.mdx", fetched_at: "2026-10-01" }
+    fixtures: { positive: fixtures/MCP-005.pos.json, negative: fixtures/MCP-005.neg.json }
+    tags: [mcp, lifecycle, deprecated, agentic]
+
+  - id: TSC-001
+    title: Third-party MCP server not entered in the design's registry
+    scope: node
+    severity: medium
+    # The registry half of ADR-047 §4 "unpinned and unregistered third-party server" (the pin half is AGT-004): the
+    # design draws an agent_registry, yet this third-party server has no entry in it.
+    condition: |
+      n.type == "mcp_server" && attr(n, "origin", "") == "third_party" && g.has("agent_registry") &&
+      attr(n, "registry_entry", "") == ""
+    requires: [n.attrs.origin]
+    domain: 'n.type == "mcp_server" && g.has("agent_registry")'
+    message: "{{n.name}} is a third-party MCP server with no entry in the design's registry ({{g.nodes('agent_registry').map(r, r.name).join(', ')}}): whatever the registry verifies on admission was not applied to it."
+    clauses: [OWASP:AgenticTop10:ASI04, MAESTRO:L7, ISO:27001:A.5.21]
+    remediation: "Admit the server through the registry and record its entry name (registry_entry), so the namespace check and the review the registry applies cover it; keep the pin or signature AGT-004 asks for."
+    references:
+      - { kind: document, title: "MCP Registry (preview, API v0.1): server.json entries and namespace verification", url: "https://github.com/modelcontextprotocol/registry", fetched_at: "2026-10-01" }
+    fixtures: { positive: fixtures/TSC-001.pos.json, negative: fixtures/TSC-001.neg.json }
+    tags: [mcp, supply-chain, registry, agentic]
+
+  - id: HOV-003
+    title: Autonomous agent reaches a state-changing tool with no human step on any path
+    scope: edge
+    severity: high
+    # All paths (ADR-088 §1): the hop into a tool or MCP server that changes state fires when an autonomous agent
+    # reaches its source by some walk that enters no human step and the source is not one itself. A tool that also
+    # executes code is AGT-006's, so one hop raises one finding.
+    condition: |
+      e.to.type in ["tool","mcp_server"] &&
+      ("modifies_state" in attr(e.to, "capabilities", []) || attr(e.to, "write_capable", false)) &&
+      !("executes_code" in attr(e.to, "capabilities", [])) &&
+      e.from.type != "human_step" &&
+      g.upstreamAvoiding(e.from.id, ["human_step"], []).exists(a, a.type == "agent" && attr(a, "autonomy", "") == "autonomous")
+    requires: [e.to.attrs.capabilities, e.to.attrs.write_capable]
+    domain: 'e.to.type in ["tool","mcp_server"] && e.from.type != "human_step"'
+    message: "{{e.from.name}} reaches {{e.to.name}}, which changes state, on a path from an autonomous agent with no human approval step: a steered run changes records nobody approved."
+    clauses: [OWASP:AgenticTop10:ASI02, OWASP:AgenticTop10:ASI05, OWASP:LLMTop10:LLM06, MAESTRO:L7]
+    remediation: "Insert a human approval step before the state-changing call (or declare an ask/defer disposition for the tool class and route the call through the step), or replace the tool with a read-only one."
+    patch_template:
+      - { op: add, path: "/nodes/-", value: { id: "{{new:hs}}", type: human_step, name: "Approval before a state change", layer: human, attrs: { role: operations } } }
+      - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:hs}}" }
+      - { op: add, path: "/edges/-", value: { id: "{{new:e}}", from: "{{new:hs}}", to: "{{e.to.id}}", kind: "{{e.kind}}", auth: managed_identity, encryption: tls, attrs: { logged: true } } }
+    fixtures: { positive: fixtures/HOV-003.pos.json, negative: fixtures/HOV-003.neg.json }
+    tags: [mcp, agentic, oversight, state-change]
+
+  - id: MEM-001
+    title: Agent writes its memory with no validation of stored items
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent_memory" && attr(n, "validated", true) == false &&
+      g.inEdges(n.id, "writes").exists(w, w.from.type == "agent")
+    requires: [n.attrs.validated]
+    domain: 'n.type == "agent_memory" && g.inEdges(n.id, "writes").exists(w, w.from.type == "agent")'
+    message: "{{g.inEdges(n.id, 'writes').filter(w, w.from.type == 'agent').map(w, w.from.name).join(', ')}} write{{size(g.inEdges(n.id, 'writes').filter(w, w.from.type == 'agent')) == 1 ? 's' : ''}} {{n.name}} and the design declares that stored items pass no validation (validated=false): one steered turn becomes a standing instruction every later run reads back."
+    clauses: [OWASP:AgenticTop10:ASI06, OWASP:LLMTop10-2026:LLM08, MAESTRO:L2]
+    remediation: "Validate items before they are stored (format, provenance, a content-safety and secret check) and record it as validated=true; keep the validation outside the agent that writes."
+    patch_template:
+      - { op: replace, path: "/nodes/{{n.id}}/attrs/validated", value: true }
+    fixtures: { positive: fixtures/MEM-001.pos.json, negative: fixtures/MEM-001.neg.json }
+    tags: [agentic, memory, poisoning]
+
+  - id: ARH-001
+    title: Autonomous agent runs or triggers code with no sandbox
+    scope: node
+    severity: high
+    # docs/18 D3: an autonomous agent that declares sandbox none, or reaches a code-executing MCP server that declares
+    # no isolation (an absent server sandbox reads none, as the agent-runtime-hardening spec states). An agent that
+    # declares no sandbox at all is not_checked (requires), never a finding.
+    # ADR-093 (amendment of 00-synthesis.md §4.3, schema 1.2 FS-08): the rule also reads a code-executing `tool` the
+    # agent reaches. For a tool, container, os_sandbox, wasm, vm, managed and model_hosted count as isolation; none,
+    # process (a child process of the host, ADK's UnsafeLocalCodeExecutor) and an absent sandbox do not. A code-executing
+    # MCP server keeps its 1.1 reading (process, container or os_sandbox).
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") == "autonomous" &&
+      (attr(n, "sandbox", "") == "none" ||
+       g.outEdges(n.id, "").exists(x, "executes_code" in attr(x.to, "capabilities", []) &&
+         ((x.to.type == "mcp_server" && !(attr(x.to, "sandbox", "none") in ["process","container","os_sandbox"])) ||
+          (x.to.type == "tool" &&
+           !(attr(x.to, "sandbox", "none") in ["container","os_sandbox","wasm","vm","managed","model_hosted"])))))
+    requires: [n.attrs.autonomy, n.attrs.sandbox]
+    domain: 'n.type == "agent"'
+    message: "Autonomous agent {{n.name}} {{attr(n, 'sandbox', '') == 'none' ? 'declares no sandbox (sandbox=none)' : 'reaches a code-executing ' + (g.outEdges(n.id, '').exists(x, x.to.type == 'tool' && 'executes_code' in attr(x.to, 'capabilities', []) && !(attr(x.to, 'sandbox', 'none') in ['container','os_sandbox','wasm','vm','managed','model_hosted'])) ? 'tool' : 'MCP server') + ' that declares no isolation'}}: code it runs or triggers shares a host with its credentials and data."
+    clauses: [OWASP:AgenticTop10:ASI05, MAESTRO:L4, MCSB:v1:PA-7]
+    remediation: "Run the agent in a container, an OS sandbox or the managed platform's isolation (sandbox=container, os_sandbox or managed), and run code-executing MCP servers in a process, container or OS sandbox with minimal privileges."
+    references:
+      - { kind: document, title: "MCP 2026-07-28 Security Best Practices: Local MCP Server Compromise (sandboxed execution)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/docs/2026-07-28/tutorials/security/security_best_practices.mdx", fetched_at: "2026-10-01" }
+    fixtures: { positive: fixtures/ARH-001.pos.json, negative: fixtures/ARH-001.neg.json }
+    tags: [agentic, runtime, sandbox]
+
+  # docs/18 WS-I I2 (swarm team 03, mcp-server-posture): an OAuth 2.1 server that declares it publishes no protected
+  # resource metadata. Only an explicit false reports; an undeclared resource_metadata is not_checked (requires), and
+  # the agent requests the deployed RFC 9728 document as evidence instead of assuming it.
+  - id: MCP-004
+    title: OAuth 2.1 MCP server without protected resource metadata
+    scope: node
+    severity: medium
+    condition: 'n.type == "mcp_server" && attr(n, "auth_mode", "") == "oauth21" && attr(n, "resource_metadata", true) == false'
+    requires: [n.attrs.auth_mode, n.attrs.resource_metadata]
+    domain: 'n.type == "mcp_server"'
+    message: "{{n.name}} authenticates its clients with OAuth 2.1 but declares no protected resource metadata (resource_metadata=false): a client cannot discover which authorization server the server trusts the way the profile prescribes, and falls back to configuration or guessing."
+    clauses: [MCSB:v1:IM-1, MCSB:v1:IM-4, OWASP:ASVS:V6]
+    remediation: "Publish the server's OAuth protected resource metadata (RFC 9728) naming the authorization servers it trusts, and declare it (resource_metadata=true); the deployed document is the evidence."
+    references:
+      - { kind: document, title: "MCP 2026-07-28 Authorization: Protocol Requirements (protected resource metadata for authorization server discovery)", url: "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/authorization/index.mdx", fetched_at: "2026-10-01" }
+    patch_template:
+      - { op: replace, path: "/nodes/{{n.id}}/attrs/resource_metadata", value: true }
+    fixtures: { positive: fixtures/MCP-004.pos.json, negative: fixtures/MCP-004.neg.json }
+    tags: [mcp, identity, oauth, discovery, agentic]

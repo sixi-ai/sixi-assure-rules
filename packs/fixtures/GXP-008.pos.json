@@ -1,0 +1,95 @@
+{
+  "id": "arch_fx_gxp_008_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture GXP-008 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "FDA",
+      "EU-GMP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Deviation assistant",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "autonomous",
+        "owner": "QA lead",
+        "purpose": "Drafts deviation reports"
+      }
+    },
+    {
+      "id": "n_mcp",
+      "type": "mcp_server",
+      "name": "Records tool server",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "vetted": true,
+        "identity": "managed_identity"
+      }
+    },
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Batch records",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "engine": "sql",
+        "data_class": "confidential",
+        "region": "switzerlandnorth",
+        "backup": true
+      }
+    },
+    {
+      "id": "n_audit",
+      "type": "log_sink",
+      "name": "Audit trail",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_agent_mcp",
+      "from": "n_agent",
+      "to": "n_mcp",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_mcp_db",
+      "from": "n_mcp",
+      "to": "n_db",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

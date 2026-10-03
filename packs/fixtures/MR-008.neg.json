@@ -1,0 +1,61 @@
+{
+  "id": "arch_fx_mr_008_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture MR-008 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MR",
+      "AIACT"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "ai_act_tier": "high_risk",
+    "incident_reporting": "Serious incidents to the market surveillance authority (AI Act Art. 73) via the product safety officer."
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_guard",
+      "type": "edge_model",
+      "name": "Person-detection guard",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "safety_function": true,
+        "self_evolving": true,
+        "conformity_route": "module_b_c",
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "n_log",
+      "type": "log_sink",
+      "name": "Safety decision log",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 730,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_guard_log",
+      "from": "n_guard",
+      "to": "n_log",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

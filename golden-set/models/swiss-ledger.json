@@ -1,0 +1,309 @@
+{
+  "schema_version": "1.2",
+  "identities": [
+    {
+      "id": "ident_agent_id",
+      "name": "Agent identity (agent_id)",
+      "kind": "agent_identity",
+      "attrs": {
+        "x_migrated_from": "agent.identity=agent_id"
+      }
+    }
+  ],
+  "id": "arch_gs_swiss_ledger",
+  "tenant_id": "tenant_templates",
+  "name": "Clinic patient-service agent under Swiss law",
+  "version": 1,
+  "attrs": {
+    "owner": "Head of Patient Services",
+    "criticality": "high",
+    "regimes": [
+      "FADP",
+      "CH-ISG",
+      "CH-CO"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Cyberattacks are reported to BACS within 24 h of discovery and completed within 14 days; FDPIC notification as quickly as possible.",
+    "description": "A Swiss clinic's public information portal and an autonomous patient-service agent that reads health records and prepares service-case updates.",
+    "decisions": [
+      {
+        "id": "ADR-001",
+        "title": "Data protection impact assessment (FADP Art. 22) for the patient-service agent",
+        "status": "accepted",
+        "context": "Health records reach the patient-service agent and the model behind it.",
+        "decision": "The impact assessment was carried out before processing; its measures are the human review of every case update and the private model endpoint. It is filed with the data protection advisor.",
+        "consequences": "A change of purpose, data or model reopens the assessment.",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "FADP:2023:Art22"
+          },
+          {
+            "kind": "clause",
+            "id": "FADP:2023:Art7"
+          }
+        ],
+        "proposed_by": "Data protection advisor",
+        "decided_by": "Head of Patient Services",
+        "decided_at": "2026-09-20T08:00:00Z"
+      }
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_customer",
+      "type": "user",
+      "name": "Patient (customer)",
+      "layer": "human",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 120
+      },
+      "attrs": {
+        "population": "customer",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_visitor",
+      "type": "user",
+      "name": "Portal visitor (customer)",
+      "layer": "human",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "attrs": {
+        "population": "customer",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_portal",
+      "type": "app",
+      "name": "Public information portal",
+      "layer": "app",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 0
+      },
+      "attrs": {
+        "exposure": "public",
+        "owner": "Head of Patient Services"
+      }
+    },
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Patient-service agent",
+      "layer": "ai",
+      "source": "design",
+      "position": {
+        "x": 240,
+        "y": 240
+      },
+      "attrs": {
+        "identity": "agent_id",
+        "identity_id": "ident_agent_id",
+        "autonomy": "autonomous",
+        "purpose": "Answers patients and prepares service-case updates.",
+        "owner": "Head of Patient Services",
+        "materiality": "medium",
+        "kill_switch": true,
+        "rate_limit": true,
+        "ai_disclosure": true,
+        "output_marking": true,
+        "content_safety": true
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI",
+      "layer": "ai",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 360
+      },
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "model": "gpt-4.1",
+        "model_card": true,
+        "owner": "Head of Patient Services",
+        "materiality": "medium",
+        "purpose": "Generation model of the patient-service agent."
+      }
+    },
+    {
+      "id": "n_ehr",
+      "type": "datastore",
+      "name": "Health records",
+      "layer": "data",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 240
+      },
+      "attrs": {
+        "engine": "sql",
+        "data_class": "phi",
+        "region": "switzerlandnorth",
+        "encryption_key": "cmk"
+      }
+    },
+    {
+      "id": "n_cases",
+      "type": "datastore",
+      "name": "Service cases",
+      "layer": "data",
+      "source": "design",
+      "position": {
+        "x": 720,
+        "y": 120
+      },
+      "attrs": {
+        "engine": "sql",
+        "data_class": "pii",
+        "region": "switzerlandnorth",
+        "encryption_key": "cmk",
+        "retention_days": 3650
+      }
+    },
+    {
+      "id": "n_review",
+      "type": "human_step",
+      "name": "Case handler review",
+      "layer": "human",
+      "source": "design",
+      "position": {
+        "x": 480,
+        "y": 120
+      },
+      "attrs": {
+        "role": "case handler",
+        "approval_identity": "separate"
+      }
+    },
+    {
+      "id": "n_sink",
+      "type": "log_sink",
+      "name": "Security log (immutable)",
+      "layer": "platform",
+      "source": "design",
+      "position": {
+        "x": 0,
+        "y": 360
+      },
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true,
+        "region": "switzerlandnorth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_visitor_portal",
+      "from": "n_visitor",
+      "to": "n_portal",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "public",
+      "attrs": {}
+    },
+    {
+      "id": "e_cust_agent",
+      "from": "n_customer",
+      "to": "n_agent",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "phi",
+      "attrs": {}
+    },
+    {
+      "id": "e_agent_ehr",
+      "from": "n_agent",
+      "to": "n_ehr",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "phi",
+      "attrs": {}
+    },
+    {
+      "id": "e_agent_llm",
+      "from": "n_agent",
+      "to": "n_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "phi",
+      "attrs": {}
+    },
+    {
+      "id": "e_agent_review",
+      "from": "n_agent",
+      "to": "n_review",
+      "kind": "delegates",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_review_cases",
+      "from": "n_review",
+      "to": "n_cases",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "pii",
+      "attrs": {}
+    },
+    {
+      "id": "e_agent_sink",
+      "from": "n_agent",
+      "to": "n_sink",
+      "kind": "publishes",
+      "label": "security events",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    },
+    {
+      "id": "e_portal_sink",
+      "from": "n_portal",
+      "to": "n_sink",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

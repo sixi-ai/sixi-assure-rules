@@ -1,0 +1,80 @@
+{
+  "id": "arch_fx_drf_007_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture DRF-007 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "decisions": [
+      {
+        "id": "dec_1",
+        "title": "Ground the assistant on enterprise data",
+        "status": "proposed",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "MCSB:v1:IM-1"
+          },
+          {
+            "kind": "document",
+            "url": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/use-your-data",
+            "title": "Provider documentation",
+            "fetched_at": "2026-06-01T00:00:00Z"
+          }
+        ]
+      }
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "kind": "ai",
+        "logging": true
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Azure OpenAI",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "provider": "azure",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "purpose": "Fixture model",
+        "owner": "Fixture owner",
+        "materiality": "medium",
+        "outsourcing_registered": true,
+        "exit_strategy": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_gw",
+      "to": "n_llm",
+      "kind": "calls",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

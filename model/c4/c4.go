@@ -80,13 +80,20 @@ type Boundary struct {
 	Group   *model.Group `json:"-"`
 }
 
-// Identity is what authenticates in the model: identity providers and every distinct auth kind
-// the relationships use.
+// Identity is what authenticates in the model: identity providers, every distinct auth kind the
+// relationships use, and (schema 1.1, ADR-047 §5) the identity entities components run as.
 type Identity struct {
 	ID        string   `json:"id"`
 	Name      string   `json:"name"`
-	Type      string   `json:"type"` // node type (identity_provider) or "auth"
+	Type      string   `json:"type"` // node type (identity_provider), "auth" or "identity" (an identities[] entry)
 	AuthKinds []string `json:"auth_kinds,omitempty"`
+	// Kind, CredentialType, Federation and Issuer describe an identity entity (Type "identity").
+	Kind           string `json:"kind,omitempty"`
+	CredentialType string `json:"credential_type,omitempty"`
+	Federation     string `json:"federation,omitempty"`
+	Issuer         string `json:"issuer,omitempty"`
+	// Used lists the elements that run as the identity, sorted.
+	Used []string `json:"used_by,omitempty"`
 }
 
 // Decision mirrors model.schema.json `decision` (kept on architecture attrs).
@@ -130,21 +137,37 @@ type Model struct {
 	arch *model.Architecture
 }
 
-// Project derives the C4 model. It never mutates the architecture.
+// Project derives the C4 model. It never mutates the architecture. Notes (ADR-081) are annotations,
+// not C4 elements: they are left out of the elements and of every boundary's members, while
+// Unproject still returns the architecture with them, so the round trip stays the identity.
 func Project(a *model.Architecture) *Model {
 	m := &Model{ArchID: a.ID, Name: a.Name, Version: a.Version, Elements: []Element{}, Relationships: []Relationship{},
 		Boundaries: []Boundary{}, Identities: []Identity{}, Decisions: []Decision{}, Findings: append([]model.Finding{}, a.Findings...), arch: a}
+	notes := map[string]bool{}
+	for i := range a.Nodes {
+		if model.IsNote(a.Nodes[i].Type) {
+			notes[a.Nodes[i].ID] = true
+		}
+	}
 	membership := map[string][]string{} // node id → boundary ids (direct)
 	for i := range a.Groups {
 		g := &a.Groups[i]
-		m.Boundaries = append(m.Boundaries, Boundary{ID: g.ID, Kind: g.Kind, Name: g.Name, Parent: g.Parent, Members: append([]string{}, g.NodeIDs...), Group: g})
+		members := make([]string, 0, len(g.NodeIDs))
 		for _, nid := range g.NodeIDs {
+			if notes[nid] {
+				continue
+			}
+			members = append(members, nid)
 			membership[nid] = append(membership[nid], g.ID)
 		}
+		m.Boundaries = append(m.Boundaries, Boundary{ID: g.ID, Kind: g.Kind, Name: g.Name, Parent: g.Parent, Members: members, Group: g})
 	}
 	authKinds := map[string]bool{}
 	for i := range a.Nodes {
 		n := &a.Nodes[i]
+		if notes[n.ID] {
+			continue
+		}
 		el := Element{ID: n.ID, Name: n.Name, Type: n.Type, Description: n.Description, Node: n}
 		el.Level, el.Kind, el.Declared = Classify(n)
 		el.Provider = n.Attrs.String("provider", "")
@@ -158,7 +181,7 @@ func Project(a *model.Architecture) *Model {
 	}
 	for i := range a.Edges {
 		e := &a.Edges[i]
-		r := Relationship{ID: e.ID, Src: e.From, Dst: e.To, Kind: e.Kind, Technology: e.Protocol, Auth: e.Auth, Encryption: e.Encryption, DataClass: e.DataClass, Label: e.Label, Edge: e}
+		r := Relationship{ID: e.ID, Src: e.From, Dst: e.To, Kind: e.Kind, Technology: technology(a, e), Auth: e.Auth, Encryption: e.Encryption, DataClass: e.DataClass, Label: e.Label, Edge: e}
 		r.Crosses = crosses(membership[e.From], membership[e.To])
 		m.Relationships = append(m.Relationships, r)
 		if e.Auth != "" && e.Auth != "none" && e.Auth != "unknown" {
@@ -172,6 +195,17 @@ func Project(a *model.Architecture) *Model {
 		}
 		sort.Strings(kinds)
 		m.Identities = append(m.Identities, Identity{ID: "auth", Name: "relationship authentication", Type: "auth", AuthKinds: kinds})
+	}
+	for i := range a.Identities {
+		id := &a.Identities[i]
+		var used []string
+		for j := range a.Nodes {
+			if !notes[a.Nodes[j].ID] && a.Nodes[j].Attrs.String("identity_id", "") == id.ID {
+				used = append(used, a.Nodes[j].ID)
+			}
+		}
+		m.Identities = append(m.Identities, Identity{ID: id.ID, Name: identityLabel(id), Type: "identity", Kind: id.Kind,
+			CredentialType: id.CredentialType, Federation: id.Federation, Issuer: id.Issuer, Used: sortedCopy(used)})
 	}
 	if raw, ok := a.Attrs["decisions"].([]any); ok {
 		for _, d := range raw {
@@ -210,6 +244,40 @@ func Classify(n *model.Node) (level, kind string, declared bool) {
 	return level, kind, declared
 }
 
+// technology is the C4 technology text of a relationship (ADR-047 §5): the protocol, and when the
+// calling element runs as an identity entity, that identity — "https · as Planner identity
+// (agent_identity, entra_agent_id)" — so a container diagram shows who authenticates each call.
+func technology(a *model.Architecture, e *model.Edge) string {
+	id := a.IdentityOf(a.Node(e.From))
+	if id == nil {
+		return e.Protocol
+	}
+	var quals []string
+	for _, q := range []string{id.Kind, id.Federation} {
+		if q != "" && q != "none" {
+			quals = append(quals, q)
+		}
+	}
+	if id.Federation == "" && id.CredentialType != "" {
+		quals = append(quals, id.CredentialType)
+	}
+	as := "as " + identityLabel(id)
+	if len(quals) > 0 {
+		as += " (" + strings.Join(quals, ", ") + ")"
+	}
+	if e.Protocol == "" {
+		return as
+	}
+	return e.Protocol + " · " + as
+}
+
+func identityLabel(id *model.Identity) string {
+	if id.Name != "" {
+		return id.Name
+	}
+	return id.ID
+}
+
 func kindOf(nodeType string) string {
 	switch nodeType {
 	case "user", "human_step":
@@ -232,6 +300,9 @@ func kindOf(nodeType string) string {
 		return KindIdentity
 	case "gateway", "dmz", "edge_gateway", "data_diode":
 		return KindGateway
+	case "agent_registry", "credential_broker":
+		// ADR-047 §5: registries and credential brokers are containers the agents depend on.
+		return KindContainer
 	default:
 		return KindContainer
 	}

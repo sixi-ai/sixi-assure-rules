@@ -9,6 +9,15 @@ import (
 
 // Canonical returns deterministic JSON (sorted keys, no insignificant whitespace) for hashing.
 // Findings and evidence are excluded: the hash identifies the designed model at a version.
+//
+// `schema_version` is inside the hash from schema 1.0 (ADR-040 §1, docs/02 §Versions): the same
+// content means different things under different schemas, so the hash names both. A Go value that
+// left the field empty is hashed at CurrentSchemaVersion, which is what it is by construction. A
+// document read at 0.9 is hashed after its upgrade; hashes already recorded in the evidence chain
+// and in architecture_versions are never recomputed, and the store returns them as stored.
+//
+// The provenance sidecar (ADR-086 §6) is inside the hash from schema 1.1: it is an omitempty member, so a model
+// that carries none hashes exactly as before, and a stored 1.0 version is hashed as stored.
 func Canonical(a *Architecture) ([]byte, error) {
 	b, err := json.Marshal(a)
 	if err != nil {
@@ -19,6 +28,9 @@ func Canonical(a *Architecture) ([]byte, error) {
 	dec.UseNumber()
 	if err := dec.Decode(&generic); err != nil {
 		return nil, err
+	}
+	if _, ok := generic["schema_version"]; !ok {
+		generic["schema_version"] = CurrentSchemaVersion
 	}
 	delete(generic, "findings")
 	delete(generic, "evidence")

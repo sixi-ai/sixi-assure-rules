@@ -145,5 +145,30 @@
     "licence": "admin.ch",
     "verified": true,
     "note": "Verified 2026-09-10 against the Fedlex English translation (version of 1 September 2023). Confirmed 2026-09-16: Art. 24(1) requires notification 'as quickly as possible' (so rasch als möglich) and sets no hour count — the GDPR's 72-hour deadline does not apply under the FADP."
+  },
+  {
+    "id": "FADP:2023:Art21",
+    "regime": "FADP",
+    "doc": "Federal Act on Data Protection (FADP), SR 235.1",
+    "ref": "Art. 21",
+    "title": "Duty to inform in the case of an automated individual decision",
+    "summary": "The controller informs the data subject of a decision based exclusively on automated processing that has a legal consequence for them or significantly affects them, and on request lets them state their position and have the decision reviewed by a natural person; exceptions apply where the decision is directly connected to a contract and the request is granted, or the data subject expressly consented.",
+    "excerpt": "",
+    "version": "2023-09-01",
+    "effective": "2023-09-01",
+    "applies_to": [
+      "all",
+      "deployer"
+    ],
+    "source_url": "https://www.fedlex.admin.ch/eli/cc/2022/491/en",
+    "tags": [
+      "automated-decision",
+      "human-review",
+      "transparency",
+      "privacy"
+    ],
+    "licence": "admin.ch",
+    "verified": false,
+    "note": "Tied to the agent's human_in_the_loop[] and human_step in the model (CHE-002 reads the customer-facing write path). Cited side by side with GDPR:Art22. Added 2026-10-01, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
   }
 ]

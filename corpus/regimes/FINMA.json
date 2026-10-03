@@ -436,5 +436,29 @@
     "licence": "finma",
     "verified": true,
     "note": "Verified 2026-09-16 against the German circular PDF fetched from finma.ch (finma-rs-2023-01-20221207.pdf), section V margin nos. 101-111 and the transitional rule Rz 113; the excerpt is Rz 108 in the German original. Staged application: Rz 101, 103 and the first reporting under Rz 105 from 1 January 2024; Rz 106-109 and the first tests under Rz 110 from 1 January 2025; Rz 102, 104 and 111 from 1 January 2026, which is the effective date recorded here."
+  },
+  {
+    "id": "FINMA:05/2020:CyberReporting",
+    "regime": "FINMA",
+    "doc": "FINMA Guidance 05/2020 on the duty to report cyber attacks pursuant to Art. 29 para. 2 FINMASA",
+    "ref": "Guidance 05/2020",
+    "title": "Reporting of cyber attacks to FINMA",
+    "summary": "Supervised institutions report a cyber attack on critical functions or assets of material importance to FINMA: a first notification within 24 hours of its detection with an initial assessment of its criticality, and a full report through the FINMA reporting platform within 72 hours.",
+    "excerpt": "",
+    "version": "2020-05-07",
+    "effective": "2020-05-07",
+    "applies_to": [
+      "finma_supervised"
+    ],
+    "source_url": "https://www.finma.ch/en/documentation/finma-guidance/",
+    "tags": [
+      "incident",
+      "reporting",
+      "cyber",
+      "notification"
+    ],
+    "licence": "finma",
+    "verified": false,
+    "note": "Event-driven duty: its evidence is the declared notification path to FINMA (contact, channel, the 24 h and 72 h SLA), not a periodic record; no cadence entry. Whether a later FINMA communication amended the timelines is to be checked by the reviewer. Added 2026-10-01, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
   }
 ]

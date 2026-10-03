@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.2",
+  "id": "arch_fx_fw_007_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture FW-007 (positive)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Triage agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the FW rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true
+      }
+    },
+    {
+      "id": "n_peer",
+      "type": "external_agent",
+      "name": "Partner claims agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "card_url": "https://partner.example/.well-known/agent-card.json"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_peer",
+      "kind": "delegates",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true,
+        "mode": "handoff",
+        "context_forwarded": "full_history"
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

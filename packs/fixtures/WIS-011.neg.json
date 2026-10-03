@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.1",
+  "id": "arch_fx_wis_011_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture WIS-011 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "MCSB",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ]
+  },
+  "identities": [
+    {
+      "id": "id_agent",
+      "name": "Identity id_agent",
+      "kind": "agent_identity",
+      "issuer": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0",
+      "federation": "workload_identity_federation",
+      "owner": "Fixture owner",
+      "sponsor": "Head of Fixtures"
+    }
+  ],
+  "groups": [
+    {
+      "id": "g_home",
+      "kind": "zone",
+      "name": "Agent runtime",
+      "node_ids": [
+        "n_agent"
+      ]
+    },
+    {
+      "id": "g_partner",
+      "kind": "trust_boundary",
+      "name": "Partner",
+      "node_ids": [
+        "n_api"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "autonomy": "assisted",
+        "purpose": "Fixture agent for the D2 rules.",
+        "owner": "Fixture owner",
+        "kill_switch": true,
+        "rate_limit": true,
+        "identity_id": "id_agent"
+      }
+    },
+    {
+      "id": "n_api",
+      "type": "api",
+      "name": "Partner API",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oauth"
+        ],
+        "secrets_in": "secret_store"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_api",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

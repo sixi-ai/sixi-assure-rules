@@ -1,0 +1,64 @@
+{
+  "id": "arch_fx_prv_001_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture PRV-001 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "NIST"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "x_import_source": "terraform_plan",
+    "x_import_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_db",
+      "type": "datastore",
+      "name": "Ledger store",
+      "layer": "data",
+      "source": "declared",
+      "attrs": {
+        "engine": "azure_sql",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "pmk",
+        "backup": true,
+        "x_iac_address": "azurerm_mssql_database.ledger"
+      }
+    },
+    {
+      "id": "n_gw",
+      "type": "gateway",
+      "name": "API gateway",
+      "layer": "platform",
+      "source": "declared",
+      "attrs": {
+        "kind": "api",
+        "logging": true,
+        "x_iac_address": "azurerm_api_management.front"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_gw",
+      "to": "n_db",
+      "kind": "reads",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "data_class": "internal",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

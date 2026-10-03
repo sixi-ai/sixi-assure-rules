@@ -51,7 +51,11 @@ func TestEnumsMatchSchema(t *testing.T) {
 	cases := map[string][]string{
 		"nodeType": NodeTypes, "layer": Layers, "source": Sources, "edgeKind": EdgeKinds, "edgeAuth": EdgeAuths,
 		"edgeEncryption": Encryptions, "dataClass": DataClasses, "severity": Severities, "findingStatus": FindingStatuses,
-		"groupKind": GroupKinds, "regime": Regimes, "integrity": Integrities,
+		"groupKind": GroupKinds, "regime": Regimes, "integrity": Integrities, "noteTone": NoteTones,
+		"edgeProtocol": Protocols, "identityKind": IdentityKinds, "credentialType": CredentialTypes,
+		"federation": Federations, "sandbox": Sandboxes,
+		// Schema 1.2 (ADR-093 FS-01, FS-03).
+		"framework": Frameworks, "orchestration": Orchestrations,
 	}
 	for def, want := range cases {
 		assert.Equal(t, want, doc.Defs[def].Enum, def)
@@ -218,6 +222,9 @@ func TestApplyRejections(t *testing.T) {
 		{"evidence is server-owned", []PatchOp{{Op: "remove", Path: "/evidence"}}, "managed by the server"},
 		{"id immutable", []PatchOp{{Op: "replace", Path: "/id", Value: json.RawMessage(`"x"`)}}, "immutable"},
 		{"version immutable", []PatchOp{{Op: "replace", Path: "/version", Value: json.RawMessage(`99`)}}, "immutable"},
+		// Only a migration writes schema_version (ADR-040 §1).
+		{"schema_version immutable", []PatchOp{{Op: "replace", Path: "/schema_version", Value: json.RawMessage(`"0.9"`)}}, "immutable"},
+		{"schema_version not removable", []PatchOp{{Op: "remove", Path: "/schema_version"}}, "immutable"},
 		{"invalid value", []PatchOp{{Op: "replace", Path: "/edges/e_agent_sql/auth", Value: json.RawMessage(`"magic"`)}}, "/edges/4/auth"},
 		{"test op mismatch", []PatchOp{{Op: "test", Path: "/name", Value: json.RawMessage(`"other"`)}}, "test"},
 		{"empty", nil, "empty patch"},
@@ -262,4 +269,86 @@ func TestAttrsHelpers(t *testing.T) {
 	assert.True(t, at.Bool("b", false))
 	assert.Equal(t, 7, at.Int("n", 0))
 	assert.Equal(t, 3, at.Int("missing", 3))
+}
+
+// ADR-081: a note carries text and a tone, may sit in a group, and has no flows.
+func TestNoteInvariants(t *testing.T) {
+	t.Parallel()
+	base := func() *Architecture {
+		a := Empty("arch_n", "t1", "notes")
+		a.Nodes = append(a.Nodes,
+			Node{ID: "n_api", Type: "api", Name: "API", Layer: "app", Attrs: Attrs{}},
+			Node{ID: "n_note", Type: "note", Name: "Decision", Layer: "app", Attrs: Attrs{"text": "Decided 2026-09-12: one region.", "tone": "decision"}})
+		a.Groups = append(a.Groups, Group{ID: "g_zone", Kind: "zone", Name: "Zone", NodeIDs: []string{"n_api", "n_note"}})
+		a.Nodes[1].Zone = "g_zone"
+		a.Nodes[0].Zone = "g_zone"
+		return a
+	}
+	require.NoError(t, Validate(base()), "a note with text and a tone, inside a zone, is valid")
+
+	tests := []struct {
+		name   string
+		mutate func(a *Architecture)
+		want   string
+	}{
+		{"missing text", func(a *Architecture) { delete(a.Nodes[1].Attrs, "text") }, "a note needs text"},
+		{"blank text", func(a *Architecture) { a.Nodes[1].Attrs["text"] = "   " }, "a note needs text"},
+		{"text too long", func(a *Architecture) { a.Nodes[1].Attrs["text"] = strings.Repeat("é", NoteTextMax+1) }, "/nodes/1/attrs/text"},
+		{"unknown tone", func(a *Architecture) { a.Nodes[1].Attrs["tone"] = "shouting" }, "/nodes/1/attrs/tone"},
+		{"edge from a note", func(a *Architecture) {
+			a.Edges = append(a.Edges, Edge{ID: "e1", From: "n_note", To: "n_api", Kind: "calls", Auth: "none", Encryption: "tls"})
+		}, "a note has no flows"},
+		{"edge to a note", func(a *Architecture) {
+			a.Edges = append(a.Edges, Edge{ID: "e1", From: "n_api", To: "n_note", Kind: "flows", Auth: "none", Encryption: "tls"})
+		}, "/edges/0/to: a note has no flows"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			a := base()
+			tt.mutate(a)
+			err := Validate(a)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), tt.want)
+		})
+	}
+
+	t.Run("text at the limit counts runes", func(t *testing.T) {
+		t.Parallel()
+		a := base()
+		a.Nodes[1].Attrs["text"] = strings.Repeat("é", NoteTextMax)
+		require.NoError(t, Validate(a))
+	})
+	t.Run("tone defaults to neutral", func(t *testing.T) {
+		t.Parallel()
+		a := base()
+		delete(a.Nodes[1].Attrs, "tone")
+		require.NoError(t, Validate(a))
+		assert.Equal(t, "neutral", NoteTone(&a.Nodes[1]))
+		assert.Equal(t, "decision", NoteTone(&base().Nodes[1]))
+	})
+	t.Run("assessed nodes skip notes", func(t *testing.T) {
+		t.Parallel()
+		a := base()
+		got := AssessedNodes(a)
+		require.Len(t, got, 1)
+		assert.Equal(t, "n_api", got[0].ID)
+	})
+}
+
+// TestSharedSecretAuthsAreEdgeAuths: every shared-secret value is a drawable edge.auth value, and the list carries
+// the four values the shared-secret rules name (sas since FS-23), so the critics, planners, the retrieval-security
+// agent and the Annex IV export, which all read SharedSecretAuths, agree with the rules.
+func TestSharedSecretAuthsAreEdgeAuths(t *testing.T) {
+	for _, s := range SharedSecretAuths {
+		assert.Contains(t, EdgeAuths, s)
+	}
+	assert.ElementsMatch(t, []string{"api_key", "sas", "password", "connection_string"}, SharedSecretAuths)
+	for _, tc := range []struct {
+		auth string
+		want bool
+	}{{"sas", true}, {"api_key", true}, {"password", true}, {"connection_string", true},
+		{"managed_identity", false}, {"none", false}, {"unknown", false}, {"token_passthrough", false}, {"", false}} {
+		assert.Equal(t, tc.want, IsSharedSecretAuth(tc.auth), tc.auth)
+	}
 }

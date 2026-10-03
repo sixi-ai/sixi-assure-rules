@@ -32,6 +32,16 @@
         "c4_level": "component",
         "c4_parent": "n_app"
       }
+    },
+    {
+      "id": "n_comp_kind",
+      "type": "api",
+      "name": "Pricing component",
+      "layer": "app",
+      "attrs": {
+        "c4_kind": "Component",
+        "c4_parent": "n_app"
+      }
     }
   ],
   "edges": [],

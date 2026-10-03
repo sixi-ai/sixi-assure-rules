@@ -1,0 +1,26 @@
+[
+  {
+    "id": "EIDAS:2014/910:Art42",
+    "regime": "EIDAS",
+    "doc": "Regulation (EU) No 910/2014 (eIDAS), as amended by Regulation (EU) 2024/1183",
+    "ref": "Art. 42",
+    "title": "Requirements for qualified electronic time stamps",
+    "summary": "A qualified electronic time stamp binds the date and time to data in a way that reasonably precludes an undetectable change of the data, rests on an accurate time source linked to Coordinated Universal Time, and is signed with an advanced electronic signature or sealed with an advanced electronic seal of the qualified trust service provider, or by an equivalent method. Implementing acts may name standards whose use is presumed to meet these requirements.",
+    "excerpt": "",
+    "version": "2014-08-28",
+    "effective": "2016-07-01",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2014/910/oj",
+    "tags": [
+      "timestamp",
+      "trust-services",
+      "integrity",
+      "evidence"
+    ],
+    "licence": "eu-law",
+    "verified": false,
+    "note": "Reference regime (no rule pack, corpus/README.md): cited by the evidence-chain-integrity agent for the time anchor of the evidence chain (ADR-087 §3: an RFC 3161 receipt from a public TSA in the MVP, a qualified one in production). An Assure bundle is not a qualified electronic signature, seal or time stamp (ADR-087 §6). The wording after Regulation (EU) 2024/1183 could not be compared offline. Added 2026-10-02, awaiting review by a named reviewer (corpus/README.md §Governance). Paraphrase written offline: the official source could not be fetched from the authoring environment (egress to the source host refused), so no excerpt is stored and the record stays unverified until a named reviewer checks it against the source URL."
+  }
+]

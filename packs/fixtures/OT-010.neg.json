@@ -1,0 +1,155 @@
+{
+  "id": "arch_fx_ot_010_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture OT-010 (negative)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "IEC",
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "incident_reporting": "Plant CSIRT within 24 h (NIS2 Art. 23); CRA Art. 14 via the PSIRT."
+  },
+  "groups": [
+    {
+      "id": "z_cloud",
+      "kind": "zone",
+      "name": "Cloud",
+      "node_ids": [
+        "n_hs"
+      ]
+    },
+    {
+      "id": "z_conduit",
+      "kind": "zone",
+      "name": "Conduit",
+      "node_ids": [
+        "n_hub"
+      ]
+    },
+    {
+      "id": "z_plant",
+      "kind": "zone",
+      "name": "Plant",
+      "node_ids": [
+        "n_gw",
+        "n_plc"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_hs",
+      "type": "human_step",
+      "name": "Command approval",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "approver",
+        "approval_for": [
+          "command"
+        ],
+        "approval_identity": "separate"
+      },
+      "zone": "z_cloud"
+    },
+    {
+      "id": "n_hub",
+      "type": "broker",
+      "name": "Command conduit",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "network_exposure": "private"
+      },
+      "zone": "z_conduit"
+    },
+    {
+      "id": "n_gw",
+      "type": "edge_gateway",
+      "name": "Line gateway",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm",
+        "command_validation": true
+      },
+      "zone": "z_plant"
+    },
+    {
+      "id": "n_plc",
+      "type": "edge_device",
+      "name": "PLC",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant",
+        "attestation": "tpm"
+      },
+      "zone": "z_plant"
+    },
+    {
+      "id": "n_audit",
+      "type": "log_sink",
+      "name": "Approval log",
+      "layer": "platform",
+      "source": "design",
+      "attrs": {
+        "retention_days": 365,
+        "immutable": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_hs_hub",
+      "from": "n_hs",
+      "to": "n_hub",
+      "kind": "executes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "consequence": "high"
+      }
+    },
+    {
+      "id": "e_hub_gw",
+      "from": "n_hub",
+      "to": "n_gw",
+      "kind": "publishes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_gw_plc",
+      "from": "n_gw",
+      "to": "n_plc",
+      "kind": "writes",
+      "auth": "mtls",
+      "encryption": "mtls",
+      "attrs": {}
+    },
+    {
+      "id": "e_gw_audit",
+      "from": "n_gw",
+      "to": "n_audit",
+      "kind": "writes",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}
