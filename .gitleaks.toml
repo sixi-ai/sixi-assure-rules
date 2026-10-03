@@ -16,6 +16,12 @@ useDefault = true
 
 [allowlist]
 description = "Synthetic test vectors of the secret guard — credential-shaped by design, never real"
+# Same entries as the product repository's .gitleaks.toml: synthetic fixture bodies (EXAMPLE / notareal), and prose
+# that names an attribute, not a value (the prov pack's remediation says `encryption_key=cmk`).
+regexes = [
+  '''(?i)EXAMPL(E|notareal)''',
+  '''encryption_key=cmk''',
+]
 paths = [
   '''secretguard/testdata/.*''',
   '''secretguard/.*_test\.go''',
