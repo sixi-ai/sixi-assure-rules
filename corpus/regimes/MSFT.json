@@ -123,5 +123,1455 @@
     "verified": true,
     "note": "Product guidance, not law. Verified 2026-09-10 against the Microsoft Learn article on AI gateway capabilities.",
     "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:01",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:01",
+    "title": "Simplicity and efficiency",
+    "summary": "Recommends keeping the workload design simple and efficient, avoiding complexity that the business goals and requirements do not need.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "simplicity",
+      "design"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:02",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:02",
+    "title": "Identify and rate flows",
+    "summary": "Recommends identifying user and system flows and rating them on a criticality scale derived from business requirements, so that they can be prioritised.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "flows",
+      "criticality"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:03",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:03",
+    "title": "Failure mode analysis",
+    "summary": "Recommends failure mode analysis to identify dependencies, failure points and potential failures and to plan mitigations for them.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "failure-mode-analysis",
+      "dependencies"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:04",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:04",
+    "title": "Reliability and recovery targets",
+    "summary": "Recommends defining reliability and recovery targets for the workload and using them to inform the design and the health model.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "targets",
+      "rto-rpo"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:05",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:05",
+    "title": "Redundancy",
+    "summary": "Recommends adding redundancy at several levels, especially for critical flows, such as redundant compute and network components and multiple instances of the solution, to meet the reliability targets.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "redundancy",
+      "resilience"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:06",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:06",
+    "title": "Scaling strategy",
+    "summary": "Recommends a timely and reliable scaling strategy at the application, data and infrastructure levels, based on actual or predicted usage and with little manual intervention.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "scaling"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:07",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:07",
+    "title": "Self-preservation and self-healing",
+    "summary": "Recommends self-preservation and self-healing measures, using built-in features and established cloud patterns, so that the workload keeps working during incidents and recovers from them.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "self-healing",
+      "resilience"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:08",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:08",
+    "title": "Reliability testing and chaos engineering",
+    "summary": "Recommends testing resiliency and availability scenarios with chaos-engineering principles to show that the workload withstands faults, scales under demand and recovers within its targets.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "testing",
+      "chaos-engineering"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:09",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:09",
+    "title": "Disaster recovery plans",
+    "summary": "Recommends structured, tested and documented disaster recovery plans that align with the recovery targets and cover every component and the system as a whole.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "disaster-recovery",
+      "backup"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:RE:10",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Reliability checklist",
+    "ref": "RE:10",
+    "title": "Health monitoring",
+    "summary": "Recommends continuously measuring system health with uptime and reliability indicators across components and critical flows, and keeping that data available for detection, response and post-incident analysis.",
+    "excerpt": "",
+    "version": "2026-05-29",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+    "tags": [
+      "waf",
+      "reliability",
+      "monitoring",
+      "health-model"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:01",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:01",
+    "title": "Security baseline",
+    "summary": "Recommends a security baseline aligned with regulatory requirements, industry standards and platform recommendations, against which the workload is measured regularly.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "baseline",
+      "posture"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:02",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:02",
+    "title": "Secure development lifecycle",
+    "summary": "Recommends applying a secure development lifecycle throughout software development to protect the confidentiality, integrity and availability of the software.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "sdl",
+      "supply-chain"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:03",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:03",
+    "title": "Data classification",
+    "summary": "Recommends classifying all workload data and the systems that process it with sensitivity and information-type labels, and letting the classification drive design and security priorities.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "data-classification",
+      "data"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:04",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:04",
+    "title": "Segmentation and perimeters",
+    "summary": "Recommends intentional segmentation and perimeters that cover networks, roles and responsibilities, workload identities and resource organisation.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "segmentation",
+      "zones"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:05",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:05",
+    "title": "Identity and access management",
+    "summary": "Recommends strict, conditional and auditable identity and access management for users, team members and system components, limited to what is necessary and built on modern authentication and authorisation standards.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "identity",
+      "access-control",
+      "least-privilege"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:06",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:06",
+    "title": "Network traffic control",
+    "summary": "Recommends isolating, filtering and controlling ingress and egress traffic, with defence in depth at every available network boundary for east-west and north-south flows.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "network",
+      "egress"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:07",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:07",
+    "title": "Encryption",
+    "summary": "Recommends encrypting data with modern industry-standard methods, aligning the encryption scope with data classification and preferring native platform encryption.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "encryption",
+      "keys"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:08",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:08",
+    "title": "Hardening",
+    "summary": "Recommends hardening every workload component by reducing extraneous surface area and tightening configurations.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "hardening",
+      "attack-surface"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:09",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:09",
+    "title": "Application secrets",
+    "summary": "Recommends protecting application secrets through hardened storage, restricted and audited access, and a regular rotation process that can also rotate in an emergency.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "secrets",
+      "rotation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:10",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:10",
+    "title": "Threat monitoring",
+    "summary": "Recommends a holistic monitoring strategy with modern threat detection integrated with the platform, alerting reliably and feeding security operations.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "monitoring",
+      "threat-detection"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:11",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:11",
+    "title": "Security testing",
+    "summary": "Recommends a comprehensive testing regimen that prevents security issues and validates threat prevention and threat detection mechanisms.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "testing",
+      "adversarial"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:SE:12",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Security checklist",
+    "ref": "SE:12",
+    "title": "Incident response",
+    "summary": "Recommends defined and tested incident response procedures that cover incidents from local issues to disaster recovery, with a clear owner for each procedure.",
+    "excerpt": "",
+    "version": "2026-06-26",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+    "tags": [
+      "waf",
+      "security",
+      "incident-response"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/security/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:01",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:01",
+    "title": "Culture of financial responsibility",
+    "summary": "Recommends a culture of financial responsibility through regular training, spending accountability and investment in tooling and automation.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "finops",
+      "culture"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:02",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:02",
+    "title": "Cost model",
+    "summary": "Recommends creating and maintaining a cost model of initial, run-rate and ongoing costs, and a budget with a buffer for unplanned spending.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "cost-model",
+      "budget"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:03",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:03",
+    "title": "Collect and review cost data",
+    "summary": "Recommends collecting daily cost data, reviewing spending against the budget and cost model, and automating alerts for thresholds and anomalies.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "cost-data",
+      "alerts"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:04",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:04",
+    "title": "Spending guardrails",
+    "summary": "Recommends spending guardrails such as release gates, governance policies, resource limits and access controls, preferring platform automation over manual processes.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "guardrails",
+      "limits"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:05",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:05",
+    "title": "Best rates",
+    "summary": "Recommends finding and regularly reviewing the best rates for cloud resources and licences across regions, tiers, pricing models and purchasing plans.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "pricing"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:06",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:06",
+    "title": "Billing increments",
+    "summary": "Recommends understanding billing meters and aligning resource usage or service configuration with those billing increments.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "billing"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:07",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:07",
+    "title": "Component costs",
+    "summary": "Recommends regularly removing or optimising legacy, unneeded and underused workload components, features and resources.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "components"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:08",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:08",
+    "title": "Environment costs",
+    "summary": "Recommends aligning spending across preproduction, production, operations and disaster recovery environments with what each environment needs.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "environments"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:09",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:09",
+    "title": "Flow costs",
+    "summary": "Recommends aligning the cost of each flow with the priority of that flow.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "flows"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:10",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:10",
+    "title": "Data costs",
+    "summary": "Recommends aligning data spending with data priority through tiering, retention, volume, replication, backup and storage choices.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "data",
+      "retention"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:11",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:11",
+    "title": "Code costs",
+    "summary": "Recommends evaluating and changing code so that it meets its requirements with fewer or cheaper resources.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "code"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:12",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:12",
+    "title": "Scaling costs",
+    "summary": "Recommends evaluating alternative scaling configurations within scale units, aligned with the cost model and with demand and supply controls.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "scaling"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:13",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:13",
+    "title": "Personnel time",
+    "summary": "Recommends aligning the time personnel spend on tasks with task priority and reducing it without degrading outcomes.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "personnel"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:CO:14",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Cost Optimization checklist",
+    "ref": "CO:14",
+    "title": "Consolidation",
+    "summary": "Recommends consolidating resources and responsibilities within the workload and using shared central services where they exist.",
+    "excerpt": "",
+    "version": "2025-10-30",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist",
+    "tags": [
+      "waf",
+      "cost-optimization",
+      "consolidation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/cost-optimization/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:01",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:01",
+    "title": "Standard practices and accountability",
+    "summary": "Recommends defined standard practices for developing and operating the workload, clear accountability and a blameless culture of continuous improvement.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "devops",
+      "accountability"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:02",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:02",
+    "title": "Standardised operations tasks",
+    "summary": "Recommends standardising routine, ad hoc and emergency operations so that they are consistent and predictable.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "operations",
+      "standardisation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:03",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:03",
+    "title": "Formalised development practices",
+    "summary": "Recommends formalising processes across the software development lifecycle, from ideation to delivery, and making them transparent to the team and stakeholders.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "sdlc",
+      "process"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:04",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:04",
+    "title": "Development and quality assurance practices",
+    "summary": "Recommends industry-standard development and quality assurance practices with clear roles and standardised tools, source control, design patterns, documentation and style guides.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "documentation",
+      "quality"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:05",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:05",
+    "title": "Infrastructure as code",
+    "summary": "Recommends a standardised, preferably declarative infrastructure-as-code approach to prepare resources and configurations.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "iac"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:06",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:06",
+    "title": "Workload supply chain",
+    "summary": "Recommends a workload supply chain of predictable, automated pipelines that test and promote changes through every environment and quality gate.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "pipelines",
+      "supply-chain"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:07",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:07",
+    "title": "Monitoring stack",
+    "summary": "Recommends a monitoring stack that captures operational telemetry, metrics and logs from infrastructure and code to validate design decisions and guide improvement.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "monitoring",
+      "logging"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:08",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:08",
+    "title": "Incident management",
+    "summary": "Recommends a structured incident management process with defined roles, documented procedures and an architecture designed for rapid detection, diagnosis and recovery.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "incident-management"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:09",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:09",
+    "title": "Testing practices",
+    "summary": "Recommends testing practices aligned with business objectives and quality standards to improve workload quality.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "testing",
+      "quality"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:10",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:10",
+    "title": "Automation design",
+    "summary": "Recommends designing automation to be reliable, secure and maintainable, and automating repetitive procedural tasks that give a clear return.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "automation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:OE:11",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Operational Excellence checklist",
+    "ref": "OE:11",
+    "title": "Safe deployment practices",
+    "summary": "Recommends safe deployment practices built on small incremental releases, quality gates and progressive exposure, for routine and emergency deployments.",
+    "excerpt": "",
+    "version": "2026-06-11",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+    "tags": [
+      "waf",
+      "operational-excellence",
+      "deployment"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:01",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:01",
+    "title": "Performance targets",
+    "summary": "Recommends numerical performance targets, tied to workload requirements, for every workload flow.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "targets"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:02",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:02",
+    "title": "Capacity planning",
+    "summary": "Recommends capacity planning ahead of predicted changes in usage such as seasonal variation, product updates, campaigns, events or regulatory changes.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "capacity"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:03",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:03",
+    "title": "Service selection",
+    "summary": "Recommends selecting services, infrastructure and tiers that can reach the performance targets and absorb expected capacity changes.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "services"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:04",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:04",
+    "title": "Performance measurement",
+    "summary": "Recommends consistent performance measurement so that behaviour can be compared with baselines over time and degradation or scaling gaps detected.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "monitoring"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:05",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:05",
+    "title": "Scaling and partitioning",
+    "summary": "Recommends reliable and controlled scaling and partitioning built on the workload's scale-unit design.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "scaling",
+      "partitioning"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:06",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:06",
+    "title": "Performance testing",
+    "summary": "Recommends regular performance testing in a production-like environment against the performance targets.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "testing"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:07",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:07",
+    "title": "Code and infrastructure optimisation",
+    "summary": "Recommends performant code that offloads responsibilities to the platform, using code and infrastructure only where necessary.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "code"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:08",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:08",
+    "title": "Data usage optimisation",
+    "summary": "Recommends optimising data stores, partitions and indexes for their intended and actual use.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "data"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:09",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:09",
+    "title": "Critical flow prioritisation",
+    "summary": "Recommends prioritising resources and optimisation effort for the flows that support the most important business processes, users and operations.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "flows"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:10",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:10",
+    "title": "Operational task optimisation",
+    "summary": "Recommends monitoring and minimising the performance effect of routine operations such as scans, secret rotations, backups, reindexing and deployments.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "operations"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:11",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:11",
+    "title": "Live performance issues",
+    "summary": "Recommends planning the response to live performance problems with clear communication and responsibilities, and learning from each occurrence.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "incident-response"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
+  },
+  {
+    "id": "MSFT:WAF:PE:12",
+    "regime": "MSFT",
+    "doc": "Microsoft Azure Well-Architected Framework — Performance Efficiency checklist",
+    "ref": "PE:12",
+    "title": "Continuous performance optimisation",
+    "summary": "Recommends continuous optimisation focused on components whose performance deteriorates over time, such as databases and networking.",
+    "excerpt": "",
+    "version": "2026-05-06",
+    "effective": "",
+    "applies_to": [
+      "all"
+    ],
+    "source_url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+    "tags": [
+      "waf",
+      "performance-efficiency",
+      "optimisation"
+    ],
+    "licence": "microsoft-docs",
+    "verified": true,
+    "note": "Product guidance, not law. Code and title verified 2026-10-04 against https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist.",
+    "redacted": "licence"
   }
 ]
