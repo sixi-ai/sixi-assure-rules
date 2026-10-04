@@ -25,6 +25,11 @@ model, and any assistant may only *propose* JSON Patches that a person reviews a
 **Today: 88 rules in 16 packs, grouped into 19 causes · 383 clause records across 23 regimes ·
 14 golden models with expected findings · 180 rule fixtures.**
 
+Related, and a different job: [`radeksixi/sixi-scanner`](https://github.com/radeksixi/sixi-scanner)
+red-teams a live LLM agent endpoint, where this repository assesses the
+architecture around one. They do not overlap and neither substitutes for the
+other. Both are open-source Apache-2.0 projects by Radek (Sixi).
+
 ## Quick start
 
 Go ≥ 1.27, no other dependency.
