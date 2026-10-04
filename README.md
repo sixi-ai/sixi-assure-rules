@@ -27,6 +27,12 @@ source of truth.
 **Today: 88 rules in 16 packs, grouped into 19 causes · 383 clause records across 23 regimes ·
 14 golden models with expected findings · 180 rule fixtures.**
 
+Related, and a different job: [`rbrus/sixi-scanner`](https://github.com/rbrus/sixi-scanner)
+red-teams a live LLM agent endpoint, where this repository assesses the
+architecture around one. They do not overlap and neither substitutes for the
+other. Both are by Radoslaw Brus; the scanner is a personal Apache-2.0 project
+and is not a Sixi product.
+
 ## Quick start
 
 Go ≥ 1.27, no other dependency.
