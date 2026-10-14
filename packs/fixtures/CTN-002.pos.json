@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.3",
+  "id": "arch_fx_ctn_002_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CTN-002 (pos)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "semi",
+        "purpose": "Fixture agent for the ADR-105 rules.",
+        "owner": "Fixture owner",
+        "max_instances": 0
+      }
+    },
+    {
+      "id": "n_hs",
+      "type": "human_step",
+      "name": "Approval step",
+      "layer": "human",
+      "source": "design",
+      "attrs": {
+        "role": "operations"
+      }
+    },
+    {
+      "id": "n_tool",
+      "type": "tool",
+      "name": "Fixture tool",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "run"
+        ],
+        "capabilities": [
+          "spawns_agents"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_tool",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

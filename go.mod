@@ -1,6 +1,6 @@
 module github.com/sixi-ai/sixi-assure-rules
 
-go 1.27.1
+go 1.27.2
 
 require (
 	cel.dev/cel-go v0.32.0
@@ -8,7 +8,7 @@ require (
 	github.com/goccy/go-yaml v1.19.2
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/text v0.42.0
+	golang.org/x/text v0.43.0
 )
 
 require (

@@ -68,7 +68,7 @@ func TestSchema12ModelValidates(t *testing.T) {
 	t.Parallel()
 	a, err := ValidateJSON(marshal(t, frameworks12()))
 	require.NoError(t, err)
-	assert.Equal(t, "1.2", a.SchemaVersion)
+	assert.Equal(t, CurrentSchemaVersion, a.SchemaVersion)
 	sup := a.Node("n_sup")
 	require.NotNil(t, sup)
 	assert.Equal(t, "langgraph", sup.Attrs["framework"])

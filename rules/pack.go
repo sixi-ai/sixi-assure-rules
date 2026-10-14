@@ -76,6 +76,7 @@ type Rule struct {
 	RemediationByFramework map[string]FrameworkRemediation
 
 	prog       cel.Program
+	guards     []typeGuard // leading type tests of the condition: elements they exclude are not evaluated
 	msg        *tmpl
 	overrides  []cel.Program
 	patchExprs map[string]cel.Program // placeholder expression → program (patch templates)
@@ -471,14 +472,15 @@ func compileRule(rf ruleFile, pack, baseDir string, envs *envSet, o LoadOptions)
 	}
 	scopeOK := slices.Contains(Scopes, rf.Scope)
 	if scopeOK && strings.TrimSpace(rf.Condition) != "" {
-		prog, typ, err := envs.compile(rf.Scope, rf.Condition, o.CostLimit)
+		prog, a, err := envs.compileAst(rf.Scope, rf.Condition, o.CostLimit)
 		switch {
 		case err != nil:
 			fail("condition: %v", err)
-		case typ != nil && !typ.IsEquivalentType(cel.BoolType) && !typ.IsEquivalentType(cel.DynType):
-			fail("condition must evaluate to bool, got %s", typ)
+		case a.OutputType() != nil && !a.OutputType().IsEquivalentType(cel.BoolType) && !a.OutputType().IsEquivalentType(cel.DynType):
+			fail("condition must evaluate to bool, got %s", a.OutputType())
 		default:
 			r.prog = prog
+			r.guards = typeGuards(rf.Scope, a.NativeRep().Expr())
 		}
 	}
 	if scopeOK && strings.TrimSpace(rf.Message) != "" {

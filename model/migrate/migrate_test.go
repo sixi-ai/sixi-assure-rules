@@ -41,8 +41,9 @@ func TestVersion(t *testing.T) {
 		{"absent means 0.9", `{"id":"a"}`, "0.9", nil},
 		{"explicit 0.9", `{"schema_version":"0.9"}`, "0.9", nil},
 		{"an older version", `{"schema_version":"1.0"}`, "1.0", nil},
-		{"the previous minor", `{"schema_version":"1.1"}`, "1.1", nil},
-		{"current", `{"schema_version":"1.2"}`, "1.2", nil},
+		{"an older minor", `{"schema_version":"1.1"}`, "1.1", nil},
+		{"the previous minor", `{"schema_version":"1.2"}`, "1.2", nil},
+		{"current", `{"schema_version":"1.3"}`, "1.3", nil},
 		{"well-formed future", `{"schema_version":"12.3"}`, "12.3", nil},
 		{"null", `{"schema_version":null}`, "", ErrInvalidVersion},
 		{"number", `{"schema_version":1.0}`, "", ErrInvalidVersion},
@@ -79,16 +80,19 @@ func TestUpgrade(t *testing.T) {
 	}{
 		{name: "unversioned gains the field and nothing else", from: "0.9",
 			raw:  `{"id":"a","nodes":[{"id":"n","attrs":{"x_html":"<b>&</b>","x_big":12345678901234567890,"x_exp":1.5e3}}]}`,
-			want: `{"id":"a","schema_version":"1.2","nodes":[{"id":"n","attrs":{"x_html":"<b>&</b>","x_big":12345678901234567890,"x_exp":1.5e3}}]}`},
-		{name: "explicit 0.9", from: "0.9", raw: `{"schema_version":"0.9","id":"a"}`, want: `{"schema_version":"1.2","id":"a"}`},
+			want: `{"id":"a","schema_version":"1.3","nodes":[{"id":"n","attrs":{"x_html":"<b>&</b>","x_big":12345678901234567890,"x_exp":1.5e3}}]}`},
+		{name: "explicit 0.9", from: "0.9", raw: `{"schema_version":"0.9","id":"a"}`, want: `{"schema_version":"1.3","id":"a"}`},
 		{name: "1.0 without agents or edges changes only the version", from: "1.0", raw: `{"schema_version":"1.0","id":"a","nodes":[]}`,
-			want: `{"schema_version":"1.2","id":"a","nodes":[]}`},
+			want: `{"schema_version":"1.3","id":"a","nodes":[]}`},
 		// Schema 1.2 is additive (ADR-093 M1): a 1.1 model inside the 1.2 profiles changes only its version.
 		{name: "1.1 changes only the version", from: "1.1",
 			raw:  `{"schema_version":"1.1","id":"a","nodes":[{"id":"n","type":"agent","attrs":{"egress_policy":"default_allow","sandbox":"managed"}}],"edges":[{"id":"e","protocol":"https","attrs":{}}]}`,
-			want: `{"schema_version":"1.2","id":"a","nodes":[{"id":"n","type":"agent","attrs":{"egress_policy":"default_allow","sandbox":"managed"}}],"edges":[{"id":"e","protocol":"https","attrs":{}}]}`},
-		{name: "current is untouched", from: "1.2", raw: `{ "schema_version" : "1.2", "id":"a" }`, want: `{ "schema_version" : "1.2", "id":"a" }`},
-		{name: "newer is refused", raw: `{"schema_version":"1.3"}`, err: ErrUnsupportedVersion, contains: "1.3 is newer than 1.2"},
+			want: `{"schema_version":"1.3","id":"a","nodes":[{"id":"n","type":"agent","attrs":{"egress_policy":"default_allow","sandbox":"managed"}}],"edges":[{"id":"e","protocol":"https","attrs":{}}]}`},
+		{name: "1.2 changes only the version", from: "1.2",
+			raw:  `{"schema_version":"1.2","id":"a","nodes":[{"id":"n","type":"agent","attrs":{"kind":"orchestrator","max_iterations":5}}],"edges":[]}`,
+			want: `{"schema_version":"1.3","id":"a","nodes":[{"id":"n","type":"agent","attrs":{"kind":"orchestrator","max_iterations":5}}],"edges":[]}`},
+		{name: "current is untouched", from: "1.3", raw: `{ "schema_version" : "1.3", "id":"a" }`, want: `{ "schema_version" : "1.3", "id":"a" }`},
+		{name: "newer is refused", raw: `{"schema_version":"1.4"}`, err: ErrUnsupportedVersion, contains: "1.4 is newer than 1.3"},
 		{name: "older without a step is refused", raw: `{"schema_version":"0.5"}`, err: ErrUnsupportedVersion, contains: "no migration from 0.5"},
 		{name: "a malformed version is refused without echoing it", raw: `{"schema_version":"sk-live-secret"}`, err: ErrInvalidVersion},
 		{name: "not an object", raw: `"text"`, err: ErrNotObject},
@@ -139,7 +143,7 @@ func TestUpgradeDocDoesNotModifyItsInput(t *testing.T) {
 		{"nil", nil, ErrNotObject},
 		{"not a string", map[string]any{Field: json.Number("1.0")}, ErrInvalidVersion},
 		{"newer", map[string]any{Field: "2.0"}, ErrUnsupportedVersion},
-		{"next minor", map[string]any{Field: "1.3"}, ErrUnsupportedVersion},
+		{"next minor", map[string]any{Field: "1.4"}, ErrUnsupportedVersion},
 	} {
 		_, _, _, err := UpgradeDoc(tc.doc)
 		require.ErrorIs(t, err, tc.err, tc.name)
@@ -151,43 +155,43 @@ func TestUpgradeDocDoesNotModifyItsInput(t *testing.T) {
 // the real steps.
 func TestUpgradeChainsSteps(t *testing.T) {
 	t.Parallel()
-	retire := Deprecation{Scope: ScopeEdges, Field: "auth", Removed: "legacy_token", Successor: "oauth_client", Since: "1.3"}
-	list := append(Steps(), Step{From: "1.2", To: "1.3", Note: "synthetic", Fn: func(doc map[string]any) (map[string]any, error) {
+	retire := Deprecation{Scope: ScopeEdges, Field: "auth", Removed: "legacy_token", Successor: "oauth_client", Since: "1.4"}
+	list := append(Steps(), Step{From: "1.3", To: "1.4", Note: "synthetic", Fn: func(doc map[string]any) (map[string]any, error) {
 		if _, err := Rewrite(doc, retire); err != nil {
 			return nil, err
 		}
-		doc[Field] = "1.3"
+		doc[Field] = "1.4"
 		return doc, nil
 	}})
 
 	raw := `{"id":"a","edges":[{"id":"e1","auth":"legacy_token","attrs":{}},{"id":"e2","auth":"none","attrs":{}}]}`
-	got, from, to, err := upgradeWith(list, "1.3", []byte(raw))
+	got, from, to, err := upgradeWith(list, "1.4", []byte(raw))
 	require.NoError(t, err)
 	assert.Equal(t, "0.9", from)
-	assert.Equal(t, "1.3", to)
-	assert.JSONEq(t, `{"id":"a","schema_version":"1.3","edges":[
+	assert.Equal(t, "1.4", to)
+	assert.JSONEq(t, `{"id":"a","schema_version":"1.4","edges":[
 		{"id":"e1","auth":"oauth_client","attrs":{"x_migrated_from":"auth=legacy_token"}},
 		{"id":"e2","auth":"none","attrs":{}}]}`, string(got))
 
-	// A document already at 1.2 runs the last step only.
-	got, from, _, err = upgradeWith(list, "1.3", []byte(`{"schema_version":"1.2","edges":[]}`))
+	// A document already at 1.3 runs the last step only.
+	got, from, _, err = upgradeWith(list, "1.4", []byte(`{"schema_version":"1.3","edges":[]}`))
 	require.NoError(t, err)
-	assert.Equal(t, "1.2", from)
-	assert.JSONEq(t, `{"schema_version":"1.3","edges":[]}`, string(got))
+	assert.Equal(t, "1.3", from)
+	assert.JSONEq(t, `{"schema_version":"1.4","edges":[]}`, string(got))
 
 	// A step that forgets to set the version, or fails, stops the upgrade.
 	for name, fn := range map[string]Func{
 		"forgets the version": func(doc map[string]any) (map[string]any, error) { return doc, nil },
 		"fails":               func(map[string]any) (map[string]any, error) { return nil, errors.New("boom") },
 	} {
-		broken := append(Steps(), Step{From: "1.2", To: "1.3", Note: name, Fn: fn})
-		_, _, _, err := upgradeWith(broken, "1.3", []byte(`{"id":"a"}`))
+		broken := append(Steps(), Step{From: "1.3", To: "1.4", Note: name, Fn: fn})
+		_, _, _, err := upgradeWith(broken, "1.4", []byte(`{"id":"a"}`))
 		require.Error(t, err, name)
-		assert.Contains(t, err.Error(), "1.2 → 1.3", name)
+		assert.Contains(t, err.Error(), "1.3 → 1.4", name)
 	}
 
 	// A list that does not reach the current version is refused rather than half-applied.
-	_, _, _, err = upgradeWith(Steps(), "1.3", []byte(`{"id":"a"}`))
+	_, _, _, err = upgradeWith(Steps(), "1.4", []byte(`{"id":"a"}`))
 	require.Error(t, err)
 }
 

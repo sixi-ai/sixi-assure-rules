@@ -365,6 +365,8 @@ func TestShippedRequires(t *testing.T) {
 	annotated["aei"] = true
 	// docs/18 WS-M M3 (ADR-093): the fw pack declares the schema 1.2 facts whose absence silences its rules.
 	annotated["fw"] = true
+	// ADR-105: the ctn and edg packs declare the schema 1.3 facts whose absence silences their rules.
+	annotated["ctn"], annotated["edg"] = true, true
 	withRequires := 0
 	for _, r := range c.Rules() {
 		if len(r.Requires) == 0 {
@@ -686,14 +688,16 @@ func TestShippedRequires(t *testing.T) {
 		assert.Empty(t, r.Requires, "%s: reports an explicit value, a drawn edge or (FW-008) an undeclared egress policy", id)
 	}
 	fwRequires := 8
-	assert.Equal(t, 43+11+7+10+21+14+2+1+team03Requires+team01Requires+team02Requires+team04Requires+team07Requires+fwRequires, withRequires, "rules with a requires list (docs/03 \"requires and not_checked\")")
+	// ADR-105: CTN-003, CTN-005, EDG-001, EDG-002, EDG-003, EDG-005, RES-008, RES-009 and RES-010.
+	adr105Requires := 9
+	assert.Equal(t, 43+11+7+10+21+14+2+1+team03Requires+team01Requires+team02Requires+team04Requires+team07Requires+fwRequires+adr105Requires, withRequires, "rules with a requires list (docs/03 \"requires and not_checked\")")
 
 	// The per-pack table is complete (Reconcile A, 2026-10-02): every loaded pack has a row, 0 for a pack whose rules
 	// read no defaulted fact (cmp: the absence is the finding), and the counts are read from the loaded catalog, so a
 	// pack added or a requires list changed fails here with the pack named, not only in the total above.
 	perPack := map[string]int{"a2a": 6, "aei": 1, "agt": 0, "ai": 9, "aia": 2, "arh": 2, "blr": 4, "c4": 3, "cmp": 0,
-		"data": 11, "drift": 8, "evd": 3, "evl": 2, "fin": 3, "fw": 8, "gov": 9, "gxp": 6, "hov": 2, "imp": 1, "ing": 1,
-		"irr": 1, "log": 2, "lpv": 4, "mcp": 9, "mem": 3, "mr": 5, "net": 9, "ot": 5, "prov": 4, "rag": 2, "res": 5,
+		"ctn": 2, "data": 11, "drift": 8, "edg": 4, "evd": 3, "evl": 2, "fin": 3, "fw": 8, "gov": 9, "gxp": 6, "hov": 2, "imp": 1, "ing": 1,
+		"irr": 1, "log": 2, "lpv": 4, "mcp": 9, "mem": 3, "mr": 5, "net": 9, "ot": 5, "prov": 4, "rag": 2, "res": 8,
 		"scp": 4, "tpr": 6, "tsc": 3, "zt": 28}
 	got := map[string]int{}
 	for _, p := range c.Packs() {

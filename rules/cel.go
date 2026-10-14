@@ -138,6 +138,15 @@ func policyMacro(name string) cel.Macro {
 
 // compile parses, checks and plans one expression for a scope.
 func (s *envSet) compile(scope, src string, costLimit uint64) (cel.Program, *cel.Type, error) {
+	prog, a, err := s.compileAst(scope, src, costLimit)
+	if err != nil {
+		return nil, nil, err
+	}
+	return prog, a.OutputType(), nil
+}
+
+// compileAst is compile returning the checked AST, which a rule condition reads its type guards from.
+func (s *envSet) compileAst(scope, src string, costLimit uint64) (cel.Program, *cel.Ast, error) {
 	env, err := s.env(scope)
 	if err != nil {
 		return nil, nil, err
@@ -153,7 +162,7 @@ func (s *envSet) compile(scope, src string, costLimit uint64) (cel.Program, *cel
 	if err != nil {
 		return nil, nil, err
 	}
-	return provProgram{prog}, a.OutputType(), nil
+	return provProgram{prog}, a, nil
 }
 
 // provProgram resolves the `prov` variable (ADR-086 §7) from the graph of the activation, so every program the

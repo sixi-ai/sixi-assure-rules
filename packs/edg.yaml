@@ -1,0 +1,85 @@
+# EDG — edge-fleet hygiene (ADR-105 proposal, docs/research/09-agent-swarms-2026.md). Deterministic CEL over what the
+# architect declares about devices at the edge: the facts a self-replicating agent uses to land on cheap devices and to
+# run there (an unauthenticated debug port, a factory credential, an unsigned update, a direct device-to-device path,
+# an accelerator anyone can reach). Assure never discovers or scans a device; every fact is a declaration.
+#
+# One fact raises one finding: signed updates on a device in CRA scope stay CRA-002's (secure boot and signed OTA), so
+# EDG-003 reads devices outside CRA scope only. A device fact that is not declared is a not_checked row through
+# `requires:` (ADR-088 §4), never a finding. The network-segmentation steward owns the pack (agents/swarm/README.md §3).
+pack: edg
+version: 0.1.0
+regimes: [CRA, NIS2, IEC, CH-ISG, AIACT]
+offer: agentic
+rules:
+  - id: EDG-001
+    title: Device debug interface reachable without authentication
+    scope: node
+    severity: high
+    condition: |
+      n.type in ["edge_device","edge_gateway"] &&
+      attr(n, "debug_interface", "") in ["adb","ssh","telnet","jtag","serial","other"] && !attr(n, "debug_auth", true)
+    requires: [n.attrs.debug_interface, n.attrs.debug_auth]
+    domain: 'n.type in ["edge_device","edge_gateway"]'
+    message: "{{n.name}} exposes a {{attr(n, 'debug_interface', '')}} debug interface that does not require authentication: the first door a self-replicating agent tries."
+    clauses: [CRA:2024/2847:AnnexI-PtI-2(d), CRA:2024/2847:AnnexI-PtI-2(j), IEC:62443-4-2:Standard]
+    remediation: "Disable the debug interface in production builds (debug_interface=none), or require authentication on it (debug_auth=true) and reach it only from a maintenance zone."
+    fixtures: { positive: fixtures/EDG-001.pos.json, negative: fixtures/EDG-001.neg.json }
+    tags: [edge, device-hygiene, attack-surface]
+
+  - id: EDG-002
+    title: Device runs with a default or factory credential
+    scope: node
+    severity: high
+    condition: 'n.type in ["edge_device","edge_gateway"] && attr(n, "default_credentials", false)'
+    requires: [n.attrs.default_credentials]
+    domain: 'n.type in ["edge_device","edge_gateway"]'
+    message: "{{n.name}} is declared to use a default or factory credential: anything that knows the vendor's default can sign in."
+    clauses: [CRA:2024/2847:AnnexI-PtI-2(d), NIS2:2022/2555:Art21(2)(i), IEC:62443-4-2:Standard]
+    remediation: "Give every device a unique credential at provisioning, or force a change at first use, and declare it (default_credentials=false)."
+    patch_template:
+      - { op: replace, path: "/nodes/{{n.id}}/attrs/default_credentials", value: false }
+    fixtures: { positive: fixtures/EDG-002.pos.json, negative: fixtures/EDG-002.neg.json }
+    tags: [edge, device-hygiene, credentials]
+
+  - id: EDG-003
+    title: Device outside CRA scope accepts unsigned updates
+    scope: node
+    severity: medium
+    condition: 'n.type in ["edge_device","edge_gateway"] && !attr(n, "cra_scope", false) && !attr(n, "ota_signed", true)'
+    requires: [n.attrs.ota_signed]
+    domain: 'n.type in ["edge_device","edge_gateway"] && !attr(n, "cra_scope", false)'
+    message: "{{n.name}} accepts updates that are not signed: a payload installed once survives every later update."
+    clauses: [CRA:2024/2847:AnnexI-PtII-(7), CRA:2024/2847:AnnexI-PtI-2(f), NIS2:2022/2555:Art21(2)(d)]
+    remediation: "Sign every firmware and software update and verify the signature on the device before install (ota_signed=true)."
+    patch_template:
+      - { op: replace, path: "/nodes/{{n.id}}/attrs/ota_signed", value: true }
+    fixtures: { positive: fixtures/EDG-003.pos.json, negative: fixtures/EDG-003.neg.json }
+    tags: [edge, device-hygiene, updates]
+
+  # Devices in a fleet talk to their gateway, not to each other. A direct device-to-device edge is the path a
+  # replicator walks from one device to the next.
+  - id: EDG-004
+    title: Device talks to another device directly
+    scope: edge
+    severity: medium
+    condition: 'e.from.type == "edge_device" && e.to.type == "edge_device" && e.kind != "authenticates"'
+    message: "{{e.from.name}} {{e.kind}} {{e.to.name}} directly, device to device: one compromised device reaches the next with no conduit between them."
+    clauses: [IEC:62443-3-2:Zones, NIS2:2024/2690:Annex-6.8]
+    remediation: "Route device traffic through an edge gateway or broker that enforces which device may talk to which, and keep devices of one fleet unable to reach each other."
+    fixtures: { positive: fixtures/EDG-004.pos.json, negative: fixtures/EDG-004.neg.json }
+    tags: [edge, segmentation, lateral-movement]
+
+  - id: EDG-005
+    title: Device with an AI accelerator exposed to the public network
+    scope: node
+    severity: high
+    condition: 'n.type in ["edge_device","edge_gateway"] && attr(n, "accelerator", false) && attr(n, "network_exposure", "") == "public"'
+    requires: [n.attrs.network_exposure]
+    domain: 'n.type in ["edge_device","edge_gateway"] && attr(n, "accelerator", false)'
+    message: "{{n.name}} carries an AI accelerator and is exposed to the public network: free compute for anyone's model."
+    clauses: [CRA:2024/2847:AnnexI-PtI-2(j), CRA:2024/2847:AnnexI-PtI-2(d)]
+    remediation: "Keep devices with accelerators on a private network behind an edge gateway (network_exposure=private), reachable only by the services that schedule work on them."
+    patch_template:
+      - { op: replace, path: "/nodes/{{n.id}}/attrs/network_exposure", value: private }
+    fixtures: { positive: fixtures/EDG-005.pos.json, negative: fixtures/EDG-005.neg.json }
+    tags: [edge, device-hygiene, attack-surface, accelerator]
