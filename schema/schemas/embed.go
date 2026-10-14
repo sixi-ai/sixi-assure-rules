@@ -11,3 +11,10 @@ import _ "embed"
 //
 //go:embed model-1.1.schema.json
 var ModelV11 []byte
+
+// ModelV12 is the published schema of model version 1.2, kept byte for byte as it was served:
+// GET /schema/model/1.2 still answers with it after 1.3 became current. A 1.2 model is upgraded on
+// read and never validated against this file.
+//
+//go:embed model-1.2.schema.json
+var ModelV12 []byte

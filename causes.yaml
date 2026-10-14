@@ -90,6 +90,18 @@ causes:
     sentence: A steered agent changes state through at most one unattended component per run and reaches neither sensitive data with an open outbound channel nor a second acting agent.
     rules: [BLR-001, BLR-002, BLR-003, BLR-004]
 
+  # ADR-105 (docs/research/09-agent-swarms-2026.md): how far a hijacked agent can multiply and what it can carry off.
+  - id: containment
+    title: Containment
+    sentence: A steerable agent cannot make more of itself, carry off model weights or reach past a declared limit without a person, and someone outside its own identity can stop it.
+    rules: [CTN-001, CTN-002, CTN-003, CTN-004, CTN-005, CTN-006, CTN-007]
+
+  # ADR-105: the facts a self-replicating agent uses to land on and run on edge devices.
+  - id: edge-device-hygiene
+    title: Edge device hygiene
+    sentence: Every device at the edge ships with no default credential and no open debug port, accepts only signed updates, talks only through its gateway and keeps its accelerator off the public network.
+    rules: [EDG-001, EDG-002, EDG-003, EDG-004, EDG-005]
+
   - id: network-exposure
     title: Network exposure
     sentence: Nothing sits open on the public network; calls in and out pass a gateway that can see, filter and cut them, and every hop is encrypted.
@@ -120,7 +132,7 @@ causes:
   - id: resilience
     title: Resilience and continuity
     sentence: A component the business depends on survives the loss of a site — it is replicated or backed up, it has a stated recovery time, and the recovery has been rehearsed.
-    rules: [RES-001, RES-002, RES-003, DATA-005, RES-004, RES-005, RES-006, RES-007]
+    rules: [RES-001, RES-002, RES-003, DATA-005, RES-004, RES-005, RES-006, RES-007, RES-008, RES-009, RES-010, RES-011, RES-012]
 
   - id: supplier-conformity
     title: Supplier and product conformity

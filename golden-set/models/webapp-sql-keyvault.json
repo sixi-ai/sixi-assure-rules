@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "id": "arch_tpl_webapp_sql",
   "tenant_id": "tenant_templates",
   "name": "Web app + SQL + Key Vault (no AI)",

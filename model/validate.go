@@ -390,6 +390,17 @@ func Invariants(a *Architecture) error {
 		if ref, ok := n.Attrs["identity_id"].(string); ok && ref != "" && !identityIDs[ref] {
 			add(fmt.Sprintf("/nodes/%d/attrs/identity_id", i), fmt.Sprintf("unknown identity %q", ref))
 		}
+		// Schema 1.3 (ADR-105): the kill switch is operated by a declared identity that is not the
+		// agent's own; a stop the agent holds itself is no stop.
+		if ref, ok := n.Attrs["kill_switch_identity"].(string); ok && ref != "" {
+			own, _ := n.Attrs["identity_id"].(string)
+			switch {
+			case !identityIDs[ref]:
+				add(fmt.Sprintf("/nodes/%d/attrs/kill_switch_identity", i), fmt.Sprintf("unknown identity %q", ref))
+			case ref == own:
+				add(fmt.Sprintf("/nodes/%d/attrs/kill_switch_identity", i), "names the component's own identity_id")
+			}
+		}
 		hostedOnInvariant(a, n, nodeIdx, fmt.Sprintf("/nodes/%d/attrs/hosted_on", i), add)
 	}
 	for i, e := range a.Edges {

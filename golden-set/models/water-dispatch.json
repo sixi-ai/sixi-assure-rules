@@ -1,0 +1,410 @@
+{
+  "schema_version": "1.3",
+  "id": "arch_tpl_water_dispatch",
+  "tenant_id": "tenant_templates",
+  "version": 1,
+  "name": "Water dispatch with AI-assisted pump scheduling (manual fallback)",
+  "attrs": {
+    "owner": "Head of Network Operations",
+    "criticality": "high",
+    "regimes": [
+      "NIS2"
+    ],
+    "allowed_regions": [
+      "switzerlandnorth",
+      "switzerlandwest"
+    ],
+    "description": "Template (ADR-105): a water utility's dispatch. A scheduling agent proposes pump schedules and a triage agent reads network telemetry; the shift engineer can run the schedule from the dispatch console without either agent; the model has a recorded exit strategy, runs are budgeted, a quarantine segment is declared and the degraded mode without the agents is rehearsed.",
+    "incident_reporting": "Significant incidents go to the national CSIRT through the security office: early warning within 24 h, notification within 72 h, final report within a month; the shift engineer may switch the agents off at any time.",
+    "dr_tested_at": "2026-06-15",
+    "degraded_mode_tested_at": "2026-09-20",
+    "decisions": [
+      {
+        "id": "ADR-001",
+        "title": "NIS2 applies as transposed by the national act named in the register",
+        "status": "accepted",
+        "context": "The utility runs an essential drinking-water service in an EU Member State; the Directive binds through the national transposition.",
+        "decision": "Art. 21 and Art. 23 are read as transposed by the national act the utility names in its compliance register, with the registration with the national authority recorded there.",
+        "consequences": "Every NIS2 row names the act from the register; a change of the act reopens this decision.",
+        "citations": [
+          {
+            "kind": "clause",
+            "id": "NIS2:2022/2555:Art41"
+          },
+          {
+            "kind": "clause",
+            "id": "NIS2:2022/2555:Art21"
+          }
+        ],
+        "proposed_by": "Head of Network Operations",
+        "decided_by": "Head of Network Operations",
+        "decided_at": "2026-09-20T08:00:00Z"
+      }
+    ]
+  },
+  "identities": [
+    {
+      "id": "ident_agents",
+      "name": "Dispatch agents",
+      "kind": "agent_identity"
+    },
+    {
+      "id": "ident_shift",
+      "name": "Shift engineer on duty",
+      "kind": "user_account"
+    }
+  ],
+  "groups": [
+    {
+      "id": "g_ops",
+      "kind": "zone",
+      "name": "Operations zone",
+      "node_ids": [
+        "n_engineer"
+      ]
+    },
+    {
+      "id": "g_dc",
+      "kind": "zone",
+      "name": "Utility data centre – Switzerland North",
+      "node_ids": [
+        "n_console",
+        "n_scheduler",
+        "n_triage",
+        "n_aigw",
+        "n_llm",
+        "n_schedule",
+        "n_telemetry",
+        "n_logs",
+        "n_qnet"
+      ],
+      "attrs": {
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "g_isolation",
+      "kind": "isolation",
+      "name": "Quarantine segment",
+      "node_ids": [
+        "n_qnet"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_engineer",
+      "type": "user",
+      "name": "Shift engineer",
+      "layer": "human",
+      "zone": "g_ops",
+      "attrs": {
+        "population": "employee",
+        "mfa": true
+      }
+    },
+    {
+      "id": "n_console",
+      "type": "app",
+      "name": "Dispatch console",
+      "layer": "app",
+      "zone": "g_dc",
+      "attrs": {
+        "exposure": "internal",
+        "authn": [
+          "oidc"
+        ],
+        "owner": "Head of Network Operations",
+        "criticality": "critical",
+        "geo_redundant": true,
+        "rto_min": 30,
+        "rpo_min": 5
+      }
+    },
+    {
+      "id": "n_scheduler",
+      "type": "agent",
+      "name": "Pump scheduling agent",
+      "layer": "ai",
+      "zone": "g_dc",
+      "attrs": {
+        "identity": "agent_id",
+        "identity_id": "ident_agents",
+        "autonomy": "semi",
+        "purpose": "Proposes pump schedules from demand forecasts; writes the schedule store, which the shift engineer can also write directly.",
+        "owner": "Head of Network Operations",
+        "kill_switch": true,
+        "rate_limit": true,
+        "kill_switch_identity": "ident_shift",
+        "max_iterations": 10,
+        "max_tool_calls": 25,
+        "max_duration_s": 300,
+        "egress_policy": "default_deny_allowlist"
+      }
+    },
+    {
+      "id": "n_triage",
+      "type": "agent",
+      "name": "Leak triage agent",
+      "layer": "ai",
+      "zone": "g_dc",
+      "attrs": {
+        "identity": "agent_id",
+        "identity_id": "ident_agents",
+        "autonomy": "semi",
+        "purpose": "Reads network telemetry and flags probable leaks to the shift engineer; read-only.",
+        "owner": "Head of Network Operations",
+        "kill_switch": true,
+        "rate_limit": true,
+        "kill_switch_identity": "ident_shift",
+        "max_iterations": 10,
+        "max_tool_calls": 25,
+        "max_duration_s": 300,
+        "egress_policy": "default_deny_allowlist"
+      }
+    },
+    {
+      "id": "n_aigw",
+      "type": "gateway",
+      "name": "AI gateway",
+      "layer": "platform",
+      "zone": "g_dc",
+      "attrs": {
+        "kind": "ai",
+        "functions": [
+          "identity_termination",
+          "policy",
+          "observability"
+        ],
+        "logging": true,
+        "token_limits": true,
+        "content_safety": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_llm",
+      "type": "llm_endpoint",
+      "name": "Forecasting model",
+      "layer": "ai",
+      "zone": "g_dc",
+      "attrs": {
+        "provider": "azure",
+        "model": "gpt-4.1",
+        "region": "switzerlandnorth",
+        "network": "private",
+        "content_safety": true,
+        "exit_strategy": true,
+        "outsourcing_registered": true,
+        "model_card": true,
+        "owner": "Head of Network Operations",
+        "purpose": "Demand forecasting and schedule drafting."
+      }
+    },
+    {
+      "id": "n_schedule",
+      "type": "datastore",
+      "name": "Pump schedule store",
+      "layer": "data",
+      "zone": "g_dc",
+      "attrs": {
+        "engine": "postgres",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true,
+        "criticality": "critical",
+        "geo_redundant": true,
+        "rto_min": 30,
+        "rpo_min": 5
+      }
+    },
+    {
+      "id": "n_telemetry",
+      "type": "datastore",
+      "name": "Network telemetry",
+      "layer": "data",
+      "zone": "g_dc",
+      "attrs": {
+        "engine": "timeseries",
+        "data_class": "internal",
+        "region": "switzerlandnorth",
+        "network_exposure": "private",
+        "encryption_key": "cmk",
+        "backup": true
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "log_sink",
+      "name": "Operations log",
+      "layer": "platform",
+      "zone": "g_dc",
+      "attrs": {
+        "retention_days": 3650,
+        "immutable": true,
+        "region": "switzerlandnorth"
+      }
+    },
+    {
+      "id": "n_qnet",
+      "type": "network",
+      "name": "Quarantine segment",
+      "layer": "network",
+      "zone": "g_dc",
+      "attrs": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_engineer_console",
+      "from": "n_engineer",
+      "to": "n_console",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "oauth_client",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_console_schedule",
+      "from": "n_console",
+      "to": "n_schedule",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_console_scheduler",
+      "from": "n_console",
+      "to": "n_scheduler",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_console_triage",
+      "from": "n_console",
+      "to": "n_triage",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_scheduler_aigw",
+      "from": "n_scheduler",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_triage_aigw",
+      "from": "n_triage",
+      "to": "n_aigw",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_aigw_llm",
+      "from": "n_aigw",
+      "to": "n_llm",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true,
+        "prompt_contains": "internal"
+      }
+    },
+    {
+      "id": "e_scheduler_schedule",
+      "from": "n_scheduler",
+      "to": "n_schedule",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_triage_telemetry",
+      "from": "n_triage",
+      "to": "n_telemetry",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {
+        "logged": true
+      }
+    },
+    {
+      "id": "e_scheduler_logs",
+      "from": "n_scheduler",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_triage_logs",
+      "from": "n_triage",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "agent_id",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_aigw_logs",
+      "from": "n_aigw",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e_console_logs",
+      "from": "n_console",
+      "to": "n_logs",
+      "kind": "writes",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

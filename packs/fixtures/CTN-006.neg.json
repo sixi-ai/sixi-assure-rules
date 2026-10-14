@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.3",
+  "id": "arch_fx_ctn_006_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CTN-006 (neg)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ],
+    "max_blast_radius": 2
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "semi",
+        "purpose": "Fixture agent for the ADR-105 rules.",
+        "owner": "Fixture owner"
+      }
+    },
+    {
+      "id": "n_t1",
+      "type": "tool",
+      "name": "Search",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "run"
+        ],
+        "capabilities": []
+      }
+    },
+    {
+      "id": "n_t2",
+      "type": "tool",
+      "name": "Ticketing",
+      "layer": "app",
+      "source": "design",
+      "attrs": {
+        "origin": "first_party",
+        "scopes": [
+          "run"
+        ],
+        "capabilities": []
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_t1",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    },
+    {
+      "id": "e2",
+      "from": "n_agent",
+      "to": "n_t2",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

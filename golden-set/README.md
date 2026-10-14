@@ -6,10 +6,10 @@ model with the packs in `packs/` (pack applicability = pack `regimes` ∩ model 
 reports TP/FP/FN per rule; thresholds: precision ≥ 0.90, recall ≥ 0.85 per pack (docs/09 §2).
 Never add real customer diagrams; create anonymised twins instead.
 
-## Fifty models, fifty expectation files
+## Fifty-six models, fifty-six expectation files
 
-`models/` holds 51 files: the 50 models listed in this file (the core fourteen just below, then the pairs of each
-increment in their own sections) and `README-templates.md`. `expected/` holds 50 files, one per model. Counts as of
+`models/` holds 57 files: the 56 models listed in this file (the core fourteen just below, then the pairs of each
+increment in their own sections) and `README-templates.md`. `expected/` holds 56 files, one per model. Counts as of
 2026-10-02, read from the files ("rules (findings)" is the number of distinct rule ids and of entries in
 `expected/<name>.json`); `server/cmd/eval` pins the total (`goldenModelCount`, docs/09 §2).
 
@@ -248,3 +248,28 @@ What each pair exercises, and the rules its bad twin raises:
 - **fw-foundry-agent-service**: docs/18 WS-M M3: the fw pack on Azure AI Foundry Agent Service. `fw-foundry-agent-service-bad` raises FW-002, FW-004, FW-008, FW-009, FW-011.
 - **fw-google-adk**: docs/18 WS-M M3: the fw pack on Google ADK. `fw-google-adk-bad` raises FW-001, FW-005, FW-006, FW-009, FW-010.
 - **fw-openai-agents**: docs/18 WS-M M3: the fw pack on the OpenAI Agents SDK. `fw-openai-agents-bad` raises ATA-010, FW-003, FW-005, FW-006, FW-007, FW-012, STR-006.
+
+## The containment and continuity pairs (ADR-105, schema 1.3 native)
+
+Each clean twin is a gallery template (`arch_tpl_*`), each bad twin a gallery example (`arch_demo_*`). Expectations are
+the rule authors' (D-048).
+
+| Model | id | Tenant | Regimes | Nodes | Edges | Expected rules (findings) |
+|---|---|---|---|---|---|---|
+| `soc-containment.json` | `arch_tpl_soc_containment` | templates | FINMA AIACT OWASP MSFT | 20 | 27 | 0 (0) |
+| `soc-containment-bad.json` | `arch_demo_soc_containment_bad` | demo | FINMA AIACT OWASP MSFT | 20 | 28 | 8 (10) |
+| `edge-fleet-containment.json` | `arch_tpl_edge_fleet_containment` | templates | CRA CH-ISG IEC DORA | 14 | 11 | 0 (0) |
+| `edge-fleet-containment-bad.json` | `arch_demo_edge_fleet_containment_bad` | demo | CRA CH-ISG IEC DORA | 15 | 13 | 6 (6) |
+| `water-dispatch.json` | `arch_tpl_water_dispatch` | templates | NIS2 | 10 | 13 | 0 (0) |
+| `water-dispatch-bad.json` | `arch_demo_water_dispatch_bad` | demo | NIS2 | 9 | 12 | 5 (5) |
+
+- **soc-containment**: a defensive SOC agent fleet (triage, enrichment, containment) whose containment worker proposes and a
+  duty analyst approves; the kill switch is a person's, instances are bounded, the detection weights are private and
+  signed, a quarantine segment is declared. `soc-containment-bad` raises BLR-001, CTN-001, CTN-002, CTN-003, CTN-004,
+  CTN-005, CTN-006 (×3) and CTN-007.
+- **edge-fleet-containment**: the edge IoT template with no debug ports, no factory credentials, a private gateway
+  accelerator, signed vision weights and a quarantine VLAN. `edge-fleet-containment-bad` raises CTN-005, EDG-001,
+  EDG-002, EDG-003, EDG-004 and EDG-005.
+- **water-dispatch**: a water utility's dispatch under NIS2 with a scheduling and a triage agent, a manual route around
+  them, a model exit strategy, run budgets, a quarantine segment and a rehearsed degraded mode. `water-dispatch-bad`
+  raises RES-008, RES-009, RES-010, RES-011 and RES-012.

@@ -98,6 +98,18 @@
     ]
   },
   {
+    "rule_id": "RES-008",
+    "ids": [
+      "n_ledger"
+    ]
+  },
+  {
+    "rule_id": "RES-012",
+    "ids": [
+      "arch_demo_foundry_agent_bad"
+    ]
+  },
+  {
     "rule_id": "TPR-002",
     "ids": [
       "n_llm"

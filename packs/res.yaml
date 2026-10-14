@@ -1,8 +1,12 @@
 # RES — resilience (docs/03 §RES). Deterministic CEL; the LLM never creates findings.
 # 0.2.0 (docs/18 WS-I I2, resilience-continuity.md): the pack also applies under NIS2, ISO and CH-CO, so RES-006's
 # NIS2 and ISO branches and RES-004, RES-005 and RES-007 (which cite NIS2 and CH-CO clauses) run where they cite.
+# 0.3.0 (ADR-105, docs/research/09-agent-swarms-2026.md): RES-008 to RES-012, essential-service continuity when agents
+# sit in the control path — a manual path that avoids every agent, more than one model provider, a run budget, a
+# declared isolation segment and a recorded degraded-mode test. RES-010 absorbs November backlog N1's step budget
+# (OWASP ASI08, cascading failures); FW-005 keeps the loop bound.
 pack: res
-version: 0.2.0
+version: 0.3.0
 regimes: [DORA, FINMA, NIS2, ISO, CH-CO]
 offer: agentic
 rules:
@@ -104,3 +108,92 @@ rules:
       - { op: add, path: "/nodes/{{n.id}}/attrs/backup", value: true }
     fixtures: { positive: fixtures/RES-007.pos.json, negative: fixtures/RES-007.neg.json }
     tags: [resilience, backup, logging]
+
+  # ADR-105: an essential function driven by an agent keeps a manual path. A person (a user or a human step) reaches
+  # the critical component by some walk that enters no agent; without one, losing or distrusting the agents stops the
+  # function. The person need not be drawn as the operator of record: any drawn manual route counts.
+  - id: RES-008
+    title: Critical component driven by an agent with no manual path around the agents
+    scope: node
+    severity: high
+    condition: |
+      attr(n, "criticality", "") == "critical" &&
+      g.inEdges(n.id, "").exists(x, x.kind in ["writes","executes","calls"] && x.from.type == "agent") &&
+      !(g.nodes("user") + g.nodes("human_step")).exists(h, g.reachable(h.id, n.id) && g.pathAvoiding(h.id, n.id, "agent"))
+    requires: [n.attrs.criticality]
+    domain: 'n.type in ["app","api","datastore","queue","saas","edge_device","edge_gateway"] && g.inEdges(n.id, "").exists(x, x.from.type == "agent")'
+    message: "{{n.name}} is critical and an agent drives it, but no person reaches it on a path that avoids every agent: if the agents are lost, hijacked or switched off, the function stops."
+    clauses: [NIS2:2022/2555:Art21(2)(c), DORA:2022/2554:Art11, FINMA:2023/1:Rz-OpRes, ISO:27001:A.5.30]
+    remediation: "Draw and keep a manual route to the critical component that does not depend on any agent (an operator console, a runbook step), and rehearse it (degraded_mode_tested_at)."
+    fixtures: { positive: fixtures/RES-008.pos.json, negative: fixtures/RES-008.neg.json }
+    tags: [resilience, continuity, agentic, manual-fallback]
+
+  # Concentration from the consumer's side: every model a critical component reaches comes from one provider and none
+  # declares an exit strategy, so the loss or withdrawal of that provider stops it. DOR-002 reads several critical
+  # services at one provider; this rule reads one critical consumer with no alternative and no plan to get one.
+  - id: RES-009
+    title: Critical component depends on a single model provider
+    scope: node
+    severity: medium
+    condition: |
+      n.type in ["agent","app","api"] && attr(n, "criticality", "") == "critical" &&
+      cel.bind(ls, g.nodes("llm_endpoint").filter(l, g.reachable(n.id, l.id)),
+        ls.size() > 0 && !ls.exists(l, attr(l, "exit_strategy", false)) &&
+        cel.bind(ps, ls.map(l, attr(l, "provider", "")), !ps.exists(p, p == "") && ps.all(p, p == ps[0])))
+    requires: [n.attrs.criticality]
+    domain: 'n.type in ["agent","app","api"] && g.nodes("llm_endpoint").exists(l, g.reachable(n.id, l.id))'
+    message: "{{n.name}} is critical, every model it reaches comes from {{g.nodes('llm_endpoint').filter(l, g.reachable(n.id, l.id)).map(l, attr(l, 'provider', ''))[0]}} and none declares an exit strategy: an outage, withdrawal or compromise of that one provider stops it."
+    clauses: [DORA:2022/2554:Art28(8), DORA:2022/2554:Art29, FINMA:2023/1:Rz-OpRes, NIS2:2022/2555:Art21(2)(d)]
+    remediation: "Give the critical function a second model from another provider, or a tested exit strategy (exit_strategy=true on the endpoint) and a degraded mode that works without a model."
+    fixtures: { positive: fixtures/RES-009.pos.json, negative: fixtures/RES-009.neg.json }
+    tags: [resilience, continuity, agentic, concentration]
+
+  # A run budget (ASI08, cascading failures): an agent that drives a critical component declares its tool-call budget
+  # unbounded (max_tool_calls=0) and no time bound. An undeclared budget is not_checked (ADR-088 §4, as in the fw pack);
+  # a loop declared unbounded with no time bound stays FW-005's.
+  - id: RES-010
+    title: Agent drives a critical component with no run budget
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(n, "autonomy", "") in ["semi","autonomous"] &&
+      attr(n, "max_tool_calls", -1) == 0 && attr(n, "max_duration_s", 0) == 0 && attr(n, "max_iterations", -1) != 0 &&
+      g.outEdges(n.id, "").exists(x, x.kind in ["writes","executes","calls"] && attr(x.to, "criticality", "") == "critical")
+    requires: [n.attrs.autonomy, n.attrs.max_tool_calls]
+    domain: 'n.type == "agent" && g.outEdges(n.id, "").exists(x, attr(x.to, "criticality", "") == "critical")'
+    message: "{{n.name}} drives a critical component, declares its tool calls unbounded (max_tool_calls=0) and sets no time bound: one bad run can cascade into the function it serves."
+    clauses: [DORA:2022/2554:Art9, NIS2:2022/2555:Art21, FINMA:2023/1:Rz-OpRes]
+    remediation: "Bound every run of the agent: a tool-call budget (max_tool_calls) and a time limit (max_duration_s), enforced by the runtime, so a failing run stops before it spreads."
+    fixtures: { positive: fixtures/RES-010.pos.json, negative: fixtures/RES-010.neg.json }
+    tags: [resilience, agentic, cascading-failure, budget]
+
+  # Containment needs somewhere to go. An architecture with two or more steerable agents and either edge devices or a
+  # critical component declares a group of kind isolation: the segment a compromised component is moved to or cut off
+  # in. The group is a declaration; the cut-off procedure is the evidence.
+  - id: RES-011
+    title: Agent fleet with no declared isolation segment
+    scope: graph
+    severity: low
+    condition: |
+      g.nodes("agent").filter(a, attr(a, "autonomy", "") in ["semi","autonomous"]).size() >= 2 &&
+      (g.has("edge_device") || g.nodes.exists(x, attr(x, "criticality", "") == "critical")) &&
+      !g.groups.exists(gr, gr.kind == "isolation")
+    message: "The architecture runs {{g.nodes('agent').filter(a, attr(a, 'autonomy', '') in ['semi','autonomous']).size()}} steerable agents beside edge devices or a critical component, but declares no isolation segment to move a compromised component into."
+    clauses: [NIS2:2024/2690:Annex-6.8, DORA:2022/2554:Art9, ISO:27001:A.8.22]
+    remediation: "Declare an isolation group (kind isolation): the network segment or account a compromised agent or device is moved into, and write down who triggers the move."
+    fixtures: { positive: fixtures/RES-011.pos.json, negative: fixtures/RES-011.neg.json }
+    tags: [resilience, containment, agentic, isolation]
+
+  - id: RES-012
+    title: Degraded mode without the agents never tested
+    scope: graph
+    severity: low
+    condition: |
+      attr(g, "degraded_mode_tested_at", "") == "" &&
+      g.nodes.exists(x, attr(x, "criticality", "") == "critical" &&
+        g.inEdges(x.id, "").exists(e, e.kind in ["writes","executes","calls"] && e.from.type == "agent"))
+    message: "An agent drives a critical component, but no test of the function running without its agents and model providers is recorded (degraded_mode_tested_at)."
+    clauses: [NIS2:2022/2555:Art21(2)(c), DORA:2022/2554:Art11, FINMA:2023/1:Rz-BCM, ISO:27001:A.5.30]
+    remediation: "Run the essential function with its agents and model providers switched off, at least yearly, and record the date (degraded_mode_tested_at); the test report is the evidence."
+    fixtures: { positive: fixtures/RES-012.pos.json, negative: fixtures/RES-012.neg.json }
+    tags: [resilience, continuity, agentic, testing]

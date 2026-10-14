@@ -33,6 +33,7 @@ var publishedSchemas = map[string][]byte{
 	CurrentSchemaVersion: modelschema.ModelSchema,
 	"1.0":                modelschema.ModelSchemaV10,
 	"1.1":                schemas.ModelV11,
+	"1.2":                schemas.ModelV12,
 }
 
 // PublishedSchemaVersions lists the versions SchemaDocument serves, oldest first.

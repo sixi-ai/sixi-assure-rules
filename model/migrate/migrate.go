@@ -27,7 +27,7 @@ import (
 )
 
 // Current is the schema version this build reads, writes and evaluates.
-const Current = "1.2"
+const Current = "1.3"
 
 // Unversioned is the version of a document that carries no `schema_version`: every model written
 // before ADR-040 §1 shipped.
@@ -59,6 +59,9 @@ var steps = []Step{
 	{From: "1.1", To: "1.2", Note: "the framework vocabulary (ADR-093 M1) is additive: nothing changes on a model whose values are in the 1.2 type profiles; " +
 		"the tolerant reading of the 1.0 shapes runs as on a current document; an agent.kind outside llm/orchestrator, a boolean tool.egress_policy, " +
 		"and an agent or agent_memory hosted_on that names no node, the node itself or a note are removed (with x_migrated_from and their provenance entries)", Fn: v11to12},
+	{From: "1.2", To: "1.3", Note: "the containment and continuity vocabulary (ADR-105) is additive: the model_artifact node type, the isolation group kind, " +
+		"five capabilities, agent max_instances, kill_switch_identity and agent_role, edge-device debug, credential and accelerator facts, " +
+		"and two architecture attributes; nothing in a 1.2 model changes but schema_version", Fn: v12to13},
 }
 
 // Steps returns a copy of the ordered migration list.

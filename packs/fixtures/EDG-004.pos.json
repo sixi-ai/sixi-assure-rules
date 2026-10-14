@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.3",
+  "id": "arch_fx_edg_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture EDG-004 (pos)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "CRA",
+      "NIS2"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_d1",
+      "type": "edge_device",
+      "name": "Camera 1",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm"
+      }
+    },
+    {
+      "id": "n_d2",
+      "type": "edge_device",
+      "name": "Camera 2",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_d1",
+      "to": "n_d2",
+      "kind": "calls",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

@@ -158,7 +158,7 @@ func (e *Engine) runRule(ctx context.Context, r *Rule, g *graphVal, tenant, kb m
 	ctx, cancel := context.WithTimeout(ctx, e.ruleTimeout)
 	defer cancel()
 	var out []model.Finding
-	err := forEachElement(r, g, func(elementID string, vars map[string]any) error {
+	err := forEachElement(r, g, r.guards, func(elementID string, vars map[string]any) error {
 		vars["g"] = g
 		vars["tenant"] = tenant
 		vars["kb"] = kb
@@ -183,12 +183,16 @@ func (e *Engine) runRule(ctx context.Context, r *Rule, g *graphVal, tenant, kb m
 }
 
 // forEachElement calls fn for every element of the rule's scope with a fresh activation holding the scope variable:
-// each node (n), each edge (e), or the architecture once (graph scope, element id = the architecture id).
-func forEachElement(r *Rule, g *graphVal, fn func(elementID string, vars map[string]any) error) error {
+// each node (n), each edge (e), or the architecture once (graph scope, element id = the architecture id). An element
+// the guards exclude (typeGuard) is skipped; coverage passes none, so it visits every element.
+func forEachElement(r *Rule, g *graphVal, guards []typeGuard, fn func(elementID string, vars map[string]any) error) error {
 	switch r.Scope {
 	case ScopeNode:
 		for _, n := range g.nodes {
 			nm := n.(map[string]any)
+			if excludes(guards, nm) {
+				continue
+			}
 			if err := fn(nm["id"].(string), map[string]any{"n": nm}); err != nil {
 				return err
 			}
@@ -196,6 +200,9 @@ func forEachElement(r *Rule, g *graphVal, fn func(elementID string, vars map[str
 	case ScopeEdge:
 		for _, ed := range g.edges {
 			em := ed.(map[string]any)
+			if excludes(guards, em) {
+				continue
+			}
 			if err := fn(em["id"].(string), map[string]any{"e": em}); err != nil {
 				return err
 			}
@@ -223,7 +230,7 @@ func (e *Engine) coverRule(ctx context.Context, r *Rule, g *graphVal, tenant, kb
 	}
 	decided := len(hits)
 	if len(r.required) == 0 {
-		_ = forEachElement(r, g, func(id string, _ map[string]any) error {
+		_ = forEachElement(r, g, nil, func(id string, _ map[string]any) error {
 			if !hits[id] {
 				decided++
 			}
@@ -234,7 +241,7 @@ func (e *Engine) coverRule(ctx context.Context, r *Rule, g *graphVal, tenant, kb
 	ctx, cancel := context.WithTimeout(ctx, e.ruleTimeout)
 	defer cancel()
 	var notChecked []string
-	_ = forEachElement(r, g, func(id string, vars map[string]any) error {
+	_ = forEachElement(r, g, nil, func(id string, vars map[string]any) error {
 		if hits[id] {
 			return nil
 		}

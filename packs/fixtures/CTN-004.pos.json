@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.3",
+  "id": "arch_fx_ctn_004_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture CTN-004 (pos)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "AIACT",
+      "OWASP"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_agent",
+      "type": "agent",
+      "name": "Fixture agent",
+      "layer": "ai",
+      "source": "design",
+      "attrs": {
+        "identity": "agent_id",
+        "autonomy": "semi",
+        "purpose": "Fixture agent for the ADR-105 rules.",
+        "owner": "Fixture owner",
+        "egress_policy": "default_allow"
+      }
+    },
+    {
+      "id": "n_w",
+      "type": "model_artifact",
+      "name": "Fine-tuned weights",
+      "layer": "data",
+      "source": "design",
+      "attrs": {
+        "integrity": "signed",
+        "network_exposure": "private"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n_agent",
+      "to": "n_w",
+      "kind": "reads",
+      "protocol": "https",
+      "auth": "managed_identity",
+      "encryption": "tls",
+      "attrs": {}
+    }
+  ],
+  "findings": [],
+  "evidence": []
+}

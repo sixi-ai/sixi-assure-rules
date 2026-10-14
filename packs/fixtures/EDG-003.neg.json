@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.3",
+  "id": "arch_fx_edg_003_neg",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture EDG-003 (neg)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "CRA",
+      "NIS2"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_dev",
+      "type": "edge_device",
+      "name": "Camera",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "ota_signed": true
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}
