@@ -45,6 +45,9 @@ type Options struct {
 	Now time.Time
 	// Tool names the command in the output ("assure verify", "assure-check verify").
 	Tool string
+	// SignatureFile is a detached signature (-signature): Path is then any file it signs (a board summary's PDF, an
+	// exit bundle's zip), checked against it and nothing else (detached.go).
+	SignatureFile string
 }
 
 // Run verifies one input. An error is an input it cannot read at all (ErrInput) or an unreadable
@@ -57,6 +60,9 @@ func Run(ctx context.Context, o Options) (*Report, error) {
 	tool := o.Tool
 	if tool == "" {
 		tool = "assure verify"
+	}
+	if o.SignatureFile != "" {
+		return runDetached(o, now, tool)
 	}
 	src, err := open(o.Path)
 	if err != nil {

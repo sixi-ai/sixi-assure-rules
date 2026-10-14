@@ -155,6 +155,8 @@ const (
 	KindChain     = "chain_export"
 	KindBundleDir = "bundle_directory"
 	KindBundleZip = "bundle_zip"
+	// KindSignedFile is any file checked against a detached signature (-signature).
+	KindSignedFile = "signed_file"
 )
 
 func (r *Report) add(section, name string, st Status, format string, a ...any) {
