@@ -36,6 +36,19 @@ comma-separated) names reanchor receipts kept elsewhere (below). Exit codes: `0`
 Every line is `pass`, `FAIL`, `NOT CHECKED`, `FLAG` or `info`. A check whose input is absent says
 **"not present in this input"** and is never counted as passed.
 
+## Verify one signed file (a board summary)
+
+```bash
+# board.pdf.sig        the file's detached signature (GET /org/board-summaries/{id}/signature), saved beside it
+# evidence-keys.json   the organisation's GET /evidence/keys, saved from the product
+assure-check verify --signature board.pdf.sig --keys evidence-keys.json board.pdf
+```
+
+`--signature` checks any file the organisation signed — a board summary's PDF, an exit bundle's zip — against its
+detached signature and the key list, and nothing else: the file's sha256, the Ed25519 signature over the versioned
+message, the key it names, and the signing time inside the key's validity window. What the file says is not read.
+Without `--keys` the signature is not checked against a key and the line says so.
+
 ## The bundle
 
 | Member | What the verifier does with it |
