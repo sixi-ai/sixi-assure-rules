@@ -22,8 +22,8 @@ Three properties hold throughout, and they are the reason this repository exists
 Canvas views, assurance exports and patch proposals are projections of this same typed
 model, and any assistant may only *propose* JSON Patches that a person reviews and accepts.
 
-**Today: 88 rules in 16 packs, grouped into 19 causes · 383 clause records across 23 regimes ·
-14 golden models with expected findings · 180 rule fixtures.**
+**Today: 287 rules in 37 packs, grouped into 32 causes · 459 clause records across 24 regimes ·
+56 golden models with expected findings · 631 rule fixtures.**
 
 Related, and a different job: [`radeksixi/sixi-scanner`](https://github.com/radeksixi/sixi-scanner)
 red-teams a live LLM agent endpoint, where this repository assesses the
