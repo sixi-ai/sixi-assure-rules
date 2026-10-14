@@ -44,12 +44,14 @@ func Main(tool string, args []string, stdout, stderr io.Writer) int {
 		}
 		return nil
 	})
+	fs.StringVar(&o.SignatureFile, "signature", "", "detached signature (.sig) of the input: any signed file (a board summary's PDF, an exit bundle's zip) is checked against it and the key list")
 	fs.BoolVar(&o.AllowPackMismatch, "allow-pack-mismatch", false, "re-run the rules even when the packs' combined hash is not the report's; prints the per-pack diff")
 	fs.BoolVar(&strict, "strict", false, "exit 1 when a check could not be made because its input is not present")
 	fs.BoolVar(&asJSON, "json", false, "print the verification as JSON")
 	fs.StringVar(&now, "at", "", "verification time, RFC 3339 (default now): the long-term rule checks the authorities' chains at it")
 	fs.Usage = func() {
-		_, _ = fmt.Fprintf(stderr, "usage: %s [flags] <report.json | spot-check.json | chain.json | bundle directory | bundle.zip>\n\n"+
+		_, _ = fmt.Fprintf(stderr, "usage: %s [flags] <report.json | spot-check.json | chain.json | bundle directory | bundle.zip>\n"+
+			"       %[1]s -signature <file>.sig -keys keys.json <file>\n\n"+
 			"Verifies offline, with no account and no network: chain hashes from genesis, signatures against their key and its\n"+
 			"validity window, RFC 3161 anchors and their certificate chains, the rule packs' hash, and the findings re-run on\n"+
 			"the embedded snapshot. Exit 0: no check failed; 1: a check failed; 2: usage or unreadable input.\n\n", tool)
