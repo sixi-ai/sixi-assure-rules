@@ -26,7 +26,7 @@ func TestSchemaFileNamesTheCurrentVersion(t *testing.T) {
 		} `json:"properties"`
 	}
 	require.NoError(t, json.Unmarshal(modelschema.ModelSchema, &doc))
-	assert.Equal(t, "https://schema.sixi.ai/model/1.2/model.schema.json", doc.ID)
+	assert.Equal(t, "https://schema.sixi.ai/model/1.3/model.schema.json", doc.ID)
 	assert.Equal(t, SchemaID(CurrentSchemaVersion), doc.ID, "the file's $id is the published URL of the current version")
 	sv, ok := doc.Properties["schema_version"]
 	require.True(t, ok, "schema_version is a root member")
@@ -68,6 +68,29 @@ func TestSchemaFileNamesTheCurrentVersion(t *testing.T) {
 	assert.Contains(t, v11.Properties, "identities")
 	assert.NotContains(t, v11.Defs.GroupKind.Enum, "workflow", "the 1.1 file is the one 1.1 published, not a copy of 1.2")
 	assert.NotContains(t, v11.Defs.NodeAttrs.Properties, "framework")
+
+	// The published 1.2 file stays as it was served too, without the 1.3 containment vocabulary
+	// (ADR-105).
+	var v12 struct {
+		ID         string `json:"$id"`
+		Properties map[string]struct {
+			Const string `json:"const"`
+		} `json:"properties"`
+		Defs struct {
+			GroupKind struct {
+				Enum []string `json:"enum"`
+			} `json:"groupKind"`
+			NodeType struct {
+				Enum []string `json:"enum"`
+			} `json:"nodeType"`
+		} `json:"$defs"`
+	}
+	require.NoError(t, json.Unmarshal(schemas.ModelV12, &v12))
+	assert.Equal(t, "https://schema.sixi.ai/model/1.2/model.schema.json", v12.ID)
+	assert.Equal(t, "1.2", v12.Properties["schema_version"].Const)
+	assert.Contains(t, v12.Defs.GroupKind.Enum, "workflow")
+	assert.NotContains(t, v12.Defs.GroupKind.Enum, "isolation", "the 1.2 file is the one 1.2 published, not a copy of 1.3")
+	assert.NotContains(t, v12.Defs.NodeType.Enum, "model_artifact")
 }
 
 func TestSchemaIDsAndDocuments(t *testing.T) {
@@ -81,8 +104,9 @@ func TestSchemaIDsAndDocuments(t *testing.T) {
 		{"https://sixi.ai/schemas/model.schema.json", "1.0", true}, // the pre-1.0 id, an alias of 1.0
 		{"https://schema.sixi.ai/model/1.1/model.schema.json", "1.1", true},
 		{"https://schema.sixi.ai/model/1.2/model.schema.json", "1.2", true},
+		{"https://schema.sixi.ai/model/1.3/model.schema.json", "1.3", true},
 		{"https://schema.sixi.ai/model/0.9/model.schema.json", "", false},
-		{"https://schema.sixi.ai/model/1.3/model.schema.json", "", false},
+		{"https://schema.sixi.ai/model/1.4/model.schema.json", "", false},
 		{"", "", false},
 	} {
 		got, ok := SchemaVersionOfID(tc.id)
@@ -99,7 +123,11 @@ func TestSchemaIDsAndDocuments(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, schemas.ModelV11, b, "the 1.1 file is still served")
 	assert.NotEqual(t, modelschema.ModelSchema, b, "not the current file")
-	assert.Equal(t, []string{"1.0", "1.1", "1.2"}, PublishedSchemaVersions())
+	b, ok = SchemaDocument("1.2")
+	require.True(t, ok)
+	assert.Equal(t, schemas.ModelV12, b, "the 1.2 file is still served")
+	assert.NotEqual(t, modelschema.ModelSchema, b, "not the current file")
+	assert.Equal(t, []string{"1.0", "1.1", "1.2", "1.3"}, PublishedSchemaVersions())
 	for _, v := range PublishedSchemaVersions() {
 		doc, ok := SchemaDocument(v)
 		require.True(t, ok, v)
@@ -109,7 +137,7 @@ func TestSchemaIDsAndDocuments(t *testing.T) {
 		require.NoError(t, json.Unmarshal(doc, &head))
 		assert.Equal(t, SchemaID(v), head.ID, "the file served at %s carries its own $id", v)
 	}
-	for _, v := range []string{"0.9", "1.3", "2.0", "", "latest"} {
+	for _, v := range []string{"0.9", "1.4", "2.0", "", "latest"} {
 		_, ok := SchemaDocument(v)
 		assert.False(t, ok, v)
 	}
@@ -134,7 +162,7 @@ func TestValidateJSONUpgradesOnRead(t *testing.T) {
 		{"explicit 0.9 upgrades", with(`"0.9"`), ""},
 		{"explicit 1.0 upgrades", with(`"1.0"`), ""},
 		{"explicit 1.1 upgrades", with(`"1.1"`), ""},
-		{"newer is refused", with(`"1.3"`), "/schema_version"},
+		{"newer is refused", with(`"1.4"`), "/schema_version"},
 		{"unknown older is refused", with(`"0.1"`), "/schema_version"},
 		{"free text is refused", with(`"one"`), "/schema_version"},
 		{"a number is refused", with(`1.0`), "/schema_version"},

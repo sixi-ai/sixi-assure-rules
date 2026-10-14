@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schema.sixi.ai/model/1.2/model.schema.json",
+  "$id": "https://schema.sixi.ai/model/1.3/model.schema.json",
   "title": "Sixi Assure architecture model",
   "description": "Typed graph model (docs/02). Single source of truth; Go validation and Zod schemas derive from this file. Invariants that JSON Schema cannot express are listed in $comment and enforced in the model package.",
-  "$comment": "Server-enforced invariants (docs/02 §4): (1) edge endpoints reference existing node ids; (2) no self-loops except agent→agent 'delegates' with auth=obo; (3) a node belongs to at most one zone group (node.zone must match the zone group listing it) and may belong to many trust boundaries; (4) source=observed nodes are read-only; (5) region attrs must be known Azure regions or a generic region code; (6) findings and evidence reference existing ids; (7) ids are unique across nodes, edges, groups, findings and identities; (8) a node's attrs.identity_id names an entry of identities[] and an identity's registry names an agent_registry node (schema 1.1); (9) every provenance key resolves to a model element, member or attribute, and the sidecar is written by the server alone (ADR-086, schema 1.1); (10) an agent's or agent_memory's attrs.hosted_on names another existing node (schema 1.2, ADR-093 SD-2); (11) an edge attribute annotated 'x-edge-kinds' is set only on an edge of those kinds and a group attribute annotated 'x-group-kinds' only on a group of those kinds (schema 1.2: the delegation attributes on delegates, the flow-group attributes on flows, the workflow bounds on workflow groups). 'x-required-attrs' lists attributes that must be completed for inventory purposes — their absence is reported by rules (e.g. AI-005), not rejected by validation. 'x-required-unless' (schema 1.1) names a required attribute another declared attribute replaces: an agent that declares identity_id no longer needs the deprecated identity string. 'x-attr-values' (schema 1.1) narrows an attribute the flat nodeAttrs set shares between types to the values one type accepts (e.g. gateway.kind vs agent_registry.kind, edge_device egress_policy boolean vs agent egress_policy enum); enforced in Go.",
+  "$comment": "Server-enforced invariants (docs/02 §4): (1) edge endpoints reference existing node ids; (2) no self-loops except agent→agent 'delegates' with auth=obo; (3) a node belongs to at most one zone group (node.zone must match the zone group listing it) and may belong to many trust boundaries; (4) source=observed nodes are read-only; (5) region attrs must be known Azure regions or a generic region code; (6) findings and evidence reference existing ids; (7) ids are unique across nodes, edges, groups, findings and identities; (8) a node's attrs.identity_id names an entry of identities[] and an identity's registry names an agent_registry node (schema 1.1); (9) every provenance key resolves to a model element, member or attribute, and the sidecar is written by the server alone (ADR-086, schema 1.1); (10) an agent's or agent_memory's attrs.hosted_on names another existing node (schema 1.2, ADR-093 SD-2); (11) an edge attribute annotated 'x-edge-kinds' is set only on an edge of those kinds and a group attribute annotated 'x-group-kinds' only on a group of those kinds (schema 1.2: the delegation attributes on delegates, the flow-group attributes on flows, the workflow bounds on workflow groups); (12) an agent's attrs.kill_switch_identity names an entry of identities[] other than the agent's own identity_id (schema 1.3, ADR-105). 'x-required-attrs' lists attributes that must be completed for inventory purposes — their absence is reported by rules (e.g. AI-005), not rejected by validation. 'x-required-unless' (schema 1.1) names a required attribute another declared attribute replaces: an agent that declares identity_id no longer needs the deprecated identity string. 'x-attr-values' (schema 1.1) narrows an attribute the flat nodeAttrs set shares between types to the values one type accepts (e.g. gateway.kind vs agent_registry.kind, edge_device egress_policy boolean vs agent egress_policy enum); enforced in Go.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -21,7 +21,7 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "1.2",
+      "const": "1.3",
       "description": "Schema version the model follows (ADR-040 §1, docs/02 §Versions), MAJOR.MINOR. Optional on input: a model without it is 0.9 and is upgraded on read; the server writes the current version whenever it saves or returns a model.",
       "$comment": "MINOR adds optional attributes, enum values or node types; MAJOR renames or removes. Older versions are upgraded on read by the model package/migrate, never validated against this file."
     },
@@ -159,6 +159,7 @@
         "agent_registry",
         "credential_broker",
         "external_agent",
+        "model_artifact",
         "note"
       ]
     },
@@ -271,7 +272,8 @@
         "site",
         "tenant",
         "jurisdiction",
-        "workflow"
+        "workflow",
+        "isolation"
       ]
     },
     "regime": {
@@ -350,7 +352,7 @@
       ]
     },
     "capabilities": {
-      "$comment": "Declared capability classes of a tool or MCP server (docs/02 §3). Design-time declaration by the architect, never observed.",
+      "$comment": "Declared capability classes of a tool or MCP server (docs/02 §3). Design-time declaration by the architect, never observed. Schema 1.3 (ADR-105): the self-propagation capabilities provisions_compute, deploys_code, creates_identity and spawns_agents, and transfers_model_artifact (moves model weights).",
       "type": "array",
       "maxItems": 20,
       "uniqueItems": true,
@@ -364,12 +366,17 @@
           "sends_message",
           "modifies_state",
           "reads_secrets",
-          "deserializes_input"
+          "deserializes_input",
+          "provisions_compute",
+          "deploys_code",
+          "creates_identity",
+          "spawns_agents",
+          "transfers_model_artifact"
         ]
       }
     },
     "integrity": {
-      "$comment": "How the tool or MCP server definition is fixed against later change (rug pull).",
+      "$comment": "How the tool or MCP server definition is fixed against later change (rug pull); on a model_artifact (schema 1.3), how the stored weights are fixed.",
       "type": "string",
       "enum": [
         "",
@@ -768,6 +775,16 @@
         "dr_tested_at": {
           "type": "string",
           "maxLength": 40
+        },
+        "degraded_mode_tested_at": {
+          "type": "string",
+          "maxLength": 40,
+          "$comment": "schema 1.3 (ADR-105): when the essential function was last run with its agents and model providers switched off (manual or degraded mode)"
+        },
+        "max_blast_radius": {
+          "type": "integer",
+          "minimum": 1,
+          "$comment": "schema 1.3 (ADR-105): the most acting components (agents, tools, MCP servers, edge devices) a single compromised agent may reach; absent = no policy"
         },
         "external_ref": {
           "$ref": "#/$defs/shortText"
@@ -1271,6 +1288,22 @@
             "properties": {
               "attrs": {
                 "$ref": "#/$defs/attrs/external_agent"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "model_artifact"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attrs": {
+                "$ref": "#/$defs/attrs/model_artifact"
               }
             }
           }
@@ -2023,6 +2056,51 @@
           "minimum": 0,
           "$comment": "ADR-093 FS-04: longest run, in seconds; absent = undeclared, 0 = unbounded"
         },
+        "max_instances": {
+          "type": "integer",
+          "minimum": 0,
+          "$comment": "schema 1.3 (ADR-105): most copies of the agent that may run at once, spawned ones included; absent = undeclared, 0 = unbounded"
+        },
+        "kill_switch_identity": {
+          "$ref": "#/$defs/id",
+          "$comment": "schema 1.3 (ADR-105): id of the identities[] entry that operates the agent's kill switch; must differ from the agent's own identity_id (checked in Go)"
+        },
+        "agent_role": {
+          "type": "string",
+          "enum": [
+            "",
+            "business",
+            "security_operations",
+            "it_operations"
+          ],
+          "$comment": "schema 1.3 (ADR-105): what the agent is for; security_operations marks a defensive agent (triage, quarantine, block)"
+        },
+        "default_credentials": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "schema 1.3 (ADR-105): the device ships with, or still uses, a default or shared factory credential"
+        },
+        "debug_interface": {
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "adb",
+            "ssh",
+            "telnet",
+            "jtag",
+            "serial",
+            "other"
+          ],
+          "$comment": "schema 1.3 (ADR-105): the debug or maintenance interface the device exposes"
+        },
+        "debug_auth": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "schema 1.3 (ADR-105): the debug interface requires authentication"
+        },
+        "accelerator": {
+          "$ref": "#/$defs/boolish",
+          "$comment": "schema 1.3 (ADR-105): the device carries an AI accelerator (GPU, NPU) able to run a model"
+        },
         "guardrails": {
           "$ref": "#/$defs/guardrails"
         },
@@ -2143,7 +2221,10 @@
           "definition_source",
           "config_imports_code",
           "config_env_access",
-          "hosted_on"
+          "hosted_on",
+          "max_instances",
+          "kill_switch_identity",
+          "agent_role"
         ],
         "x-attr-values": {
           "egress_policy": [
@@ -2385,7 +2466,12 @@
           "safety_function",
           "self_evolving",
           "conformity_route",
-          "identity_id"
+          "identity_id",
+          "default_credentials",
+          "debug_interface",
+          "debug_auth",
+          "accelerator",
+          "network_exposure"
         ],
         "x-attr-values": {
           "egress_policy": [
@@ -2591,6 +2677,20 @@
           "inbound_auth",
           "region",
           "region_name"
+        ]
+      },
+      "model_artifact": {
+        "$comment": "schema 1.3 (ADR-105): stored model weights or a model registry; a weight-carrying replicator needs only a copy",
+        "x-required-attrs": [],
+        "x-optional-attrs": [
+          "integrity",
+          "network_exposure",
+          "data_class",
+          "owner",
+          "version",
+          "region",
+          "region_name",
+          "environment"
         ]
       }
     },

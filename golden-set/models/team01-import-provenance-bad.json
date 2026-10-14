@@ -3,7 +3,7 @@
   "tenant_id": "tenant_templates",
   "name": "Payments back office imported from a Terraform plan (gaps)",
   "version": 1,
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "attrs": {
     "owner": "Head of Platform Engineering",
     "description": "A payments back office imported from its Terraform plan: a public web front, an API gateway, an orders API with its components, two stores and a private endpoint; the provenance sidecar records the plan it was read from.",

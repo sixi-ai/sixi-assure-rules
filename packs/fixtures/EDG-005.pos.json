@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.3",
+  "id": "arch_fx_edg_005_pos",
+  "tenant_id": "tenant_fixtures",
+  "name": "Fixture EDG-005 (pos)",
+  "version": 1,
+  "attrs": {
+    "owner": "Fixture owner",
+    "regimes": [
+      "CRA",
+      "NIS2"
+    ]
+  },
+  "groups": [],
+  "nodes": [
+    {
+      "id": "n_dev",
+      "type": "edge_device",
+      "name": "Camera",
+      "layer": "edge",
+      "source": "design",
+      "attrs": {
+        "site": "Plant A",
+        "attestation": "tpm",
+        "accelerator": true,
+        "network_exposure": "public"
+      }
+    }
+  ],
+  "edges": [],
+  "findings": [],
+  "evidence": []
+}

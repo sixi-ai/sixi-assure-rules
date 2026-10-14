@@ -1,0 +1,62 @@
+[
+  {
+    "rule_id": "BLR-001",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "CTN-001",
+    "ids": [
+      "e_orch_scale"
+    ]
+  },
+  {
+    "rule_id": "CTN-002",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "CTN-003",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "CTN-004",
+    "ids": [
+      "n_weights"
+    ]
+  },
+  {
+    "rule_id": "CTN-005",
+    "ids": [
+      "n_weights"
+    ]
+  },
+  {
+    "rule_id": "CTN-006",
+    "ids": [
+      "n_orch"
+    ]
+  },
+  {
+    "rule_id": "CTN-006",
+    "ids": [
+      "n_w_draft"
+    ]
+  },
+  {
+    "rule_id": "CTN-006",
+    "ids": [
+      "n_w_research"
+    ]
+  },
+  {
+    "rule_id": "CTN-007",
+    "ids": [
+      "e_draft_fw"
+    ]
+  }
+]

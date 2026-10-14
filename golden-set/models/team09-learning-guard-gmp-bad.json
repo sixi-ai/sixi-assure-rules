@@ -461,7 +461,7 @@
       "zone": "g_site_it"
     }
   ],
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "tenant_id": "tenant_templates",
   "version": 1
 }

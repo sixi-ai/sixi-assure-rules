@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "identities": [
     {"id": "ident_agent_id", "name": "Agent identity (agent_id)", "kind": "agent_identity", "attrs": {"x_migrated_from": "agent.identity=agent_id"}},
     {"id": "ident_user_impersonation", "name": "User impersonation", "kind": "user_account", "attrs": {"x_migrated_from": "agent.identity=user_impersonation"}}

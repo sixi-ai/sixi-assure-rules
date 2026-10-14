@@ -1,0 +1,32 @@
+[
+  {
+    "rule_id": "RES-008",
+    "ids": [
+      "n_schedule"
+    ]
+  },
+  {
+    "rule_id": "RES-009",
+    "ids": [
+      "n_console"
+    ]
+  },
+  {
+    "rule_id": "RES-010",
+    "ids": [
+      "n_scheduler"
+    ]
+  },
+  {
+    "rule_id": "RES-011",
+    "ids": [
+      "arch_demo_water_dispatch_bad"
+    ]
+  },
+  {
+    "rule_id": "RES-012",
+    "ids": [
+      "arch_demo_water_dispatch_bad"
+    ]
+  }
+]

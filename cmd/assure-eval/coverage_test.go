@@ -45,7 +45,10 @@ import (
 // docs/18 WS-M M3 and M5 (ADR-093) add the five framework pairs fw-{langgraph,ms-agent-framework,foundry-agent-service,
 // google-adk,openai-agents}{,-bad} (schema 1.2 native, regimes OWASP and AIACT): each clean twin is a blueprint template
 // of the gallery (arch_tpl_fw_*), each bad twin (arch_gs_fw_*_bad) exercises the fw pack.
-const goldenModelCount = 50
+// ADR-105 adds soc-containment, edge-fleet-containment and water-dispatch {,-bad} (schema 1.3 native): each clean
+// twin is a gallery template (arch_tpl_*), each bad twin an example (arch_demo_*), and together they exercise the
+// ctn and edg packs and RES-008 to RES-012.
+const goldenModelCount = 56
 
 // packsNotInGoldenModels are packs no hand-authored golden model can exercise, with the reason
 // and where they are covered instead. Every entry is a deliberate gap: keep this list empty

@@ -1,15 +1,15 @@
 {
   "schema": "sixi-assure/golden-set-result/v1",
-  "run_date": "2026-10-02",
-  "catalog_hash": "9b3d615502eb6cb4ee75e3f98c899d0d6b42c274f92253c340ef5f4f29eb9d2d",
+  "run_date": "2026-10-13",
+  "catalog_hash": "95ff7aed97e9fc3845f75d73b317a840e8638a7562d9683ed097c47d5ed73db2",
   "thresholds": {
     "precision": 0.9,
     "recall": 0.85
   },
-  "models": 50,
-  "rules": 270,
+  "models": 56,
+  "rules": 287,
   "authors": {
-    "rule-authors": 404
+    "rule-authors": 427
   },
   "by_pack": [
     {
@@ -92,7 +92,7 @@
       "pack": "blr",
       "version": "0.1.0",
       "hash": "32f7369a7e7cee46652813a46426059e4354bdab9267beabdca417255148a278",
-      "tp": 4,
+      "tp": 5,
       "fp": 0,
       "fn": 0,
       "precision": 1,
@@ -127,6 +127,18 @@
       "unexercised_rules": []
     },
     {
+      "pack": "ctn",
+      "version": "0.1.0",
+      "hash": "dd2ad87497347020a56bcf813680bec4491599eeca75e1b7a915de937ff4f0c7",
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 7,
+      "unexercised_rules": []
+    },
+    {
       "pack": "data",
       "version": "0.4.0",
       "hash": "ba7f7c09fbdfd3ce1ac6c972bbb828cd0108747d10275f94c420d019c19d9142",
@@ -158,6 +170,18 @@
         "DRF-007",
         "DRF-008"
       ]
+    },
+    {
+      "pack": "edg",
+      "version": "0.1.0",
+      "hash": "27441314329d84cec5b3018fe6a5be3735dabdfcc3163ab97fac5f1c9b100613",
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "rules": 5,
+      "unexercised_rules": []
     },
     {
       "pack": "evd",
@@ -395,14 +419,14 @@
     },
     {
       "pack": "res",
-      "version": "0.2.0",
-      "hash": "8914a644fe525f10b3f2ae330d0cdd24a630f848243abe4d6b923d2dbc249cdd",
-      "tp": 12,
+      "version": "0.3.0",
+      "hash": "a2b9a5ac525c2bd4785f4b9e318c26eacbd87d4b59994f42aa84203a71d29fe7",
+      "tp": 19,
       "fp": 0,
       "fn": 0,
       "precision": 1,
       "recall": 1,
-      "rules": 7,
+      "rules": 12,
       "unexercised_rules": []
     },
     {

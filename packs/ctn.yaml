@@ -1,0 +1,154 @@
+# CTN — containment by design (ADR-105 proposal, docs/research/09-agent-swarms-2026.md). Deterministic CEL over what
+# the architect declares about how an agent could multiply, what it could carry off and who stops it, read from the
+# behaviours of self-replicating agents in Anthropic's Frontier Red Team report (2026-10-12): acquiring compute, code,
+# identities or other agents; spreading without a ceiling; no central point to shut off; carrying model weights away.
+# Assure assesses the design; it never watches traffic, finds devices or acts on a system (CLAUDE.md §1.6).
+#
+# One fact raises one finding. The research note's planned key-theft rule is BLR-002 (a steered agent that reads
+# secrets and reaches an unguarded outbound channel), the "notes between generations" rule is MEM-004 and MEM-005
+# (an agent writes its own memory, with no secret guard), delegation depth is DLG-001, and default-allow agent egress
+# is SEG-010: none is repeated here. A tool that declares a self-propagation capability and also modifies state or
+# executes code is read by CTN-001 and, for an autonomous agent, by HOV-003 or AGT-006 too: the capabilities are
+# separate declarations and the remedy (an approval step) closes all of them at once.
+#
+# The autonomy-blast-radius steward owns the pack (agents/swarm/README.md §3).
+pack: ctn
+version: 0.1.0
+regimes: [AIACT, OWASP, MAESTRO, NIS2, DORA, FINMA, ISO, NIST]
+offer: agentic
+rules:
+  # All paths (ADR-088 §1), as AGT-006: the hop into the self-propagating tool fires when a semi-autonomous or
+  # autonomous agent reaches its source by some walk that enters no human step, and the source is not one itself.
+  - id: CTN-001
+    title: Agent can acquire compute, code, identities or agents with no approval step
+    scope: edge
+    severity: high
+    condition: |
+      e.to.type in ["tool","mcp_server"] &&
+      attr(e.to, "capabilities", []).exists(c, c in ["provisions_compute","deploys_code","creates_identity","spawns_agents"]) &&
+      e.from.type != "human_step" &&
+      g.upstreamAvoiding(e.from.id, ["human_step"], []).exists(a, a.type == "agent" && attr(a, "autonomy", "") in ["semi","autonomous"])
+    message: "{{e.from.name}} reaches {{e.to.name}}, which can {{attr(e.to, 'capabilities', []).filter(c, c in ['provisions_compute','deploys_code','creates_identity','spawns_agents']).map(c, c == 'provisions_compute' ? 'provision compute' : (c == 'deploys_code' ? 'deploy code' : (c == 'creates_identity' ? 'create identities' : 'start agents'))).join(', ')}}, on a path from a steerable agent that passes no human approval: a hijacked agent can make more of itself."
+    clauses: [AIACT:2024/1689:Art14, OWASP:AgenticTop10:ASI10, OWASP:LLMTop10:LLM06, MAESTRO:L3]
+    remediation: "Put a human approval step before every call that provisions compute, deploys code, creates an identity or starts an agent, or replace the tool with one that does a bounded, pre-approved operation."
+    patch_template:
+      - { op: add, path: "/nodes/-", value: { id: "{{new:hs}}", type: human_step, name: "Approval before the agent multiplies", layer: human, attrs: { role: operations } } }
+      - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:hs}}" }
+      - { op: add, path: "/edges/-", value: { id: "{{new:e}}", from: "{{new:hs}}", to: "{{e.to.id}}", kind: "{{e.kind}}", auth: managed_identity, encryption: tls, attrs: { logged: true } } }
+    fixtures: { positive: fixtures/CTN-001.pos.json, negative: fixtures/CTN-001.neg.json }
+    tags: [agentic, containment, self-propagation, human-approval]
+
+  # An agent that can start agents (directly, through a tool that declares spawns_agents) declares how many copies may
+  # run at once: absent is undeclared and 0 is unbounded, and both are the finding, so the rule takes no requires.
+  - id: CTN-002
+    title: Agent that can start agents declares no instance ceiling
+    scope: node
+    severity: high
+    condition: |
+      n.type == "agent" &&
+      g.outEdges(n.id, "").exists(x, x.to.type in ["tool","mcp_server"] && "spawns_agents" in attr(x.to, "capabilities", [])) &&
+      attr(n, "max_instances", 0) == 0
+    message: "{{n.name}} can start agents, yet declares {{'max_instances' in n.attrs ? 'no ceiling (max_instances is 0)' : 'no instance ceiling'}}: nothing in the design bounds how far it multiplies."
+    clauses: [OWASP:AgenticTop10:ASI08, OWASP:LLMTop10:LLM10, AIACT:2024/1689:Art15(4)]
+    remediation: "Declare the most copies of the agent that may run at once (max_instances) and enforce it where the agents are started; a ceiling keeps one bad run from becoming many."
+    fixtures: { positive: fixtures/CTN-002.pos.json, negative: fixtures/CTN-002.neg.json }
+    tags: [agentic, containment, self-propagation, blast-radius]
+
+  # A kill switch is a claim (ARH): CTN-003 asks who holds it. The validator already refuses a kill_switch_identity that
+  # is the agent's own identity_id (schema 1.3 invariant 12); here the operator is another agent, so no person can stop
+  # the run. An agent that declares a kill switch but names no operator is a not_checked row (requires), never a finding:
+  # kill_switch_identity is new in 1.3 and its absence is an undeclared fact (ADR-088 §4).
+  - id: CTN-003
+    title: Kill switch operated by another agent
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(n, "kill_switch", false) &&
+      g.identities.exists(i, i.id == attr(n, "kill_switch_identity", "") && i.kind in ["agent_identity","agent_user_account"])
+    requires: [n.attrs.kill_switch_identity]
+    domain: 'n.type == "agent" && attr(n, "kill_switch", false)'
+    message: "{{n.name}}'s kill switch is operated by {{attr(n, 'kill_switch_identity', '')}}, an agent identity: a stop that another agent holds is not a stop a person controls, and a hijacked fleet can hold it too."
+    clauses: [AIACT:2024/1689:Art14, OWASP:AgenticTop10:ASI10, MAESTRO:L6]
+    remediation: "Give the kill switch to an identity a person holds (a user account or an on-call role) outside the agent fleet's trust boundary, and keep the stop procedure as the evidence."
+    fixtures: { positive: fixtures/CTN-003.pos.json, negative: fixtures/CTN-003.neg.json }
+    tags: [agentic, containment, kill-switch]
+
+  # A weight-carrying replicator needs only a copy. An agent reaches the weights on a walk that passes no model endpoint
+  # (an endpoint serves inferences, not its weights), and it is egress-capable when it does not declare a default-deny
+  # allow-list or reaches, in one hop, a tool or MCP server declaring network_egress or transfers_model_artifact.
+  - id: CTN-004
+    title: Model weights reachable by an agent that can send data out
+    scope: node
+    severity: high
+    condition: |
+      n.type == "model_artifact" &&
+      g.nodes("agent").exists(a, g.pathAvoiding(a.id, n.id, "llm_endpoint") &&
+        (attr(a, "egress_policy", "") != "default_deny_allowlist" ||
+         g.outEdges(a.id, "").exists(x, x.to.type in ["tool","mcp_server"] &&
+           attr(x.to, "capabilities", []).exists(c, c in ["network_egress","transfers_model_artifact"]))))
+    message: "{{n.name}} holds model weights that {{g.nodes('agent').filter(a, g.pathAvoiding(a.id, n.id, 'llm_endpoint') && (attr(a, 'egress_policy', '') != 'default_deny_allowlist' || g.outEdges(a.id, '').exists(x, x.to.type in ['tool','mcp_server'] && attr(x.to, 'capabilities', []).exists(c, c in ['network_egress','transfers_model_artifact'])))).map(a, a.name).join(', ')}} can reach while able to send data out: a hijacked agent can carry the model away."
+    clauses: [AIACT:2024/1689:Art15(5), OWASP:LLMTop10:LLM03, MAESTRO:L1]
+    remediation: "Keep model weights out of every agent's reach, or give each agent that reaches them a default-deny egress allow-list and no tool that sends data or moves model artifacts out."
+    fixtures: { positive: fixtures/CTN-004.pos.json, negative: fixtures/CTN-004.neg.json }
+    tags: [agentic, containment, model-weights, exfiltration]
+
+  - id: CTN-005
+    title: Model weights exposed publicly or not signed
+    scope: node
+    severity: high
+    condition: |
+      n.type == "model_artifact" &&
+      (attr(n, "network_exposure", "") == "public" || attr(n, "integrity", "signed") in ["none","pinned"])
+    requires: [n.attrs.integrity]
+    domain: 'n.type == "model_artifact"'
+    message: "{{n.name}} {{attr(n, 'network_exposure', '') == 'public' ? 'is exposed to the public network' : 'is not signed'}}{{attr(n, 'network_exposure', '') == 'public' && attr(n, 'integrity', 'signed') in ['none','pinned'] ? ' and is not signed' : ''}}: the weights can be copied, or replaced without detection."
+    clauses: [AIACT:2024/1689:Art15(5), OWASP:LLMTop10:LLM03, CRA:2024/2847:AnnexI-PtI-2(f)]
+    remediation: "Store model weights on a private network only (network_exposure=private) and sign them, checking the signature on every load (integrity=signed)."
+    fixtures: { positive: fixtures/CTN-005.pos.json, negative: fixtures/CTN-005.neg.json }
+    tags: [agentic, containment, model-weights, integrity]
+
+  # The R₀ ceiling of the design: the acting components (agents, tools, MCP servers, edge devices) one agent reaches
+  # over drawn edges, against the architecture's declared policy. No policy, no rule: the count is only a finding
+  # against a number the organisation chose.
+  - id: CTN-006
+    title: One agent reaches more acting components than the blast-radius policy allows
+    scope: node
+    severity: medium
+    condition: |
+      n.type == "agent" && attr(g, "max_blast_radius", 0) > 0 &&
+      cel.bind(reach,
+        g.nodes("agent").filter(x, x.id != n.id && g.reachable(n.id, x.id)).size() +
+        g.nodes("tool").filter(x, g.reachable(n.id, x.id)).size() +
+        g.nodes("mcp_server").filter(x, g.reachable(n.id, x.id)).size() +
+        g.nodes("edge_device").filter(x, g.reachable(n.id, x.id)).size(),
+        reach > attr(g, "max_blast_radius", 0))
+    message: "{{n.name}} reaches {{g.nodes('agent').filter(x, x.id != n.id && g.reachable(n.id, x.id)).size() + g.nodes('tool').filter(x, g.reachable(n.id, x.id)).size() + g.nodes('mcp_server').filter(x, g.reachable(n.id, x.id)).size() + g.nodes('edge_device').filter(x, g.reachable(n.id, x.id)).size()}} acting components (agents, tools, MCP servers, edge devices), more than the blast-radius policy of {{attr(g, 'max_blast_radius', 0)}}: one hijacked agent spreads further than the organisation accepts."
+    clauses: [OWASP:AgenticTop10:ASI08, AIACT:2024/1689:Art15(4), NIS2:2024/2690:Annex-6.8]
+    remediation: "Split the agent's reach: give it fewer tools, put a human step or a gateway between it and the rest of the fleet, or move devices behind a conduit, until one agent reaches no more than the policy allows."
+    fixtures: { positive: fixtures/CTN-006.pos.json, negative: fixtures/CTN-006.neg.json }
+    tags: [agentic, containment, blast-radius]
+
+  # A defensive agent (agent_role security_operations) that quarantines, blocks or reconfigures infrastructure is the
+  # most valuable agent to hijack. All paths, as AGT-006: the write into network, identity or device infrastructure fires
+  # when such an agent reaches its source by a walk that enters no human step. Tool targets stay HOV-003's. The walk
+  # runs only when the model has a defensive agent at all (perf-500 budget, docs/09).
+  - id: CTN-007
+    title: Defensive agent changes infrastructure with no approval step
+    scope: edge
+    severity: high
+    condition: |
+      e.kind in ["writes","executes"] &&
+      e.to.type in ["network","gateway","identity_provider","edge_device","edge_gateway","dmz","broker","secret_store"] &&
+      e.from.type != "human_step" &&
+      g.nodes("agent").exists(a, attr(a, "agent_role", "") == "security_operations") &&
+      g.upstreamAvoiding(e.from.id, ["human_step"], []).exists(a, a.type == "agent" &&
+        attr(a, "agent_role", "") == "security_operations" && attr(a, "autonomy", "") in ["semi","autonomous"])
+    message: "{{e.from.name}} {{e.kind}} {{e.to.name}} on a path from a defensive agent that passes no human approval: whoever hijacks the defender can quarantine, block or reconfigure the infrastructure it guards."
+    clauses: [AIACT:2024/1689:Art14, OWASP:AgenticTop10:ASI03, NIS2:2022/2555:Art21]
+    remediation: "Let the defensive agent propose the containment action and a person approve it (a human step before the write), or limit it to reversible, rate-limited actions on a declared isolation segment."
+    patch_template:
+      - { op: add, path: "/nodes/-", value: { id: "{{new:hs}}", type: human_step, name: "Approval before a containment action", layer: human, attrs: { role: security } } }
+      - { op: replace, path: "/edges/{{e.id}}/to", value: "{{new:hs}}" }
+      - { op: add, path: "/edges/-", value: { id: "{{new:e}}", from: "{{new:hs}}", to: "{{e.to.id}}", kind: "{{e.kind}}", auth: managed_identity, encryption: tls, attrs: { logged: true } } }
+    fixtures: { positive: fixtures/CTN-007.pos.json, negative: fixtures/CTN-007.neg.json }
+    tags: [agentic, containment, defensive-agent, human-approval]

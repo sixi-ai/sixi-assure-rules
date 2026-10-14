@@ -293,6 +293,14 @@ var nativeAtCurrent = map[string]string{
 	"team09-learning-guard-gmp-bad": "born at 1.1 (docs/18 WS-I I2, swarm team 09)",
 	"machinery-learning-guard":      "born at 1.1 (docs/18 WS-I I2, swarm team 09)",
 	"machinery-learning-guard-bad":  "born at 1.1 (docs/18 WS-I I2, swarm team 09)",
+	// ADR-105: the containment and continuity pairs use schema 1.3 facts (model_artifact, isolation groups,
+	// kill_switch_identity, debug interfaces) that no earlier version can hold.
+	"soc-containment":            "born at 1.3 (ADR-105)",
+	"soc-containment-bad":        "born at 1.3 (ADR-105)",
+	"edge-fleet-containment":     "born at 1.3 (ADR-105)",
+	"edge-fleet-containment-bad": "born at 1.3 (ADR-105)",
+	"water-dispatch":             "born at 1.3 (ADR-105)",
+	"water-dispatch-bad":         "born at 1.3 (ADR-105)",
 }
 
 // TestEveryGoldenModelHasAPair keeps the pairs complete and the golden set at the current version:

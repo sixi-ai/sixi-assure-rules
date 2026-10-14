@@ -12,6 +12,8 @@ var NodeTypes = []string{"user", "external_party", "edge_device", "edge_gateway"
 	// ADR-047 §3 (schema 1.1): agent memory, a registry of agents or servers, a credential broker
 	// (token vault) and an A2A peer outside the organisation's control.
 	"agent_memory", "agent_registry", "credential_broker", "external_agent",
+	// ADR-105 (schema 1.3): stored model weights or a model registry.
+	"model_artifact",
 	"note"}
 
 // NoteTones lists the attrs.tone values of a note (ADR-081); absent means neutral.
@@ -89,7 +91,20 @@ var Encryptions = []string{"tls", "mtls", "none", "unknown"}
 // (docs/02 §3). They are what the architect states the component is able to do, which is
 // what the agentic rule pack reasons over; nothing here is observed from a running system.
 var Capabilities = []string{"executes_code", "reads_filesystem", "queries_database", "network_egress",
-	"sends_message", "modifies_state", "reads_secrets", "deserializes_input"}
+	"sends_message", "modifies_state", "reads_secrets", "deserializes_input",
+	// ADR-105 (schema 1.3): what lets an agent spread (SelfPropagationCapabilities) and move weights.
+	"provisions_compute", "deploys_code", "creates_identity", "spawns_agents", "transfers_model_artifact"}
+
+// SelfPropagationCapabilities are the capabilities through which an agent acquires more of itself:
+// compute, deployed code, identities or other agents (ADR-105, CTN-001).
+var SelfPropagationCapabilities = []string{"provisions_compute", "deploys_code", "creates_identity", "spawns_agents"}
+
+// AgentRoles lists agent attrs.agent_role values (schema 1.3, ADR-105); security_operations marks a
+// defensive agent.
+var AgentRoles = []string{"", "business", "security_operations", "it_operations"}
+
+// DebugInterfaces lists edge-device attrs.debug_interface values (schema 1.3, ADR-105).
+var DebugInterfaces = []string{"", "none", "adb", "ssh", "telnet", "jtag", "serial", "other"}
 
 // Integrities lists node.attrs.integrity values: how a tool or MCP server definition is fixed
 // against later change (docs/03 AGT-004).
@@ -114,7 +129,9 @@ var GroupKinds = []string{"zone", "trust_boundary", "region", "subscription", "s
 	"tenant", "jurisdiction",
 	// ADR-093 FS-06 (schema 1.2): the executors of one workflow (MAF, ADK, CrewAI flows), with its
 	// loop bound and checkpointing as group attributes.
-	"workflow"}
+	"workflow",
+	// ADR-105 (schema 1.3): where a compromised component is moved or cut off to (quarantine).
+	"isolation"}
 
 // Regimes lists regime pack codes (docs/04).
 var Regimes = []string{"FINMA", "CH-CO", "FADP", "CH-ISG", "DORA", "AIACT", "CRA", "NIS2", "ISO", "MCSB", "NIST", "IEC", "OWASP", "MAESTRO", "MSFT", "FDA", "EU-GMP", "MR", "GAMP", "GDPR", "OSFI", "CSA"}

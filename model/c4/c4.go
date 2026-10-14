@@ -300,6 +300,9 @@ func kindOf(nodeType string) string {
 		return KindIdentity
 	case "gateway", "dmz", "edge_gateway", "data_diode":
 		return KindGateway
+	case "model_artifact":
+		// ADR-105 (schema 1.3): stored weights are data the system holds.
+		return KindDataStore
 	case "agent_registry", "credential_broker":
 		// ADR-047 §5: registries and credential brokers are containers the agents depend on.
 		return KindContainer

@@ -1,0 +1,38 @@
+[
+  {
+    "rule_id": "CTN-005",
+    "ids": [
+      "n_weights"
+    ]
+  },
+  {
+    "rule_id": "EDG-001",
+    "ids": [
+      "n_cam2"
+    ]
+  },
+  {
+    "rule_id": "EDG-002",
+    "ids": [
+      "n_vib3"
+    ]
+  },
+  {
+    "rule_id": "EDG-003",
+    "ids": [
+      "n_retro"
+    ]
+  },
+  {
+    "rule_id": "EDG-004",
+    "ids": [
+      "e_cam2_vib3"
+    ]
+  },
+  {
+    "rule_id": "EDG-005",
+    "ids": [
+      "n_egw"
+    ]
+  }
+]

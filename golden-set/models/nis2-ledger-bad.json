@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "id": "arch_gs_nis2_ledger_bad",
   "tenant_id": "tenant_templates",
   "name": "Dispatch system under NIS2 (bad twin)",
