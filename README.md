@@ -1,7 +1,7 @@
 # Sixi Assure Rules
 
 The deterministic rule packs, the regulatory corpus and the typed-model schema behind
-[Sixi Assure](https://sixi.ai), extracted so they can be read, checked and argued with.
+Sixi Assure, extracted so they can be read, checked and argued with.
 
 An architecture is a typed graph: nodes (users, apps, agents, LLM endpoints, tools, datastores,
 gateways, edge devices, machines, log sinks …), edges with a kind, an auth mode and an encryption
@@ -19,13 +19,13 @@ Three properties hold throughout, and they are the reason this repository exists
 3. **It assesses and evidences; it never certifies.** No output of this engine says *compliant*,
    *certified*, *guaranteed* or *confirmed*.
 
-The product at https://sixi.ai runs this same engine: the canvas, the exports and the assistant are
+The Sixi Assure product runs this same engine: the canvas, the exports and the assistant are
 projections of the same typed model, and the assistant may only *propose* patches a person accepts.
 This repository is a synced snapshot of the engine and its data; the product repository is the
 source of truth.
 
-**Today: 88 rules in 16 packs, grouped into 19 causes · 383 clause records across 23 regimes ·
-14 golden models with expected findings · 180 rule fixtures.**
+**Today: 287 rules in 37 packs, grouped into 32 causes · 459 clause records across 24 regimes ·
+56 golden models with expected findings · 631 rule fixtures.**
 
 Related, and a different job: [`rbrus/sixi-scanner`](https://github.com/rbrus/sixi-scanner)
 red-teams a live LLM agent endpoint, where this repository assesses the
@@ -250,4 +250,4 @@ and clause text is only ever added where its licence permits.
 
 Security reports: `SECURITY.md`, or [email removed] — please do not open a public issue.
 
-Contact: **[email removed]** · https://sixi.ai
+Contact: **[email removed]**
