@@ -73,7 +73,7 @@ at a clause; the compliance judgement belongs to the organisation and its regula
 
 ## Security
 
-Do not open a public issue for a vulnerability. See `SECURITY.md` — report to **[email removed]**.
+Do not open a public issue for a vulnerability. See `SECURITY.md` — report it privately through [GitHub's private vulnerability reporting](https://github.com/sixi-ai/sixi-assure-rules/security/advisories/new).
 
 ## Code of conduct
 
@@ -86,4 +86,4 @@ in the private Sixi Assure product repository and mirrored here after each relea
 request is reviewed here and merged upstream, then reappears in the next sync. That is also why a
 merged change may land with a different commit hash.
 
-Questions: **[email removed]**.
+Questions: [open an issue](https://github.com/sixi-ai/sixi-assure-rules/issues).

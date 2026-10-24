@@ -27,5 +27,5 @@ A secret scanner will still flag them, because that is exactly what they are des
 the detection patterns themselves, including prefixes such as `AIza` and `AKIA`) and the tests that
 use them. If you run a different scanner, allowlist the same paths.
 
-If you believe a fixture here is a real credential, please report it to [email removed] rather than
+If you believe a fixture here is a real credential, please report it privately through [GitHub's private vulnerability reporting](https://github.com/sixi-ai/sixi-assure-rules/security/advisories/new) rather than
 opening a public issue (`SECURITY.md`).

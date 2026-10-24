@@ -248,6 +248,6 @@ that is wrong or out of date, a missing helper, a fixture that proves a gap. Ple
 [DCO](https://developercertificate.org/) sign-off (`git commit -s`), rules must ship both fixtures,
 and clause text is only ever added where its licence permits.
 
-Security reports: `SECURITY.md`, or [email removed] — please do not open a public issue.
+Security reports: `SECURITY.md`, through [GitHub's private vulnerability reporting](https://github.com/sixi-ai/sixi-assure-rules/security/advisories/new) — please do not open a public issue.
 
-Contact: **[email removed]**
+Contact: [GitHub Issues](https://github.com/sixi-ai/sixi-assure-rules/issues)

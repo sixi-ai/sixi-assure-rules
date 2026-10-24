@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Email **[email removed]** with `SECURITY` in the subject. Please do not open a public issue, a
+Report it privately through [GitHub's private vulnerability reporting](https://github.com/sixi-ai/sixi-assure-rules/security/advisories/new) (Security → Report a vulnerability). Please do not open a public issue, a
 discussion or a pull request for a vulnerability.
 
 Include what you have: the affected file or command, the version or commit, a model or pack that
@@ -51,4 +51,4 @@ model, no heuristic and no language model in this repository.
 
 The `main` branch is supported. Fixes land there and are mirrored from the product repository.
 
-Contact: **[email removed]**
+Contact: [private vulnerability report](https://github.com/sixi-ai/sixi-assure-rules/security/advisories/new)
